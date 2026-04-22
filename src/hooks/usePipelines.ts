@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { listPipelines, fetchLatestPipeline } from '@/api/seki'
 import type { PipelineStatusResponse } from '@/api/seki.type'
+import { SEKI_CONFIG } from '@/config/seki'
 
 interface UsePipelinesOptions {
   product: string
@@ -31,6 +32,7 @@ export function usePipelines({
     },
     enabled: enabled && !!product,
     placeholderData: (previousData) => previousData,
+    refetchInterval: SEKI_CONFIG.refetchInterval,
   })
 }
 
@@ -53,5 +55,6 @@ export function useLatestPipeline({
       )
     },
     enabled: enabled && !!product,
+    refetchInterval: SEKI_CONFIG.refetchInterval,
   })
 }

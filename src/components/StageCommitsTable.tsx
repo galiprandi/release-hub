@@ -1,6 +1,8 @@
 import { type GitCommit, useGitCommits } from "@/hooks/useGitCommits";
 import { type GitTag, useGitTags } from "@/hooks/useGitTags";
 import { DisplayInfo } from "./DislpayInfo";
+import { CommitLink } from "./CommitLink";
+import { TagLink } from "./TagLink";
 
 // Compare semantic versions (e.g., v2.0.7 > v1.0.24)
 function compareVersions(a: string, b: string): number {
@@ -78,14 +80,7 @@ export function StageCommitsTable({
 							commits?.map((c: GitCommit) => (
 								<tr key={c.hash} className="border-t hover:bg-muted/50">
 									<td className="px-4 py-3">
-										<a
-											href={`https://github.com/${org}/${product}/commit/${c.hash}`}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="font-mono text-xs hover:text-primary"
-										>
-											{c.hash.slice(0, 7)}
-										</a>
+										<CommitLink hash={c.hash} org={org} repo={product} />
 									</td>
 									<td className="px-4 py-3 text-muted-foreground">
 										<DisplayInfo value={c.date} type="dates" />
@@ -109,14 +104,7 @@ export function StageCommitsTable({
 								.map((t: GitTag) => (
 									<tr key={t.name} className="border-t hover:bg-muted/50">
 										<td className="px-4 py-3">
-											<a
-												href={`https://github.com/${org}/${product}/releases/tag/${t.name}`}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="font-mono text-xs hover:text-primary"
-											>
-												{t.name}
-											</a>
+											<TagLink tagName={t.name} org={org} repo={product} />
 										</td>
 										<td className="px-4 py-3 text-muted-foreground">
 											<DisplayInfo value={t.date} type="dates" />

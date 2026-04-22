@@ -118,7 +118,7 @@ export function CreateTagDialog({ latestTag, repo, product, commit, canCreateTag
 						className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
 					>
 						<Plus className="w-3 h-3" />
-						Nuevo Tag
+						Tag
 					</button>
 				</Dialog.Trigger>
 			) : (
@@ -129,7 +129,7 @@ export function CreateTagDialog({ latestTag, repo, product, commit, canCreateTag
 					title={isLoadingPermissions ? "Verificando permisos..." : canCreateTags === false ? "No tienes permisos para crear tags en este repositorio" : "Verificando permisos..."}
 				>
 					<Plus className="w-3 h-3" />
-					Nuevo Tag
+					Tag
 				</button>
 			)}
 			<Dialog.Portal>

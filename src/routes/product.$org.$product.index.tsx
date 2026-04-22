@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { SekiMonitor } from "@/components/SekiMonitor/SekiMonitor";
 import { StageCommitsTable } from "@/components/StageCommitsTable";
 import { CreateTagDialog } from "@/components/CreateTagDialog";
+import { DiffDialog } from "@/components/DiffDialog";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTags } from "@/hooks/useGitTags";
 import { usePipeline, usePipelineWithTag } from "@/hooks/usePipeline";
@@ -151,21 +152,29 @@ function ProductIndex() {
 							</button>
 						</div>
 						{activeStage === "production" && (
-							<CreateTagDialog
-								latestTag={latestTag?.name}
-								repo={fullProduct}
-								product={fullProduct}
-								commit={latestCommit?.hash}
-								canCreateTags={canCreateTags}
-								isLoadingPermissions={isLoadingPermissions}
-								onSuccess={() => {
-									// Invalidate queries after creating a new one
-									queryClient.invalidateQueries({ queryKey: ['git', 'tags', fullProduct] });
-									queryClient.invalidateQueries({ queryKey: ['repo', 'permission', fullProduct] });
-									// Keep active stage as production
-									setActiveStage('production');
-								}}
-							/>
+							<div className="flex items-center gap-2">
+								{latestTag?.name && (
+									<DiffDialog
+										repo={fullProduct}
+										currentTag={latestTag?.name}
+									/>
+								)}
+								<CreateTagDialog
+									latestTag={latestTag?.name}
+									repo={fullProduct}
+									product={fullProduct}
+									commit={latestCommit?.hash}
+									canCreateTags={canCreateTags}
+									isLoadingPermissions={isLoadingPermissions}
+									onSuccess={() => {
+										// Invalidate queries after creating a new one
+										queryClient.invalidateQueries({ queryKey: ['git', 'tags', fullProduct] });
+										queryClient.invalidateQueries({ queryKey: ['repo', 'permission', fullProduct] });
+										// Keep active stage as production
+										setActiveStage('production');
+									}}
+								/>
+							</div>
 						)}
 					</div>
 					<StageCommitsTable

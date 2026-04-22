@@ -1,12 +1,12 @@
-# Seki Web - Arquitectura
+# Repo Dash - Arquitectura
 
 ## Resumen
 
-Seki Web es una aplicación React que permite visualizar y gestionar pipelines de CI/CD y repositorios de GitHub. La arquitectura combina el uso de la API Seki con comandos locales ejecutados en la máquina del usuario.
+Repo Dash es una aplicación React que permite visualizar y gestionar pipelines de CI/CD y repositorios de GitHub. La arquitectura combina el uso de la API con comandos locales ejecutados en la máquina del usuario.
 
 ## Componentes Principales
 
-### 1. Seki API (Backend)
+### 1. API (Backend)
 
 - **URL**: `https://seki-bff-api.cencosudx.com`
 - **Uso**: Obtiene información de pipelines, eventos y estados de despliegue
@@ -42,7 +42,7 @@ Ubicados en `vite.config.ts`:
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   React App     │────▶│   Vite Proxy     │────▶│   Seki API      │
+│   React App     │────▶│   Vite Proxy     │────▶│   API           │
 │                 │     │                  │     │                 │
 │  - Dashboard    │     │  - /api/repos/*  │     │  - Pipelines    │
 │  - RepoSearch   │     │  - /api/git      │     │  - Events       │

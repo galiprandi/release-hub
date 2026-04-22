@@ -1,10 +1,11 @@
 import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
+import { useInfiniteQuery } from "@tanstack/react-query"
 import * as Dialog from "@radix-ui/react-dialog"
 import { GitCompare, X, Loader2, GitBranch } from "lucide-react"
 import { runCommand } from "@/api/exec"
 import { CommitLink } from "./CommitLink"
 import { DisplayInfo } from "./DislpayInfo"
+import { RefetchButton } from "./ui/RefetchButton"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import "dayjs/locale/es"
@@ -21,15 +22,27 @@ export function DiffDialog({ repo, currentTag }: DiffDialogProps) {
 	const [open, setOpen] = useState(false)
 	const [org, product] = repo.split("/")
 
-	const { data: diffCommits, isLoading, error } = useQuery({
+	const { data, isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage, refetch, dataUpdatedAt } = useInfiniteQuery({
 		queryKey: ["git", "diff", repo, currentTag],
-		queryFn: async () => {
+		queryFn: async ({ pageParam = 0 }) => {
+			const page = pageParam as number
+			const perPage = 15
 			const result = await runCommand(`gh api repos/${repo}/compare/${currentTag}...main`)
 			const data = JSON.parse(result.stdout)
-			return data.commits || []
+			const allCommits = data.commits || []
+			// Paginación local: retornar solo los commits de la página actual
+			return allCommits.slice(page * perPage, (page + 1) * perPage)
+		},
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages) => {
+			// Si la última página tiene menos de 15 commits o es undefined, no hay más páginas
+			if (!lastPage || lastPage.length < 15) return undefined
+			return allPages.length
 		},
 		enabled: open && !!currentTag,
 	})
+
+	const diffCommits = data?.pages.flat()
 
 	return (
 		<Dialog.Root open={open} onOpenChange={setOpen}>
@@ -45,19 +58,30 @@ export function DiffDialog({ repo, currentTag }: DiffDialogProps) {
 			<Dialog.Portal>
 				<Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
 				<Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-4xl max-h-[80vh] bg-background rounded-lg shadow-lg border p-6 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] overflow-hidden flex flex-col">
+					<Dialog.Description className="sr-only">
+						Ver los commits que están en main pero no en {currentTag}
+					</Dialog.Description>
 					<div className="flex items-center justify-between mb-4 flex-shrink-0">
 						<Dialog.Title className="text-lg font-semibold flex items-center gap-2">
 							Diferencia main <GitBranch className="w-4 h-4" /> {currentTag} ({diffCommits?.length || 0} commits)
 						</Dialog.Title>
-						<Dialog.Close asChild>
-							<button
-								type="button"
-								className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
-							>
-								<X className="w-4 h-4" />
-								<span className="sr-only">Cerrar</span>
-							</button>
-						</Dialog.Close>
+						<div className="flex items-center gap-2">
+							<RefetchButton
+								onRefetch={() => refetch()}
+								isRefetching={isLoading || isFetchingNextPage}
+								showFeedback={true}
+								targetTime={dataUpdatedAt}
+							/>
+							<Dialog.Close asChild>
+								<button
+									type="button"
+									className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+								>
+									<X className="w-4 h-4" />
+									<span className="sr-only">Cerrar</span>
+								</button>
+							</Dialog.Close>
+						</div>
 					</div>
 
 					{isLoading && (
@@ -76,37 +100,52 @@ export function DiffDialog({ repo, currentTag }: DiffDialogProps) {
 					)}
 
 					{diffCommits && diffCommits.length > 0 ? (
-						<div className="overflow-hidden border rounded-lg flex-1">
-							<table className="w-full text-sm" style={{ tableLayout: 'fixed' }}>
-								<thead className="bg-muted">
-									<tr>
-										<th className="px-3 py-2 text-left font-medium w-[15%]">Hash</th>
-										<th className="px-3 py-2 text-left font-medium w-[15%]">Fecha</th>
-										<th className="px-3 py-2 text-left font-medium w-[20%]">Autor</th>
-										<th className="px-3 py-2 text-left font-medium w-[50%]">Mensaje</th>
-									</tr>
-								</thead>
-								<tbody>
-									{diffCommits.map((commit: { sha: string; commit: { message: string; author: { name: string; date: string } }; author?: { login: string } }) => (
-										<tr key={commit.sha} className="border-t hover:bg-muted/50">
-											<td className="px-3 py-2 w-[15%]">
-												<CommitLink hash={commit.sha} org={org} repo={product} />
-											</td>
-											<td className="px-3 py-2 text-muted-foreground w-[15%]">
-												{dayjs(commit.commit.author.date).fromNow()}
-											</td>
-											<td className="px-3 py-2 w-[20%]">
-												<DisplayInfo value={commit.author?.login || commit.commit.author.name} type="author" maxChar={30} />
-											</td>
-											<td className="px-3 py-2 w-[50%]">
-												<div className="truncate text-muted-foreground" title={commit.commit.message.split('\n')[0]}>
-													{commit.commit.message.split('\n')[0]}
-												</div>
-											</td>
+						<div className="flex flex-col flex-1 overflow-hidden">
+							<div className="overflow-hidden border rounded-lg flex-1">
+								<table className="w-full text-sm" style={{ tableLayout: 'fixed' }}>
+									<thead className="bg-muted">
+										<tr>
+											<th className="px-3 py-2 text-left font-medium w-[15%]">Hash</th>
+											<th className="px-3 py-2 text-left font-medium w-[15%]">Fecha</th>
+											<th className="px-3 py-2 text-left font-medium w-[20%]">Autor</th>
+											<th className="px-3 py-2 text-left font-medium w-[50%]">Mensaje</th>
 										</tr>
-									))}
-								</tbody>
-							</table>
+									</thead>
+									<tbody>
+										{diffCommits.map((commit: { sha: string; commit: { message: string; author: { name: string; date: string } }; author?: { login: string } }) => (
+											<tr key={commit.sha} className="border-t hover:bg-muted/50">
+												<td className="px-3 py-2 w-[15%]">
+													<CommitLink hash={commit.sha} org={org} repo={product} />
+												</td>
+												<td className="px-3 py-2 text-muted-foreground w-[15%]">
+													{dayjs(commit.commit.author.date).fromNow()}
+												</td>
+												<td className="px-3 py-2 w-[20%]">
+													<DisplayInfo value={commit.author?.login || commit.commit.author.name} type="author" maxChar={30} />
+												</td>
+												<td className="px-3 py-2 w-[50%]">
+													<div className="truncate text-muted-foreground" title={commit.commit.message.split('\n')[0]}>
+														{commit.commit.message.split('\n')[0]}
+													</div>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+							{hasNextPage && !isLoading && (
+								<div className="mt-3 flex justify-center">
+									<button
+										type="button"
+										onClick={() => fetchNextPage()}
+										disabled={isFetchingNextPage}
+										className="flex items-center gap-2 px-4 py-2 text-sm bg-background hover:bg-accent hover:text-accent-foreground rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+									>
+										{isFetchingNextPage && <Loader2 className="w-4 h-4 animate-spin" />}
+										{isFetchingNextPage ? "Cargando..." : "Ver más"}
+									</button>
+								</div>
+							)}
 						</div>
 					) : (
 						<div className="text-sm text-muted-foreground py-4 flex-shrink-0">

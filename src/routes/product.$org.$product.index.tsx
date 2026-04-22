@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2, RefreshCw } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es";
@@ -9,12 +9,12 @@ import { SekiMonitor } from "@/components/SekiMonitor/SekiMonitor";
 import { StageCommitsTable } from "@/components/StageCommitsTable";
 import { CreateTagDialog } from "@/components/CreateTagDialog";
 import { DiffDialog } from "@/components/DiffDialog";
+import { RefetchButton } from "@/components/ui/RefetchButton";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTags } from "@/hooks/useGitTags";
 import { usePipeline, usePipelineWithTag } from "@/hooks/usePipeline";
 import { useToken } from "@/hooks/useToken";
 import { useRepoPermission } from "@/hooks/useUserRepos";
-import { SEKI_CONFIG } from "@/config/seki";
 
 dayjs.extend(relativeTime);
 dayjs.locale("es");
@@ -62,32 +62,8 @@ function ProductIndex() {
 	const pipeline = isStaging ? stagingPipeline.data : prodPipeline.data;
 	const isPipelineLoading = isStaging ? stagingPipeline.isLoading : prodPipeline.isLoading;
 	const isPipelineFetching = isStaging ? stagingPipeline.isFetching : prodPipeline.isFetching;
+	const currentPipeline = isStaging ? stagingPipeline : prodPipeline;
 	const dataUpdatedAt = isStaging ? stagingPipeline.dataUpdatedAt : prodPipeline.dataUpdatedAt;
-
-	// Cuenta regresiva hasta la próxima actualización
-	const [timeUntilNextUpdate, setTimeUntilNextUpdate] = useState<string>("");
-
-	useEffect(() => {
-		if (!dataUpdatedAt) return;
-
-		const updateCountdown = () => {
-			const now = Date.now();
-			const nextUpdate = dataUpdatedAt + SEKI_CONFIG.refetchInterval;
-			const remaining = Math.max(0, nextUpdate - now);
-
-			if (remaining === 0) {
-				setTimeUntilNextUpdate("Actualizando...");
-			} else {
-				const seconds = Math.floor(remaining / 1000);
-				setTimeUntilNextUpdate(`${seconds}s`);
-			}
-		};
-
-		updateCountdown();
-		const interval = setInterval(updateCountdown, 1000);
-
-		return () => clearInterval(interval);
-	}, [dataUpdatedAt]);
 
 	// Usar fecha del commit/tag para consistencia con la tabla
 	const gitDate = isStaging ? latestCommit?.date : latestTag?.date;
@@ -142,14 +118,12 @@ function ProductIndex() {
 					) : (
 						<div className="space-y-2 mb-10">
 							<div className="flex justify-between items-center gap-4 px-4">
-								<div className="flex items-center gap-2 text-xs text-muted-foreground">
-									<RefreshCw className="w-3 h-3" />
-									{timeUntilNextUpdate && (
-										<span className="text-foreground">
-											{timeUntilNextUpdate}
-										</span>
-									)}
-								</div>
+								<RefetchButton
+									onRefetch={() => currentPipeline.refetch()}
+									isRefetching={isPipelineFetching}
+									showFeedback={true}
+									targetTime={dataUpdatedAt}
+								/>
 								<div className="flex items-center gap-2">
 									{expirationDate && (
 										<p className="text-xs text-muted-foreground">

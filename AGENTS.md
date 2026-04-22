@@ -1,8 +1,8 @@
-# Repo Dash - Arquitectura y Guía de Desarrollo
+# ReleaseHub - Architecture and Development Guide
 
-## Resumen
+## Summary
 
-Repo Dash es una aplicación React que permite visualizar y gestionar pipelines de CI/CD y repositorios de GitHub. La arquitectura combina el uso de la API de Seki con operaciones remotas vía GitHub CLI, evitando operaciones locales de git.
+ReleaseHub is a React application for visualizing and managing CI/CD pipelines and GitHub repositories. The architecture combines a CI/CD API with remote operations via GitHub CLI, avoiding local git operations.
 
 ## Stack Tecnológico
 
@@ -12,7 +12,7 @@ Repo Dash es una aplicación React que permite visualizar y gestionar pipelines 
 - **UI Components**: shadcn/ui + TailwindCSS
 - **Iconos**: Lucide React
 - **APIs**:
-  - Seki API: `https://seki-bff-api.cencosudx.com` (pipelines, eventos)
+  - CI/CD API: pipelines and deployment events
   - GitHub API: via GitHub CLI (`gh api`)
 - **CLI Tools**:
   - GitHub CLI (`gh`): operaciones remotas en repositorios
@@ -24,10 +24,10 @@ Repo Dash es una aplicación React que permite visualizar y gestionar pipelines 
 src/
 ├── api/
 │   ├── exec.ts          # Ejecución de comandos locales
-│   ├── seki.ts          # Cliente de API de Seki
-│   └── seki.type.ts     # Tipos de Seki
+│   ├── pipeline.ts      # CI/CD API client
+│   └── pipeline.type.ts # CI/CD types
 ├── components/
-│   ├── SekiMonitor/     # Monitor de pipelines
+│   ├── PipelineMonitor/ # Pipeline monitor component
 │   ├── ui/              # Componentes shadcn/ui
 │   ├── CommitAuthor.tsx # Display de autor de commit
 │   ├── CreateTagDialog.tsx # Diálogo para crear tags
@@ -57,8 +57,8 @@ src/
 
 ## Componentes Principales
 
-### 1. SekiMonitor
-- **Propósito**: Visualizar estado de pipelines de CI/CD
+### 1. PipelineMonitor
+- **Purpose**: Visualize CI/CD pipeline status
 - **Props**: `pipeline` (datos), `stage` (staging/production)
 - **Características**:
   - Altura fija de 82px
@@ -122,23 +122,23 @@ src/
   - Información de autor y fecha
 
 ### usePipeline / usePipelineWithTag
-- **Propósito**: Obtener datos de pipelines de Seki
-- **Uso**: API de Seki con token JWT
-- **Tokens**: Token Seki almacenado en localStorage
+- **Purpose**: Fetch CI/CD pipeline data
+- **Usage**: CI/CD API with JWT token
+- **Tokens**: API token stored in localStorage
 
 ### useToken
-- **Propósito**: Gestión de token JWT de Seki
-- **Características**:
-  - Almacenamiento en localStorage
-  - Verificación de expiración
-  - Funciones `saveToken`, `clearToken`, `isExpired`, `needsToken`
+- **Purpose**: JWT token management
+- **Features**:
+  - LocalStorage persistence
+  - Expiration checking
+  - Functions: `saveToken`, `clearToken`, `isExpired`, `needsToken`
 
 ## Routing (TanStack Router)
 
 ### Rutas Principales
 - `/`: Dashboard con lista de repositorios favoritos
 - `/product/$org/$product`: Layout de producto con breadcrumb
-- `/product/$org/$product/`: Vista detalle con commits/tags y monitor Seki
+- `/product/$org/$product/`: Detail view with commits/tags and pipeline monitor
 
 ### Breadcrumb
 - Muestra navegación: Home → org/repo
@@ -149,7 +149,7 @@ src/
 
 ### 1. Operaciones por Repositorio
 
-⚠️ **MUY IMPORTANTE**: Repo Dash trabaja con múltiples repositorios simultáneamente. Todas las operaciones deben cumplir estas reglas:
+⚠️ **IMPORTANT**: ReleaseHub works with multiple repositories simultaneously. Todas las operaciones deben cumplir estas reglas:
 
 1. **Operaciones remotas únicamente**: TODAS las operaciones (crear tags, obtener commits, etc.) deben hacerse vía API de GitHub o GitHub CLI (`gh`). NUNCA usar comandos `git` locales que requieran estar en el directorio del repo (ej: `git tag`, `git push`, `git commit`).
 
@@ -324,16 +324,16 @@ export function NewComponent({ data, onAction }: NewComponentProps) {
 2. Usar `createFileRoute` con parámetros si es necesario
 3. Agregar breadcrumb si es una vista de producto
 
-## Requisitos Locales
+## Local Requirements
 
-Para desarrollo completo:
+For full development:
 1. **Node.js** (v18+)
-2. **Git** instalado
-3. **GitHub CLI** (`gh`) instalado y autenticado:
+2. **Git** installed
+3. **GitHub CLI** (`gh`) installed and authenticated:
    ```bash
    gh auth login
    ```
-4. **Acceso** a repositorios GitHub de Cencosud
+4. **Access** to your GitHub repositories
 
 ## Comandos Útiles
 
@@ -362,9 +362,9 @@ gh api repos/org/repo/commits --jq '.[] | {sha: .sha, message: .message}'
 
 ## Troubleshooting Común
 
-### Error: 401 Unauthorized en GitHub API
-- **Causa**: Usando token incorrecto (Seki token en lugar de gh token)
-- **Solución**: Usar `gh auth token` para obtener token de GitHub CLI
+### Error: 401 Unauthorized on GitHub API
+- **Cause**: Using wrong token (API token instead of gh token)
+- **Solution**: Use `gh auth token` to get GitHub CLI token
 
 ### Error: Permisos nulos
 - **Causa**: Usando `viewerPermission` cuando debería usar `permissions`

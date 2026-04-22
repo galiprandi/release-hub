@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Loader2, Star } from "lucide-react";
+import { Loader2, Star, Github } from "lucide-react";
 import { DisplayInfo } from "@/components/DislpayInfo";
+import { CommitLink } from "@/components/CommitLink";
+import { TagLink } from "@/components/TagLink";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTagsSimple } from "@/hooks/useGitTagsSimple";
@@ -24,7 +26,7 @@ function Dashboard() {
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center justify-between">
-				<h1 className="text-2xl font-bold">Favoritos</h1>
+				<h1 className="text-lg font-bold">Favoritos</h1>
 			</div>
 
 			{/* Favorites Table */}
@@ -125,14 +127,25 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 					</div>
 				</td>
 				<td className="px-4 py-3 text-center">
-					<button
-						type="button"
-						onClick={() => onToggleFavorite(repo.fullName)}
-						className={`${isFavorite ? "text-yellow-500" : "text-muted-foreground"} hover:text-yellow-600`}
-						title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
-					>
-						<Star className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
-					</button>
+					<div className="flex items-center justify-center gap-2">
+						<a
+							href={`https://github.com/${org}/${name}`}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-muted-foreground hover:text-primary"
+							title="Ver en GitHub"
+						>
+							<Github className="w-5 h-5" />
+						</a>
+						<button
+							type="button"
+							onClick={() => onToggleFavorite(repo.fullName)}
+							className={`${isFavorite ? "text-yellow-500" : "text-muted-foreground"} hover:text-yellow-600`}
+							title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+						>
+							<Star className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
+						</button>
+					</div>
 				</td>
 			</tr>
 		);
@@ -151,14 +164,10 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 				</Link>
 			</td>
 			<td className="px-4 py-3">
-				<div className="flex items-center gap-1 text-sm font-mono">
-					<DisplayInfo type="tag" value={latestTag?.name} />
-				</div>
+				{latestTag?.name && <TagLink tagName={latestTag.name} org={org} repo={name} />}
 			</td>
 			<td className="px-4 py-3">
-				<div className="flex items-center gap-1 text-sm font-mono">
-					<DisplayInfo type="commit" value={commitShortHash} />
-				</div>
+				{commitShortHash && <CommitLink hash={commitShortHash} org={org} repo={name} />}
 			</td>
 			<td className="px-4 py-3 text-sm text-muted-foreground">
 				<div className="flex items-center gap-1">
@@ -169,14 +178,25 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 				<DisplayInfo type="author" value={commitAuthor} maxChar={20} />
 			</td>
 			<td className="px-4 py-3 text-center">
-				<button
-					type="button"
-					onClick={() => onToggleFavorite(repo.fullName)}
-					className={`${isFavorite ? "text-yellow-500" : "text-muted-foreground"} hover:text-yellow-600`}
-					title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
-				>
-					<Star className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
-				</button>
+				<div className="flex items-center justify-center gap-2">
+					<a
+						href={`https://github.com/${org}/${name}`}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="text-muted-foreground hover:text-primary"
+						title="Ver en GitHub"
+					>
+						<Github className="w-5 h-5" />
+					</a>
+					<button
+						type="button"
+						onClick={() => onToggleFavorite(repo.fullName)}
+						className={`${isFavorite ? "text-yellow-500" : "text-muted-foreground"} hover:text-yellow-600`}
+						title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+					>
+						<Star className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
+					</button>
+				</div>
 			</td>
 		</tr>
 	);

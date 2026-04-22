@@ -1,5 +1,6 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { Github } from "lucide-react";
 import { RepoSearch } from "@/components/RepoSearch";
 import { useGitUser } from "@/hooks/useGitUser";
 
@@ -63,8 +64,9 @@ export const Route = createRootRoute({
 			<div className="min-h-screen bg-background">
 				<header className="border-b px-4 py-3">
 					<div className="flex items-center justify-between">
-						<Link to="/" className="text-xl font-bold hover:text-primary">
-							Repo Dash
+						<Link to="/" className="text-2xl font-bold hover:text-primary flex items-center gap-2">
+							<Github className="w-6 h-6" />
+							ReleaseHub
 						</Link>
 						<div className="flex items-center gap-4">
 							<RepoSearch />

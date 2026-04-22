@@ -1,11 +1,11 @@
-# Repo Dash
+# ReleaseHub
 
-Web application for visualizing CI/CD pipelines from the Seki ecosystem (Cencosud-xlabs).
+Web application for visualizing CI/CD pipelines and managing GitHub releases.
 
 ## Features
 
 - Real-time pipeline status visualization
-- Integration with Seki BFF API
+- Integration with CI/CD API
 - Modern UI with Tailwind CSS and shadcn/ui components
 - Routing with TanStack Router
 - Server state management with TanStack Query
@@ -31,12 +31,6 @@ Web application for visualizing CI/CD pipelines from the Seki ecosystem (Cencosu
    ```bash
    npm install
    ```
-3. Copy environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-4. Configure `VITE_SEKI_API_URL` and `VITE_SEKI_API_TOKEN` in `.env`
-
 ## Available Scripts
 
 | Command | Description |
@@ -59,4 +53,4 @@ src/
 
 ## License
 
-Private project - Cencosud-xlabs
+MIT License

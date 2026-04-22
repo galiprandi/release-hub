@@ -120,7 +120,8 @@ export function useGitTags({
 				.slice(0, limit);
 		},
 		enabled: enabled && !!repo,
-		staleTime: 5 * 60 * 1000,
+		staleTime: 30 * 60 * 1000, // 30 minutos - tags históricos no cambian frecuentemente
+		gcTime: 60 * 60 * 1000, // 1 hora - mantener en cache por más tiempo
 	});
 
 	const latestTag = tags?.[0];

@@ -45,12 +45,13 @@ export function useGitCommits({
 						return null;
 					}
 				})
-				.filter(Boolean);
+				.filter(Boolean) as GitCommit[];
 
 			return allCommits.slice(0, limit);
 		},
 		enabled: enabled && !!repo,
-		staleTime: 5 * 60 * 1000,
+		staleTime: 30 * 60 * 1000, // 30 minutos - commits históricos no cambian frecuentemente
+		gcTime: 60 * 60 * 1000, // 1 hora - mantener en cache por más tiempo
 	});
 
 	const latestCommit = commits?.[0];

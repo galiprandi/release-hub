@@ -11,7 +11,7 @@ import {
 import { MiniTimeline } from "./MiniTimeline";
 import type { MetaPart, SekiMonitorProps } from "./types";
 
-export function SekiMonitor({ pipeline, stage }: SekiMonitorProps) {
+export function SekiMonitor({ pipeline, stage, gitDate }: SekiMonitorProps) {
 	if (!pipeline) {
 		return (
 			<div className="bg-card border rounded-xl p-4 h-[82px] flex items-center justify-center">
@@ -22,12 +22,14 @@ export function SekiMonitor({ pipeline, stage }: SekiMonitorProps) {
 		);
 	}
 
-	const shortHash = pipeline.git.commit.slice(0, 7);
-	const duration = DayJS(pipeline.updated_at).from(
-		DayJS(pipeline.created_at),
-		true,
-	);
-	const lastUpdated = DayJS(pipeline.updated_at).fromNow();
+	// Mostrar tag en producción, commit hash en staging
+	const displayRef = stage === "production" && pipeline.git.ref
+		? pipeline.git.ref
+		: pipeline.git.commit.slice(0, 7);
+
+	// Usar gitDate si está disponible para consistencia con la tabla, sino usar fecha del pipeline
+	const dateToUse = gitDate || pipeline.updated_at;
+	const lastUpdated = DayJS(dateToUse).fromNow();
 	const subEvents = flattenSubEvents(pipeline.events);
 	const failedSubEvents = subEvents.filter(
 		(item) => item.sub.state === "FAILED",
@@ -52,11 +54,7 @@ export function SekiMonitor({ pipeline, stage }: SekiMonitorProps) {
 	if (lastUpdated) {
 		metaParts.push({
 			id: "time",
-			node: (
-				<span>
-					{lastUpdated} ({duration})
-				</span>
-			),
+			node: <span>{lastUpdated}</span>,
 		});
 	}
 
@@ -81,12 +79,12 @@ export function SekiMonitor({ pipeline, stage }: SekiMonitorProps) {
 				<div className="flex-1 min-w-[220px] space-y-2">
 					<div className="flex items-center gap-2">
 						<span className="font-mono text-base font-semibold text-foreground">
-							{shortHash}
+							{displayRef}
 						</span>
 						<span
 							className={`px-2 py-0.5 text-[11px] rounded-full uppercase tracking-wide ${stageStyle.badge}`}
 						>
-							{stage.toUpperCase()}
+							{stage === "staging" ? "COMMIT" : "TAG"}
 						</span>
 					</div>
 					{metaParts.length > 0 && (

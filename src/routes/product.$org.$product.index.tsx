@@ -55,6 +55,9 @@ function ProductIndex() {
 	const isPipelineLoading = isStaging ? stagingPipeline.isLoading : prodPipeline.isLoading;
 	const isPipelineFetching = isStaging ? stagingPipeline.isFetching : prodPipeline.isFetching;
 
+	// Usar fecha del commit/tag para consistencia con la tabla
+	const gitDate = isStaging ? latestCommit?.date : latestTag?.date;
+
 	const handleSaveToken = () => {
 		if (tokenInput.trim()) {
 			saveToken(tokenInput.trim());
@@ -104,7 +107,7 @@ function ProductIndex() {
 						</div>
 					) : (
 						<div className="space-y-4 mb-10">
-							<SekiMonitor pipeline={pipeline} stage={activeStage} />
+							<SekiMonitor pipeline={pipeline} stage={activeStage} gitDate={gitDate} />
 							<div className="flex justify-end items-center gap-2">
 								{expirationDate && (
 									<p className="text-xs text-muted-foreground">

@@ -3,7 +3,7 @@ import { Loader2, Star } from "lucide-react";
 import { DisplayInfo } from "@/components/DislpayInfo";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useGitCommits } from "@/hooks/useGitCommits";
-import { useGitTags } from "@/hooks/useGitTags";
+import { useGitTagsSimple } from "@/hooks/useGitTagsSimple";
 
 export const Route = createFileRoute("/")({
 	component: Dashboard,
@@ -92,21 +92,16 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 	const { latestCommit, isLoading: isLoadingCommits } = useGitCommits({
 		repo: repo.fullName,
 	});
-	const { latestTag, isLoading: isLoadingTags } = useGitTags({
+	const { latestTag, isLoading: isLoadingTags } = useGitTagsSimple({
 		repo: repo.fullName,
 	});
 
 	const commitShortHash = latestCommit?.shortHash;
 	const commitAuthor = latestCommit?.author;
 	const commitDate = latestCommit?.date;
-	const tagDate = latestTag?.date;
 
-	// Mostrar la fecha más reciente entre commit y tag
-	const latestDate = commitDate && tagDate
-		? new Date(commitDate) > new Date(tagDate)
-			? commitDate
-			: tagDate
-		: commitDate || tagDate;
+	// En el home solo usamos fecha del commit (tags simples no tienen fecha)
+	const latestDate = commitDate;
 
 	const isLoading = isLoadingCommits || isLoadingTags;
 

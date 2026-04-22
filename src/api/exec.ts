@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const apiExec = axios.create({
-  baseURL: '/api',
+  baseURL: '/local',
 })
 
 interface ExecResponse {

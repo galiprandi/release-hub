@@ -1,12 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { SekiMonitor } from "@/components/SekiMonitor/SekiMonitor";
 import { StageCommitsTable } from "@/components/StageCommitsTable";
+import { CreateTagDialog } from "@/components/CreateTagDialog";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTags } from "@/hooks/useGitTags";
 import { usePipeline, usePipelineWithTag } from "@/hooks/usePipeline";
 import { useToken } from "@/hooks/useToken";
+import { useRepoPermission } from "@/hooks/useUserRepos";
 
 export const Route = createFileRoute("/product/$org/$product/")({
 	component: ProductIndex,
@@ -15,15 +18,25 @@ export const Route = createFileRoute("/product/$org/$product/")({
 function ProductIndex() {
 	const { org, product } = Route.useParams();
 	const [activeStage, setActiveStage] = useState<"staging" | "production">(
-		"production",
+		"staging",
 	);
 	const [tokenInput, setTokenInput] = useState("");
 	const { saveToken, clearToken, isExpired, needsToken, expirationDate } = useToken();
 	const fullProduct = `${org}/${product}`;
 	const isStaging = activeStage === "staging";
+	const queryClient = useQueryClient();
 
 	const { latestCommit } = useGitCommits({ repo: fullProduct });
 	const { latestTag } = useGitTags({ repo: fullProduct });
+	const { data: repoPermission, isLoading: isLoadingPermissions } = useRepoPermission(fullProduct);
+
+	const canCreateTags =
+		repoPermission?.permissions?.push ||
+		repoPermission?.permissions?.maintain ||
+		repoPermission?.permissions?.admin ||
+		repoPermission?.viewerPermission === 'WRITE' ||
+		repoPermission?.viewerPermission === 'ADMIN' ||
+		repoPermission?.viewerCanAdminister;
 
 	const stagingPipeline = usePipeline({
 		product: fullProduct,
@@ -51,31 +64,6 @@ function ProductIndex() {
 
 	return (
 		<div>
-			{/* Environment Selector - Pill Style */}
-			<div className="flex bg-muted rounded-lg p-1 mb-10">
-				<button
-					type="button"
-					onClick={() => setActiveStage("production")}
-					className={`px-4 py-1.5 text-sm rounded-md transition-all ${
-						activeStage === "production"
-							? "bg-white shadow-sm text-foreground"
-							: "text-muted-foreground hover:text-foreground"
-					}`}
-				>
-					Production
-				</button>
-				<button
-					type="button"
-					onClick={() => setActiveStage("staging")}
-					className={`px-4 py-1.5 text-sm rounded-md transition-all ${
-						activeStage === "staging"
-							? "bg-white shadow-sm text-foreground"
-							: "text-muted-foreground hover:text-foreground"
-					}`}
-				>
-					Staging
-				</button>
-			</div>
 			{needsToken || isExpired ? (
 				<div className="mb-8 rounded-xl border border-dashed p-6 space-y-3">
 					<p className="text-sm text-muted-foreground">
@@ -115,7 +103,7 @@ function ProductIndex() {
 							</div>
 						</div>
 					) : (
-						<div className="space-y-4">
+						<div className="space-y-4 mb-10">
 							<SekiMonitor pipeline={pipeline} stage={activeStage} />
 							<div className="flex justify-end items-center gap-2">
 								{expirationDate && (
@@ -133,20 +121,58 @@ function ProductIndex() {
 							</div>
 						</div>
 					)}
+					{/* Environment Selector - Pill Style */}
+					<div className="flex bg-muted rounded-lg p-1 mb-4 items-center justify-between">
+						<div className="flex gap-2">
+							<button
+								type="button"
+								onClick={() => setActiveStage("staging")}
+								className={`px-4 py-1.5 text-sm rounded-md transition-all ${
+									activeStage === "staging"
+										? "bg-white shadow-sm text-foreground"
+										: "text-muted-foreground hover:text-foreground"
+								}`}
+							>
+								Commits
+							</button>
+							<button
+								type="button"
+								onClick={() => setActiveStage("production")}
+								className={`px-4 py-1.5 text-sm rounded-md transition-all ${
+									activeStage === "production"
+										? "bg-white shadow-sm text-foreground"
+										: "text-muted-foreground hover:text-foreground"
+								}`}
+							>
+								Tags
+							</button>
+						</div>
+						{activeStage === "production" && (
+							<CreateTagDialog
+								latestTag={latestTag?.name}
+								repo={fullProduct}
+								product={fullProduct}
+								commit={latestCommit?.hash}
+								canCreateTags={canCreateTags}
+								isLoadingPermissions={isLoadingPermissions}
+								onSuccess={() => {
+									// Invalidate queries after creating a new one
+									queryClient.invalidateQueries({ queryKey: ['git', 'tags', fullProduct] });
+									queryClient.invalidateQueries({ queryKey: ['repo', 'permission', fullProduct] });
+									// Keep active stage as production
+									setActiveStage('production');
+								}}
+							/>
+						)}
+					</div>
+					<StageCommitsTable
+						stage={activeStage}
+						org={org}
+						product={product}
+						limit={10}
+					/>
 				</>
 			)}
-			<div>
-				<br />
-				<h2 className="text-sm text-muted-foreground mb-4 uppercase tracking-wider font-medium">
-					{activeStage === "staging" ? "Recent Commits" : "Recent Tags"}
-				</h2>
-				<StageCommitsTable
-					stage={activeStage}
-					org={org}
-					product={product}
-					limit={10}
-				/>
-			</div>
 		</div>
 	);
 }

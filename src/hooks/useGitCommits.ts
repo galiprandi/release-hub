@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { runCommand } from "@/api/exec";
 
 export interface GitCommit {
 	hash: string;
@@ -24,9 +24,9 @@ export function useGitCommits({
 		queryKey: ["git", "commits", repo, limit],
 		queryFn: async () => {
 			const command = `gh api repos/${repo}/commits --paginate --jq '.[] | {hash: .sha, author: .commit.author.name, date: .commit.committer.date, message: .commit.message}'`;
-			const response = await axios.post("/api/exec", { command });
+			const response = await runCommand(command);
 
-			const lines = response.data.stdout
+			const lines = response.stdout
 				.trim()
 				.split("\n")
 				.filter((line: string) => line?.startsWith("{"));

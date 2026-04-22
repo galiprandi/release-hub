@@ -15,8 +15,29 @@ function UserAvatar() {
 		);
 	}
 
-	const initials = user?.name
-		? user.name
+	const displayName = user?.name
+		? user.name.length > 17
+			? user.name.slice(0, 17) + "..."
+			: user.name
+		: "Sin nombre";
+
+	if (user?.avatar_url) {
+		return (
+			<div className="flex items-center gap-2">
+				<img
+					src={user.avatar_url}
+					alt={displayName}
+					className="w-8 h-8 rounded-full"
+				/>
+				<span className="text-sm font-medium hidden sm:inline">
+					{displayName}
+				</span>
+			</div>
+		);
+	}
+
+	const initials = displayName
+		? displayName
 				.split(" ")
 				.map((n) => n[0])
 				.join("")
@@ -30,7 +51,7 @@ function UserAvatar() {
 				{initials}
 			</div>
 			<span className="text-sm font-medium hidden sm:inline">
-				{user?.name || "Sin nombre"}
+				{displayName}
 			</span>
 		</div>
 	);

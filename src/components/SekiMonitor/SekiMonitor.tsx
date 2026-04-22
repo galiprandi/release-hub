@@ -14,7 +14,7 @@ import type { MetaPart, SekiMonitorProps } from "./types";
 export function SekiMonitor({ pipeline, stage }: SekiMonitorProps) {
 	if (!pipeline) {
 		return (
-			<div className="bg-card border rounded-xl p-4">
+			<div className="bg-card border rounded-xl p-4 h-[82px] flex items-center justify-center">
 				<p className="text-sm text-muted-foreground">
 					No pipeline data available yet for this stage.
 				</p>
@@ -73,7 +73,7 @@ export function SekiMonitor({ pipeline, stage }: SekiMonitorProps) {
 	}
 
 	return (
-		<div className="bg-card border rounded-xl p-4 space-y-4">
+		<div className="bg-card border rounded-xl p-4 h-[82px] space-y-4">
 			<div className="flex flex-wrap items-start gap-4">
 				<div
 					className={`w-1 rounded-full self-stretch hidden sm:block ${stageStyle.accent}`}

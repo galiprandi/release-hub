@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { type GitCommit, useGitCommits } from "@/hooks/useGitCommits";
 import { type GitTag, useGitTags } from "@/hooks/useGitTags";
 import { DisplayInfo } from "./DislpayInfo";
@@ -50,11 +49,8 @@ export function StageCommitsTable({
 	const isLoading = stage === "staging" ? isLoadingCommits : isLoadingTags;
 	const isStaging = stage === "staging";
 	return (
-		<div className="p-4 border rounded-lg space-y-2">
-			<h3 className="font-medium">
-				{stage === "staging" ? "Commits recientes" : "Tags disponibles"}
-			</h3>
-			<div className="border rounded-lg overflow-hidden">
+		<div>
+			<div className="overflow-hidden border rounded-lg">
 				<table className="w-full text-sm">
 					<thead className="bg-muted">
 						<tr>
@@ -82,14 +78,14 @@ export function StageCommitsTable({
 							commits?.map((c: GitCommit) => (
 								<tr key={c.hash} className="border-t hover:bg-muted/50">
 									<td className="px-4 py-3">
-										<Link
-											to="/product/$org/$product"
-											params={{ org, product }}
-											search={{ stage: "staging", event: "commit" }}
+										<a
+											href={`https://github.com/${org}/${product}/commit/${c.hash}`}
+											target="_blank"
+											rel="noopener noreferrer"
 											className="font-mono text-xs hover:text-primary"
 										>
 											{c.hash.slice(0, 7)}
-										</Link>
+										</a>
 									</td>
 									<td className="px-4 py-3 text-muted-foreground">
 										<DisplayInfo value={c.date} type="dates" />
@@ -113,14 +109,14 @@ export function StageCommitsTable({
 								.map((t: GitTag) => (
 									<tr key={t.name} className="border-t hover:bg-muted/50">
 										<td className="px-4 py-3">
-											<Link
-												to="/product/$org/$product"
-												params={{ org, product }}
-												search={{ stage: "production", event: "tag" }}
+											<a
+												href={`https://github.com/${org}/${product}/releases/tag/${t.name}`}
+												target="_blank"
+												rel="noopener noreferrer"
 												className="font-mono text-xs hover:text-primary"
 											>
 												{t.name}
-											</Link>
+											</a>
 										</td>
 										<td className="px-4 py-3 text-muted-foreground">
 											<DisplayInfo value={t.date} type="dates" />

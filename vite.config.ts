@@ -21,7 +21,7 @@ export default defineConfig({
 			name: "cmd",
 			configureServer(server) {
 				// Generic exec endpoint - executes any bash command
-				server.middlewares.use("/api/exec", async (req, res) => {
+				server.middlewares.use("/local/exec", async (req, res) => {
 					if (req.method !== "POST" && req.method !== "GET") {
 						res.statusCode = 405;
 						res.end("Method not allowed");

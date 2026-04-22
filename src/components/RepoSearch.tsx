@@ -10,7 +10,7 @@ export function RepoSearch() {
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Load all repos from user (via gh CLI)
+  // Load all repos from user (via gh CLI) - no org specified to get all accessible repos
   const { data, isLoading } = useUserRepos()
 
   const { toggleFavorite, isFavorite } = useFavorites()
@@ -87,7 +87,7 @@ export function RepoSearch() {
             setIsOpen(true)
           }}
           onFocus={() => query.length >= 2 && setIsOpen(true)}
-          placeholder="Buscar repositorio... (Cmd+K)"
+          placeholder={`Buscar en ${data?.results?.length || 0} repos... (Cmd+K)`}
           className="w-[28rem] pl-9 pr-4 py-2 bg-muted rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
         />
         {isLoading && (

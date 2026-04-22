@@ -62,7 +62,16 @@ function ProductLayout() {
 										{fullProduct}
 									</Link>
 								) : (
-									<BreadcrumbPage>{fullProduct}</BreadcrumbPage>
+									<BreadcrumbPage>
+										<a
+											href={`https://github.com/${fullProduct}`}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="hover:text-foreground transition-colors"
+										>
+											{fullProduct}
+										</a>
+									</BreadcrumbPage>
 								)}
 							</div>
 						</BreadcrumbItem>

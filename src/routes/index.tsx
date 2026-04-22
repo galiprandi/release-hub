@@ -99,6 +99,14 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 	const commitShortHash = latestCommit?.shortHash;
 	const commitAuthor = latestCommit?.author;
 	const commitDate = latestCommit?.date;
+	const tagDate = latestTag?.date;
+
+	// Mostrar la fecha más reciente entre commit y tag
+	const latestDate = commitDate && tagDate
+		? new Date(commitDate) > new Date(tagDate)
+			? commitDate
+			: tagDate
+		: commitDate || tagDate;
 
 	const isLoading = isLoadingCommits || isLoadingTags;
 
@@ -159,7 +167,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 			</td>
 			<td className="px-4 py-3 text-sm text-muted-foreground">
 				<div className="flex items-center gap-1">
-					<DisplayInfo type="dates" value={commitDate} />
+					<DisplayInfo type="dates" value={latestDate} />
 				</div>
 			</td>
 			<td className="px-4 py-3 text-sm">

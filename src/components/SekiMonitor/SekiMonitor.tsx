@@ -12,6 +12,16 @@ import { MiniTimeline } from "./MiniTimeline";
 import type { MetaPart, SekiMonitorProps } from "./types";
 
 export function SekiMonitor({ pipeline, stage }: SekiMonitorProps) {
+	if (!pipeline) {
+		return (
+			<div className="bg-card border rounded-xl p-4">
+				<p className="text-sm text-muted-foreground">
+					No pipeline data available yet for this stage.
+				</p>
+			</div>
+		);
+	}
+
 	const shortHash = pipeline.git.commit.slice(0, 7);
 	const duration = DayJS(pipeline.updated_at).from(
 		DayJS(pipeline.created_at),

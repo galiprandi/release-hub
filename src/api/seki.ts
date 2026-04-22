@@ -33,16 +33,31 @@ const serializeParams = (params: Record<string, unknown>): string => {
   return parts.join('&')
 }
 
+// Helper to get token from localStorage or fallback to env
+const getToken = (): string => {
+  const storedToken = localStorage.getItem('seki_api_token')
+  if (storedToken) return storedToken
+  return import.meta.env.VITE_SEKI_API_TOKEN || ''
+}
+
 export const apiSeki = axios.create({
   baseURL: '/api',
   headers: {
     Accept: 'application/json, text/plain, */*',
     'Accept-Language': 'en-US',
-    Authorization: `bearer ${import.meta.env.VITE_SEKI_API_TOKEN}`,
   },
   paramsSerializer: {
     serialize: serializeParams,
   },
+})
+
+// Add request interceptor to dynamically set Authorization header
+apiSeki.interceptors.request.use((config) => {
+  const token = getToken()
+  if (token) {
+    config.headers.Authorization = `bearer ${token}`
+  }
+  return config
 })
 
 /**

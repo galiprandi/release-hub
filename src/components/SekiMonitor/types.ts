@@ -5,7 +5,7 @@ import type { PipelineStatusResponse } from "@/api/seki.type";
 export type StageType = "staging" | "production";
 
 export interface SekiMonitorProps {
-	pipeline: PipelineStatusResponse;
+	pipeline?: PipelineStatusResponse;
 	stage: StageType;
 }
 

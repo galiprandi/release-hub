@@ -1,7 +1,6 @@
 import type { Product } from '@/types/api'
 
-const API_URL = import.meta.env.VITE_SEKI_API_URL
-const API_TOKEN = import.meta.env.VITE_SEKI_API_TOKEN
+const API_URL = import.meta.env.VITE_SEKI_API_URL || 'https://seki-bff-api.cencosudx.com'
 
 class ApiError extends Error {
   status?: number
@@ -17,12 +16,13 @@ class ApiError extends Error {
 
 async function fetchWithAuth(
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  token: string
 ): Promise<Response> {
   const headers = new Headers({
     Accept: 'application/json, text/plain, */*',
     'Accept-Language': 'en-US',
-    Authorization: `bearer ${API_TOKEN}`,
+    Authorization: `bearer ${token}`,
     ...options.headers,
   })
 
@@ -45,19 +45,21 @@ async function fetchWithAuth(
 export async function getProductPipeline(
   org: string,
   project: string,
-  pipelineId: string
+  pipelineId: string,
+  token: string
 ): Promise<Product> {
   const url = `${API_URL}/products/${org}/${project}/pipelines/${pipelineId}`
-  const response = await fetchWithAuth(url)
+  const response = await fetchWithAuth(url, {}, token)
   return response.json()
 }
 
 export async function getPipelines(
   org: string,
-  project: string
+  project: string,
+  token: string
 ): Promise<Product> {
   const url = `${API_URL}/products/${org}/${project}/pipelines`
-  const response = await fetchWithAuth(url)
+  const response = await fetchWithAuth(url, {}, token)
   return response.json()
 }
 

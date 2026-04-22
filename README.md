@@ -1,4 +1,4 @@
-# Seki Web
+# Repo Dash
 
 Web application for visualizing CI/CD pipelines from the Seki ecosystem (Cencosud-xlabs).
 

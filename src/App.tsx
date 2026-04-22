@@ -5,7 +5,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background p-8">
-      <h1 className="text-2xl font-bold mb-4">Seki Web</h1>
+      <h1 className="text-2xl font-bold mb-4">Repo Dash</h1>
 
       {isLoading && <p>Cargando repositorios...</p>}
       {error && <p className="text-red-500">Error: {error.message}</p>}

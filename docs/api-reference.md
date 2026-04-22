@@ -12,7 +12,7 @@ Documento de referencia de los endpoints expuestos por el BFF (Backend for Front
   - [Repositories](#repositories)
   - [Operations](#operations)
   - [Secrets](#secrets)
-- [Análisis de Utilidad para Seki Web](#análisis-de-utilidad-para-seki-web)
+- [Análisis de Utilidad para Repo Dash](#análisis-de-utilidad-para-seki-web)
 
 ---
 
@@ -378,7 +378,7 @@ Crea/actualiza un secreto.
 
 ---
 
-## Análisis de Utilidad para Seki Web
+## Análisis de Utilidad para Repo Dash
 
 ### Endpoints de Alta Prioridad (Implementar primero)
 

@@ -4,8 +4,6 @@ import DayJS from "@/lib/dayjs";
 import { Streamdown } from "streamdown";
 
 import {
-	extractErrorDetails,
-	extractSummary,
 	flattenSubEvents,
 	severityRank,
 	stageStyles,
@@ -16,25 +14,14 @@ import type { FlattenedSubEvent } from "./helpers";
 
 function ErrorCard({ sub, parent }: FlattenedSubEvent) {
 	const [isExpanded, setIsExpanded] = useState(false);
-	const errorDetails = extractErrorDetails(sub.markdown);
 
 	return (
-		<div className="border border-red-200 bg-red-50/70 rounded-lg p-3">
+		<div className="border border-red-200 bg-red-50/70 rounded-lg p-2">
 			<div className="text-sm font-medium text-red-700">
 				{parent.label.es} · {sub.label}
 			</div>
-			{errorDetails && (
-				<div className="mt-2 p-2 bg-red-100/50 rounded border border-red-200">
-					<span className="text-xs text-red-700 font-mono">
-						{errorDetails.message}
-					</span>
-				</div>
-			)}
-			<p className="text-sm text-red-800 mt-1">
-				{extractSummary(sub.markdown)}
-			</p>
 			{sub.markdown && (
-				<div className="mt-2">
+				<div className="mt-1">
 					<button
 						type="button"
 						onClick={() => setIsExpanded(!isExpanded)}

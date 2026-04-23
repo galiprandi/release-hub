@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es";
+import { useQueryClient } from "@tanstack/react-query";
 import { SekiMonitor } from "@/components/SekiMonitor/SekiMonitor";
 import { StageCommitsTable } from "@/components/StageCommitsTable";
 import { PromoteDialog } from "@/components/PromoteDialog";
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/product/$org/$product/")({
 
 function ProductIndex() {
 	const { org, product } = Route.useParams();
+	const queryClient = useQueryClient();
 	const [activeStage, setActiveStage] = useState<"staging" | "production">(
 		"staging",
 	);
@@ -107,7 +109,12 @@ function ProductIndex() {
 						<div className="space-y-2 mb-10">
 							<div className="flex justify-between items-center gap-4 px-4">
 								<RefetchButton
-									onRefetch={() => currentPipeline.refetch()}
+									onRefetch={() => {
+										// Invalida todas las queries relacionadas con este repo
+										queryClient.invalidateQueries({ queryKey: ["git", "commits", fullProduct] });
+										queryClient.invalidateQueries({ queryKey: ["git", "tags", fullProduct] });
+										queryClient.invalidateQueries({ queryKey: ["pipeline", fullProduct] });
+									}}
 									isRefetching={isPipelineFetching}
 									showFeedback={true}
 									targetTime={dataUpdatedAt}

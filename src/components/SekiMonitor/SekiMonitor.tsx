@@ -1,4 +1,4 @@
-import { GitCommit } from "lucide-react";
+import { GitCommit, Loader2, XCircle } from "lucide-react";
 import { Fragment, useState } from "react";
 import DayJS from "@/lib/dayjs";
 import { Streamdown } from "streamdown";
@@ -16,24 +16,25 @@ function ErrorCard({ sub, parent }: FlattenedSubEvent) {
 	const [isExpanded, setIsExpanded] = useState(false);
 
 	return (
-		<div className="border border-red-200 bg-red-50/70 rounded-lg p-2">
-			<div className="text-sm font-medium text-red-700">
-				{parent.label.es} · {sub.label}
-			</div>
-			{sub.markdown && (
-				<div className="mt-1">
-					<button
-						type="button"
-						onClick={() => setIsExpanded(!isExpanded)}
-						className="text-xs text-red-600 hover:text-red-800 underline"
-					>
-						{isExpanded ? "Ocultar detalles" : "Ver detalles completos"}
-					</button>
-					{isExpanded && (
-						<div className="mt-2 p-3 bg-white rounded border border-red-200 prose prose-sm max-w-none dark:prose-invert overflow-auto max-h-96">
-							<Streamdown>{sub.markdown}</Streamdown>
-						</div>
-					)}
+		<div className="border border-red-200 bg-red-50/70 rounded-lg overflow-hidden transition-all duration-200">
+			<button
+				type="button"
+				onClick={() => setIsExpanded(!isExpanded)}
+				className="w-full text-left p-2 flex items-center justify-between hover:bg-red-100/50 transition-colors"
+			>
+				<div className="text-sm font-medium text-red-700 flex items-center gap-2">
+					<XCircle className="w-3.5 h-3.5" />
+					<span>
+						{parent.label.es} · {sub.label}
+					</span>
+				</div>
+				<span className="text-[10px] text-red-600 font-medium bg-red-100 px-2 py-0.5 rounded">
+					{isExpanded ? "Ocultar" : "Ver detalle"}
+				</span>
+			</button>
+			{isExpanded && sub.markdown && (
+				<div className="p-3 bg-white border-t border-red-200 prose prose-sm max-w-none dark:prose-invert overflow-auto max-h-96 shadow-inner">
+					<Streamdown>{sub.markdown}</Streamdown>
 				</div>
 			)}
 		</div>
@@ -99,12 +100,14 @@ export function SekiMonitor({ pipeline, stage, gitDate }: SekiMonitorProps) {
 		});
 	}
 
+	const isRunning = pipeline.state === "STARTED";
+
 	return (
 		<div className="space-y-2">
-			<div className="bg-card border rounded-xl p-4 h-[82px] space-y-4">
+			<div className={`bg-card border rounded-xl p-4 h-[82px] space-y-4 transition-all duration-500 ${isRunning ? 'ring-1 ring-blue-400/20 bg-blue-50/5 dark:bg-blue-900/5' : ''}`}>
 				<div className="flex flex-wrap items-start gap-4">
 					<div
-						className={`w-1 rounded-full self-stretch hidden sm:block ${stageStyle.accent}`}
+						className={`w-1 rounded-full self-stretch hidden sm:block ${isRunning ? 'bg-blue-400 animate-pulse-slow' : stageStyle.accent}`}
 					/>
 					<div className="flex-1 min-w-[220px] space-y-2">
 						<div className="flex items-center gap-2">
@@ -116,6 +119,12 @@ export function SekiMonitor({ pipeline, stage, gitDate }: SekiMonitorProps) {
 							>
 								{stage === "staging" ? "COMMIT" : "TAG"}
 							</span>
+							{isRunning && (
+								<span className="flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded-md animate-pulse-slow">
+									<Loader2 className="w-3 h-3 animate-spin" />
+									EN PROGRESO
+								</span>
+							)}
 						</div>
 						{metaParts.length > 0 && (
 							<div className="text-xs text-muted-foreground flex items-center gap-2 whitespace-nowrap overflow-hidden">

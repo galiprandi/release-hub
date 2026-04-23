@@ -26,6 +26,7 @@ const timelineStatusTextColor = (state: string) => {
 			return "text-amber-600";
 		case "RUNNING":
 		case "PENDING":
+		case "STARTED":
 			return "text-blue-600";
 		default:
 			return "text-muted-foreground";
@@ -43,6 +44,7 @@ const timelineStatusIcon = (state: string) => {
 			return <AlertTriangle className={baseClass} />;
 		case "RUNNING":
 		case "PENDING":
+		case "STARTED":
 			return <Loader2 className={`${baseClass} animate-spin`} />;
 		default:
 			return null;
@@ -59,7 +61,8 @@ const timelineStatusColor = (state: string) => {
 			return "bg-amber-500";
 		case "RUNNING":
 		case "PENDING":
-			return "bg-blue-500 animate-pulse";
+		case "STARTED":
+			return "bg-blue-500 animate-pulse-slow shadow-[0_0_8px_rgba(59,130,246,0.4)]";
 		default:
 			return "bg-muted";
 	}

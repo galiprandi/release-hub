@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoDeployCardRouteImport } from './routes/demo.deploy-card'
 import { Route as ProductOrgProductRouteImport } from './routes/product.$org.$product'
 import { Route as ProductOrgProductIndexRouteImport } from './routes/product.$org.$product.index'
 
@@ -23,11 +22,6 @@ const SetupRoute = SetupRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoDeployCardRoute = DemoDeployCardRouteImport.update({
-  id: '/demo/deploy-card',
-  path: '/demo/deploy-card',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductOrgProductRoute = ProductOrgProductRouteImport.update({
@@ -44,21 +38,18 @@ const ProductOrgProductIndexRoute = ProductOrgProductIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/setup': typeof SetupRoute
-  '/demo/deploy-card': typeof DemoDeployCardRoute
   '/product/$org/$product': typeof ProductOrgProductRouteWithChildren
   '/product/$org/$product/': typeof ProductOrgProductIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/setup': typeof SetupRoute
-  '/demo/deploy-card': typeof DemoDeployCardRoute
   '/product/$org/$product': typeof ProductOrgProductIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/setup': typeof SetupRoute
-  '/demo/deploy-card': typeof DemoDeployCardRoute
   '/product/$org/$product': typeof ProductOrgProductRouteWithChildren
   '/product/$org/$product/': typeof ProductOrgProductIndexRoute
 }
@@ -67,16 +58,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/setup'
-    | '/demo/deploy-card'
     | '/product/$org/$product'
     | '/product/$org/$product/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/setup' | '/demo/deploy-card' | '/product/$org/$product'
+  to: '/' | '/setup' | '/product/$org/$product'
   id:
     | '__root__'
     | '/'
     | '/setup'
-    | '/demo/deploy-card'
     | '/product/$org/$product'
     | '/product/$org/$product/'
   fileRoutesById: FileRoutesById
@@ -84,7 +73,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SetupRoute: typeof SetupRoute
-  DemoDeployCardRoute: typeof DemoDeployCardRoute
   ProductOrgProductRoute: typeof ProductOrgProductRouteWithChildren
 }
 
@@ -102,13 +90,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/deploy-card': {
-      id: '/demo/deploy-card'
-      path: '/demo/deploy-card'
-      fullPath: '/demo/deploy-card'
-      preLoaderRoute: typeof DemoDeployCardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/product/$org/$product': {
@@ -142,7 +123,6 @@ const ProductOrgProductRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SetupRoute: SetupRoute,
-  DemoDeployCardRoute: DemoDeployCardRoute,
   ProductOrgProductRoute: ProductOrgProductRouteWithChildren,
 }
 export const routeTree = rootRouteImport

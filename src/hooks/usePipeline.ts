@@ -37,7 +37,12 @@ export function usePipeline({
       return data
     },
     enabled: enabled && !!product && !!commit,
-    refetchInterval: SEKI_CONFIG.refetchInterval,
+    refetchInterval: (query) => {
+      const data = query.state.data as any
+      const status = data?.status?.toLowerCase()
+      const inProgressStatuses = ['in_progress', 'running', 'pending']
+      return status && inProgressStatuses.includes(status) ? 30000 : false
+    },
     staleTime: 5000, // Mantener datos frescos por 5s para evitar flick
   })
 }
@@ -60,7 +65,12 @@ export function usePipelineWithTag({
       return data
     },
     enabled: enabled && !!product && !!commit && !!tag,
-    refetchInterval: SEKI_CONFIG.refetchInterval,
+    refetchInterval: (query) => {
+      const data = query.state.data as any
+      const status = data?.status?.toLowerCase()
+      const inProgressStatuses = ['in_progress', 'running', 'pending']
+      return status && inProgressStatuses.includes(status) ? 30000 : false
+    },
     staleTime: 5000, // Mantener datos frescos por 5s para evitar flick
   })
 }

@@ -123,7 +123,7 @@ export function useGitTags({
 			return allPages.length;
 		},
 		enabled: enabled && !!repo,
-		staleTime: 30 * 60 * 1000, // 30 minutos - tags históricos no cambian frecuentemente
+		staleTime: 30000, // 30 segundos - permitir ver cambios recientes
 		gcTime: 60 * 60 * 1000, // 1 hora - mantener en cache por más tiempo
 	});
 

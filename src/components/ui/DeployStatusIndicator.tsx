@@ -34,7 +34,8 @@ export function DeployStatusIndicator({
 			case "in_progress":
 			case "running":
 			case "pending":
-				return "text-yellow-500"
+			case "started":
+				return "text-yellow-500 animate-pulse-slow"
 			case "warn":
 			case "warning":
 				return "text-orange-500"
@@ -96,6 +97,7 @@ export function DeployStatusIndicator({
 			case "in_progress":
 			case "running":
 			case "pending":
+			case "started":
 				return (
 					<div className="text-xs space-y-1">
 						<div className="font-medium">Deploy en progreso</div>

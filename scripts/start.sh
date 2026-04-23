@@ -16,7 +16,24 @@ if is_port_in_use; then
     echo "🌐 Opening browser..."
     open "http://localhost:$PORT"
 else
-    echo "📦 Building and starting $APP_NAME on port $PORT..."
+    # 🔍 Auto-update check
+    if [ -d ".git" ]; then
+        echo "🔍 Checking for updates..."
+        # Try a quick fetch (timeout prevents hanging if offline)
+        if git fetch --timeout=3 origin main &>/dev/null; then
+            LOCAL=$(git rev-parse HEAD)
+            REMOTE=$(git rev-parse @{u})
+            if [ "$LOCAL" != "$REMOTE" ]; then
+                echo "✨ New version detected. Updating $APP_NAME..."
+                git pull origin main
+                npm install
+                npm run build
+                echo "✅ Update complete!"
+            fi
+        fi
+    fi
+
+    echo "📦 Starting $APP_NAME on port $PORT..."
     
     # Check if we are in the right directory
     if [ ! -f "package.json" ]; then

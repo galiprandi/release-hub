@@ -35,7 +35,7 @@ export function AppProviders({ children }: AppProvidersProps) {
 					shouldDehydrateQuery: (query) => {
 						// No persistir si el pipeline está en progreso o pendiente
 						if (query.queryKey[0] === "pipeline") {
-							const data = query.state.data as any;
+							const data = query.state.data as { status?: string } | undefined;
 							const status = data?.status?.toLowerCase();
 							const inProgressStatuses = ["in_progress", "running", "pending"];
 							

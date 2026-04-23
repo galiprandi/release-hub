@@ -37,8 +37,8 @@ export function usePipeline({
     },
     enabled: enabled && !!product && !!commit,
     refetchInterval: (query) => {
-      const data = query.state.data as any
-      const status = data?.status?.toLowerCase()
+      const data = query.state.data as PipelineStatusResponse | undefined
+      const status = data?.state?.toLowerCase()
       const inProgressStatuses = ['in_progress', 'running', 'pending']
       return status && inProgressStatuses.includes(status) ? 30000 : false
     },
@@ -65,8 +65,8 @@ export function usePipelineWithTag({
     },
     enabled: enabled && !!product && !!commit && !!tag,
     refetchInterval: (query) => {
-      const data = query.state.data as any
-      const status = data?.status?.toLowerCase()
+      const data = query.state.data as PipelineStatusResponse | undefined
+      const status = data?.state?.toLowerCase()
       const inProgressStatuses = ['in_progress', 'running', 'pending']
       return status && inProgressStatuses.includes(status) ? 30000 : false
     },

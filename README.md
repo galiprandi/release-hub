@@ -2,6 +2,21 @@
 
 Web application for visualizing CI/CD pipelines and managing GitHub releases.
 
+## 🚀 Quick Install & Launch
+
+Run the following command to install or update ReleaseHub and launch it immediately:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/galiprandi/release-hub/main/scripts/install.sh | bash
+```
+
+Once installed, you can launch the app anytime by simply typing:
+
+```bash
+rhub
+```
+
+
 ## Features
 
 - Real-time pipeline status visualization
@@ -30,8 +45,9 @@ The app leverages the **GitHub CLI (`gh`)** to perform these operations remotely
 
 ## Requirements
 
-- Node.js (version specified in `.nvmrc`)
-- npm
+- Node.js (v18+)
+- pnpm
+- GitHub CLI (`gh`) authenticated
 
 ## Setup
 
@@ -44,10 +60,11 @@ The app leverages the **GitHub CLI (`gh`)** to perform these operations remotely
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run preview` | Preview production build |
-| `npm run lint` | Run ESLint |
+| `rhub` | Launch the app (after installation) |
+| `pnpm run dev` | Start development server |
+| `pnpm run build` | Build for production |
+| `pnpm run preview` | Preview production build |
+| `pnpm run lint` | Run ESLint |
 
 ## Project Structure
 

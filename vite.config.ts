@@ -103,6 +103,7 @@ export default defineConfig({
 		},
 	},
 	preview: {
-		port: 4173,
+		port: 30779,
+		strictPort: true,
 	},
 });

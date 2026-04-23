@@ -73,7 +73,7 @@ function RootLayout() {
 
 	return (
 		<>
-			<div className="min-h-screen bg-background">
+			<div className="min-h-screen bg-background flex flex-col">
 				<header className="border-b px-4 py-3">
 					<div className="flex items-center justify-between">
 						<Link to="/" className="text-2xl font-bold hover:text-primary flex items-center gap-2">
@@ -86,9 +86,19 @@ function RootLayout() {
 						</div>
 					</div>
 				</header>
-				<main className="p-4">
+				<main className="p-4 flex-1">
 					<Outlet />
 				</main>
+				<footer className="p-4 pt-0 text-right">
+					<a
+						href="https://github.com/galiprandi/release-hub"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="text-[10px] text-muted-foreground hover:text-primary transition-colors"
+					>
+						ReleaseHub Open Source
+					</a>
+				</footer>
 			</div>
 			<TanStackRouterDevtools />
 		</>

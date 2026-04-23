@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { fetchPipeline, fetchPipelineWithTag } from '@/api/seki'
 import type { PipelineStatusResponse } from '@/api/seki.type'
-import { SEKI_CONFIG } from '@/config/seki'
 
 interface UsePipelineOptions {
   /** Full product name in format "org/repo" */

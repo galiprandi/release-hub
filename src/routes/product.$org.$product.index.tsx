@@ -52,7 +52,6 @@ function ProductIndex() {
 	const pipeline = isStaging ? stagingPipeline.data : prodPipeline.data;
 	const isPipelineLoading = isStaging ? stagingPipeline.isLoading : prodPipeline.isLoading;
 	const isPipelineFetching = isStaging ? stagingPipeline.isFetching : prodPipeline.isFetching;
-	const currentPipeline = isStaging ? stagingPipeline : prodPipeline;
 	const dataUpdatedAt = isStaging ? stagingPipeline.dataUpdatedAt : prodPipeline.dataUpdatedAt;
 
 	// Usar fecha del commit/tag para consistencia con la tabla

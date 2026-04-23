@@ -46,7 +46,7 @@ The app leverages the **GitHub CLI (`gh`)** to perform these operations remotely
 ## Requirements
 
 - Node.js (v18+)
-- pnpm
+- npm
 - GitHub CLI (`gh`) authenticated
 
 ## Setup
@@ -61,10 +61,10 @@ The app leverages the **GitHub CLI (`gh`)** to perform these operations remotely
 | Command | Description |
 |---------|-------------|
 | `rhub` | Launch the app (after installation) |
-| `pnpm run dev` | Start development server |
-| `pnpm run build` | Build for production |
-| `pnpm run preview` | Preview production build |
-| `pnpm run lint` | Run ESLint |
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Run ESLint |
 
 ## Project Structure
 

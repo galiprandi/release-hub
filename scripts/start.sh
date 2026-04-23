@@ -27,16 +27,16 @@ else
     # Install dependencies if node_modules is missing
     if [ ! -d "node_modules" ]; then
         echo "📥 node_modules not found. Installing dependencies..."
-        pnpm install
+        npm install
     fi
 
     # Build the app if dist is missing
     if [ ! -d "dist" ]; then
         echo "🛠️ Building application..."
-        pnpm run build
+        npm run build
     fi
 
     # Start the preview server
     echo "⚡ Starting preview server..."
-    pnpm run preview -- --port $PORT --open
+    npm run preview -- --port $PORT --open
 fi

@@ -10,8 +10,8 @@ set -e
 echo "🛠️  Starting ReleaseHub Installation..."
 
 # 1. Check for dependencies
-if ! command -v pnpm &> /dev/null; then
-    echo "❌ Error: pnpm is not installed. Please install it first: npm install -g pnpm"
+if ! command -v npm &> /dev/null; then
+    echo "❌ Error: npm is not installed. Please install Node.js first."
     exit 1
 fi
 
@@ -33,11 +33,11 @@ fi
 
 # 3. Install Dependencies
 echo "📦 Installing dependencies..."
-pnpm install
+npm install
 
 # 4. Build Application
 echo "🏗️  Building application..."
-pnpm run build
+npm run build
 
 # 5. Setup Permissions
 chmod +x scripts/start.sh

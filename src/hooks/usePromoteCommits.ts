@@ -38,7 +38,7 @@ export function usePromoteCommits({ repo, latestTag, enabled = true }: UsePromot
       if (latestTag) {
         const result = await runCommand(`gh api repos/${repo}/compare/${latestTag}...main`)
         const data = JSON.parse(result.stdout)
-        const allCommits = (data.commits || []) as GithubCommitResponse[]
+        const allCommits = ((data.commits || []) as GithubCommitResponse[]).reverse()
         
         const sliced = allCommits.slice(page * perPage, (page + 1) * perPage)
         

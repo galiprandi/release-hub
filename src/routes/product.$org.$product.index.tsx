@@ -7,7 +7,6 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es";
 import { SekiMonitor } from "@/components/SekiMonitor/SekiMonitor";
 import { StageCommitsTable } from "@/components/StageCommitsTable";
-import { CreateTagDialog } from "@/components/CreateTagDialog";
 import { PromoteDialog } from "@/components/PromoteDialog";
 import { RefetchButton } from "@/components/ui/RefetchButton";
 import { useGitCommits } from "@/hooks/useGitCommits";

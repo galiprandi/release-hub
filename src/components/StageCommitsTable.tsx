@@ -1,6 +1,7 @@
+import { useEffect, useRef } from "react";
 import { type GitCommit, useGitCommits } from "@/hooks/useGitCommits";
 import { type GitTag, useGitTags } from "@/hooks/useGitTags";
-import { DisplayInfo } from "./DislpayInfo";
+import { DisplayInfo } from "./DisplayInfo";
 import { CommitLink } from "./CommitLink";
 import { TagLink } from "./TagLink";
 import { Loader2 } from "lucide-react";
@@ -37,22 +38,62 @@ export function StageCommitsTable({
 	product,
 }: StageCommitsTableProps) {
 	const fullRepo = `${org}/${product}`;
+	const loadMoreRef = useRef<HTMLDivElement>(null);
 
-	const { commits, isLoading: isLoadingCommits, hasNextPage, fetchNextPage, isFetchingNextPage } = useGitCommits({
+	const { 
+		commits, 
+		isLoading: isLoadingCommits, 
+		hasNextPage: hasNextPageCommits, 
+		fetchNextPage: fetchNextPageCommits, 
+		isFetchingNextPage: isFetchingNextPageCommits 
+	} = useGitCommits({
 		repo: fullRepo,
 		enabled: stage === "staging",
 	});
 
-	const { tags, isLoading: isLoadingTags, hasNextPage: hasNextPageTags, fetchNextPage: fetchNextPageTags, isFetchingNextPage: isFetchingNextPageTags } = useGitTags({
+	const { 
+		tags, 
+		isLoading: isLoadingTags, 
+		hasNextPage: hasNextPageTags, 
+		fetchNextPage: fetchNextPageTags, 
+		isFetchingNextPage: isFetchingNextPageTags 
+	} = useGitTags({
 		repo: fullRepo,
 		enabled: stage === "production",
 	});
 
-	const isLoading = stage === "staging" ? isLoadingCommits : isLoadingTags;
 	const isStaging = stage === "staging";
-	const hasMore = isStaging ? hasNextPage : hasNextPageTags;
-	const loadMore = isStaging ? fetchNextPage : fetchNextPageTags;
-	const isLoadingMore = isStaging ? isFetchingNextPage : isFetchingNextPageTags;
+	const isLoading = isStaging ? isLoadingCommits : isLoadingTags;
+	const hasNextPage = isStaging ? hasNextPageCommits : hasNextPageTags;
+	const fetchNextPage = isStaging ? fetchNextPageCommits : fetchNextPageTags;
+	const isFetchingNextPage = isStaging ? isFetchingNextPageCommits : isFetchingNextPageTags;
+
+	// Infinite scroll implementation
+	useEffect(() => {
+		if (!hasNextPage || isFetchingNextPage) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting) {
+					fetchNextPage();
+				}
+			},
+			{ threshold: 0.1 }
+		);
+
+		const currentRef = loadMoreRef.current;
+		if (currentRef) {
+			observer.observe(currentRef);
+		}
+
+		return () => {
+			if (currentRef) {
+				observer.unobserve(currentRef);
+			}
+			observer.disconnect();
+		};
+	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
 	return (
 		<div>
 			<div className="overflow-hidden border rounded-lg">
@@ -60,7 +101,7 @@ export function StageCommitsTable({
 					<thead className="bg-muted">
 						<tr>
 							<th className="px-4 py-2 text-left font-medium">
-								{stage === "staging" ? "Hash" : "Tag"}
+								{isStaging ? "Hash" : "Tag"}
 							</th>
 							<th className="px-4 py-2 text-left font-medium">Fecha</th>
 							<th className="px-4 py-2 text-left font-medium">Autor</th>
@@ -70,18 +111,21 @@ export function StageCommitsTable({
 						</tr>
 					</thead>
 					<tbody>
-						{isLoading ? (
+						{isLoading && (!commits?.length && !tags?.length) ? (
 							<tr>
 								<td
 									colSpan={4}
 									className="px-4 py-8 text-center text-muted-foreground"
 								>
-									Cargando información...
+									<div className="flex items-center justify-center gap-2">
+										<Loader2 className="w-4 h-4 animate-spin" />
+										Cargando información...
+									</div>
 								</td>
 							</tr>
-						) : stage === "staging" ? (
+						) : isStaging ? (
 							commits?.map((c: GitCommit) => (
-								<tr key={c.hash} className="border-t hover:bg-muted/50">
+								<tr key={c.hash} className="border-t hover:bg-muted/50 transition-colors">
 									<td className="px-4 py-3">
 										<CommitLink hash={c.hash} org={org} repo={product} />
 									</td>
@@ -102,10 +146,8 @@ export function StageCommitsTable({
 							))
 						) : (
 							tags
-								?.slice()
-								.sort((a: GitTag, b: GitTag) => compareVersions(a.name, b.name))
-								.map((t: GitTag) => (
-									<tr key={t.name} className="border-t hover:bg-muted/50">
+								?.map((t: GitTag) => (
+									<tr key={t.name} className="border-t hover:bg-muted/50 transition-colors">
 										<td className="px-4 py-3">
 											<TagLink tagName={t.name} org={org} repo={product} />
 										</td>
@@ -124,20 +166,22 @@ export function StageCommitsTable({
 						)}
 					</tbody>
 				</table>
-			</div>
-			{hasMore && !isLoading && (
-				<div className="mt-3 flex justify-center">
-					<button
-						type="button"
-						onClick={() => loadMore()}
-						disabled={isLoadingMore}
-						className="flex items-center gap-2 px-4 py-2 text-sm bg-background hover:bg-accent hover:text-accent-foreground rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-					>
-						{isLoadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
-						{isLoadingMore ? "Cargando..." : "Cargar más"}
-					</button>
+				
+				{/* Infinite scroll sensor */}
+				<div ref={loadMoreRef} className="flex items-center justify-center py-4 border-t text-xs text-muted-foreground">
+					{isFetchingNextPage ? (
+						<div className="flex items-center gap-2">
+							<Loader2 className="w-3 h-3 animate-spin" />
+							Cargando más...
+						</div>
+					) : hasNextPage ? (
+						"Desliza para cargar más"
+					) : (
+						commits?.length || tags?.length ? "Fin del historial" : ""
+					)}
 				</div>
-			)}
+			</div>
 		</div>
 	);
 }
+

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Loader2, Star, Github } from "lucide-react";
-import { DisplayInfo } from "@/components/DislpayInfo";
+import { DisplayInfo } from "@/components/DisplayInfo";
 import { CommitLink } from "@/components/CommitLink";
 import { TagLink } from "@/components/TagLink";
 import { useFavorites } from "@/hooks/useFavorites";

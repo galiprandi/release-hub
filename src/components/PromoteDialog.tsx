@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import * as Dialog from "@radix-ui/react-dialog"
-import { Rocket, X, Loader2, GitBranch, GitMerge, AlertCircle, ChevronRight, ChevronLeft, CheckCircle2 } from "lucide-react"
+import { Rocket, X, Loader2, GitBranch, GitCompare, AlertCircle, ChevronRight, ChevronLeft, CheckCircle2 } from "lucide-react"
 import axios from "axios"
 import { runCommand } from "@/api/exec"
 import { CommitLink } from "./CommitLink"
-import { DisplayInfo } from "./DislpayInfo"
+import { DisplayInfo } from "./DisplayInfo"
 import { RefetchButton } from "./ui/RefetchButton"
 import { useRepoPermission } from "../hooks/useRepoPermission"
 import { usePromoteCommits } from "../hooks/usePromoteCommits"
@@ -33,8 +33,6 @@ export function PromoteDialog({ repo, latestTag }: PromoteDialogProps) {
 	const [isCreating, setIsCreating] = useState(false)
 	const [error, setError] = useState("")
 	const [org, product] = repo.split("/")
-
-	// Sensor for infinite scroll
 	const loadMoreRef = useRef<HTMLDivElement>(null)
 
 	const { data: permissions, isLoading: isLoadingPerms } = useRepoPermission({ repo })
@@ -64,48 +62,28 @@ export function PromoteDialog({ repo, latestTag }: PromoteDialogProps) {
 		}
 	}
 
-	// Infinite scroll implementation
+	// Infinite scroll
 	useEffect(() => {
 		if (step !== 'list' || !hasNextPage || isFetchingNextPage || !open) return
-
 		const observer = new IntersectionObserver(
-			(entries) => {
-				if (entries[0].isIntersecting) {
-					fetchNextPage()
-				}
-			},
+			(entries) => { if (entries[0].isIntersecting) fetchNextPage() },
 			{ threshold: 0.1 }
 		)
-
 		const currentRef = loadMoreRef.current
-		if (currentRef) {
-			observer.observe(currentRef)
-		}
-
-		return () => {
-			if (currentRef) {
-				observer.unobserve(currentRef)
-			}
-			observer.disconnect()
-		}
+		if (currentRef) observer.observe(currentRef)
+		return () => { if (currentRef) observer.unobserve(currentRef); observer.disconnect() }
 	}, [step, hasNextPage, isFetchingNextPage, fetchNextPage, open])
 
-	const toggleCommit = (sha: string) => {
+	const toggleCommit = (hash: string) => {
 		const newSelected = new Set(selectedShas)
-		if (newSelected.has(sha)) {
-			newSelected.delete(sha)
-		} else {
-			newSelected.add(sha)
-		}
+		if (newSelected.has(hash)) newSelected.delete(hash)
+		else newSelected.add(hash)
 		setSelectedShas(newSelected)
 	}
 
 	const toggleAll = () => {
-		if (selectedShas.size === commits.length) {
-			setSelectedShas(new Set())
-		} else {
-			setSelectedShas(new Set(commits.map(c => c.hash)))
-		}
+		if (selectedShas.size === commits.length) setSelectedShas(new Set())
+		else setSelectedShas(new Set(commits.map(c => c.hash)))
 	}
 
 	const canCreateTags =
@@ -117,106 +95,72 @@ export function PromoteDialog({ repo, latestTag }: PromoteDialogProps) {
 		permissions?.viewerCanAdminister
 
 	const handleCreateTag = async () => {
-		if (!tagName.trim()) {
-			setError("El nombre del Tag es requerido para proceder")
-			return
-		}
-
-		const targetCommit = selectedShas.size > 0 
-			? Array.from(selectedShas)[0]
-			: (commits[0]?.hash || "main")
-
+		if (!tagName.trim()) { setError("El nombre del Tag es requerido"); return }
+		const targetCommit = selectedShas.size > 0 ? Array.from(selectedShas)[0] : (commits[0]?.hash || "main")
 		setIsCreating(true)
 		setError("")
-
 		try {
 			const tokenResult = await runCommand('gh auth token')
 			const token = tokenResult.stdout.trim()
 			if (!token) throw new Error("Sin token de GitHub configurado en gh CLI")
-
-			// Step 1: Create tag object
 			const tagResponse = await axios.post(
 				`https://api.github.com/repos/${repo}/git/tags`,
-				{
-					tag: tagName,
-					message: tagMessage || `Release ${tagName}`,
-					object: targetCommit,
-					type: "commit",
-				},
-				{
-					headers: {
-						Authorization: `token ${token}`,
-						Accept: "application/vnd.github.v3+json",
-					},
-				}
+				{ tag: tagName, message: tagMessage || `Release ${tagName}`, object: targetCommit, type: "commit" },
+				{ headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" } }
 			)
-
-			const tagSha = tagResponse.data.sha
-
-			// Step 2: Create reference
 			await axios.post(
 				`https://api.github.com/repos/${repo}/git/refs`,
-				{
-					ref: `refs/tags/${tagName}`,
-					sha: tagSha,
-				},
-				{
-					headers: {
-						Authorization: `token ${token}`,
-						Accept: "application/vnd.github.v3+json",
-					},
-				}
+				{ ref: `refs/tags/${tagName}`, sha: tagResponse.data.sha },
+				{ headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" } }
 			)
-
-			// Invalidate related queries
 			queryClient.invalidateQueries({ queryKey: ["git", "tags", repo] })
 			queryClient.invalidateQueries({ queryKey: ["repo", "permission", repo] })
-			
 			setStep('success')
 		} catch (err) {
-			setError(err instanceof Error ? err.message : "Error detectado durante la creación del Tag")
+			setError(err instanceof Error ? err.message : "Error al crear el Tag")
 		} finally {
 			setIsCreating(false)
 		}
 	}
+
+	const dialogWidth = step === 'success'
+		? 'max-w-sm'
+		: step === 'config'
+			? 'max-w-lg'
+			: 'max-w-3xl'
 
 	return (
 		<Dialog.Root open={open} onOpenChange={handleOpenChange}>
 			<Dialog.Trigger asChild>
 				<button
 					type="button"
-					className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-red-600 text-white rounded-md hover:bg-red-700 transition-all shadow-sm hover:shadow active:scale-95 group"
+					className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
 				>
-					<Rocket className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+					<Rocket className="w-3 h-3" />
 					Promocionar
 				</button>
 			</Dialog.Trigger>
 			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-50" />
-				<Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-4xl max-h-[85vh] bg-background rounded-xl shadow-2xl border p-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] overflow-hidden flex flex-col z-50">
+				<Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+				<Dialog.Content className={`fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full ${dialogWidth} max-h-[80vh] bg-background rounded-lg shadow-lg border p-6 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] overflow-hidden flex flex-col transition-all duration-200`}>
 					<Dialog.Description className="sr-only">
-						Proceso de promoción a producción en pasos integrados
+						Proceso de promoción a producción
 					</Dialog.Description>
-					
-					{/* Header */}
-					<div className="p-6 border-b flex items-center justify-between bg-muted/30">
-						<div className="flex items-center gap-4">
-							<div className={`p-2 rounded-lg ${step === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-								{step === 'success' ? <CheckCircle2 className="w-6 h-6" /> : <GitMerge className="w-6 h-6" />}
-							</div>
-							<div>
-								<Dialog.Title className="text-xl font-bold">
-									{step === 'list' && "Seleccionar Cambios"}
-									{step === 'config' && "Configurar Lanzamiento"}
-									{step === 'success' && "¡Lanzamiento Exitoso!"}
-								</Dialog.Title>
-								<p className="text-sm text-muted-foreground mt-0.5">
-									{repo} • {step === 'list' ? 'Paso 1 de 2' : step === 'config' ? 'Paso 2 de 2' : 'Finalizado'}
-								</p>
-							</div>
-						</div>
-						
-						<div className="flex items-center gap-3">
+
+					{/* Header — same pattern as DiffDialog */}
+					<div className="flex items-center justify-between mb-4 flex-shrink-0">
+						<Dialog.Title className="text-lg font-semibold flex items-center gap-2">
+							{step === 'list' && (
+								<>
+									<GitCompare className="w-4 h-4" />
+									{latestTag ? `Promocionar: main → ${latestTag}` : `Primer lanzamiento: ${repo}`}
+									{commits.length > 0 && <span className="text-muted-foreground font-normal">({commits.length} commits)</span>}
+								</>
+							)}
+							{step === 'config' && <><Rocket className="w-4 h-4" /> Configurar Lanzamiento</>}
+							{step === 'success' && <><CheckCircle2 className="w-4 h-4 text-green-600" /> Lanzamiento Exitoso</>}
+						</Dialog.Title>
+						<div className="flex items-center gap-2">
 							{step === 'list' && (
 								<RefetchButton
 									onRefetch={() => refetch()}
@@ -228,227 +172,209 @@ export function PromoteDialog({ repo, latestTag }: PromoteDialogProps) {
 							<Dialog.Close asChild>
 								<button
 									type="button"
-									className="p-2 rounded-full hover:bg-muted transition-colors outline-none"
+									className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 								>
-									<X className="w-5 h-5" />
+									<X className="w-4 h-4" />
 									<span className="sr-only">Cerrar</span>
 								</button>
 							</Dialog.Close>
 						</div>
 					</div>
 
-					{/* Content Body */}
-					<div className="flex-1 overflow-hidden flex flex-col">
-						{step === 'list' && (
-							<div className="flex-1 flex flex-col overflow-hidden p-6">
-								{isLoading && !commits.length ? (
-									<div className="flex-1 flex flex-col items-center justify-center space-y-4">
-										<Loader2 className="w-10 h-10 animate-spin text-red-600" />
-										<p className="text-muted-foreground font-medium text-lg animate-pulse">Analizando commits...</p>
+					{/* Step 1: Commit List */}
+					{step === 'list' && (
+						<>
+							{isLoading && !commits.length && (
+								<div className="flex items-center justify-center py-8 flex-shrink-0">
+									<div className="flex items-center gap-2 text-sm text-muted-foreground">
+										<Loader2 className="w-4 h-4 animate-spin" />
+										Analizando commits...
 									</div>
-								) : fetchError ? (
-									<div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-										<AlertCircle className="w-12 h-12 text-red-600 mb-4" />
-										<h3 className="text-lg font-semibold text-foreground">Error al cargar datos</h3>
-										<p className="text-muted-foreground mt-2">{fetchError instanceof Error ? fetchError.message : "No se pudo obtener el historial."}</p>
-									</div>
-								) : commits.length === 0 ? (
-									<div className="flex-1 flex flex-col items-center justify-center p-12 text-center border-2 border-dashed rounded-xl m-4">
-										<GitBranch className="w-12 h-12 text-muted-foreground mb-4 opacity-20" />
-										<h3 className="text-lg font-medium">Sin cambios pendientes</h3>
-										<p className="text-muted-foreground mt-2">La rama main está al día con el último tag publicado.</p>
-									</div>
-								) : (
-									<>
-										<div className="flex-1 overflow-y-auto border rounded-xl bg-card custom-scrollbar">
-											<table className="w-full text-sm relative" style={{ tableLayout: 'fixed' }}>
-												<thead className="bg-muted/80 backdrop-blur-sm sticky top-0 z-20 shadow-sm">
-													<tr>
-														<th className="px-4 py-3 text-left w-[50px]">
-															<div className="flex items-center justify-center">
-																<input
-																	type="checkbox"
-																	className="w-4 h-4 rounded border-gray-300 text-red-600 accent-red-600 cursor-pointer"
-																	checked={commits.length > 0 && selectedShas.size === commits.length}
-																	onChange={toggleAll}
-																/>
+								</div>
+							)}
+
+							{fetchError && (
+								<div className="text-sm text-red-600 flex-shrink-0">
+									Error al cargar: {fetchError instanceof Error ? fetchError.message : "Error desconocido"}
+								</div>
+							)}
+
+							{!isLoading && commits.length === 0 && !fetchError && (
+								<div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
+									<GitBranch className="w-8 h-8 mb-2 opacity-30" />
+									<p className="text-sm">No hay commits pendientes de promoción.</p>
+								</div>
+							)}
+
+							{commits.length > 0 && (
+								<div className="flex flex-col flex-1 overflow-hidden">
+									<div className="overflow-hidden border rounded-lg flex-1 overflow-y-auto">
+										<table className="w-full text-sm" style={{ tableLayout: 'fixed' }}>
+											<thead className="bg-muted sticky top-0 z-10">
+												<tr>
+													<th className="px-3 py-2 text-left font-medium w-[40px]">
+														<input
+															type="checkbox"
+															className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+															checked={commits.length > 0 && selectedShas.size === commits.length}
+															onChange={toggleAll}
+														/>
+													</th>
+													<th className="px-3 py-2 text-left font-medium w-[15%]">Hash</th>
+													<th className="px-3 py-2 text-left font-medium w-[15%]">Fecha</th>
+													<th className="px-3 py-2 text-left font-medium w-[20%]">Autor</th>
+													<th className="px-3 py-2 text-left font-medium w-[45%]">Mensaje</th>
+												</tr>
+											</thead>
+											<tbody>
+												{commits.map((commit) => (
+													<tr
+														key={commit.hash}
+														className={`border-t hover:bg-muted/50 transition-colors cursor-pointer ${selectedShas.has(commit.hash) ? 'bg-red-50/30 dark:bg-red-900/10' : ''}`}
+														onClick={() => toggleCommit(commit.hash)}
+													>
+														<td className="px-3 py-2 w-[40px]" onClick={(e) => e.stopPropagation()}>
+															<input
+																type="checkbox"
+																className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+																checked={selectedShas.has(commit.hash)}
+																onChange={() => toggleCommit(commit.hash)}
+															/>
+														</td>
+														<td className="px-3 py-2 w-[15%]">
+															<CommitLink hash={commit.hash} org={org} repo={product} />
+														</td>
+														<td className="px-3 py-2 text-muted-foreground w-[15%]">
+															{dayjs(commit.date).fromNow()}
+														</td>
+														<td className="px-3 py-2 w-[20%]">
+															<DisplayInfo value={commit.author} type="author" maxChar={30} />
+														</td>
+														<td className="px-3 py-2 w-[45%]">
+															<div className="truncate text-muted-foreground" title={commit.message.split('\n')[0]}>
+																{commit.message.split('\n')[0]}
 															</div>
-														</th>
-														<th className="px-4 py-3 text-left w-[100px]">Hash</th>
-														<th className="px-4 py-3 text-left w-[130px]">Fecha</th>
-														<th className="px-4 py-3 text-left w-[150px]">Autor</th>
-														<th className="px-4 py-3 text-left">Mensaje</th>
+														</td>
 													</tr>
-												</thead>
-												<tbody className="divide-y divide-border">
-													{commits.map((commit) => (
-														<tr 
-															key={commit.hash} 
-															className={`group hover:bg-muted/40 cursor-pointer transition-colors ${selectedShas.has(commit.hash) ? 'bg-red-50/40 dark:bg-red-900/10' : ''}`}
-															onClick={() => toggleCommit(commit.hash)}
-														>
-															<td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-																<div className="flex items-center justify-center">
-																	<input
-																		type="checkbox"
-																		className="w-4 h-4 rounded border-gray-300 text-red-600 accent-red-600 cursor-pointer"
-																		checked={selectedShas.has(commit.hash)}
-																		onChange={() => toggleCommit(commit.hash)}
-																	/>
-																</div>
-															</td>
-															<td className="px-4 py-3 font-mono text-xs">
-																<CommitLink hash={commit.hash} org={org} repo={product} />
-															</td>
-															<td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
-																{dayjs(commit.date).fromNow()}
-															</td>
-															<td className="px-4 py-3">
-																<DisplayInfo value={commit.author} type="author" maxChar={25} />
-															</td>
-															<td className="px-4 py-3">
-																<div className="truncate font-medium text-foreground" title={commit.message}>
-																	{commit.message.split('\n')[0]}
-																</div>
-															</td>
-														</tr>
-													))}
-												</tbody>
-											</table>
-											
-											{/* Infinite Scroll Sensor */}
-											<div ref={loadMoreRef} className="p-6 flex items-center justify-center border-t bg-muted/5">
-												{isFetchingNextPage ? (
-													<div className="flex items-center gap-2 text-xs text-muted-foreground">
-														<Loader2 className="w-4 h-4 animate-spin" />
-														Cargando más commits...
-													</div>
-												) : hasNextPage ? (
-													<span className="text-xs text-muted-foreground animate-pulse">Desliza para cargar más</span>
+												))}
+											</tbody>
+										</table>
+										{/* Infinite scroll sensor */}
+										<div ref={loadMoreRef} className="flex items-center justify-center py-3 border-t text-xs text-muted-foreground">
+											{isFetchingNextPage ? (
+												<><Loader2 className="w-3 h-3 animate-spin mr-1" /> Cargando más commits...</>
+											) : hasNextPage ? "Desliza para cargar más" : "Fin del historial"}
+										</div>
+									</div>
+
+									<div className="mt-4 pt-4 border-t flex items-center justify-between flex-shrink-0">
+										<div className="flex flex-col">
+											<div className="text-sm font-medium">
+												{selectedShas.size > 0 ? (
+													<span className="text-orange-600">Hotfix: {selectedShas.size} commit{selectedShas.size > 1 ? 's' : ''} seleccionado{selectedShas.size > 1 ? 's' : ''}</span>
 												) : (
-													<span className="text-xs text-muted-foreground font-medium">Fin del historial disponible</span>
+													<span className="text-red-600">Full Promotion: {commits.length} commits</span>
 												)}
 											</div>
-										</div>
-
-										{/* Action Bar */}
-										<div className="mt-6 flex items-center justify-between bg-muted/20 p-4 rounded-xl border border-red-100 dark:border-red-900/30">
-											<div className="flex items-center gap-3">
-												<div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-inner ${selectedShas.size > 0 ? 'bg-orange-100 text-orange-600' : 'bg-red-100 text-red-600'}`}>
-													<Rocket className="w-5 h-5" />
-												</div>
-												<div>
-													<p className="text-sm font-bold uppercase tracking-wider">
-														{selectedShas.size > 0 ? 'Hotfix Release' : 'Full Promotion'}
-													</p>
-													<p className="text-xs text-muted-foreground font-medium">
-														{selectedShas.size > 0 ? `${selectedShas.size} cambios seleccionados manualmente` : `Se incluirán los ${commits.length} commits acumulados`}
-													</p>
-												</div>
+											<div className="text-xs text-muted-foreground mt-0.5">
+												{selectedShas.size > 0 ? "Se creará el tag en el commit seleccionado más reciente" : "Se creará el tag en el commit más reciente"}
 											</div>
-											<button
-												onClick={() => setStep('config')}
-												className="inline-flex items-center gap-2 px-6 py-2.5 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all shadow-lg active:scale-95"
-											>
-												Configurar Lanzamiento
-												<ChevronRight className="w-4 h-4" />
-											</button>
 										</div>
-									</>
+										<button
+											onClick={() => setStep('config')}
+											className="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
+										>
+											Configurar Tag
+											<ChevronRight className="w-4 h-4" />
+										</button>
+									</div>
+								</div>
+							)}
+						</>
+					)}
+
+					{/* Step 2: Tag Config */}
+					{step === 'config' && (
+						<div className="flex flex-col flex-1 overflow-y-auto">
+							<div className="space-y-4">
+								{latestTag && (
+									<div className="text-sm">
+										<span className="text-muted-foreground">Último Tag: </span>
+										<span className="font-mono font-medium">{latestTag}</span>
+									</div>
+								)}
+
+								<div>
+									<label htmlFor="promote-tag-name" className="block text-sm font-medium mb-2">
+										Nombre del Tag
+									</label>
+									<input
+										id="promote-tag-name"
+										type="text"
+										value={tagName}
+										onChange={(e) => setTagName(e.target.value)}
+										placeholder={suggestedTag}
+										className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+									/>
+								</div>
+
+								<div>
+									<label htmlFor="promote-tag-message" className="block text-sm font-medium mb-2">
+										Descripción (opcional)
+									</label>
+									<textarea
+										id="promote-tag-message"
+										value={tagMessage}
+										onChange={(e) => setTagMessage(e.target.value)}
+										placeholder="Descripción del release..."
+										rows={3}
+										className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+									/>
+								</div>
+
+								{error && <p className="text-sm text-red-600">{error}</p>}
+
+								{!canCreateTags && !isLoadingPerms && (
+									<p className="text-xs text-orange-600 bg-orange-50 p-2 rounded border border-orange-100">
+										No tienes permisos de escritura en este repositorio para crear tags.
+									</p>
 								)}
 							</div>
-						)}
 
-						{step === 'config' && (
-							<div className="flex-1 flex flex-col p-10 max-w-2xl mx-auto w-full space-y-8 animate-in slide-in-from-right-4 duration-300">
-								<div className="space-y-2">
-									<h3 className="text-lg font-bold">Detalles de la Versión</h3>
-									<p className="text-sm text-muted-foreground">Define el tag y el mensaje que quedarán registrados en GitHub.</p>
-								</div>
-
-								<div className="space-y-6">
-									<div className="space-y-2">
-										<label className="text-sm font-bold flex items-center justify-between">
-											Nombre del Tag (SemVer)
-											{latestTag && <span className="text-[10px] bg-muted px-2 py-0.5 rounded-full font-mono text-muted-foreground">Anterior: {latestTag}</span>}
-										</label>
-										<input
-											type="text"
-											value={tagName}
-											onChange={(e) => setTagName(e.target.value)}
-											placeholder="Ej: v1.5.0"
-											className="w-full px-4 py-3 bg-card border rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all font-mono shadow-sm"
-										/>
-									</div>
-
-									<div className="space-y-2">
-										<label className="text-sm font-bold">Mensaje / Notas del Release</label>
-										<textarea
-											value={tagMessage}
-											onChange={(e) => setTagMessage(e.target.value)}
-											placeholder="Ej: Solución de bug crítico en el login..."
-											rows={4}
-											className="w-full px-4 py-3 bg-card border rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all resize-none shadow-sm"
-										/>
-									</div>
-
-									{error && (
-										<div className="p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 flex items-center gap-3 text-sm animate-in fade-in zoom-in-95">
-											<AlertCircle className="w-5 h-5 flex-shrink-0" />
-											{error}
-										</div>
-									)}
-
-									{!canCreateTags && !isLoadingPerms && (
-										<div className="p-4 bg-orange-50 text-orange-700 rounded-xl border border-orange-100 text-xs flex gap-3">
-											<AlertCircle className="w-4 h-4 flex-shrink-0" />
-											<div>
-												<p className="font-bold">Acceso Denegado</p>
-												<p>No tienes permisos de escritura en este repositorio. Contacta al administrador para habilitar lanzamientos.</p>
-											</div>
-										</div>
-									)}
-
-									<div className="pt-4 flex items-center gap-4">
-										<button
-											onClick={() => setStep('list')}
-											className="flex-1 px-6 py-3 font-bold border rounded-xl hover:bg-muted transition-all inline-flex items-center justify-center gap-2"
-										>
-											<ChevronLeft className="w-4 h-4" />
-											Volver
-										</button>
-										<button
-											onClick={handleCreateTag}
-											disabled={isCreating || !tagName.trim() || (!canCreateTags && !isLoadingPerms)}
-											className="flex-[2] px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all shadow-xl active:scale-95 disabled:opacity-50 inline-flex items-center justify-center gap-2"
-										>
-											{isCreating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Rocket className="w-5 h-5" />}
-											{isCreating ? 'Publicando...' : 'Publicar Release'}
-										</button>
-									</div>
-								</div>
+							<div className="mt-4 pt-4 border-t flex justify-between gap-2 flex-shrink-0">
+								<button
+									onClick={() => setStep('list')}
+									className="px-4 py-2 text-sm font-medium border rounded-md hover:bg-muted transition-colors inline-flex items-center gap-1"
+								>
+									<ChevronLeft className="w-4 h-4" />
+									Volver
+								</button>
+								<button
+									onClick={handleCreateTag}
+									disabled={isCreating || !tagName.trim() || (!canCreateTags && !isLoadingPerms)}
+									className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+								>
+									{isCreating ? <><Loader2 className="w-4 h-4 animate-spin" /> Publicando...</> : <><Rocket className="w-4 h-4" /> Publicar Tag</>}
+								</button>
 							</div>
-						)}
+						</div>
+					)}
 
-						{step === 'success' && (
-							<div className="flex-1 flex flex-col items-center justify-center p-12 text-center space-y-6 animate-in zoom-in-95 duration-500">
-								<div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center animate-bounce shadow-inner">
-									<CheckCircle2 className="w-12 h-12" />
-								</div>
-								<div className="space-y-2">
-									<h2 className="text-4xl font-bold tracking-tight">¡Lanzamiento Exitoso!</h2>
-									<p className="text-muted-foreground text-lg max-w-md mx-auto">La versión <strong>{tagName}</strong> ha sido publicada correctamente en <strong>{repo}</strong>.</p>
-								</div>
-								<div className="pt-8">
-									<Dialog.Close asChild>
-										<button className="px-10 py-3.5 bg-primary text-white font-bold rounded-xl hover:shadow-2xl transition-all active:scale-95 shadow-xl">
-											Finalizar y Volver
-										</button>
-									</Dialog.Close>
-								</div>
+					{/* Step 3: Success */}
+					{step === 'success' && (
+						<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
+							<CheckCircle2 className="w-12 h-12 text-green-600" />
+							<div>
+								<p className="text-lg font-semibold">Tag <span className="font-mono">{tagName}</span> creado</p>
+								<p className="text-sm text-muted-foreground mt-1">El lanzamiento fue publicado correctamente en <strong>{repo}</strong>.</p>
 							</div>
-						)}
-					</div>
+							<Dialog.Close asChild>
+								<button className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+									Cerrar
+								</button>
+							</Dialog.Close>
+						</div>
+					)}
 				</Dialog.Content>
 			</Dialog.Portal>
 		</Dialog.Root>

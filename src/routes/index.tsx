@@ -17,46 +17,68 @@ function Dashboard() {
 
 	const favoriteRepos = favorites
 		.filter((f) => f.includes("/"))
-		.map((f) => ({
-			fullName: f,
-			name: f.split("/")[1],
-			description: "",
-			updatedAt: "",
-		}));
+		.map((f) => {
+			const [org, name] = f.split("/");
+			return {
+				fullName: f,
+				name,
+				org,
+				description: "",
+				updatedAt: "",
+			};
+		});
 
-	return (
-		<div className="space-y-6">
-			<div className="flex items-center justify-between">
-				<h1 className="text-lg font-bold">Favoritos</h1>
-			</div>
+	// Group repos by organization
+	const groupedRepos = favoriteRepos.reduce((acc, repo) => {
+		if (!acc[repo.org]) {
+			acc[repo.org] = [];
+		}
+		acc[repo.org].push(repo);
+		return acc;
+	}, {} as Record<string, typeof favoriteRepos>);
 
-			{/* Favorites Table */}
-			<section>
-				<ReposTable
-					repos={favoriteRepos}
-					favorites={favorites}
-					onToggleFavorite={toggleFavorite}
-				/>
-			</section>
-		</div>
-	);
-}
+	// Sort organizations alphabetically
+	const sortedOrgs = Object.keys(groupedRepos).sort();
 
-function ReposTable({ repos, favorites, onToggleFavorite }: ReposTableProps) {
-	if (repos.length === 0) {
+	if (favorites.length === 0) {
 		return (
-			<div className="border rounded-lg p-8 text-center text-muted-foreground">
-				<Star className="w-8 h-8 mx-auto mb-2 opacity-50" />
-				<p>Sin favoritos</p>
-				<p className="text-sm">
-					Búsqueda de repositorios para agregar a favoritos
+			<div className="border rounded-xl p-12 text-center text-muted-foreground bg-muted/20 border-dashed">
+				<Star className="w-10 h-10 mx-auto mb-4 opacity-20" />
+				<h3 className="text-lg font-medium text-foreground mb-1">Sin favoritos</h3>
+				<p className="text-sm max-w-xs mx-auto">
+					Busca repositorios usando la barra superior para agregarlos a tu panel principal.
 				</p>
 			</div>
 		);
 	}
 
-	// Ordenar repositorios alfabéticamente por fullName
-	const sortedRepos = [...repos].sort((a, b) => a.fullName.localeCompare(b.fullName));
+	return (
+		<div className="space-y-10">
+			{sortedOrgs.map(org => (
+				<section key={org} className="space-y-3">
+					<div className="flex items-center gap-2 px-1">
+						<div className="w-1 h-6 bg-primary rounded-full" />
+						<h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+							{org}
+							<span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-full text-muted-foreground font-medium">
+								{groupedRepos[org].length}
+							</span>
+						</h2>
+					</div>
+					<ReposTable
+						repos={groupedRepos[org]}
+						favorites={favorites}
+						onToggleFavorite={toggleFavorite}
+					/>
+				</section>
+			))}
+		</div>
+	);
+}
+
+function ReposTable({ repos, favorites, onToggleFavorite }: ReposTableProps) {
+	// Ordenar repositorios alfabéticamente por name (ya que ya están filtrados por org)
+	const sortedRepos = [...repos].sort((a, b) => a.name.localeCompare(b.name));
 
 	return (
 		<div className="border rounded-lg overflow-hidden">
@@ -219,14 +241,21 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 	return (
 		<tr className="border-t hover:bg-muted/50">
 			<td className="px-4 py-3">
-				<Link
-					to="/product/$org/$product"
-					params={{ org, product: name }}
-					search={{ stage: "staging", event: "commit" }}
-					className="font-medium hover:text-primary"
-				>
-					{repo.fullName}
-				</Link>
+				<div className="flex items-center gap-2">
+					<Link
+						to="/product/$org/$product"
+						params={{ org, product: name }}
+						search={{ stage: "staging", event: "commit" }}
+						className="font-medium hover:text-primary"
+					>
+						{name}
+					</Link>
+					{latestCommit?.hash && prodPipeline.data?.git?.commit && latestCommit.hash !== prodPipeline.data.git.commit && (
+						<span className="text-[10px] bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded border border-yellow-200 font-medium">
+							Pendiente
+						</span>
+					)}
+				</div>
 			</td>
 			<td className="px-4 py-3">
 				{latestTag?.name && (

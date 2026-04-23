@@ -26,8 +26,7 @@ export function useGhCliSetup() {
 		queryKey: ["gh-cli", "auth"],
 		queryFn: async () => {
 			try {
-				// Usar gh repo list como verificación más flexible que gh auth status
-				const result = await runCommand("gh repo list --limit 1");
+				const result = await runCommand("gh auth status");
 				return result.stdout;
 			} catch {
 				return null;

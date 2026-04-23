@@ -8,13 +8,13 @@ import "dayjs/locale/es";
 import { SekiMonitor } from "@/components/SekiMonitor/SekiMonitor";
 import { StageCommitsTable } from "@/components/StageCommitsTable";
 import { CreateTagDialog } from "@/components/CreateTagDialog";
-import { DiffDialog } from "@/components/DiffDialog";
+import { PromoteDialog } from "@/components/PromoteDialog";
 import { RefetchButton } from "@/components/ui/RefetchButton";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTags } from "@/hooks/useGitTags";
 import { usePipeline, usePipelineWithTag } from "@/hooks/usePipeline";
 import { useToken } from "@/hooks/useToken";
-import { useRepoPermission } from "@/hooks/useUserRepos";
+import { useRepoPermission } from "@/hooks/useRepoPermission";
 
 dayjs.extend(relativeTime);
 dayjs.locale("es");
@@ -36,7 +36,7 @@ function ProductIndex() {
 
 	const { latestCommit } = useGitCommits({ repo: fullProduct });
 	const { latestTag } = useGitTags({ repo: fullProduct });
-	const { data: repoPermission, isLoading: isLoadingPermissions } = useRepoPermission(fullProduct);
+	const { data: repoPermission, isLoading: isLoadingPermissions } = useRepoPermission({ repo: fullProduct });
 
 	const canCreateTags =
 		repoPermission?.permissions?.push ||
@@ -168,31 +168,12 @@ function ProductIndex() {
 								Tags
 							</button>
 						</div>
-						{activeStage === "production" && (
-							<div className="flex items-center gap-2">
-								{latestTag?.name && (
-									<DiffDialog
-										repo={fullProduct}
-										currentTag={latestTag?.name}
-									/>
-								)}
-								<CreateTagDialog
-									latestTag={latestTag?.name}
-									repo={fullProduct}
-									product={fullProduct}
-									commit={latestCommit?.hash}
-									canCreateTags={canCreateTags}
-									isLoadingPermissions={isLoadingPermissions}
-									onSuccess={() => {
-										// Invalidate queries after creating a new one
-										queryClient.invalidateQueries({ queryKey: ['git', 'tags', fullProduct] });
-										queryClient.invalidateQueries({ queryKey: ['repo', 'permission', fullProduct] });
-										// Keep active stage as production
-										setActiveStage('production');
-									}}
-								/>
-							</div>
-						)}
+						<div className="flex items-center gap-2">
+							<PromoteDialog
+								repo={fullProduct}
+								latestTag={latestTag?.name}
+							/>
+						</div>
 					</div>
 					<StageCommitsTable
 						stage={activeStage}

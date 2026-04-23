@@ -13,9 +13,10 @@ interface CreateTagDialogProps {
 	canCreateTags?: boolean
 	isLoadingPermissions?: boolean
 	onSuccess?: () => void
+	children?: React.ReactNode
 }
 
-export function CreateTagDialog({ latestTag, repo, product, commit, canCreateTags = true, isLoadingPermissions = false, onSuccess }: CreateTagDialogProps) {
+export function CreateTagDialog({ latestTag, repo, product, commit, canCreateTags = true, isLoadingPermissions = false, onSuccess, children }: CreateTagDialogProps) {
 	const [open, setOpen] = useState(false)
 	const [tagName, setTagName] = useState("")
 	const [tagMessage, setTagMessage] = useState("")
@@ -111,7 +112,11 @@ export function CreateTagDialog({ latestTag, repo, product, commit, canCreateTag
 
 	return (
 		<Dialog.Root open={open} onOpenChange={handleOpenChange}>
-			{canCreateTags === true && !isLoadingPermissions ? (
+			{children ? (
+				<Dialog.Trigger asChild>
+					{children}
+				</Dialog.Trigger>
+			) : canCreateTags === true && !isLoadingPermissions ? (
 				<Dialog.Trigger asChild>
 					<button
 						type="button"
@@ -188,6 +193,12 @@ export function CreateTagDialog({ latestTag, repo, product, commit, canCreateTag
 							<p className="text-sm text-red-600">{error}</p>
 						)}
 
+						{!canCreateTags && !isLoadingPermissions && (
+							<p className="text-xs text-orange-600 bg-orange-50 p-2 rounded border border-orange-100">
+								No tienes permisos de escritura en este repositorio para crear tags.
+							</p>
+						)}
+
 						<div className="flex justify-end gap-2">
 							<Dialog.Close asChild>
 								<button
@@ -200,14 +211,19 @@ export function CreateTagDialog({ latestTag, repo, product, commit, canCreateTag
 							<button
 								type="button"
 								onClick={handleCreateTag}
-								disabled={isCreating || !tagName.trim() || !canCreateTags}
+								disabled={isCreating || !tagName.trim() || (!canCreateTags && !isLoadingPermissions)}
 								className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
-								title={!canCreateTags ? "Permisos insuficientes para la creación de Tags" : undefined}
+								title={
+									isCreating ? "Creando tag..." :
+									!tagName.trim() ? "El nombre del tag no puede estar vacío" :
+									(!canCreateTags && !isLoadingPermissions) ? `Permisos insuficientes (${repo})` : 
+									undefined
+								}
 							>
-								{isCreating ? (
+								{isCreating || isLoadingPermissions ? (
 									<>
 										<Loader2 className="w-4 h-4 animate-spin" />
-										Procesando...
+										{isCreating ? "Procesando..." : "Verificando..."}
 									</>
 								) : (
 									"Publicar Tag"

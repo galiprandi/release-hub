@@ -100,26 +100,3 @@ export function useUserRepos({
   })
 }
 
-/**
- * Hook to get viewer permission for a specific repository
- */
-export function useRepoPermission(repo: string) {
-  return useQuery({
-    queryKey: ['repo', 'permission', repo],
-    queryFn: async () => {
-      const result = await runCommand(`gh api repos/${repo} --jq '{permissions, viewerPermission, viewerCanAdminister}'`)
-      return JSON.parse(result.stdout) as {
-        permissions?: {
-          admin: boolean
-          maintain: boolean
-          push: boolean
-          triage: boolean
-          pull: boolean
-        }
-        viewerPermission?: string
-        viewerCanAdminister?: boolean
-      }
-    },
-    enabled: !!repo,
-  })
-}

@@ -6,6 +6,8 @@ import { runCommand } from "@/api/exec"
 import { CommitLink } from "./CommitLink"
 import { DisplayInfo } from "./DislpayInfo"
 import { RefetchButton } from "./ui/RefetchButton"
+import { CreateTagDialog } from "./CreateTagDialog"
+import { useRepoPermission } from "../hooks/useRepoPermission"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import "dayjs/locale/es"
@@ -20,7 +22,10 @@ interface DiffDialogProps {
 
 export function DiffDialog({ repo, currentTag }: DiffDialogProps) {
 	const [open, setOpen] = useState(false)
+	const [selectedShas, setSelectedShas] = useState<Set<string>>(new Set())
 	const [org, product] = repo.split("/")
+
+	const { data: permissions, isLoading: isLoadingPerms } = useRepoPermission({ repo })
 
 	const { data, isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage, refetch, dataUpdatedAt } = useInfiniteQuery({
 		queryKey: ["git", "diff", repo, currentTag],
@@ -44,8 +49,29 @@ export function DiffDialog({ repo, currentTag }: DiffDialogProps) {
 
 	const diffCommits = data?.pages.flat()
 
+	const toggleCommit = (sha: string) => {
+		const newSelected = new Set(selectedShas)
+		if (newSelected.has(sha)) {
+			newSelected.delete(sha)
+		} else {
+			newSelected.add(sha)
+		}
+		setSelectedShas(newSelected)
+	}
+
+	const toggleAll = () => {
+		if (selectedShas.size === (diffCommits?.length || 0)) {
+			setSelectedShas(new Set())
+		} else {
+			setSelectedShas(new Set(diffCommits?.map(c => c.sha) || []))
+		}
+	}
+
 	return (
-		<Dialog.Root open={open} onOpenChange={setOpen}>
+		<Dialog.Root open={open} onOpenChange={(val) => {
+			setOpen(val)
+			if (!val) setSelectedShas(new Set())
+		}}>
 			<Dialog.Trigger asChild>
 				<button
 					type="button"
@@ -98,22 +124,37 @@ export function DiffDialog({ repo, currentTag }: DiffDialogProps) {
 							Error detectado durante la carga de Diff: {error instanceof Error ? error.message : "Error desconocido"}
 						</div>
 					)}
-
 					{diffCommits && diffCommits.length > 0 ? (
 						<div className="flex flex-col flex-1 overflow-hidden">
-							<div className="overflow-hidden border rounded-lg flex-1">
+							<div className="overflow-hidden border rounded-lg flex-1 overflow-y-auto">
 								<table className="w-full text-sm" style={{ tableLayout: 'fixed' }}>
-									<thead className="bg-muted">
+									<thead className="bg-muted sticky top-0 z-10">
 										<tr>
+											<th className="px-3 py-2 text-left font-medium w-[40px]">
+												<input
+													type="checkbox"
+													className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+													checked={selectedShas.size > 0 && selectedShas.size === (diffCommits?.length || 0)}
+													onChange={toggleAll}
+												/>
+											</th>
 											<th className="px-3 py-2 text-left font-medium w-[15%]">Hash</th>
 											<th className="px-3 py-2 text-left font-medium w-[15%]">Fecha</th>
 											<th className="px-3 py-2 text-left font-medium w-[20%]">Autor</th>
-											<th className="px-3 py-2 text-left font-medium w-[50%]">Mensaje</th>
+											<th className="px-3 py-2 text-left font-medium w-[45%]">Mensaje</th>
 										</tr>
 									</thead>
 									<tbody>
 										{diffCommits.map((commit: { sha: string; commit: { message: string; author: { name: string; date: string } }; author?: { login: string } }) => (
-											<tr key={commit.sha} className="border-t hover:bg-muted/50">
+											<tr key={commit.sha} className={`border-t hover:bg-muted/50 transition-colors ${selectedShas.has(commit.sha) ? 'bg-blue-50/30' : ''}`}>
+												<td className="px-3 py-2 w-[40px]">
+													<input
+														type="checkbox"
+														className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+														checked={selectedShas.has(commit.sha)}
+														onChange={() => toggleCommit(commit.sha)}
+													/>
+												</td>
 												<td className="px-3 py-2 w-[15%]">
 													<CommitLink hash={commit.sha} org={org} repo={product} />
 												</td>
@@ -123,7 +164,7 @@ export function DiffDialog({ repo, currentTag }: DiffDialogProps) {
 												<td className="px-3 py-2 w-[20%]">
 													<DisplayInfo value={commit.author?.login || commit.commit.author.name} type="author" maxChar={30} />
 												</td>
-												<td className="px-3 py-2 w-[50%]">
+												<td className="px-3 py-2 w-[45%]">
 													<div className="truncate text-muted-foreground" title={commit.commit.message.split('\n')[0]}>
 														{commit.commit.message.split('\n')[0]}
 													</div>
@@ -133,19 +174,72 @@ export function DiffDialog({ repo, currentTag }: DiffDialogProps) {
 									</tbody>
 								</table>
 							</div>
-							{hasNextPage && !isLoading && (
-								<div className="mt-3 flex justify-center">
-									<button
-										type="button"
-										onClick={() => fetchNextPage()}
-										disabled={isFetchingNextPage}
-										className="flex items-center gap-2 px-4 py-2 text-sm bg-background hover:bg-accent hover:text-accent-foreground rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-									>
-										{isFetchingNextPage && <Loader2 className="w-4 h-4 animate-spin" />}
-										{isFetchingNextPage ? "Cargando..." : "Cargar más"}
-									</button>
+							
+							<div className="mt-4 pt-4 border-t flex items-center justify-between flex-shrink-0">
+								<div className="flex flex-col">
+									<div className="text-sm font-medium">
+										{selectedShas.size > 0 ? (
+											<span className="text-orange-600">{selectedShas.size} commit(s) seleccionados para Hotfix</span>
+										) : (
+											<span className="text-blue-600">Lanzamiento Completo (Full Release)</span>
+										)}
+									</div>
+									<div className="text-xs text-muted-foreground">
+										{selectedShas.size > 0 
+											? "Se creará un tag desde el commit seleccionado más reciente." 
+											: `Se incluirán los ${diffCommits.length} commits pendientes.`
+										}
+									</div>
 								</div>
-							)}
+								
+								<div className="flex items-center gap-2">
+									{hasNextPage && !isLoading && (
+										<button
+											type="button"
+											onClick={() => fetchNextPage()}
+											disabled={isFetchingNextPage}
+											className="flex items-center gap-2 px-3 py-1.5 text-xs bg-background hover:bg-accent border rounded-md transition-colors disabled:opacity-50"
+										>
+											{isFetchingNextPage && <Loader2 className="w-3 h-3 animate-spin" />}
+											Cargar más
+										</button>
+									)}
+									
+									<CreateTagDialog 
+										repo={repo}
+										product={product}
+										latestTag={currentTag}
+										commit={selectedShas.size > 0 ? Array.from(selectedShas)[0] : "main"}
+										canCreateTags={
+											permissions?.permissions?.push ||
+											permissions?.permissions?.maintain ||
+											permissions?.permissions?.admin ||
+											permissions?.viewerPermission === 'WRITE' ||
+											permissions?.viewerPermission === 'ADMIN' ||
+											permissions?.viewerCanAdminister
+										}
+										isLoadingPermissions={isLoadingPerms}
+										onSuccess={() => {
+											setOpen(false)
+											setSelectedShas(new Set())
+										}}
+									>
+										<button
+											type="button"
+											className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-md transition-all shadow-sm ${
+												selectedShas.size > 0 
+												? 'bg-orange-600 hover:bg-orange-700 ring-orange-100 focus:ring-4' 
+												: 'bg-red-600 hover:bg-red-700 ring-red-100 focus:ring-4'
+											}`}
+										>
+											{selectedShas.size > 0 
+												? `Crear Hotfix (${selectedShas.size})` 
+												: "Promocionar todo a Producción"
+											}
+										</button>
+									</CreateTagDialog>
+								</div>
+							</div>
 						</div>
 					) : (
 						<div className="text-sm text-muted-foreground py-4 flex-shrink-0">

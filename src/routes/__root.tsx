@@ -3,6 +3,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Github } from "lucide-react";
 import { useEffect } from "react";
 import { RepoSearch } from "@/components/RepoSearch";
+import { NovedadesDialog } from "@/components/NovedadesDialog";
 import { useGitUser } from "@/hooks/useGitUser";
 import { useGhCliSetup } from "@/hooks/useGhCliSetup";
 
@@ -81,6 +82,7 @@ function RootLayout() {
 							ReleaseHub
 						</Link>
 						<div className="flex items-center gap-4">
+							<NovedadesDialog />
 							<RepoSearch />
 							<UserAvatar />
 						</div>

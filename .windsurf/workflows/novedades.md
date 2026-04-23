@@ -44,22 +44,6 @@ Los commits obtenidos pueden ser de distintas fechas (desde la última entrada e
 - Mencionar dónde se encuentra el cambio en la interfaz
 - Usar verbos de acción: "Ahora puedes...", "Se agregó...", "Se corrigió..."
 
-**Formato de salida (WhatsApp-compatible):**
-
-Nuevo formato **inline** - cada novedad lleva su emoji de tipo:
-
-```
-🚀 Novedades del Sistema
-
-🗓️ 17 de Abril de 2026
-• ✨ Ventas Rápidas: El botón ahora dice "Registrar pago".
-• 🎉 Clientes: Ahora puedes registrar pagos desde la ficha.
-
-🗓️ 15 de Abril de 2026
-• ✨ Clientes: Los nombres ahora se muestran con formato correcto.
-• 🐛 Productos: Corrección en el cálculo de costos.
-```
-
 **Reglas de formato WhatsApp:**
 - NO usar `**negrita**`, `## títulos`, ni markdown syntax
 - Cada novedad es una línea con bullet: `• [emoji] [Área]: Descripción`
@@ -130,16 +114,18 @@ fix: resolve payment calculation rounding error
 
 **Ejemplo de estructura final:**
 ```
-🚀 Novedades del Sistema
+## 🚀 Novedades del Sistema
 
-🗓️ 17 de Abril de 2026      ← Nueva entrada (commits recientes)
-[contenido...]
+---
 
-🗓️ 15 de Abril de 2026      ← Nueva entrada (otros commits)
-[contenido...]
+### 🗓️ 23 de Abril de 2026      ← Nueva entrada (commits recientes)
 
-🗓️ 10 de Abril de 2026      ← Ya existía, se preserva
-[contenido...]
+- [contenido...]
+
+
+### 🗓️ 22 de Abril de 2026      ← Nueva entrada (commits recientes)
+
+- [contenido...]
 ```
 
 ### 6. Si hay dudas

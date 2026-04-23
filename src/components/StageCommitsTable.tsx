@@ -11,12 +11,14 @@ interface StageCommitsTableProps {
 	stage: "staging" | "production";
 	org: string;
 	product: string;
+	showStatus?: boolean;
 }
 
 export function StageCommitsTable({
 	stage,
 	org,
 	product,
+	showStatus = true,
 }: StageCommitsTableProps) {
 	const fullRepo = `${org}/${product}`;
 	const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -108,7 +110,7 @@ export function StageCommitsTable({
 							commits?.map((c: GitCommit) => (
 								<tr key={c.hash} className="border-t hover:bg-muted/50 transition-colors">
 									<td className="px-4 py-3">
-										<CommitLink hash={c.hash} org={org} repo={product} />
+										<CommitLink hash={c.hash} org={org} repo={product} showStatus={showStatus} />
 									</td>
 									<td className="px-4 py-3 text-muted-foreground">
 										<DisplayInfo value={c.date} type="dates" />
@@ -130,7 +132,7 @@ export function StageCommitsTable({
 								?.map((t: GitTag) => (
 									<tr key={t.name} className="border-t hover:bg-muted/50 transition-colors">
 										<td className="px-4 py-3">
-											<TagLink tagName={t.name} org={org} repo={product} />
+											<TagLink tagName={t.name} org={org} repo={product} showStatus={showStatus} />
 										</td>
 										<td className="px-4 py-3 text-muted-foreground">
 											<DisplayInfo value={t.date} type="dates" />

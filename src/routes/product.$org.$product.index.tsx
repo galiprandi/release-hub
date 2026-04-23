@@ -167,6 +167,7 @@ function ProductIndex() {
 						stage={activeStage}
 						org={org}
 						product={product}
+						showStatus={false}
 					/>
 				</>
 			)}

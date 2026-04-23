@@ -13,9 +13,10 @@ interface CommitLinkProps {
 		errorDetail?: string;
 	};
 	isLoading?: boolean;
+	showStatus?: boolean;
 }
 
-export function CommitLink({ hash, org, repo, short = true, pipelineStatus, isLoading }: CommitLinkProps) {
+export function CommitLink({ hash, org, repo, short = true, pipelineStatus, isLoading, showStatus = true }: CommitLinkProps) {
 	const displayHash = short ? hash.slice(0, 7) : hash;
 	const githubUrl = `https://github.com/${org}/${repo}/commit/${hash}`;
 
@@ -30,14 +31,16 @@ export function CommitLink({ hash, org, repo, short = true, pipelineStatus, isLo
 				<GitCommit className="w-4 h-4" />
 				{displayHash}
 			</a>
-			<DeployStatusIndicator
-				status={pipelineStatus?.status}
-				updatedAt={pipelineStatus?.updatedAt}
-				failedStage={pipelineStatus?.failedStage}
-				errorDetail={pipelineStatus?.errorDetail}
-				stage="staging"
-				isLoading={isLoading}
-			/>
+			{showStatus && (
+				<DeployStatusIndicator
+					status={pipelineStatus?.status}
+					updatedAt={pipelineStatus?.updatedAt}
+					failedStage={pipelineStatus?.failedStage}
+					errorDetail={pipelineStatus?.errorDetail}
+					stage="staging"
+					isLoading={isLoading}
+				/>
+			)}
 		</div>
 	);
 }

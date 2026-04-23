@@ -12,9 +12,10 @@ interface TagLinkProps {
 		errorDetail?: string;
 	};
 	isLoading?: boolean;
+	showStatus?: boolean;
 }
 
-export function TagLink({ tagName, org, repo, pipelineStatus, isLoading }: TagLinkProps) {
+export function TagLink({ tagName, org, repo, pipelineStatus, isLoading, showStatus = true }: TagLinkProps) {
 	const githubUrl = `https://github.com/${org}/${repo}/releases/tag/${tagName}`;
 
 	return (
@@ -28,14 +29,16 @@ export function TagLink({ tagName, org, repo, pipelineStatus, isLoading }: TagLi
 				<Tag className="w-4 h-4" />
 				{tagName}
 			</a>
-			<DeployStatusIndicator
-				status={pipelineStatus?.status}
-				updatedAt={pipelineStatus?.updatedAt}
-				failedStage={pipelineStatus?.failedStage}
-				errorDetail={pipelineStatus?.errorDetail}
-				stage="production"
-				isLoading={isLoading}
-			/>
+			{showStatus && (
+				<DeployStatusIndicator
+					status={pipelineStatus?.status}
+					updatedAt={pipelineStatus?.updatedAt}
+					failedStage={pipelineStatus?.failedStage}
+					errorDetail={pipelineStatus?.errorDetail}
+					stage="production"
+					isLoading={isLoading}
+				/>
+			)}
 		</div>
 	);
 }

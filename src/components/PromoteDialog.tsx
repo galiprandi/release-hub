@@ -6,6 +6,9 @@ import { Rocket, X, Loader2, CheckCircle2 } from "lucide-react"
 import axios from "axios"
 import { runCommand } from "@/api/exec"
 import { useRepoPermission } from "../hooks/useRepoPermission"
+import { useDiscordChannel } from "@/hooks/useDiscordChannel"
+import { useGitUser } from "@/hooks/useGitUser"
+import { DiscordNotification } from "@/components/ui/DiscordNotification"
 
 interface PromoteDialogProps {
 	repo: string
@@ -23,6 +26,10 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDial
 	const [tagMessage, setTagMessage] = useState("")
 	const [isCreating, setIsCreating] = useState(false)
 	const [error, setError] = useState("")
+	const { webhookUrl, saveWebhook } = useDiscordChannel(repo)
+	const [tempWebhookUrl, setTempWebhookUrl] = useState(webhookUrl)
+	const [notificationsEnabled, setNotificationsEnabled] = useState(!!webhookUrl)
+	const { data: gitUser } = useGitUser()
 
 	const { data: permissions, isLoading: isLoadingPerms } = useRepoPermission({ repo })
 	const suggestedTag = latestTag ? incrementVersion(latestTag) : "v1.0.0"
@@ -31,8 +38,11 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDial
 		setOpen(newOpen)
 		if (newOpen) {
 			setStep('config')
-			setTagName(suggestedTag)
-			setTagMessage(`Release ${suggestedTag}`)
+			// Recalculate suggested tag when opening dialog to get latest version
+			const newSuggestedTag = latestTag ? incrementVersion(latestTag) : "v1.0.0"
+			setTagName(newSuggestedTag)
+			setTagMessage(`Release ${newSuggestedTag}`)
+			setTempWebhookUrl(webhookUrl)
 			setError("")
 		}
 	}
@@ -52,7 +62,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDial
 		const latestCommitResult = await runCommand(`gh api repos/${repo}/commits/main --jq '.sha'`)
 		const targetCommit = latestCommitResult.stdout.trim()
 		if (!targetCommit) throw new Error("No se pudo obtener el commit más reciente de main")
-		
+
 		setIsCreating(true)
 		setError("")
 		try {
@@ -69,13 +79,58 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDial
 				{ ref: `refs/tags/${tagName}`, sha: tagResponse.data.sha },
 				{ headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" } }
 			)
+
+			// Save Discord webhook if provided
+			if (tempWebhookUrl && tempWebhookUrl !== webhookUrl) {
+				saveWebhook(tempWebhookUrl)
+			}
+
+			// Send Discord notification if enabled and webhook is configured
+			if (notificationsEnabled && tempWebhookUrl) {
+				await sendDiscordNotification(tempWebhookUrl, repo, tagName)
+			}
+
 			queryClient.invalidateQueries({ queryKey: ["git", "tags", repo] })
+			queryClient.invalidateQueries({ queryKey: ["git", "tags-simple", repo] })
 			queryClient.invalidateQueries({ queryKey: ["repo", "permission", repo] })
 			setStep('success')
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Error al crear el Tag")
 		} finally {
 			setIsCreating(false)
+		}
+	}
+
+	const sendDiscordNotification = async (webhookUrl: string, repo: string, tag: string) => {
+		try {
+			const timestamp = new Date().toISOString()
+			const userName = gitUser?.name || "Unknown"
+
+			const embed = {
+				title: "🚀 Nueva Promoción a Producción",
+				description: `El tag **${tag}** de \`${repo}\` ha sido publicado en producción ${userName} desde ReleaseHub.`,
+				color: 16777215, // White for promotion
+				timestamp,
+				footer: {
+					text: "ReleaseHub - Promoción",
+				},
+			}
+
+			const response = await fetch(webhookUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					embeds: [embed],
+				}),
+			})
+
+			if (!response.ok) {
+				throw new Error(`Discord webhook failed: ${response.statusText}`)
+			}
+		} catch (err) {
+			console.error('Error sending Discord notification:', err)
 		}
 	}
 
@@ -176,6 +231,13 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDial
 									/>
 								</div>
 
+								<DiscordNotification
+									webhookUrl={tempWebhookUrl}
+									onWebhookChange={setTempWebhookUrl}
+									enabled={notificationsEnabled}
+									onEnabledChange={setNotificationsEnabled}
+								/>
+
 								{error && <p className="text-sm text-red-600">{error}</p>}
 
 								{!canCreateTags && !isLoadingPerms && (
@@ -204,6 +266,11 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDial
 							<div>
 								<p className="text-lg font-semibold">Tag <span className="font-mono">{tagName}</span> creado</p>
 								<p className="text-sm text-muted-foreground mt-1">El lanzamiento fue publicado correctamente en <strong>{repo}</strong>.</p>
+								{tempWebhookUrl && (
+									<p className="text-xs text-muted-foreground mt-2">
+										Notificación enviada al canal de Discord
+									</p>
+								)}
 							</div>
 							<Dialog.Close asChild>
 								<button className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">

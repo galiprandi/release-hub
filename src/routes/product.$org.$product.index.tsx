@@ -9,6 +9,7 @@ import { SekiMonitor } from "@/components/SekiMonitor/SekiMonitor";
 import { StageCommitsTable } from "@/components/StageCommitsTable";
 import { PromoteDialog } from "@/components/PromoteDialog";
 import { ForceRedeployDialog } from "@/components/ForceRedeployDialog";
+import { FreezeDialog } from "@/components/FreezeDialog";
 import { RefetchButton } from "@/components/ui/RefetchButton";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTags } from "@/hooks/useGitTags";
@@ -166,6 +167,7 @@ function ProductIndex() {
 							</button>
 						</div>
 						<div className="flex items-center gap-2">
+							<FreezeDialog repo={fullProduct} iconOnly={false} />
 							{isStaging ? (
 								<ForceRedeployDialog repo={fullProduct} />
 							) : (

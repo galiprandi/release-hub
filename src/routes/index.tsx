@@ -5,6 +5,7 @@ import { CommitLink } from "@/components/CommitLink";
 import { TagLink } from "@/components/TagLink";
 import { PromoteDialog } from "@/components/PromoteDialog";
 import { ForceRedeployDialog } from "@/components/ForceRedeployDialog";
+import { FreezeDialog } from "@/components/FreezeDialog";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTagsSimple } from "@/hooks/useGitTagsSimple";
@@ -291,6 +292,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 			</td>
 			<td className="px-4 py-3 text-center">
 				<div className="flex items-center justify-center gap-2">
+					<FreezeDialog repo={repo.fullName} iconOnly={true} />
 					<ForceRedeployDialog repo={repo.fullName} iconOnly={true} />
 					<PromoteDialog repo={repo.fullName} latestTag={latestTag?.name} iconOnly={true} />
 					<a

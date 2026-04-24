@@ -157,6 +157,10 @@ src/
 - Nombre del repo es enlace externo a GitHub en nueva pestaña
 - Ícono de estrella para favoritos
 
+## Preferencias del Usuario
+
+- **Discord Notifications**: NO usar `fields` en los embeds de Discord. Usar solo `title` y `description` con toda la información en la descripción.
+
 ## REGLAS CRÍTICAS DE DESARROLLO
 
 ### 1. Operaciones por Repositorio

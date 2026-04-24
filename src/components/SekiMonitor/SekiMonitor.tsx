@@ -1,4 +1,4 @@
-import { GitCommit, Loader2, XCircle } from "lucide-react";
+import { GitCommit, Loader2, XCircle, X } from "lucide-react";
 import { Fragment, useState } from "react";
 import DayJS from "@/lib/dayjs";
 import { Streamdown } from "streamdown";
@@ -41,7 +41,39 @@ function ErrorCard({ sub, parent }: FlattenedSubEvent) {
 	);
 }
 
-export function SekiMonitor({ pipeline, stage, gitDate }: SekiMonitorProps) {
+export function SekiMonitor({ pipeline, stage, gitDate, isLoading, error }: SekiMonitorProps) {
+	const [dismissedError, setDismissedError] = useState(false);
+
+	if (isLoading) {
+		return (
+			<div className="bg-card border rounded-xl p-4 h-[82px] flex items-center justify-center">
+				<div className="flex items-center gap-2 text-sm text-muted-foreground">
+					<Loader2 className="w-4 h-4 animate-spin" />
+					<p>Cargando información del pipeline...</p>
+				</div>
+			</div>
+		);
+	}
+
+	if (error && !dismissedError) {
+		return (
+			<div className="bg-card border border-red-200 rounded-xl p-4 h-[82px] flex items-center justify-between">
+				<div className="flex items-center gap-2 text-sm text-red-600">
+					<XCircle className="w-4 h-4" />
+					<p>Error al cargar el pipeline: {error.message}</p>
+				</div>
+				<button
+					type="button"
+					onClick={() => setDismissedError(true)}
+					className="text-muted-foreground hover:text-foreground transition-colors"
+					title="Cerrar"
+				>
+					<X className="w-4 h-4" />
+				</button>
+			</div>
+		);
+	}
+
 	if (!pipeline) {
 		return (
 			<div className="bg-card border rounded-xl p-4 h-[82px] flex items-center justify-center">
@@ -66,6 +98,9 @@ export function SekiMonitor({ pipeline, stage, gitDate }: SekiMonitorProps) {
 	);
 	const sortedEvents = [...pipeline.events].sort(
 		(a, b) => severityRank(a.state) - severityRank(b.state),
+	);
+	const runningEvent = sortedEvents.find(
+		(e) => e.state === "STARTED" || e.state === "RUNNING"
 	);
 	const metaParts: MetaPart[] = [];
 	const stageStyle = stageStyles[stage];
@@ -110,36 +145,38 @@ export function SekiMonitor({ pipeline, stage, gitDate }: SekiMonitorProps) {
 						className={`w-1 rounded-full self-stretch hidden sm:block ${isRunning ? 'bg-blue-400 animate-pulse-slow' : stageStyle.accent}`}
 					/>
 					<div className="flex-1 min-w-[220px] space-y-2">
-						<div className="flex items-center gap-2">
-							<span className="font-mono text-base font-semibold text-foreground">
-								{displayRef}
-							</span>
-							<span
-								className={`px-2 py-0.5 text-[11px] rounded-full uppercase tracking-wide ${stageStyle.badge}`}
-							>
-								{stage === "staging" ? "COMMIT" : "TAG"}
-							</span>
-							{isRunning && (
-								<span className="flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded-md animate-pulse-slow">
-									<Loader2 className="w-3 h-3 animate-spin" />
-									EN PROGRESO
+						<div className="flex items-center justify-between gap-2">
+							<div className="flex items-center gap-2">
+								<span className="font-mono text-base font-semibold text-foreground">
+									{displayRef}
 								</span>
+								<span
+									className={`px-2 py-0.5 text-[11px] rounded-full uppercase tracking-wide ${stageStyle.badge}`}
+								>
+									{stage === "staging" ? "COMMIT" : "TAG"}
+								</span>
+								{isRunning && (
+									<span className="flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded-md animate-pulse-slow">
+										<Loader2 className="w-3 h-3 animate-spin" />
+										EN PROGRESO
+									</span>
+								)}
+							</div>
+							{metaParts.length > 0 && (
+								<div className="text-xs text-muted-foreground flex items-center gap-2 whitespace-nowrap overflow-hidden">
+									{metaParts.map(({ id, node }, index) => (
+										<Fragment key={id}>
+											{index > 0 && <span>·</span>}
+											{node}
+										</Fragment>
+									))}
+								</div>
 							)}
 						</div>
-						{metaParts.length > 0 && (
-							<div className="text-xs text-muted-foreground flex items-center gap-2 whitespace-nowrap overflow-hidden">
-								{metaParts.map(({ id, node }, index) => (
-									<Fragment key={id}>
-										{index > 0 && <span>·</span>}
-										{node}
-									</Fragment>
-								))}
-							</div>
-						)}
 					</div>
 					<div className="flex flex-col gap-2 min-w-[200px] items-end">
 						<div className="self-end">
-							<MiniTimeline events={sortedEvents} />
+							<MiniTimeline events={sortedEvents} runningEventId={runningEvent?.id} />
 						</div>
 					</div>
 				</div>

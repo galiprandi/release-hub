@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SetupRouteImport } from './routes/setup'
+import { Route as MockSekiRouteImport } from './routes/mock-seki'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductOrgProductRouteImport } from './routes/product.$org.$product'
 import { Route as ProductOrgProductIndexRouteImport } from './routes/product.$org.$product.index'
@@ -17,6 +18,11 @@ import { Route as ProductOrgProductIndexRouteImport } from './routes/product.$or
 const SetupRoute = SetupRouteImport.update({
   id: '/setup',
   path: '/setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MockSekiRoute = MockSekiRouteImport.update({
+  id: '/mock-seki',
+  path: '/mock-seki',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,18 +43,21 @@ const ProductOrgProductIndexRoute = ProductOrgProductIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/mock-seki': typeof MockSekiRoute
   '/setup': typeof SetupRoute
   '/product/$org/$product': typeof ProductOrgProductRouteWithChildren
   '/product/$org/$product/': typeof ProductOrgProductIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/mock-seki': typeof MockSekiRoute
   '/setup': typeof SetupRoute
   '/product/$org/$product': typeof ProductOrgProductIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/mock-seki': typeof MockSekiRoute
   '/setup': typeof SetupRoute
   '/product/$org/$product': typeof ProductOrgProductRouteWithChildren
   '/product/$org/$product/': typeof ProductOrgProductIndexRoute
@@ -57,14 +66,16 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/mock-seki'
     | '/setup'
     | '/product/$org/$product'
     | '/product/$org/$product/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/setup' | '/product/$org/$product'
+  to: '/' | '/mock-seki' | '/setup' | '/product/$org/$product'
   id:
     | '__root__'
     | '/'
+    | '/mock-seki'
     | '/setup'
     | '/product/$org/$product'
     | '/product/$org/$product/'
@@ -72,6 +83,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  MockSekiRoute: typeof MockSekiRoute
   SetupRoute: typeof SetupRoute
   ProductOrgProductRoute: typeof ProductOrgProductRouteWithChildren
 }
@@ -83,6 +95,13 @@ declare module '@tanstack/react-router' {
       path: '/setup'
       fullPath: '/setup'
       preLoaderRoute: typeof SetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mock-seki': {
+      id: '/mock-seki'
+      path: '/mock-seki'
+      fullPath: '/mock-seki'
+      preLoaderRoute: typeof MockSekiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -122,6 +141,7 @@ const ProductOrgProductRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  MockSekiRoute: MockSekiRoute,
   SetupRoute: SetupRoute,
   ProductOrgProductRoute: ProductOrgProductRouteWithChildren,
 }

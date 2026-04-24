@@ -39,7 +39,7 @@ export function usePipeline({
     refetchInterval: (query) => {
       const data = query.state.data as PipelineStatusResponse | undefined
       const status = data?.state?.toLowerCase()
-      const inProgressStatuses = ['in_progress', 'running', 'pending']
+      const inProgressStatuses = ['started', 'in_progress', 'running', 'pending']
       return status && inProgressStatuses.includes(status) ? 30000 : false
     },
     staleTime: 5000, // Mantener datos frescos por 5s para evitar flick
@@ -67,7 +67,7 @@ export function usePipelineWithTag({
     refetchInterval: (query) => {
       const data = query.state.data as PipelineStatusResponse | undefined
       const status = data?.state?.toLowerCase()
-      const inProgressStatuses = ['in_progress', 'running', 'pending']
+      const inProgressStatuses = ['started', 'in_progress', 'running', 'pending']
       return status && inProgressStatuses.includes(status) ? 30000 : false
     },
     staleTime: 5000, // Mantener datos frescos por 5s para evitar flick

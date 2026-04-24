@@ -14,6 +14,12 @@ import {
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import DayJS from "@/lib/dayjs";
 
 const timelineStatusTextColor = (state: string) => {
@@ -108,6 +114,7 @@ const extractEventUrls = (event: Event) => {
 
 interface MiniTimelineProps {
 	events: Event[];
+	runningEventId?: string; // ID del evento que está corriendo para mantener su tooltip abierto
 }
 
 interface CopyButtonProps {
@@ -160,77 +167,140 @@ function CopyButton({ url }: CopyButtonProps) {
 	);
 }
 
-export function MiniTimeline({ events }: MiniTimelineProps) {
+export function MiniTimeline({ events, runningEventId }: MiniTimelineProps) {
+	const [hoveredEventId, setHoveredEventId] = useState<string | null>(null);
+	const [selectedSubEvent, setSelectedSubEvent] = useState<{ id: string; label: string; markdown: string } | null>(null);
+
 	return (
-		<div className="flex gap-0.5">
-			{events.map((event) => {
-				const eventUrls = extractEventUrls(event);
-				return (
-					<HoverCard key={event.id} openDelay={100} closeDelay={100}>
-						<HoverCardTrigger asChild>
-							<button
-								type="button"
-								className={`h-1.5 w-6 rounded-full transition-all hover:opacity-80 ${timelineStatusColor(
-									event.state,
-								)}`}
-							/>
-						</HoverCardTrigger>
-						<HoverCardContent
-							side="top"
-							align="center"
-							sideOffset={6}
-							className="p-4 w-fit min-w-[300px] max-w-[90vw]"
+		<>
+			<div className="flex gap-0.5">
+				{events.map((event) => {
+					const eventUrls = extractEventUrls(event);
+					const isRunning = event.state === "STARTED" || event.state === "RUNNING";
+					const isRunningEvent = runningEventId === event.id && isRunning;
+					const isOpen = hoveredEventId === event.id || (isRunningEvent && !hoveredEventId);
+					return (
+						<HoverCard
+							key={event.id}
+							openDelay={100}
+							closeDelay={100}
+							open={isOpen}
+							onOpenChange={(open) => {
+								if (open) {
+									setHoveredEventId(event.id);
+								} else {
+									setHoveredEventId(null);
+								}
+							}}
 						>
-							<div className="space-y-3">
-								<div className="flex items-center gap-2">
-									{timelineStatusIcon(event.state)}
-									<span
-										className={`text-sm font-semibold ${timelineStatusTextColor(
-											event.state,
-										)}`}
-									>
-										{event.label.es}
-									</span>
-								</div>
-								<div className="text-xs text-muted-foreground border-t pt-2">
-									{`${DayJS(event.updated_at || event.created_at).fromNow()} (${formatDuration(
-										event.created_at,
-										event.updated_at,
-									)})`}
-								</div>
-								{eventUrls.length > 0 && (
-									<div className="border-t pt-2">
-										<div className="text-xs font-medium text-foreground mb-2">
-											URLs relacionadas:
+							<HoverCardTrigger asChild>
+								<button
+									type="button"
+									className={`h-1.5 w-6 rounded-full transition-all hover:opacity-80 ${timelineStatusColor(
+										event.state,
+									)}`}
+								/>
+							</HoverCardTrigger>
+							<HoverCardContent
+								align="center"
+								sideOffset={6}
+								className="p-4 w-fit min-w-[300px] max-w-[90vw] max-h-[80vh] overflow-y-auto"
+							>
+								<div className="space-y-3">
+									<div className="flex items-center justify-between gap-2">
+										<div className="flex items-center gap-2">
+											{timelineStatusIcon(event.state)}
+											<span
+												className={`text-sm font-semibold ${timelineStatusTextColor(
+													event.state,
+												)}`}
+											>
+												{event.label.es}
+											</span>
 										</div>
-										<div className="space-y-1 max-w-[250px]">
-											{eventUrls.map((url) => (
-												<div key={url} className="flex items-center gap-1">
-													<a
-														href={url}
-														target="_blank"
-														rel="noreferrer"
-														className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 transition flex-1 min-w-0"
-													>
-														<ExternalLink className="w-3 h-3 flex-shrink-0" />
-														<span className="truncate">{url}</span>
-													</a>
-													<CopyButton url={url} />
-												</div>
-											))}
+										<div className="text-xs text-muted-foreground">
+											{`${DayJS(event.updated_at || event.created_at).fromNow()} (${formatDuration(
+												event.created_at,
+												event.updated_at,
+											)})`}
 										</div>
 									</div>
-								)}
-								{event.markdown && (
-									<div className="border-t pt-2 prose prose-sm max-w-none dark:prose-invert">
-										<Streamdown>{event.markdown}</Streamdown>
-									</div>
-								)}
-							</div>
-						</HoverCardContent>
-					</HoverCard>
-				);
-			})}
-		</div>
+									{event.subevents && event.subevents.length > 0 && (
+										<div className="border-t pt-2">
+											<div className="text-xs font-medium text-foreground mb-2">
+												Progreso ({event.subevents.length}):
+											</div>
+											<div className="space-y-1">
+												{event.subevents.map((sub) => (
+													<div key={sub.id}>
+														<button
+															type="button"
+															className="flex items-center gap-2 text-xs p-1 rounded hover:bg-muted/50 cursor-pointer transition-colors w-full text-left"
+															onClick={() => sub.markdown && setSelectedSubEvent({ id: sub.id, label: sub.label, markdown: sub.markdown })}
+															disabled={!sub.markdown}
+														>
+															{timelineStatusIcon(sub.state)}
+															<span className={`flex-1 ${timelineStatusTextColor(sub.state)}`}>
+																{sub.label}
+															</span>
+															<span className="text-muted-foreground text-[10px]">
+																{formatDuration(sub.created_at, sub.updated_at)}
+															</span>
+															{sub.markdown && (
+																<span className="text-[10px] text-muted-foreground ml-1">📄</span>
+															)}
+														</button>
+													</div>
+												))}
+											</div>
+										</div>
+									)}
+									{eventUrls.length > 0 && (
+										<div className="border-t pt-2">
+											<div className="text-xs font-medium text-foreground mb-2">
+												URLs relacionadas:
+											</div>
+											<div className="space-y-1 max-w-[250px]">
+												{eventUrls.map((url) => (
+													<div key={url} className="flex items-center gap-1">
+														<a
+															href={url}
+															target="_blank"
+															rel="noreferrer"
+															className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 transition flex-1 min-w-0"
+														>
+															<ExternalLink className="w-3 h-3 flex-shrink-0" />
+															<span className="truncate">{url}</span>
+														</a>
+														<CopyButton url={url} />
+													</div>
+												))}
+											</div>
+										</div>
+									)}
+									{event.markdown && (
+										<div className="border-t pt-2 prose prose-sm max-w-none dark:prose-invert">
+											<Streamdown>{event.markdown}</Streamdown>
+										</div>
+									)}
+								</div>
+							</HoverCardContent>
+						</HoverCard>
+					);
+				})}
+			</div>
+			{selectedSubEvent && (
+				<Dialog open={!!selectedSubEvent} onOpenChange={() => setSelectedSubEvent(null)}>
+					<DialogContent className="max-w-[60vw] max-h-[80vh] overflow-y-auto">
+						<DialogHeader>
+							<DialogTitle>{selectedSubEvent.label}</DialogTitle>
+						</DialogHeader>
+						<div className="prose prose-sm max-w-none dark:prose-invert">
+							<Streamdown>{selectedSubEvent.markdown}</Streamdown>
+						</div>
+					</DialogContent>
+				</Dialog>
+			)}
+		</>
 	);
 }

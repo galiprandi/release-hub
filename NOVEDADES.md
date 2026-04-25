@@ -2,6 +2,10 @@
 
 ---
 
+### 🗓️ 25 de Abril de 2026
+
+- ⚙️ Configuración: Nuevo panel de ajustes globales accesible desde el menú superior.
+
 ### 🗓️ 24 de Abril de 2026
 
 - ✨ Header: Ahora puedes ver el nombre del producto y alternar favoritos directamente desde el encabezado.

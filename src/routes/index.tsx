@@ -83,16 +83,16 @@ function ReposTable({ repos, favorites, onToggleFavorite }: ReposTableProps) {
 			<table className="w-full">
 				<thead className="bg-muted">
 					<tr>
-						<th className="px-4 py-2 text-left text-sm font-medium">
+						<th className="px-4 py-2 text-left text-sm font-medium w-auto">
 							Repositorio
 						</th>
-						<th className="px-4 py-2 text-left text-sm font-medium">Tag</th>
-						<th className="px-4 py-2 text-left text-sm font-medium">Commit</th>
-						<th className="px-4 py-2 text-left text-sm font-medium">
+						<th className="px-4 py-2 text-left text-sm font-medium w-20">Tag</th>
+						<th className="px-4 py-2 text-left text-sm font-medium w-20">Commit</th>
+						<th className="px-4 py-2 text-left text-sm font-medium w-36">
 							Actualización
 						</th>
-						<th className="px-4 py-2 text-left text-sm font-medium">Autor</th>
-						<th className="px-4 py-2 text-center text-sm font-medium">
+						<th className="px-4 py-2 text-left text-sm font-medium" style={{ width: '250px' }}>Autor</th>
+						<th className="px-4 py-2 text-center text-sm font-medium w-16">
 							Acciones
 						</th>
 					</tr>
@@ -195,7 +195,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 	if (isLoading) {
 		return (
 			<tr className="border-t">
-				<td className="px-4 py-3">
+				<td className="px-4 py-3 w-auto">
 					<Link
 						to="/product/$org/$product"
 						params={{ org, product: name }}
@@ -211,7 +211,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 						Cargando información...
 					</div>
 				</td>
-				<td className="px-4 py-3 text-center">
+				<td className="px-4 py-3 text-center w-16">
 					<div className="flex items-center justify-center gap-2">
 						<a
 							href={`https://github.com/${org}/${name}`}
@@ -238,7 +238,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 
 	return (
 		<tr className="border-t hover:bg-muted/50">
-			<td className="px-4 py-3">
+			<td className="px-4 py-3 w-auto">
 				<div className="flex items-center gap-2">
 					<Link
 						to="/product/$org/$product"
@@ -255,7 +255,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 					)}
 				</div>
 			</td>
-			<td className="px-4 py-3">
+			<td className="px-4 py-3 w-20">
 				{latestTag?.name && (
 					<TagLink
 						tagName={latestTag.name}
@@ -266,7 +266,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 					/>
 				)}
 			</td>
-			<td className="px-4 py-3">
+			<td className="px-4 py-3 w-20">
 				{commitShortHash && (
 					<CommitLink
 						hash={commitShortHash}
@@ -277,15 +277,17 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 					/>
 				)}
 			</td>
-			<td className="px-4 py-3 text-sm text-muted-foreground">
+			<td className="px-4 py-3 text-sm text-muted-foreground w-36">
 				<div className="flex items-center gap-1">
 					<DisplayInfo type="dates" value={latestDate} />
 				</div>
 			</td>
-			<td className="px-4 py-3 text-sm">
-				<DisplayInfo type="author" value={commitAuthor} maxChar={20} />
+			<td className="px-4 py-3 text-sm" style={{ width: '250px' }}>
+				<div className="truncate" title={commitAuthor || undefined}>
+					<DisplayInfo type="author" value={commitAuthor} hideTooltip={true} />
+				</div>
 			</td>
-			<td className="px-4 py-3 text-center">
+			<td className="px-4 py-3 text-center w-16">
 				<div className="flex items-center justify-center gap-2">
 					<FreezeDialog repo={repo.fullName} iconOnly={true} />
 					<ForceRedeployDialog repo={repo.fullName} iconOnly={true} />

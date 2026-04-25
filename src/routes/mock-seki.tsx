@@ -249,27 +249,27 @@ function MockSekiPage() {
 			<h2 className="text-lg font-semibold mb-4">Estado: Loading</h2>
 			<SekiMonitor
 				pipeline={mockPipeline}
-				stage="staging"
+				viewMode="commits"
 				isLoading={true}
 			/>
 
 			<h2 className="text-lg font-semibold mb-4 mt-8">Estado: Error</h2>
 			<SekiMonitor
 				pipeline={mockPipeline}
-				stage="staging"
+				viewMode="commits"
 				error={new Error("Error de conexión con la API")}
 			/>
 
 			<h2 className="text-lg font-semibold mb-4 mt-8">Estado: Sin Pipeline</h2>
 			<SekiMonitor
 				pipeline={undefined}
-				stage="staging"
+				viewMode="commits"
 			/>
 
 			<h2 className="text-lg font-semibold mb-4 mt-8">Estado: Normal (STARTED)</h2>
 			<SekiMonitor
 				pipeline={mockPipeline}
-				stage="staging"
+				viewMode="commits"
 			/>
 		</div>
 	);

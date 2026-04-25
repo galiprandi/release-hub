@@ -64,6 +64,7 @@ const detectPipeline = async (org: string, repo: string): Promise<{
   const hasSekiToken = !!localStorage.getItem('seki_api_token')
   console.log('[Detect Pipeline] hasSekiToken:', hasSekiToken)
 
+  // Only return Seki if there's a token, otherwise return null
   if (!hasSekiToken) {
     console.log('[Detect Pipeline] No Seki token, returning null')
     return {

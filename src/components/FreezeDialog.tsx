@@ -22,8 +22,7 @@ export function FreezeDialog({ repo, iconOnly = false }: FreezeDialogProps) {
 	const [step, setStep] = useState<Step>('config')
 	const [isToggling, setIsToggling] = useState(false)
 	const [error, setError] = useState("")
-	const { webhookUrl, saveWebhook } = useDiscordChannel(repo)
-	const [tempWebhookUrl, setTempWebhookUrl] = useState(webhookUrl)
+	const { webhookUrl } = useDiscordChannel(repo)
 	const [notificationsEnabled, setNotificationsEnabled] = useState(!!webhookUrl)
 	const { data: gitUser } = useGitUser()
 
@@ -35,7 +34,7 @@ export function FreezeDialog({ repo, iconOnly = false }: FreezeDialogProps) {
 		setOpen(newOpen)
 		if (newOpen) {
 			setStep('config')
-			setTempWebhookUrl(webhookUrl)
+			setNotificationsEnabled(!!webhookUrl)
 			setError("")
 		}
 	}
@@ -67,14 +66,9 @@ EOF`
 				throw new Error(result.stderr)
 			}
 
-			// Save Discord webhook if provided
-			if (tempWebhookUrl && tempWebhookUrl !== webhookUrl) {
-				saveWebhook(tempWebhookUrl)
-			}
-
 			// Send Discord notification if enabled and webhook is configured
-			if (notificationsEnabled && tempWebhookUrl) {
-				await sendDiscordNotification(tempWebhookUrl, repo, !isLocked)
+			if (notificationsEnabled && webhookUrl) {
+				await sendDiscordNotification(webhookUrl, repo, !isLocked)
 			}
 
 			queryClient.invalidateQueries({ queryKey: ['branch', 'protection', repo] })
@@ -203,10 +197,10 @@ EOF`
 								</div>
 
 								<DiscordNotification
-									webhookUrl={tempWebhookUrl}
-									onWebhookChange={setTempWebhookUrl}
+									webhookUrl={webhookUrl}
 									enabled={notificationsEnabled}
 									onEnabledChange={setNotificationsEnabled}
+									readonly
 								/>
 
 								{error && <p className="text-sm text-red-600">{error}</p>}
@@ -235,7 +229,7 @@ EOF`
 								<p className="text-sm text-muted-foreground mt-1">
 									{isLocked ? "El branch main de" : "El branch main de"} <strong>{repo}</strong> {isLocked ? "ya permite merges y pushes." : "ha sido bloqueado temporalmente."}
 								</p>
-								{tempWebhookUrl && (
+								{webhookUrl && (
 									<p className="text-xs text-muted-foreground mt-2">
 										Notificación enviada al canal de Discord
 									</p>

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import type { PipelineData, PipelineEvent, PipelineState, StageType, PipelineProvider } from '../types'
+import type { PipelineData, PipelineEvent, PipelineState, ViewMode, PipelineProvider } from '../types'
 
 describe('Pipeline Core Types', () => {
   describe('PipelineState', () => {
@@ -9,12 +9,12 @@ describe('Pipeline Core Types', () => {
     })
   })
 
-  describe('StageType', () => {
-    it('should accept valid stage values', () => {
-      const stage1: StageType = 'staging'
-      const stage2: StageType = 'production'
-      expect(stage1).toBe('staging')
-      expect(stage2).toBe('production')
+  describe('ViewMode', () => {
+    it('should accept valid view mode values', () => {
+      const mode1: ViewMode = 'commits'
+      const mode2: ViewMode = 'tags'
+      expect(mode1).toBe('commits')
+      expect(mode2).toBe('tags')
     })
   })
 

@@ -5,7 +5,7 @@ import type { MetaPart, PipelineCardProps } from '../components/PipelineCard'
 
 describe('PipelineCard', () => {
   const defaultProps: PipelineCardProps = {
-    stage: 'staging',
+    viewMode: 'commits',
     displayRef: 'abc1234',
     refType: 'COMMIT',
     isRunning: false,
@@ -14,16 +14,16 @@ describe('PipelineCard', () => {
 
   it('renders with basic props', () => {
     render(<PipelineCard {...defaultProps} />)
-    
+
     expect(screen.getByText('abc1234')).toBeInTheDocument()
     expect(screen.getByText('COMMIT')).toBeInTheDocument()
   })
 
-  it('renders tag ref type for production', () => {
+  it('renders tag ref type for tags', () => {
     render(
       <PipelineCard
         {...defaultProps}
-        stage="production"
+        viewMode="tags"
         displayRef="v1.0.0"
         refType="TAG"
       />
@@ -75,17 +75,17 @@ describe('PipelineCard', () => {
     expect(container.firstChild).toHaveClass('custom-class')
   })
 
-  it('has different styling for staging vs production', () => {
-    const { container: stagingContainer } = render(
-      <PipelineCard {...defaultProps} stage="staging" />
+  it('has different styling for commits vs tags', () => {
+    const { container: commitsContainer } = render(
+      <PipelineCard {...defaultProps} viewMode="commits" />
     )
-    
-    const { container: productionContainer } = render(
-      <PipelineCard {...defaultProps} stage="production" />
+
+    const { container: tagsContainer } = render(
+      <PipelineCard {...defaultProps} viewMode="tags" />
     )
-    
+
     // Both should render successfully with different accent colors
-    expect(stagingContainer.firstChild).toBeInTheDocument()
-    expect(productionContainer.firstChild).toBeInTheDocument()
+    expect(commitsContainer.firstChild).toBeInTheDocument()
+    expect(tagsContainer.firstChild).toBeInTheDocument()
   })
 })

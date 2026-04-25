@@ -4,6 +4,7 @@ import { Github, Star } from "lucide-react";
 import { useEffect } from "react";
 import { RepoSearch } from "@/components/RepoSearch";
 import { NovedadesDialog } from "@/components/NovedadesDialog";
+import { SettingsDialog } from "@/components/SettingsDialog";
 import { useGitUser } from "@/hooks/useGitUser";
 import { useGhCliSetup } from "@/hooks/useGhCliSetup";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -13,51 +14,32 @@ function UserAvatar() {
 
 	if (isLoading) {
 		return (
-			<div className="flex items-center gap-2 text-sm text-muted-foreground">
-				<div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
-				<span>Cargando información...</span>
-			</div>
+			<div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
 		);
 	}
-
-	const displayName = user?.name
-		? user.name.length > 17
-			? user.name.slice(0, 17) + "..."
-			: user.name
-		: "Sin nombre";
 
 	if (user?.avatar_url) {
 		return (
-			<div className="flex items-center gap-2">
-				<img
-					src={user.avatar_url}
-					alt={displayName}
-					className="w-8 h-8 rounded-full"
-				/>
-				<span className="text-sm font-medium hidden sm:inline">
-					{displayName}
-				</span>
-			</div>
+			<img
+				src={user.avatar_url}
+				alt={user.name || "Usuario"}
+				className="w-8 h-8 rounded-full"
+			/>
 		);
 	}
 
-	const initials = displayName
-		? displayName
+	const initials = user?.name
+		? user.name
 				.split(" ")
-				.map((n) => n[0])
+				.map((n: string) => n[0])
 				.join("")
 				.toUpperCase()
 				.slice(0, 2)
 		: "?";
 
 	return (
-		<div className="flex items-center gap-2">
-			<div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-medium">
-				{initials}
-			</div>
-			<span className="text-sm font-medium hidden sm:inline">
-				{displayName}
-			</span>
+		<div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-medium">
+			{initials}
 		</div>
 	);
 }
@@ -112,6 +94,7 @@ function RootLayout() {
 							<NovedadesDialog />
 							<RepoSearch />
 							<UserAvatar />
+							<SettingsDialog />
 						</div>
 					</div>
 				</header>

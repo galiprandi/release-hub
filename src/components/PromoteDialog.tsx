@@ -26,8 +26,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDial
 	const [tagMessage, setTagMessage] = useState("")
 	const [isCreating, setIsCreating] = useState(false)
 	const [error, setError] = useState("")
-	const { webhookUrl, saveWebhook } = useDiscordChannel(repo)
-	const [tempWebhookUrl, setTempWebhookUrl] = useState(webhookUrl)
+	const { webhookUrl } = useDiscordChannel(repo)
 	const [notificationsEnabled, setNotificationsEnabled] = useState(!!webhookUrl)
 	const { data: gitUser } = useGitUser()
 
@@ -42,7 +41,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDial
 			const newSuggestedTag = latestTag ? incrementVersion(latestTag) : "v1.0.0"
 			setTagName(newSuggestedTag)
 			setTagMessage(`Release ${newSuggestedTag}`)
-			setTempWebhookUrl(webhookUrl)
+			setNotificationsEnabled(!!webhookUrl)
 			setError("")
 		}
 	}
@@ -80,14 +79,9 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDial
 				{ headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" } }
 			)
 
-			// Save Discord webhook if provided
-			if (tempWebhookUrl && tempWebhookUrl !== webhookUrl) {
-				saveWebhook(tempWebhookUrl)
-			}
-
 			// Send Discord notification if enabled and webhook is configured
-			if (notificationsEnabled && tempWebhookUrl) {
-				await sendDiscordNotification(tempWebhookUrl, repo, tagName)
+			if (notificationsEnabled && webhookUrl) {
+				await sendDiscordNotification(webhookUrl, repo, tagName)
 			}
 
 			queryClient.invalidateQueries({ queryKey: ["git", "tags", repo] })
@@ -232,10 +226,10 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDial
 								</div>
 
 								<DiscordNotification
-									webhookUrl={tempWebhookUrl}
-									onWebhookChange={setTempWebhookUrl}
+									webhookUrl={webhookUrl}
 									enabled={notificationsEnabled}
 									onEnabledChange={setNotificationsEnabled}
+									readonly
 								/>
 
 								{error && <p className="text-sm text-red-600">{error}</p>}
@@ -266,7 +260,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDial
 							<div>
 								<p className="text-lg font-semibold">Tag <span className="font-mono">{tagName}</span> creado</p>
 								<p className="text-sm text-muted-foreground mt-1">El lanzamiento fue publicado correctamente en <strong>{repo}</strong>.</p>
-								{tempWebhookUrl && (
+								{webhookUrl && (
 									<p className="text-xs text-muted-foreground mt-2">
 										Notificación enviada al canal de Discord
 									</p>

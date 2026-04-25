@@ -9,6 +9,7 @@ export function RepoSearch() {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const [isEditable, setIsEditable] = useState(false)
 
   // Load all repos from user (via gh CLI) - no org specified to get all accessible repos
   const { data, isLoading } = useUserRepos()
@@ -86,9 +87,19 @@ export function RepoSearch() {
             setQuery(e.target.value)
             setIsOpen(true)
           }}
-          onFocus={() => query.length >= 2 && setIsOpen(true)}
+          onFocus={() => {
+            setIsEditable(true);
+            if (query.length >= 2) setIsOpen(true);
+          }}
+          onBlur={() => setIsEditable(false)}
           placeholder={`Búsqueda en ${data?.results?.length || 0} repositorios... (Cmd+K)`}
           className="w-[28rem] pl-9 pr-4 py-2 bg-muted rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck="false"
+          name="search-repos-not-credentials"
+          readOnly={!isEditable}
         />
         {isLoading && (
           <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />

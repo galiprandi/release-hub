@@ -8,14 +8,14 @@ import { Loader2 } from "lucide-react";
 
 
 interface StageCommitsTableProps {
-	stage: "staging" | "production";
+	viewMode: "commits" | "tags";
 	org: string;
 	product: string;
 	showStatus?: boolean;
 }
 
 export function StageCommitsTable({
-	stage,
+	viewMode,
 	org,
 	product,
 	showStatus = true,
@@ -31,7 +31,7 @@ export function StageCommitsTable({
 		isFetchingNextPage: isFetchingNextPageCommits 
 	} = useGitCommits({
 		repo: fullRepo,
-		enabled: stage === "staging",
+		enabled: viewMode === "commits",
 	});
 
 	const { 
@@ -42,14 +42,14 @@ export function StageCommitsTable({
 		isFetchingNextPage: isFetchingNextPageTags 
 	} = useGitTags({
 		repo: fullRepo,
-		enabled: stage === "production",
+		enabled: viewMode === "tags",
 	});
 
-	const isStaging = stage === "staging";
-	const isLoading = isStaging ? isLoadingCommits : isLoadingTags;
-	const hasNextPage = isStaging ? hasNextPageCommits : hasNextPageTags;
-	const fetchNextPage = isStaging ? fetchNextPageCommits : fetchNextPageTags;
-	const isFetchingNextPage = isStaging ? isFetchingNextPageCommits : isFetchingNextPageTags;
+	const isCommits = viewMode === "commits";
+	const isLoading = isCommits ? isLoadingCommits : isLoadingTags;
+	const hasNextPage = isCommits ? hasNextPageCommits : hasNextPageTags;
+	const fetchNextPage = isCommits ? fetchNextPageCommits : fetchNextPageTags;
+	const isFetchingNextPage = isCommits ? isFetchingNextPageCommits : isFetchingNextPageTags;
 
 	// Infinite scroll implementation
 	useEffect(() => {
@@ -84,11 +84,11 @@ export function StageCommitsTable({
 					<thead className="bg-muted">
 						<tr>
 							<th className="px-4 py-2 text-left font-medium">
-								{isStaging ? "Hash" : "Tag"}
+								{isCommits ? "Hash" : "Tag"}
 							</th>
 							<th className="px-4 py-2 text-left font-medium">Fecha</th>
 							<th className="px-4 py-2 text-left font-medium">Autor</th>
-							{isStaging && (
+							{isCommits && (
 								<th className="px-4 py-2 text-left font-medium">Mensaje</th>
 							)}
 						</tr>
@@ -106,7 +106,7 @@ export function StageCommitsTable({
 									</div>
 								</td>
 							</tr>
-						) : isStaging ? (
+						) : isCommits ? (
 							commits?.map((c: GitCommit) => (
 								<tr key={c.hash} className="border-t hover:bg-muted/50 transition-colors">
 									<td className="px-4 py-3">

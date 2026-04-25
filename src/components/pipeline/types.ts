@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 
-export type StageType = "staging" | "production";
+// Re-export ViewMode from pipeline-core for backward compatibility
+export type { ViewMode } from '@/pipeline-core/types';
+// Legacy alias - deprecated, use ViewMode
+export type StageType = "commits" | "tags";
 
 export type MetaPart = {
 	id: string;

@@ -86,3 +86,106 @@ The pipeline data returned by Seki includes:
 
 - `/products/:organization/:name/pipelines` endpoint throws `PIPELINES_EXCEPTION` when attempting to list pipelines
 - This prevents using the list endpoint to verify if a product is compatible with Seki
+
+## Unified Pipeline Architecture
+
+**Created**: April 2025
+
+### Overview
+
+New unified pipeline monitoring architecture introduced to simplify and make the system more extensible:
+
+**Location**: `src/pipeline-core/`
+
+### Architecture Components
+
+#### 1. Types (`src/pipeline-core/types.ts`)
+Unified types that work with any pipeline provider:
+- `PipelineData` - Common data structure for all pipelines
+- `PipelineEvent` - Standardized event representation
+- `PipelineState` - Unified state machine (IDLE, STARTED, RUNNING, COMPLETED, FAILED, CANCELLED)
+- `PipelineProvider` - 'seki' | 'pulsar' | null
+- `PipelineAdapter` - Interface for implementing new providers
+
+#### 2. Adapters (`src/pipeline-core/adapters/`)
+Adapter pattern for different pipeline providers:
+
+**SekiAdapter** (`sekiAdapter.ts`):
+- Transforms Seki API responses to unified format
+- Supports token-based authentication
+- Handles staging (commit) and production (tag) pipelines
+
+**PulsarAdapter** (`pulsarAdapter.ts`):
+- Transforms GitHub Actions workflow data
+- Detects Nx Build workflow
+- Fetches runs, jobs, and commit info
+
+**Adding a new adapter**:
+```typescript
+export const myAdapter: PipelineAdapter = {
+  name: 'my-provider',
+  async supports(org: string, repo: string): Promise<boolean> {
+    // Detect if this provider is available
+  },
+  async fetch(org: string, repo: string, stage: StageType, ref: string): Promise<PipelineData | null> {
+    // Fetch and transform data
+  }
+}
+```
+
+#### 3. Hooks (`src/pipeline-core/hooks/`)
+**useUnifiedPipeline** - Single hook for all providers:
+- Automatically detects the appropriate provider
+- Fetches pipeline data with smart polling
+- Unified error handling
+
+**usePipelineDetection** - Provider detection:
+- Checks adapters in priority order (Pulsar > Seki)
+- Caches results for 1 hour
+
+#### 4. Components (`src/pipeline-core/components/`)
+**UnifiedPipelineMonitor** - Displays pipeline from any provider
+**PipelineCard** - Reusable card UI
+**SimpleTimeline** - Visual timeline for pipeline events
+
+### Usage Example
+
+```typescript
+import { useUnifiedPipeline } from '@/pipeline-core'
+
+function MyComponent() {
+  const { data, provider, isLoading, error } = useUnifiedPipeline({
+    org: 'my-org',
+    repo: 'my-repo',
+    stage: 'staging',
+    ref: 'abc1234',
+  })
+  
+  // Works with any provider automatically!
+}
+```
+
+### Testing
+
+Added Vitest test suite:
+- `npm test` - Run tests in watch mode
+- `npm run test:run` - Run tests once
+- `npm run coverage` - Generate coverage report
+
+Test files:
+- `src/pipeline-core/__tests__/types.test.ts`
+- `src/pipeline-core/__tests__/adapters.test.ts`
+- `src/pipeline-core/__tests__/PipelineCard.test.tsx`
+- `src/pipeline-core/__tests__/SimpleTimeline.test.tsx`
+
+### Migration from Old System
+
+Old components (kept for backward compatibility):
+- `PipelineMonitor` - Routes to appropriate monitor
+- `SekiMonitor` - Seki-specific implementation
+- `PulsarMonitor` - GitHub Actions implementation
+
+New unified approach:
+- Use `UnifiedPipelineMonitor` for new code
+- Adapters handle provider-specific logic
+- Single hook `useUnifiedPipeline` replaces multiple hooks

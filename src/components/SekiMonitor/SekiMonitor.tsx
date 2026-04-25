@@ -110,7 +110,7 @@ function StatusCard({ type, message, onClose, onRetry }: StatusCardProps) {
 	);
 }
 
-export function SekiMonitor({ pipeline, stage, gitDate, isLoading, error }: SekiMonitorProps) {
+export function SekiMonitor({ pipeline, viewMode, gitDate, isLoading, error }: SekiMonitorProps) {
 	const [dismissedError, setDismissedError] = useState(false);
 	const [dismissedWarn, setDismissedWarn] = useState(false);
 	const [isOffline, setIsOffline] = useState(!navigator.onLine);
@@ -148,7 +148,7 @@ export function SekiMonitor({ pipeline, stage, gitDate, isLoading, error }: Seki
 	}
 
 	if (!pipeline && !dismissedWarn) {
-		return <StatusCard type="warn" message="Información de Pipeline no disponible para este Stage." onClose={() => setDismissedWarn(true)} />;
+		return <StatusCard type="warn" message="Información de Pipeline no disponible." onClose={() => setDismissedWarn(true)} />;
 	}
 
 	// Si pipeline es null después de todos los checks, no renderizar nada
@@ -156,8 +156,8 @@ export function SekiMonitor({ pipeline, stage, gitDate, isLoading, error }: Seki
 		return null;
 	}
 
-	// Mostrar tag en producción, commit hash en staging
-	const displayRef = stage === "production" && pipeline.git.ref
+	// Mostrar tag en vista de tags, commit hash en vista de commits
+	const displayRef = viewMode === "tags" && pipeline.git.ref
 		? pipeline.git.ref
 		: pipeline.git.commit.slice(0, 7);
 
@@ -211,9 +211,9 @@ export function SekiMonitor({ pipeline, stage, gitDate, isLoading, error }: Seki
 	return (
 		<div className="space-y-2">
 			<PipelineCard
-				stage={stage}
+				viewMode={viewMode}
 				displayRef={displayRef}
-				refType={stage === "staging" ? "COMMIT" : "TAG"}
+				refType={viewMode === "commits" ? "COMMIT" : "TAG"}
 				isRunning={isRunning}
 				metaParts={metaParts}
 			>

@@ -26,13 +26,11 @@ export const Route = createFileRoute("/product/$org/$product/")({
 function ProductIndex() {
 	const { org, product } = Route.useParams();
 	const queryClient = useQueryClient();
-	const [activeStage, setActiveStage] = useState<"staging" | "production">(
-		"staging",
-	);
+	const [viewMode, setViewMode] = useState<"commits" | "tags">("commits");
 	const [tokenInput, setTokenInput] = useState("");
 	const { saveToken, clearToken, isExpired, needsToken, expirationDate } = useToken();
 	const fullProduct = `${org}/${product}`;
-	const isStaging = activeStage === "staging";
+	const isCommits = viewMode === "commits";
 
 	const { latestCommit } = useGitCommits({ repo: fullProduct });
 	const { latestTag } = useGitTags({ repo: fullProduct });
@@ -45,31 +43,31 @@ function ProductIndex() {
 
 	const isSeki = detectedPlugin === "seki";
 
-	const stagingPipeline = usePipeline({
+	const commitsPipeline = usePipeline({
 		product: fullProduct,
 		commit: latestCommit?.hash ?? "",
-		enabled: isSeki && isStaging && !!latestCommit?.hash,
+		enabled: isSeki && isCommits && !!latestCommit?.hash,
 	});
 
-	const prodPipeline = usePipelineWithTag({
+	const tagsPipeline = usePipelineWithTag({
 		product: fullProduct,
 		commit: latestCommit?.hash ?? "",
 		tag: latestTag?.name ?? "",
-		enabled: isSeki && !isStaging && !!latestCommit?.hash && !!latestTag?.name, // Require both commit and tag for production
+		enabled: isSeki && !isCommits && !!latestCommit?.hash && !!latestTag?.name,
 	});
 
-	const pipeline = isStaging ? stagingPipeline.data : prodPipeline.data;
-	const isPipelineLoading = isStaging ? stagingPipeline.isLoading : prodPipeline.isLoading;
-	const isPipelineFetching = isStaging ? stagingPipeline.isFetching : prodPipeline.isFetching;
-	const dataUpdatedAt = isStaging ? stagingPipeline.dataUpdatedAt : prodPipeline.dataUpdatedAt;
-	const currentPipeline = isStaging ? stagingPipeline : prodPipeline;
+	const pipeline = isCommits ? commitsPipeline.data : tagsPipeline.data;
+	const isPipelineLoading = isCommits ? commitsPipeline.isLoading : tagsPipeline.isLoading;
+	const isPipelineFetching = isCommits ? commitsPipeline.isFetching : tagsPipeline.isFetching;
+	const dataUpdatedAt = isCommits ? commitsPipeline.dataUpdatedAt : tagsPipeline.dataUpdatedAt;
+	const currentPipeline = isCommits ? commitsPipeline : tagsPipeline;
 
 	const handleRefetchPipeline = () => {
 		currentPipeline.refetch();
 	};
 
 	// Usar fecha del commit/tag para consistencia con la tabla
-	const gitDate = isStaging ? latestCommit?.date : latestTag?.date;
+	const gitDate = isCommits ? latestCommit?.date : latestTag?.date;
 
 	const handleSaveToken = () => {
 		if (tokenInput.trim()) {
@@ -147,7 +145,7 @@ function ProductIndex() {
 							repo={product}
 							sekiData={{
 								pipeline,
-								stage: activeStage,
+								viewMode,
 								gitDate,
 								isLoading: isPipelineLoading || isPipelineFetching,
 								refetch: handleRefetchPipeline,
@@ -160,9 +158,9 @@ function ProductIndex() {
 						<div className="flex gap-2">
 							<button
 								type="button"
-								onClick={() => setActiveStage("staging")}
+								onClick={() => setViewMode("commits")}
 								className={`px-4 py-1.5 text-sm rounded-md transition-all ${
-									activeStage === "staging"
+									viewMode === "commits"
 										? "bg-white shadow-sm text-foreground"
 										: "text-muted-foreground hover:text-foreground"
 								}`}
@@ -171,9 +169,9 @@ function ProductIndex() {
 							</button>
 							<button
 								type="button"
-								onClick={() => setActiveStage("production")}
+								onClick={() => setViewMode("tags")}
 								className={`px-4 py-1.5 text-sm rounded-md transition-all ${
-									activeStage === "production"
+									viewMode === "tags"
 										? "bg-white shadow-sm text-foreground"
 										: "text-muted-foreground hover:text-foreground"
 								}`}
@@ -183,7 +181,7 @@ function ProductIndex() {
 						</div>
 						<div className="flex items-center gap-2">
 							<FreezeDialog repo={fullProduct} iconOnly={false} />
-							{isStaging ? (
+							{isCommits ? (
 								<ForceRedeployDialog repo={fullProduct} />
 							) : (
 								<PromoteDialog repo={fullProduct} latestTag={latestTag?.name} />
@@ -191,7 +189,7 @@ function ProductIndex() {
 						</div>
 					</div>
 					<StageCommitsTable
-						stage={activeStage}
+						viewMode={viewMode}
 						org={org}
 						product={product}
 						showStatus={false}

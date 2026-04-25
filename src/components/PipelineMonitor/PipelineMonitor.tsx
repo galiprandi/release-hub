@@ -2,7 +2,7 @@ import { usePipelineDetector } from '@/hooks/usePipelineDetector'
 import { SekiMonitor } from '@/components/SekiMonitor/SekiMonitor'
 import { PulsarMonitor } from '@/components/PulsarMonitor/PulsarMonitor'
 import type { PipelineStatusResponse } from '@/api/seki.type'
-import type { StageType } from '@/components/pipeline/types'
+import type { ViewMode } from '@/components/pipeline/types'
 
 export interface PipelineMonitorProps {
 	org: string
@@ -10,7 +10,7 @@ export interface PipelineMonitorProps {
 	// Seki data for rendering SekiMonitor with actual pipeline data
 	sekiData?: {
 		pipeline?: PipelineStatusResponse
-		stage?: StageType
+		viewMode?: ViewMode
 		gitDate?: string
 		isLoading?: boolean
 		error?: Error | null
@@ -55,7 +55,7 @@ export function PipelineMonitor({ org, repo, sekiData }: PipelineMonitorProps) {
 				return (
 					<SekiMonitor
 						pipeline={sekiData.pipeline}
-						stage={sekiData.stage || 'staging'}
+						viewMode={sekiData.viewMode || 'commits'}
 						gitDate={sekiData.gitDate}
 						isLoading={sekiData.isLoading || false}
 						error={sekiData.error}
@@ -89,7 +89,8 @@ export function PipelineMonitor({ org, repo, sekiData }: PipelineMonitorProps) {
 				</div>
 			)
 		case 'pulsar':
-			return <PulsarMonitor org={org} repo={repo} stage={sekiData?.stage || 'staging'} />
+			// Pulsar always shows the latest workflow run, ignoring the stage
+			return <PulsarMonitor org={org} repo={repo} />
 		case null:
 			return (
 				<div className="flex items-center gap-2 p-4 border-2 border-gray-200 rounded-lg">

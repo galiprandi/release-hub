@@ -1,7 +1,7 @@
 import { GitCommit, ExternalLink } from 'lucide-react'
 import DayJS from '@/lib/dayjs'
 import { useGitHubActions } from '@/hooks/useGitHubActions'
-import type { MetaPart, StageType } from '@/components/pipeline/types'
+import type { MetaPart } from '@/components/pipeline/types'
 import { PipelineCard } from '@/components/pipeline/PipelineCard'
 import { MiniTimeline } from '@/components/SekiMonitor/MiniTimeline'
 import {
@@ -13,10 +13,9 @@ import {
 interface PulsarMonitorProps {
 	org: string
 	repo: string
-	stage: StageType
 }
 
-export function PulsarMonitor({ org, repo, stage }: PulsarMonitorProps) {
+export function PulsarMonitor({ org, repo }: PulsarMonitorProps) {
 	const { runs, isLoading, error } = useGitHubActions({
 		org,
 		repo,
@@ -87,9 +86,9 @@ export function PulsarMonitor({ org, repo, stage }: PulsarMonitorProps) {
 	return (
 		<div className="space-y-2">
 			<PipelineCard
-				stage={stage}
+				viewMode="commits"
 				displayRef={displayRef}
-				refType={stage === "staging" ? "COMMIT" : "TAG"}
+				refType="COMMIT"
 				isRunning={isRunning}
 				metaParts={metaParts}
 			>

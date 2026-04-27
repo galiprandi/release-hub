@@ -3,13 +3,19 @@
 ---
 
 ### 🗓️ 27 de Abril de 2026
-- Health Monitor: agregada acción de copiar URL y abrir /health en nueva ventana por endpoint
-- Health Monitor: muestra mensaje de error descriptivo (ej: "unconditional drop overload") en lugar de solo código HTTP
-- Health Monitor: captura respuesta body de health checks para todos los endpoints (con y sin error)
-- Health Monitor: toda la línea del endpoint es clickeable para expandir/colapsar detalles con animación
-- Health Monitor: todos los endpoints son expandibles (con y sin error), muestra JSON formateado
-- Health Monitor: múltiples endpoints pueden estar expandidos simultáneamente para comparar ambientes
-- Health Monitor: mejoras de accesibilidad (ARIA attributes, navegación por teclado, aria-labels)
+
+- 🎉 Health Monitor: Nuevo sistema de monitoreo de salud con detección automática de endpoints desde pipelines.
+- ✨ Health Monitor: Filtros por ambiente (Todos, Staging, Production, Con errores) con contadores dinámicos.
+- 🔍 Health Monitor: Búsqueda de servicios y URLs.
+- ✨ Health Monitor: Ordenamiento (Por defecto, Con errores primero, Más recientes).
+- ✨ Health Monitor: Indicador de última verificación (hace X tiempo).
+- ✨ Health Monitor: Auto-refresh periódico cada 10 minutos.
+- ✨ Health Monitor: Acciones por endpoint (copiar URL, abrir /health en nueva ventana).
+- 🎨 Health Monitor: Mensajes de error descriptivos (ej: "unconditional drop overload").
+- ✨ Health Monitor: Toda la línea del endpoint es clickeable para expandir/colapsar detalles con animación.
+- ✨ Health Monitor: Múltiples endpoints pueden estar expandidos simultáneamente para comparar ambientes.
+- ♻️ TanStack Router: Sincronización de estado con URL y eliminación de parámetros redundantes.
+- ♻️ Docs: Agregadas preferencias de workflow UI al AGENTS.md.
 
 ### 🗓️ 25 de Abril de 2026
 

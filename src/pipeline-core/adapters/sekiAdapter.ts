@@ -126,7 +126,11 @@ export const sekiAdapter: PipelineAdapter = {
 			
 			if (viewMode === 'tags') {
 				// For production, we need a tag (ref should be the tag name)
+				// Note: This adapter is not used by the old system that uses fetchPipelineWithTag
+				// The old system uses usePipelineWithTag directly
 				if (!ref || ref.length < 5) return null
+				// For the unified system, we would need to pass the commit separately
+				// This is a limitation of the current unified adapter design
 				response = await fetchPipelineWithTag(fullProduct, '', ref)
 			} else {
 				// For commits view, we need a commit hash

@@ -160,7 +160,7 @@ export function useHealthMonitor() {
   }, [endpoints]);
 
   // Extraer endpoints de eventos de pipeline
-  const extractEndpointsFromEvents = useCallback((product: string, events: Event[]) => {
+  const extractEndpointsFromEvents = useCallback((product: string, events: Event[], environment?: Environment) => {
     // extractRoutes ya filtra solo URLs externas accesibles desde el navegador
     const urls = extractRoutes(events);
 
@@ -171,8 +171,8 @@ export function useHealthMonitor() {
 
       for (const url of urls) {
         const service = extractServiceName(url);
-        const environment = detectEnvironment(url);
-        const id = `${product}:${service}:${environment}`;
+        const env = environment || detectEnvironment(url);
+        const id = `${product}:${service}:${env}`;
 
         // Evitar duplicados
         const exists = newEndpoints.some((ep) => ep.id === id);
@@ -182,7 +182,7 @@ export function useHealthMonitor() {
             product,
             service,
             url,
-            environment,
+            environment: env,
             lastChecked: new Date().toISOString(),
             isHealthy: null, // Pendiente de verificación
           });

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { Activity, RefreshCw, Trash2, ExternalLink, ChevronDown, ChevronUp, Copy, Check } from 'lucide-react';
+import { Activity, RefreshCw, Trash2, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { useHealthMonitor } from '@/hooks/useHealthMonitor';
 import { useFavorites } from '@/hooks/useFavorites';
 
@@ -8,22 +8,20 @@ export const Route = createFileRoute('/health')({
   component: HealthMonitorPage,
 });
 
-function HealthStatusIndicator({ isHealthy, isChecking }: { isHealthy: boolean | null; isChecking: boolean }) {
-  if (isChecking) {
-    return (
-      <div className="w-4 h-4 rounded-full border-2 border-gray-300 border-t-green-500 animate-spin" />
-    );
-  }
+// Función para formatear tiempo relativo
+function formatTimeAgo(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
 
-  if (isHealthy === null) {
-    return <div className="w-4 h-4 rounded-full bg-gray-300" />;
-  }
-
-  return isHealthy ? (
-    <div className="w-4 h-4 rounded-full bg-green-500" title="Healthy" />
-  ) : (
-    <div className="w-4 h-4 rounded-full bg-red-500" title="Unhealthy" />
-  );
+  if (diffMins < 1) return 'ahora mismo';
+  if (diffMins < 60) return `hace ${diffMins} min`;
+  if (diffHours < 24) return `hace ${diffHours} h`;
+  if (diffDays < 7) return `hace ${diffDays} días`;
+  return date.toLocaleDateString();
 }
 
 function InfoBanner() {
@@ -61,115 +59,6 @@ function InfoBanner() {
   );
 }
 
-function EndpointRow({
-  endpoint,
-  isChecking,
-  onCheck,
-  onRemove,
-}: {
-  endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][number];
-  isChecking: boolean;
-  onCheck: () => void;
-  onRemove: () => void;
-}) {
-  const [copied, setCopied] = useState(false);
-
-  const copyUrl = async () => {
-    try {
-      await navigator.clipboard.writeText(endpoint.url);
-      setCopied(true);
-    } catch {
-      // Silently fail if clipboard API not available
-    }
-  };
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    if (copied) {
-      timeout = setTimeout(() => setCopied(false), 2000);
-    }
-    return () => {
-      if (timeout) clearTimeout(timeout);
-    };
-  }, [copied]);
-
-  return (
-    <div className="flex items-center gap-2 px-3 py-2 bg-white hover:bg-gray-50 transition-colors">
-      {/* Status indicator */}
-      <HealthStatusIndicator isHealthy={endpoint.isHealthy} isChecking={isChecking} />
-
-      {/* Service name */}
-      <span className="font-medium text-sm">{endpoint.service === '/' ? '/' : `/${endpoint.service}`}</span>
-
-      {/* Environment badge */}
-      <span
-        className={`px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide ${
-          endpoint.environment === 'production'
-            ? 'bg-purple-100 text-purple-700'
-            : 'bg-blue-100 text-blue-700'
-        }`}
-      >
-        {endpoint.environment}
-      </span>
-
-      {/* Response time */}
-      {endpoint.responseTime !== undefined && (
-        <span className={`text-xs ${endpoint.isHealthy ? 'text-green-600' : 'text-red-600'}`}>
-          {endpoint.responseTime}ms
-        </span>
-      )}
-
-      {/* URL - truncado */}
-      <span className="flex-1 text-xs text-gray-500 truncate min-w-0">
-        {endpoint.url}
-      </span>
-
-      {/* Actions */}
-      <div className="flex items-center gap-0.5">
-        <button
-          onClick={onCheck}
-          disabled={isChecking}
-          className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:opacity-50"
-          title="Verificar ahora"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
-        </button>
-
-        <button
-          onClick={copyUrl}
-          className={`p-1.5 rounded transition-colors ${
-            copied
-              ? 'text-green-600 bg-green-50'
-              : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50'
-          }`}
-          title={copied ? 'Copiado!' : 'Copiar URL'}
-        >
-          {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-        </button>
-
-        <a
-          href={endpoint.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-          title="Abrir URL"
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-        </a>
-
-        <button
-          onClick={onRemove}
-          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-          title="Eliminar del monitoreo"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
 function ProductSection({
   product,
   endpoints,
@@ -185,65 +74,166 @@ function ProductSection({
 }) {
   const [, productName] = product.split('/');
 
-  // Separar endpoints con error primero
-  const unhealthy = endpoints.filter((ep) => ep.isHealthy === false);
-  const healthy = endpoints.filter((ep) => ep.isHealthy === true);
-  const pending = endpoints.filter((ep) => ep.isHealthy === null);
-
-  // Ordenar cada grupo por ambiente y luego por ruta
-  const sortByEnvAndPath = (a: typeof endpoints[0], b: typeof endpoints[0]) => {
-    // Primero por ambiente
-    if (a.environment !== b.environment) {
-      return a.environment === 'production' ? 1 : -1;
+  // Agrupar endpoints por servicio
+  const endpointsByService = endpoints.reduce((acc, ep) => {
+    const service = ep.service || '/';
+    if (!acc[service]) {
+      acc[service] = [];
     }
-    // Luego por ruta alfabéticamente
-    return a.url.localeCompare(b.url);
-  };
+    acc[service].push(ep);
+    return acc;
+  }, {} as Record<string, typeof endpoints>);
 
-  const sortedEndpoints = [...unhealthy, ...pending, ...healthy].sort(sortByEnvAndPath);
+  // Separar servicios con error primero
+  const services = Object.keys(endpointsByService).sort((a, b) => {
+    const aHasErrors = endpointsByService[a].some((ep) => ep.isHealthy === false);
+    const bHasErrors = endpointsByService[b].some((ep) => ep.isHealthy === false);
+    if (aHasErrors && !bHasErrors) return -1;
+    if (!aHasErrors && bHasErrors) return 1;
+    return a.localeCompare(b);
+  });
 
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
-      {/* Header del producto */}
-      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-gray-800">{productName}</span>
-          <span className="text-sm text-gray-500">({endpoints.length} endpoints)</span>
+      {/* Contenedor del producto con padding base */}
+      <div className="px-4">
+        {/* Header del producto */}
+        <div className="flex items-center justify-between py-3 bg-gray-50 border-b -mx-4 px-4">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-gray-800">{productName}</span>
+            <span className="text-sm text-gray-500">({services.length} servicios)</span>
+          </div>
+          <div className="flex items-center gap-3 text-sm">
+            {(() => {
+              const healthy = endpoints.filter((ep) => ep.isHealthy === true).length;
+              const unhealthy = endpoints.filter((ep) => ep.isHealthy === false).length;
+              const pending = endpoints.filter((ep) => ep.isHealthy === null).length;
+              return (
+                <>
+                  {healthy > 0 && (
+                    <span className="flex items-center gap-1">
+                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                      {healthy} OK
+                    </span>
+                  )}
+                  {pending > 0 && (
+                    <span className="flex items-center gap-1 text-gray-500">
+                      <div className="w-2 h-2 rounded-full bg-gray-400" />
+                      {pending} Pendientes
+                    </span>
+                  )}
+                  {unhealthy > 0 && (
+                    <span className="flex items-center gap-1 text-red-600 font-medium">
+                      <div className="w-2 h-2 rounded-full bg-red-500" />
+                      {unhealthy} Error
+                    </span>
+                  )}
+                </>
+              );
+            })()}
+          </div>
         </div>
-        <div className="flex items-center gap-3 text-sm">
-          {healthy.length > 0 && (
-            <span className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-green-500" />
-              {healthy.length} OK
-            </span>
-          )}
-          {pending.length > 0 && (
-            <span className="flex items-center gap-1 text-gray-500">
-              <div className="w-2 h-2 rounded-full bg-gray-400" />
-              {pending.length} Pendientes
-            </span>
-          )}
-          {unhealthy.length > 0 && (
-            <span className="flex items-center gap-1 text-red-600 font-medium">
-              <div className="w-2 h-2 rounded-full bg-red-500" />
-              {unhealthy.length} Error
-            </span>
-          )}
-        </div>
-      </div>
 
-      {/* Endpoints del producto */}
-      <div className="divide-y">
-        {sortedEndpoints.map((endpoint) => (
-          <EndpointRow
-            key={endpoint.id}
-            endpoint={endpoint}
-            isChecking={isChecking}
-            onCheck={() => onCheckEndpoint(endpoint.id)}
-            onRemove={() => onRemoveEndpoint(endpoint.id)}
-          />
-        ))}
+        {/* Servicios del producto */}
+        <div className="ml-4 space-y-3 py-3">
+          {services.map((service) => {
+          const serviceEndpoints = endpointsByService[service];
+          
+          // Ordenar: production primero, luego staging
+          const sortedEndpoints = serviceEndpoints.sort((a, b) => {
+            if (a.environment !== b.environment) {
+              return a.environment === 'production' ? -1 : 1;
+            }
+            return a.url.localeCompare(b.url);
+          });
+          
+          return (
+            <div key={service}>
+              {/* Servicio */}
+              <div className="font-medium text-gray-700 py-1">
+                {service === '/' ? '/' : `/${service}`}
+              </div>
+              
+              {/* Endpoints del servicio */}
+              <div className="ml-4 space-y-1">
+                {sortedEndpoints.map((endpoint) => (
+                  <div key={endpoint.id} className="flex items-center gap-3 px-4 py-1 hover:bg-gray-50 rounded group">
+                    {/* Status emoji */}
+                    <div className="flex-shrink-0">
+                      {endpoint.isHealthy === null && (
+                        <span className="text-gray-400">⚪</span>
+                      )}
+                      {endpoint.isHealthy === true && (
+                        <span className="text-green-500">🟢</span>
+                      )}
+                      {endpoint.isHealthy === false && (
+                        <span className="text-red-500">🔴</span>
+                      )}
+                    </div>
+
+                    {/* Ambiente badge */}
+                    <span
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide ${
+                        endpoint.environment === 'production'
+                          ? 'bg-purple-100 text-purple-700'
+                          : 'bg-blue-100 text-blue-700'
+                      }`}
+                    >
+                      {endpoint.environment}
+                    </span>
+
+                    {/* Response time */}
+                    {endpoint.responseTime !== undefined && (
+                      <span className={`text-xs ${endpoint.isHealthy ? 'text-green-600' : 'text-red-600'}`}>
+                        {endpoint.responseTime}ms
+                      </span>
+                    )}
+
+                    {/* Última verificación */}
+                    <span className="text-xs text-gray-400">
+                        {formatTimeAgo(endpoint.lastChecked)}
+                    </span>
+
+                    {/* URL */}
+                    <span className="flex-1 text-xs text-gray-500 truncate">
+                      {endpoint.url}
+                    </span>
+
+                    {/* Actions - solo visible al hover */}
+                    <div className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => onCheckEndpoint(endpoint.id)}
+                        disabled={isChecking}
+                        className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:opacity-50"
+                        title="Verificar ahora"
+                      >
+                        <RefreshCw className={`w-3 h-3 ${isChecking ? 'animate-spin' : ''}`} />
+                      </button>
+                      <a
+                        href={endpoint.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                        title="Abrir URL"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                      <button
+                        onClick={() => onRemoveEndpoint(endpoint.id)}
+                        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        title="Eliminar del monitoreo"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
+    </div>
     </div>
   );
 }
@@ -261,6 +251,29 @@ function HealthMonitorPage() {
 
   const { favorites } = useFavorites();
 
+  // Estado para filtros
+  const [environmentFilter, setEnvironmentFilter] = useState<'all' | 'staging' | 'production' | 'unhealthy'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'default' | 'errors' | 'recent'>('default');
+
+  // Filtrar endpoints según el filtro seleccionado y búsqueda
+  const filteredEndpoints = endpoints.filter((ep) => {
+    // Filtro por ambiente
+    if (environmentFilter === 'staging' && ep.environment !== 'staging') return false;
+    if (environmentFilter === 'production' && ep.environment !== 'production') return false;
+    if (environmentFilter === 'unhealthy' && ep.isHealthy !== false) return false;
+
+    // Filtro por búsqueda (servicio o URL)
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const serviceMatch = ep.service?.toLowerCase().includes(query);
+      const urlMatch = ep.url.toLowerCase().includes(query);
+      if (!serviceMatch && !urlMatch) return false;
+    }
+
+    return true;
+  });
+
   // Auto-check on mount
   useEffect(() => {
     const pending = endpoints.filter((ep) => ep.isHealthy === null);
@@ -269,6 +282,15 @@ function HealthMonitorPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Auto-refresh periódico cada 10 minutos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      checkAllEndpoints();
+    }, 10 * 60 * 1000); // 10 minutos
+
+    return () => clearInterval(interval);
+  }, [checkAllEndpoints]);
 
   // Cleanup endpoints from removed favorites
   useEffect(() => {
@@ -283,65 +305,109 @@ function HealthMonitorPage() {
   }, [favorites, endpoints, removeProductEndpoints]);
 
   // Agrupar endpoints por producto
-  const endpointsByProduct = endpoints.reduce((acc, ep) => {
+  const endpointsByProduct = filteredEndpoints.reduce((acc, ep) => {
     if (!acc[ep.product]) {
       acc[ep.product] = [];
     }
     acc[ep.product].push(ep);
     return acc;
-  }, {} as Record<string, typeof endpoints>);
+  }, {} as Record<string, typeof filteredEndpoints>);
 
   // Ordenar productos: primero los que tienen endpoints con error
   const sortedProducts = Object.keys(endpointsByProduct).sort((a, b) => {
-    const aHasErrors = endpointsByProduct[a].some((ep) => ep.isHealthy === false);
-    const bHasErrors = endpointsByProduct[b].some((ep) => ep.isHealthy === false);
-    if (aHasErrors && !bHasErrors) return -1;
-    if (!aHasErrors && bHasErrors) return 1;
+    if (sortBy === 'errors') {
+      const aHasErrors = endpointsByProduct[a].some((ep) => ep.isHealthy === false);
+      const bHasErrors = endpointsByProduct[b].some((ep) => ep.isHealthy === false);
+      if (aHasErrors && !bHasErrors) return -1;
+      if (!aHasErrors && bHasErrors) return 1;
+    }
+    
+    if (sortBy === 'recent') {
+      const aLatest = new Date(Math.max(...endpointsByProduct[a].map((ep) => new Date(ep.lastChecked).getTime())));
+      const bLatest = new Date(Math.max(...endpointsByProduct[b].map((ep) => new Date(ep.lastChecked).getTime())));
+      return bLatest.getTime() - aLatest.getTime();
+    }
+
     return a.localeCompare(b);
   });
 
   return (
     <div className="space-y-6">
-      {/* Stats + Action buttons */}
-      <div className="flex items-center gap-4">
-        <div className="grid grid-cols-3 gap-4 flex-1">
-          <div className="bg-white p-4 rounded-lg border">
-            <div className="text-2xl font-bold">{stats.total}</div>
-            <div className="text-sm text-gray-500">Total endpoints</div>
+      {/* Filtros por ambiente + CTAs */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-600">Filtrar:</span>
+            {[
+              { value: 'all' as const, label: `Todos (${filteredEndpoints.length})` },
+              { value: 'staging' as const, label: `Staging (${filteredEndpoints.filter(e => e.environment === 'staging').length})` },
+              { value: 'production' as const, label: `Production (${filteredEndpoints.filter(e => e.environment === 'production').length})` },
+              { value: 'unhealthy' as const, label: `Con errores (${filteredEndpoints.filter(e => e.isHealthy === false).length})` },
+            ].map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => setEnvironmentFilter(filter.value)}
+                className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                  environmentFilter === filter.value
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {filter.label}
+              </button>
+            ))}
           </div>
-          <div className="bg-white p-4 rounded-lg border">
-            <div className="text-2xl font-bold text-green-600">{stats.healthy}</div>
-            <div className="text-sm text-gray-500">Healthy</div>
+
+          {/* Búsqueda de servicios */}
+          <div>
+            <input
+              type="text"
+              placeholder="Buscar servicio o URL..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
           </div>
-          <div className="bg-white p-4 rounded-lg border">
-            <div className="text-2xl font-bold text-red-600">{stats.unhealthy}</div>
-            <div className="text-sm text-gray-500">Unhealthy</div>
+
+          {/* Ordenamiento */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-600">Ordenar:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'default' | 'errors' | 'recent')}
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="default">Por defecto</option>
+              <option value="errors">Con errores primero</option>
+              <option value="recent">Más recientes</option>
+            </select>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* CTAs */}
+        <div className="flex gap-2">
           {/* CTA Principal: Verificar solo los con fallo */}
           {stats.unhealthy > 0 && (
             <button
               onClick={() => {
-                const unhealthy = endpoints.filter((ep) => ep.isHealthy === false);
+                const unhealthy = filteredEndpoints.filter((ep) => ep.isHealthy === false);
                 unhealthy.forEach((ep) => checkEndpoint(ep.id));
               }}
               disabled={isChecking}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded-md hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <RefreshCw className={`w-4 h-4 ${isChecking ? 'animate-spin' : ''}`} />
-              {isChecking ? 'Verificando...' : `Verificar ${stats.unhealthy} con fallo`}
+              <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
+              {isChecking ? 'Verificando...' : `Verificar ${stats.unhealthy}`}
             </button>
           )}
 
           {/* CTA Secundario: Verificar todos */}
           <button
-            onClick={checkAllEndpoints}
+            onClick={() => checkAllEndpoints()}
             disabled={isChecking}
-            className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-gray-300 text-gray-600 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            <RefreshCw className={`w-4 h-4 ${isChecking ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
             {isChecking ? 'Verificando...' : 'Verificar todos'}
           </button>
         </div>
@@ -351,19 +417,21 @@ function HealthMonitorPage() {
       <InfoBanner />
 
       {/* Endpoints by product */}
-      {endpoints.length === 0 ? (
+      {filteredEndpoints.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed">
           <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">No hay endpoints configurados</p>
+          <p className="text-gray-500">No hay endpoints que coincidan con el filtro</p>
           <p className="text-sm text-gray-400 mt-1">
-            Navega a un producto favorito para detectar servicios automáticamente
+            {environmentFilter === 'all' ? 'Navega a un producto favorito para detectar servicios automáticamente' : 'Intenta con otro filtro'}
           </p>
-          <Link
-            to="/"
-            className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Ir al inicio
-          </Link>
+          {environmentFilter === 'all' && (
+            <Link
+              to="/"
+              className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Ir al inicio
+            </Link>
+          )}
         </div>
       ) : (
         <div className="space-y-4">

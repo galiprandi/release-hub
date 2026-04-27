@@ -21,6 +21,63 @@
 - Fix Vite server to return 200 with `success: false` instead of 500 for command errors
 - Update `exec.ts` client to handle `success` field
 
+## Incorrect Commit Hash for Tag-Based Pipeline Fetching
+
+**Problem**: Seki API was not returning pipeline data for production tags, displaying "No hay datos de pipeline disponibles para el tag seleccionado" even though direct curl commands to the API returned data.
+
+**Root Cause**: The UI was using the latest staging commit hash instead of the commit hash associated with the specific tag when fetching pipeline data for tags.
+
+**Details**:
+- In `src/routes/product.$org.$product.index.tsx`, the `tagsPipeline` hook was using `latestCommit?.hash` for the commit parameter
+- This caused the API to be called with the wrong commit (e.g., `0d262bdaada827cbea02ec159ae2516940ec0c82`) instead of the commit associated with the tag (e.g., `800a026afdf07636b9b23aa3bae38f59f26e6a8d` for tag `v1.5.9`)
+- The Seki API endpoint `/products/:org/:repo/pipelines/:commit/:tag` requires the correct commit hash associated with the tag to return pipeline data
+- The `useGitTags` hook already provides the correct commit hash in the `commit` field of each tag object
+
+**Solution**: Changed `src/routes/product.$org.$product.index.tsx` to use `latestTag?.commit` instead of `latestCommit?.hash` when in tags mode.
+
+**Files Modified**:
+- `src/routes/product.$org.$product.index.tsx` (line 51): Changed `commit: latestCommit?.hash` to `commit: latestTag?.commit`
+- `src/routes/product.$org.$product.index.tsx` (line 53): Changed enabled condition to check `latestTag?.commit` instead of `latestCommit?.hash`
+
+**Additional Changes** (ETag caching):
+- `src/api/seki.ts` (lines 74-90): Commented out response interceptor that saves ETags to localStorage
+- `src/api/seki.ts` (lines 48-50): Added Cache-Control, Pragma, and Expires headers to disable browser caching
+
+**Verification**: After the fix, the Seki monitor correctly displays pipeline data for tags including commit message, author, and date.
+
+## Production Routes Not Appearing in Health Monitor
+
+**Problem**: Production routes were not appearing in the `/health` monitor even though the pipeline data contained deployment URLs for production environments.
+
+**Root Cause**: The `detectEnvironment` function in `useHealthMonitor.ts` only recognized URLs as production if they contained specific patterns like `seki-prod` or `prod.`. However, actual production URLs like `https://yumi-ticket-control-bff-api.cencosudx.com` and `https://seki.cencosud.corp/yumi-ticket-control/api/reports` did not match these patterns, so they were incorrectly classified as staging by default.
+
+**Details**:
+- The `extractEndpointsFromEvents` function relied solely on URL pattern matching to determine the environment
+- Production pipelines (tags) and staging pipelines (commits) both used the same URL extraction logic
+- Without explicit environment information, production endpoints were misclassified as staging
+- The health monitor would then show these endpoints under the wrong environment
+
+**Solution**: Modified the environment detection to use context-based inference instead of relying solely on URL patterns:
+
+1. **Modified `usePipelineWithHealth`** (`src/hooks/usePipelineWithHealth.ts`):
+   - Added an optional `environment` parameter to `UsePipelineWithHealthOptions`
+   - Implemented automatic environment inference: `tag` present = production, no `tag` = staging
+   - Passed the inferred environment to `extractEndpointsFromEvents`
+
+2. **Modified `extractEndpointsFromEvents`** (`src/hooks/useHealthMonitor.ts`):
+   - Added an optional `environment` parameter
+   - Uses the explicit environment if provided, otherwise falls back to `detectEnvironment(url)`
+
+**Files Modified**:
+- `src/hooks/usePipelineWithHealth.ts` (lines 5-15, 20-33, 42-47): Added environment inference and parameter passing
+- `src/hooks/useHealthMonitor.ts` (lines 163-194): Added environment parameter to `extractEndpointsFromEvents`
+
+**Verification**: After the fix, production endpoints from tag-based pipelines now appear correctly in the health monitor with `environment: production`. The endpoints are:
+- `https://yumi-ticket-control-bff-api.cencosudx.com` (production)
+- `https://seki.cencosud.corp/yumi-ticket-control/api/reports` (production)
+
+**Note**: The health monitor automatically removes endpoints from products that are not in favorites. To see production endpoints, the product must be added to favorites first.
+
 ## Seki API Capabilities
 
 Based on review of Seki BFF source code at `/Users/cenco/Github/seki/apps/bff/src/api`

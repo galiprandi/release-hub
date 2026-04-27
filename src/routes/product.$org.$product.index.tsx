@@ -48,9 +48,9 @@ function ProductIndex() {
 
 	const tagsPipeline = usePipelineWithHealth({
 		product: fullProduct,
-		commit: latestCommit?.hash ?? "",
+		commit: latestTag?.commit ?? "",
 		tag: latestTag?.name ?? "",
-		enabled: isSeki && !isCommits && !!latestCommit?.hash && !!latestTag?.name,
+		enabled: isSeki && !isCommits && !!latestTag?.commit && !!latestTag?.name,
 	});
 
 	const pipeline = isCommits ? commitsPipeline.data : tagsPipeline.data;

@@ -45,6 +45,9 @@ export const apiSeki = axios.create({
   headers: {
     Accept: 'application/json, text/plain, */*',
     'Accept-Language': 'en-US',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    Pragma: 'no-cache',
+    Expires: '0',
   },
   paramsSerializer: {
     serialize: serializeParams,
@@ -72,21 +75,22 @@ apiSeki.interceptors.request.use((config) => {
 })
 
 // Add response interceptor to handle ETag caching
-apiSeki.interceptors.response.use(
-  (response) => {
-    // Guardar ETag si está presente en la respuesta
-    const etag = response.headers['etag']
-    if (etag) {
-      // Guardar en localStorage usando la URL como clave
-      const cacheKey = `etag_${response.config.url}`
-      localStorage.setItem(cacheKey, etag)
-    }
-    return response
-  },
-  (error) => {
-    return Promise.reject(error)
-  }
-)
+// Deshabilitado completamente para evitar que el navegador use ETags cacheados
+// apiSeki.interceptors.response.use(
+//   (response) => {
+//     // Guardar ETag si está presente en la respuesta
+//     const etag = response.headers['etag']
+//     if (etag) {
+//       // Guardar en localStorage usando la URL como clave
+//       const cacheKey = `etag_${response.config.url}`
+//       localStorage.setItem(cacheKey, etag)
+//     }
+//     return response
+//   },
+//   (error) => {
+//     return Promise.reject(error)
+//   }
+// )
 
 /**
  * Fetch pipeline status for specific commit

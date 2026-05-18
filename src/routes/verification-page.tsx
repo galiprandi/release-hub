@@ -8,6 +8,7 @@ import { CommitsModal } from "@/components/CommitsModal";
 import { LogsViewer } from "@/components/shared/LogsViewer";
 import { MiniTimeline } from "@/components/SekiMonitor/MiniTimeline";
 import { DisplayInfo } from "@/components/DisplayInfo";
+import { AISummaryCard } from "@/components/AISummaryCard";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { Layout } from "lucide-react";
@@ -165,8 +166,57 @@ function VerificationPage() {
                 </section>
 
 				<section className="p-8 border rounded-xl bg-card shadow-sm space-y-6 md:col-span-2">
-                    <h2 className="text-lg font-semibold border-b pb-2">Estandarización de MiniTimeline y DisplayInfo</h2>
-                    <div className="flex flex-col gap-4">
+                    <h2 className="text-lg font-semibold border-b pb-2">Estandarización de MiniTimeline, DisplayInfo y AISummaryCard</h2>
+                    <div className="flex flex-col gap-8">
+                        <div className="space-y-4">
+                            <h3 className="text-sm font-medium text-muted-foreground">AISummaryCard (Nuevos Tokens Semánticos)</h3>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <AISummaryCard
+                                    summary="Este es un resumen generado por IA utilizando los nuevos tokens semánticos del sistema de diseño."
+                                    isGenerating={false}
+                                    error={null}
+                                    onRegenerate={() => {}}
+                                    onCopy={() => {}}
+                                    isCollapsed={false}
+                                    onToggleCollapse={() => {}}
+                                    isCopied={false}
+                                />
+                                <AISummaryCard
+                                    summary="Resumen compacto."
+                                    isGenerating={true}
+                                    error={null}
+                                    onRegenerate={() => {}}
+                                    onCopy={() => {}}
+                                    isCollapsed={false}
+                                    onToggleCollapse={() => {}}
+                                    isCopied={false}
+                                    variant="compact"
+                                />
+                                <AISummaryCard
+                                    summary="Resumen con error."
+                                    isGenerating={false}
+                                    error="No se pudo conectar con el servicio de IA."
+                                    onRegenerate={() => {}}
+                                    onCopy={() => {}}
+                                    isCollapsed={false}
+                                    onToggleCollapse={() => {}}
+                                    isCopied={false}
+                                />
+                                <AISummaryCard
+                                    summary="Resumen colapsado."
+                                    isGenerating={false}
+                                    error={null}
+                                    onRegenerate={() => {}}
+                                    onCopy={() => {}}
+                                    isCollapsed={true}
+                                    onToggleCollapse={() => {}}
+                                    isCopied={false}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-4 mt-8">
                         <div className="p-4 bg-muted/20 rounded-lg">
                             <MiniTimeline events={mockEvents} />
                         </div>

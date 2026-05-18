@@ -13,6 +13,17 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Success**: `text-success`. Utilizado para estados positivos y finalizaciones exitosas.
 - **Destructive**: `text-destructive`. Utilizado para acciones críticas o errores.
 
+## Refinamiento de Componentes
+
+### AISummaryCard
+- Utiliza `bg-ai` para el fondo y `text-ai-foreground` para el texto.
+- Los iconos deben estar contenidos en un div con `bg-white/10` y un anillo sutil (`ring-white/20`) para mejorar la resonancia visual.
+- Botones de acción con `w-8 h-8` y `hover:bg-white/10`.
+
+### RepoSearch
+- Dropdown con `bg-popover` y sombras pronunciadas (`shadow-xl`).
+- Acciones de fila (favoritos, external links) visibles en focus mediante `focus-within:opacity-100`.
+
 ## Accesibilidad (a11y)
 
 ### Estados de Enfoque (Focus Rings)

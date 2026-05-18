@@ -5,6 +5,7 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import { LazyRender, useAISummarize } from "@galiprandi/react-tools";
 import { useAIErrorProcessor } from "@/hooks/useAIErrorProcessor";
 import { AISummaryCard } from "@/components/AISummaryCard";
+import { BaseDialog } from "@/components/ui/BaseDialog";
 import { highlightLogLine, groupLogs, logLevelPattern } from "./logUtils";
 import { IconButton } from "./IconButton";
 
@@ -240,137 +241,110 @@ export function LogsViewer({
 		await handleSummarizeWithAI();
 	};
 
-	const content = (
-		<>
-			<Tooltip.Provider>
-				<div className="flex items-center justify-between gap-0 mb-2 px-4 pt-4">
-					<div className="flex items-center gap-2">
-						<Terminal className="w-4 h-4 text-blue-600" />
-						{resources && resources.length > 0 && (
-							<select
-								value={selectedResourceId || resources[0].id}
-								onChange={(e) => onResourceChange?.(e.target.value)}
-								className="bg-background border rounded px-2 py-1 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
-								aria-label="Seleccionar recurso"
-							>
-								{resources.map((resource) => (
-									<option key={resource.id} value={resource.id}>
-										{resource.name}
-									</option>
-								))}
-							</select>
-						)}
-					</div>
-					<div className="flex items-center gap-0">
-						{!isLoading && logs && (
-							<span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-green-600 bg-green-50 rounded">
-								<span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-								Live
-							</span>
-						)}
-						<Tooltip.Root>
-						<Tooltip.Trigger asChild>
-							<button
-								type="button"
-								onClick={handleSummarizeWithAI}
-								disabled={isGenerating || availability !== "available" || !currentLogs}
-								className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
-							>
-								{isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-								{isGenerating ? getStatusMessage : "Resumir"}
-							</button>
-						</Tooltip.Trigger>
-							<Tooltip.Portal>
-							<Tooltip.Content
-								className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
-								sideOffset={5}
-							>
-								Resumir logs con IA
-							</Tooltip.Content>
-						</Tooltip.Portal>
-					</Tooltip.Root>
-					<div className="w-px h-6 bg-border mx-2" />
-						<div className="flex items-center gap-2">
-							<Tooltip.Root>
-								<Tooltip.Trigger asChild>
-									<select
-										value={logLevelFilter}
-										onChange={(e) => setLogLevelFilter(e.target.value as "all" | "ERROR" | "WARN" | "INFO" | "DEBUG")}
-										className="bg-background border rounded px-2 py-1 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
-										aria-label="Filtrar por nivel de log"
-									>
-										<option value="all">Todos</option>
-										<option value="ERROR">ERROR</option>
-										<option value="WARN">WARN</option>
-										<option value="INFO">INFO</option>
-										<option value="DEBUG">DEBUG</option>
-									</select>
-								</Tooltip.Trigger>
-								<Tooltip.Portal>
-									<Tooltip.Content
-										className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
-										sideOffset={5}
-									>
-										Filtrar por nivel de log
-									</Tooltip.Content>
-								</Tooltip.Portal>
-							</Tooltip.Root>
-							<Tooltip.Root>
-								<Tooltip.Trigger asChild>
-								<div className="relative">
-									<Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
-									<input
-										ref={searchInputRef}
-										type="text"
-										value={filter}
-										onChange={(e) => setFilter(e.target.value)}
-										placeholder="Buscar (Cmd+F)"
-										aria-label="Buscar logs"
-										className="pl-7 pr-2 py-1 text-sm bg-background border rounded w-48 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
-									/>
-								</div>
-							</Tooltip.Trigger>
-							<Tooltip.Portal>
-								<Tooltip.Content
-									className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
-									sideOffset={5}
-								>
-									Filtrar logs por texto
-								</Tooltip.Content>
-							</Tooltip.Portal>
-						</Tooltip.Root>
+	const headerExtra = (
+		<Tooltip.Provider>
+		<div className="flex items-center gap-0">
+			{!isLoading && logs && (
+				<span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-green-600 bg-green-50 rounded">
+					<span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+					Live
+				</span>
+			)}
+			<Tooltip.Root>
+				<Tooltip.Trigger asChild>
+					<button
+						type="button"
+						onClick={handleSummarizeWithAI}
+						disabled={isGenerating || availability !== "available" || !currentLogs}
+						className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+					>
+						{isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+						{isGenerating ? getStatusMessage : "Resumir"}
+					</button>
+				</Tooltip.Trigger>
+				<Tooltip.Portal>
+					<Tooltip.Content
+						className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+						sideOffset={5}
+					>
+						Resumir logs con IA
+					</Tooltip.Content>
+				</Tooltip.Portal>
+			</Tooltip.Root>
+			<div className="w-px h-6 bg-border mx-2" />
+			<div className="flex items-center gap-2">
+				<Tooltip.Root>
+					<Tooltip.Trigger asChild>
+						<select
+							value={logLevelFilter}
+							onChange={(e) => setLogLevelFilter(e.target.value as "all" | "ERROR" | "WARN" | "INFO" | "DEBUG")}
+							className="bg-background border rounded px-2 py-1 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+							aria-label="Filtrar por nivel de log"
+						>
+							<option value="all">Todos</option>
+							<option value="ERROR">ERROR</option>
+							<option value="WARN">WARN</option>
+							<option value="INFO">INFO</option>
+							<option value="DEBUG">DEBUG</option>
+						</select>
+					</Tooltip.Trigger>
+					<Tooltip.Portal>
+						<Tooltip.Content
+							className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+							sideOffset={5}
+						>
+							Filtrar por nivel de log
+						</Tooltip.Content>
+					</Tooltip.Portal>
+				</Tooltip.Root>
+				<Tooltip.Root>
+					<Tooltip.Trigger asChild>
+						<div className="relative">
+							<Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+							<input
+								ref={searchInputRef}
+								type="text"
+								value={filter}
+								onChange={(e) => setFilter(e.target.value)}
+								placeholder="Buscar (Cmd+F)"
+								aria-label="Buscar logs"
+								className="pl-7 pr-2 py-1 text-sm bg-background border rounded w-48 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+							/>
 						</div>
-						<div className="w-px h-6 bg-border mx-2" />
-						<IconButton
-							icon={autoScrollEnabled ? <Pause className="w-4 h-4 text-red-500" /> : <Play className="w-4 h-4" />}
-							onClick={() => setAutoScrollEnabled(!autoScrollEnabled)}
-							tooltip={autoScrollEnabled ? "Detener auto-scroll" : "Activar auto-scroll"}
-						/>
-						<IconButton
-							icon={copied ? <Check className="w-4 h-4 text-green-500" /> : <ClipboardCopy className="w-4 h-4" />}
-							onClick={handleCopy}
-							tooltip={copied ? "¡Copiado!" : "Copiar logs al portapapeles"}
-						/>
-						{asModal && (
-							<>
-								<div className="w-px h-6 bg-border mx-2" />
-								<IconButton
-									icon={<X className="w-4 h-4" />}
-									onClick={onClose}
-									tooltip="Cerrar modal de logs"
-								/>
-							</>
-						)}
-					</div>
-				</div>
-			</Tooltip.Provider>
-			<div
-				ref={logsContainerRef}
-				tabIndex={0}
-				role="log"
-				aria-label="Panel de logs"
-				className="flex-1 min-h-0 overflow-auto bg-black text-green-400 p-4 font-mono text-xs p-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset focus-visible:outline-none"
-			>
+					</Tooltip.Trigger>
+					<Tooltip.Portal>
+						<Tooltip.Content
+							className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+							sideOffset={5}
+						>
+							Filtrar logs por texto
+						</Tooltip.Content>
+					</Tooltip.Portal>
+				</Tooltip.Root>
+			</div>
+			<div className="w-px h-6 bg-border mx-2" />
+			<IconButton
+				icon={autoScrollEnabled ? <Pause className="w-4 h-4 text-red-500" /> : <Play className="w-4 h-4" />}
+				onClick={() => setAutoScrollEnabled(!autoScrollEnabled)}
+				tooltip={autoScrollEnabled ? "Detener auto-scroll" : "Activar auto-scroll"}
+			/>
+			<IconButton
+				icon={copied ? <Check className="w-4 h-4 text-green-500" /> : <ClipboardCopy className="w-4 h-4" />}
+				onClick={handleCopy}
+				tooltip={copied ? "¡Copiado!" : "Copiar logs al portapapeles"}
+			/>
+		</div>
+		</Tooltip.Provider>
+	);
+
+	const innerContent = (
+		<div
+			ref={logsContainerRef}
+			tabIndex={0}
+			role="log"
+			aria-label="Panel de logs"
+			className="flex-1 min-h-0 overflow-auto bg-black text-green-400 p-4 font-mono text-xs p-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset focus-visible:outline-none rounded-md"
+		>
 				{processedError && (
 					<div className="mb-4 p-3 bg-red-900 border border-red-500/30 rounded-lg sticky top-0 z-10">
 						<div className="flex items-center justify-between gap-2 mb-2">
@@ -420,22 +394,68 @@ export function LogsViewer({
 					)}
 				</pre>
 			</div>
-		</>
 	);
 
 	if (asModal) {
 		return (
-			<div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '16px' }}>
-				<div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', width: '90vw', height: '90vh', maxWidth: '1800px', display: 'flex', flexDirection: 'column' }}>
-					{content}
+			<BaseDialog
+				open={true}
+				onOpenChange={(open) => !open && onClose()}
+				title={
+					<div className="flex items-center gap-2">
+						<Terminal className="w-4 h-4 text-blue-600" />
+						{resources && resources.length > 0 ? (
+							<select
+								value={selectedResourceId || resources[0].id}
+								onChange={(e) => onResourceChange?.(e.target.value)}
+								className="bg-background border rounded px-2 py-1 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm font-normal"
+								aria-label="Seleccionar recurso"
+							>
+								{resources.map((resource) => (
+									<option key={resource.id} value={resource.id}>
+										{resource.name}
+									</option>
+								))}
+							</select>
+						) : (
+							<span>Logs</span>
+						)}
+					</div>
+				}
+				maxWidth="max-w-[1800px]"
+				className="w-[95vw] h-[95vh] !p-0"
+				headerExtra={headerExtra}
+			>
+				<div className="flex flex-col flex-1 min-h-0 p-4 pt-0">
+					{innerContent}
 				</div>
-			</div>
+			</BaseDialog>
 		);
 	}
 
 	return (
 		<div className="bg-background rounded-lg shadow-lg w-full h-full max-h-[80vh] flex flex-col overflow-hidden">
-			{content}
+			<div className="flex items-center justify-between gap-0 mb-2 px-4 pt-4 flex-shrink-0">
+				<div className="flex items-center gap-2">
+					<Terminal className="w-4 h-4 text-blue-600" />
+					{resources && resources.length > 0 && (
+						<select
+							value={selectedResourceId || resources[0].id}
+							onChange={(e) => onResourceChange?.(e.target.value)}
+							className="bg-background border rounded px-2 py-1 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+							aria-label="Seleccionar recurso"
+						>
+							{resources.map((resource) => (
+								<option key={resource.id} value={resource.id}>
+									{resource.name}
+								</option>
+							))}
+						</select>
+					)}
+				</div>
+				{headerExtra}
+			</div>
+			{innerContent}
 		</div>
 	);
 }

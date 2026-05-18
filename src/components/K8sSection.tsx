@@ -69,8 +69,8 @@ export function K8sSection({ namespace }: K8sSectionProps) {
 
 	if (checkingAccess) {
 		return (
-			<div className="border rounded-lg p-3 flex items-center gap-3 bg-muted/30">
-				<Boxes className="w-5 h-5 text-blue-600 flex-shrink-0" />
+			<div className="border border-input rounded-lg p-3 flex items-center gap-3 bg-muted/30">
+				<Boxes className="w-5 h-5 text-primary flex-shrink-0" />
 				<Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
 				<span className="text-sm text-muted-foreground">
 					{selectedContext 
@@ -112,8 +112,8 @@ export function K8sSection({ namespace }: K8sSectionProps) {
 
 	return (
 		<>
-			<div className="border rounded-lg p-3 flex items-center gap-3 bg-muted/30">
-				<Boxes className="w-5 h-5 text-blue-600 flex-shrink-0" />
+			<div className="border border-input rounded-lg p-3 flex items-center gap-3 bg-muted/30">
+				<Boxes className="w-5 h-5 text-primary flex-shrink-0" />
 
 				<ContextDropdown
 					selectedContext={selectedContext}
@@ -157,7 +157,7 @@ export function K8sSection({ namespace }: K8sSectionProps) {
 					<button
 						type="button"
 						onClick={() => handleViewDeploymentLogs(selectedDeployment)}
-						className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
+						className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-primary hover:text-primary/80 hover:bg-primary/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 					>
 						<Terminal className="w-3.5 h-3.5" />
 						Logs
@@ -168,7 +168,7 @@ export function K8sSection({ namespace }: K8sSectionProps) {
 					<button
 						type="button"
 						onClick={() => handleViewPodLogs(selectedPod)}
-						className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
+						className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-primary hover:text-primary/80 hover:bg-primary/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 					>
 						<Terminal className="w-3.5 h-3.5" />
 						Logs
@@ -215,7 +215,7 @@ function ContextDropdown({
 			value={displayValue}
 			onChange={(e) => onSelect(e.target.value || undefined)}
 			disabled={isLoading || !contexts || contexts.contexts.length === 0}
-			className="min-w-[180px] px-2 py-1 text-sm bg-background border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+			className="min-w-[180px] px-2 py-1 text-sm bg-background border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 disabled:opacity-50"
 		>
 			<option value="">Seleccionar contexto</option>
 			{contexts?.contexts.map((ctx) => (
@@ -250,7 +250,7 @@ function DeploymentDropdown({
 			value={selectedDeployment || ""}
 			onChange={(e) => onSelect(e.target.value || null)}
 			disabled={isLoading || !deployments || deployments.length === 0}
-			className="min-w-[200px] px-2 py-1 text-sm bg-background border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+			className="min-w-[200px] px-2 py-1 text-sm bg-background border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 disabled:opacity-50"
 		>
 			<option value="">Seleccionar deployment</option>
 			{deployments?.map((deployment) => (
@@ -326,7 +326,7 @@ function PodDropdown({
 			value={selectedPod || ""}
 			onChange={(e) => onSelect(e.target.value || null)}
 			disabled={isLoading || !pods || pods.length === 0}
-			className="min-w-[200px] px-2 py-1 text-sm bg-background border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+			className="min-w-[200px] px-2 py-1 text-sm bg-background border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 disabled:opacity-50"
 		>
 			<option value="">Todos los pods</option>
 			{pods?.map((pod) => (

@@ -26,6 +26,12 @@ export interface LogsViewerProps {
 
 ## Key Features
 
+### 0. Modal Integration (BaseDialog)
+
+- When `asModal` is true, `LogsViewer` uses `BaseDialog` for standardized behavior.
+- Use `maxWidth="max-w-[1800px]"` and custom `className="w-[95vw] h-[95vh] !p-0"` for immersive log viewing.
+- Header controls are passed to `BaseDialog` via the `headerExtra` prop.
+
 ### 1. Data Fetching
 
 - Uses React Query (`useQuery`) to fetch logs via `queryFn`

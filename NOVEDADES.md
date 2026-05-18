@@ -2,6 +2,12 @@
 
 ---
 
+### 🗓️ 13 de Mayo de 2026
+
+- ✨ UI/UX: Estandarización de diálogos con `BaseDialog` para una experiencia más fluida y accesible.
+- ✨ Logs: Refactorización del visor de logs para un uso más inmersivo y consistente con el sistema de diseño.
+- 🎨 Kubernetes: Refinamiento de la interfaz de gestión con tokens semánticos y estados de foco estandarizados.
+
 ### 🗓️ 12 de Mayo de 2026
 
 - ✨ Logs: Streaming en tiempo real para logs de Docker y Kubernetes con actualización automática.

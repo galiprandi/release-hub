@@ -133,10 +133,14 @@ describe('LogsViewer', () => {
         expect(writeText).toHaveBeenCalledWith('2024-04-30 INFO Log 1\n2024-04-30 ERROR Log 2');
     });
 
-    it('renders as modal when asModal is true', () => {
-        const { container } = renderLogsViewer({ asModal: true });
-        // The modal uses a fixed positioning div
-        const modalOverlay = container.querySelector('div[style*="position: fixed"]');
-        expect(modalOverlay).toBeTruthy();
+    it('renders as modal when asModal is true', async () => {
+        renderLogsViewer({ asModal: true });
+        // Radix Dialog renders into a portal
+        // We look for the dialog role
+        const dialog = await screen.findByRole('dialog');
+        expect(dialog).toBeTruthy();
+        // The title is in an h2 inside the dialog
+        const title = screen.getByRole('heading', { name: /Logs/i });
+        expect(title).toBeTruthy();
     });
 });

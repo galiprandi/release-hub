@@ -129,6 +129,7 @@ Los archivos de test unitarios deben ubicarse en el mismo directorio que el arch
 2. **Anillos de Foco Estándar**: Todos los elementos interactivos deben usar el patrón: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1`.
 3. **Componentes Compartidos**: Antes de crear un nuevo componente visual, verificar si puede ser una extensión de `FilterBar`, `PageHeader`, `BaseDialog` o `DisplayInfo`. Especialmente, todos los diálogos deben migrarse a `BaseDialog` para asegurar consistencia en transiciones y accesibilidad.
 4. **Referencia de Diseño**: Consultar `DESIGN.md` para la lista completa de tokens y principios de accesibilidad.
+5. **Feedback de Estado**: Utilizar el componente `StatusCard` para todos los estados de carga, error y advertencia en monitores de pipeline, asegurando una experiencia de feedback consistente y coherente.
 
 ## Local Requirements
 

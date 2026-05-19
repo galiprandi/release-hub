@@ -163,6 +163,11 @@ gh api <endpoint>    # Hacer llamada a API de GitHub
 - [GitHub API Docs](https://docs.github.com/en/rest)
 - [shadcn/ui](https://ui.shadcn.com/)
 
+## Common Testing Patterns
+
+### 1. Mocking Axios Instances
+When testing modules that use a pre-configured axios instance (e.g., `apiSeki` in `seki.ts` or `apiExec` in `exec.ts`), export the instance and use `vi.spyOn(instance, 'post|get')` to mock responses. This ensures consistent testing without requiring a global axios mock.
+
 ## Discoveries
 
 ### Seki API URL Format Issue

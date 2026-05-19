@@ -10,3 +10,5 @@
 ## 2026-05-17 - src/api/docker.ts | Cobertura Ganada: [+100%] | Aprendizaje: La implementación de --format json en comandos CLI (como docker stats) simplifica drásticamente el parsing y aumenta la confiabilidad del adaptador frente a cambios de versión.
 ## 2026-05-18 - src/components/shared/logUtils.tsx | Cobertura Ganada: [+100%] | Aprendizaje: El blindaje de utilidades de parsing de logs asegura que el agrupamiento y resaltado sean resilientes a entradas vacías o formatos inesperados.
 ## 2026-05-18 - src/components/shared/LogsViewer.tsx | Cobertura Ganada: [+93%] | Aprendizaje: El testeo de componentes con ResizeObserver requiere mocking global para evitar fallos en entornos de JSDOM.
+## 2026-05-19 - src/api/exec.ts | Cobertura Ganada: [+100%] | Aprendizaje: Blidaje total del adaptador base de comandos. La exportación de la instancia de axios permite el testeo unitario sin mocks globales de red.
+## 2026-05-19 - src/components/shared/LogsViewer.test.tsx | Cobertura Recuperada | Aprendizaje: Ajuste de selectores para Radix Portals en JSDOM usando roles ARIA (dialog, heading) en lugar de selectores de estilo/DOM directo para mayor resiliencia.

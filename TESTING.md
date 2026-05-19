@@ -2,7 +2,21 @@
 
 In ReleaseHub, we rely heavily on CLI tools like `docker`, `kubectl`, and `gh`. To ensure the reliability of our adapters, we follow these testing principles.
 
-## 1. Mocks for `runCommand`
+## 1. Testing the Core Executor (`exec.ts`)
+
+The `runCommand` utility itself must be tested by mocking the underlying `axios` instance (`apiExec`).
+
+```typescript
+import { vi } from 'vitest';
+import { apiExec } from './exec';
+
+// Inside test
+const spy = vi.spyOn(apiExec, 'post').mockResolvedValue({
+    data: { stdout: '...', stderr: '', success: true }
+});
+```
+
+## 2. Mocks for `runCommand` in Adapters
 
 All CLI-based adapters use the `runCommand` utility from `@/api/exec.ts`. We must mock this utility to avoid executing real commands during tests.
 

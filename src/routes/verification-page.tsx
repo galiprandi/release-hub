@@ -21,6 +21,7 @@ export const Route = createFileRoute("/verification-page")({
 function VerificationPage() {
 	const [isCommitsModalOpen, setIsCommitsModalOpen] = useState(false);
 	const [isLogsViewerOpen, setIsLogsViewerOpen] = useState(false);
+	const [isLogsViewerModalOpen, setIsLogsViewerModalOpen] = useState(false);
     const [activeFilter, setActiveFilter] = useState("all");
     const [searchValue, setSearchValue] = useState("");
 
@@ -115,7 +116,15 @@ function VerificationPage() {
                             onClick={() => setIsLogsViewerOpen(true)}
                             className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium border rounded-md hover:bg-muted transition-colors"
                         >
-                            Ver LogsViewer
+                            Ver LogsViewer (Inline)
+                        </button>
+                        <button
+                            type="button"
+                            id="open-logs-modal"
+                            onClick={() => setIsLogsViewerModalOpen(true)}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium border rounded-md hover:bg-muted transition-colors"
+                        >
+                            Ver LogsViewer (Modal)
                         </button>
                     </div>
                     <CommitsModal
@@ -136,6 +145,14 @@ function VerificationPage() {
                                 />
                             </div>
                         </div>
+                    )}
+                    {isLogsViewerModalOpen && (
+                        <LogsViewer
+                            queryFn={async () => "2024-05-20 INFO: Application started\n2024-05-20 WARN: Low memory\n2024-05-20 ERROR: Connection failed\n2024-05-20 DEBUG: Initializing components"}
+                            onClose={() => setIsLogsViewerModalOpen(false)}
+                            asModal={true}
+                            resources={[{ id: "main", name: "Main Container", type: "pod" }]}
+                        />
                     )}
                 </section>
 

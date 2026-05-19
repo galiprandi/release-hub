@@ -136,7 +136,7 @@ export function RepoSearch() {
           onBlur={() => setIsEditable(false)}
           placeholder={`Búsqueda en ${summaryData?.total || 0} repositorios... (Cmd+K)`}
           aria-label="Búsqueda de repositorios"
-          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted rounded-md text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none transition-all`}
+          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted rounded-md text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -148,7 +148,7 @@ export function RepoSearch() {
           <button
             type="button"
             onClick={handleClear}
-            className={`absolute ${isLoading ? 'right-9' : 'right-3'} top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground transition-all`}
+            className={`absolute ${isLoading ? 'right-9' : 'right-3'} top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
             aria-label="Limpiar búsqueda"
           >
             <X className="w-3.5 h-3.5" />
@@ -161,7 +161,7 @@ export function RepoSearch() {
 
       {/* Dropdown Results */}
       {isOpen && (
-        <div className={`absolute top-full left-0 mt-2 ${searchWidth} bg-background border rounded-lg shadow-lg z-50 overflow-hidden`}>
+        <div className={`absolute top-full left-0 mt-2 ${searchWidth} bg-popover text-popover-foreground border rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100`}>
           {isLoading ? (
             <div className="p-4 text-center text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
@@ -225,10 +225,10 @@ export function RepoSearch() {
                         <button
                           type="button"
                           onClick={() => toggleFavorite(repo.fullName)}
-                          className={`p-1.5 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none ${
+                          className={`p-1.5 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
                             isFav
                               ? 'text-yellow-500 hover:text-yellow-600'
-                              : 'text-muted-foreground hover:text-yellow-500 hover:bg-yellow-50'
+                              : 'text-muted-foreground hover:text-yellow-500 hover:bg-yellow-500/10'
                           }`}
                           aria-label={
                             isFav
@@ -248,7 +248,7 @@ export function RepoSearch() {
                         <button
                           type="button"
                           onClick={() => handleOpenInNewTab(repo.fullName)}
-                          className="p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                          className="p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
                           aria-label={`Abrir ${repo.fullName} en GitHub`}
                           title="Abrir en GitHub"
                         >

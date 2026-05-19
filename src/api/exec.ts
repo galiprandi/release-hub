@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const apiExec = axios.create({
+export const apiExec = axios.create({
   baseURL: '/local',
 })
 

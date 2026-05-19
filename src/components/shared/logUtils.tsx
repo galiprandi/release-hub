@@ -60,6 +60,7 @@ export function highlightLogLine(line: string, filter?: string): React.ReactNode
  * Detecta el inicio de nuevos logs basándose en patrones comunes
  */
 export function groupLogs(logText: string): string[] {
+	if (!logText) return [];
 	const lines = logText.split("\n");
 	const logGroups: string[][] = [];
 	let currentGroup: string[] = [];

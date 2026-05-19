@@ -91,6 +91,10 @@ Al trabajar con adaptadores CLI (Docker, Kubectl, GH):
 - `kubectl get deployment <name> -n <namespace> -o jsonpath='{.spec.selector.matchLabels}'` - Obtiene selector
 - `kubectl logs -l <selector> -n <namespace> --tail=<n>` - Obtiene logs por label selector
 
+### 5. Resumen de IA (AISummaryCard)
+
+Para componentes potenciados por IA, usar el token semántico `--ai` y `--ai-foreground`. Las acciones dentro de estas cards deben usar `focus-visible:ring-white` para asegurar contraste sobre fondos saturados.
+
 ### 3. Tokens de Autenticación
 
 ⚠️ **CRÍTICO**: Usar el token correcto para cada API:

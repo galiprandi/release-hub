@@ -343,7 +343,7 @@ export function LogsViewer({
 			tabIndex={0}
 			role="log"
 			aria-label="Panel de logs"
-			className="flex-1 min-h-0 overflow-auto bg-black text-green-400 p-4 font-mono text-xs p-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset focus-visible:outline-none rounded-md"
+			className="flex-1 min-h-0 overflow-auto bg-black text-green-400 p-4 font-mono text-xs p-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset focus-visible:outline-none rounded-b-md"
 		>
 				{processedError && (
 					<div className="mb-4 p-3 bg-red-900 border border-red-500/30 rounded-lg sticky top-0 z-10">
@@ -426,7 +426,7 @@ export function LogsViewer({
 				className="w-[95vw] h-[95vh] !p-0"
 				headerExtra={headerExtra}
 			>
-				<div className="flex flex-col flex-1 min-h-0 p-4 pt-0">
+				<div className="flex flex-col flex-1 min-h-0">
 					{innerContent}
 				</div>
 			</BaseDialog>

@@ -34,7 +34,7 @@ export function BaseDialog({
 					</Dialog.Description>
 
 					{/* Header */}
-					<div className="flex items-center justify-between mb-4 flex-shrink-0">
+					<div className="flex items-center justify-between p-2 flex-shrink-0">
 						<Dialog.Title className="text-lg font-semibold flex items-center gap-2">
 							{title}
 						</Dialog.Title>

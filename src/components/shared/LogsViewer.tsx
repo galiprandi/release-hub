@@ -250,7 +250,7 @@ export function LogsViewer({
 							<select
 								value={selectedResourceId || resources[0].id}
 								onChange={(e) => onResourceChange?.(e.target.value)}
-								className="bg-background border rounded px-2 py-1 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+								className="bg-background border rounded px-2 py-1 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md"
 								aria-label="Seleccionar recurso"
 							>
 								{resources.map((resource) => (
@@ -274,7 +274,7 @@ export function LogsViewer({
 								type="button"
 								onClick={handleSummarizeWithAI}
 								disabled={isGenerating || availability !== "available" || !currentLogs}
-								className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+								className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md"
 							>
 								{isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
 								{isGenerating ? getStatusMessage : "Resumir"}
@@ -296,7 +296,7 @@ export function LogsViewer({
 									<select
 										value={logLevelFilter}
 										onChange={(e) => setLogLevelFilter(e.target.value as "all" | "ERROR" | "WARN" | "INFO" | "DEBUG")}
-										className="bg-background border rounded px-2 py-1 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+										className="bg-background border rounded px-2 py-1 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md"
 										aria-label="Filtrar por nivel de log"
 									>
 										<option value="all">Todos</option>
@@ -326,7 +326,7 @@ export function LogsViewer({
 										onChange={(e) => setFilter(e.target.value)}
 										placeholder="Buscar (Cmd+F)"
 										aria-label="Buscar logs"
-										className="pl-7 pr-2 py-1 text-sm bg-background border rounded w-48 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+										className="pl-7 pr-2 py-1 text-sm bg-background border rounded w-48 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md"
 									/>
 								</div>
 							</Tooltip.Trigger>

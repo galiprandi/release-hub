@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Search, X, ClipboardCopy, Check, Sparkles, AlertCircle, Pause, Play, Terminal } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { LazyRender, useAISummarize } from "@galiprandi/react-tools";
@@ -28,13 +28,6 @@ export function LogsViewer({
 }: LogsViewerProps) {
 	const queryClient = useQueryClient();
 
-	const { data: logs, isLoading, error } = useQuery({
-		queryKey: ['logs', selectedResourceId],
-		queryFn,
-		enabled: !!queryFn,
-		refetchInterval: 3000,
-	});
-
 	const [filter, setFilter] = useState("");
 	const [logLevelFilter, setLogLevelFilter] = useState<"all" | "ERROR" | "WARN" | "INFO" | "DEBUG">("all");
 	const [copied, setCopied] = useState(false);
@@ -42,13 +35,30 @@ export function LogsViewer({
 	const [isAiSummaryCollapsed, setIsAiSummaryCollapsed] = useState(false);
 	const [isGeneratingLocal, setIsGeneratingLocal] = useState(false);
 	const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
+	const autoScrollEnabledRef = useRef(autoScrollEnabled);
 	const logsContainerRef = useRef<HTMLDivElement>(null);
 	const preRef = useRef<HTMLPreElement>(null);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
+	const { data: logsData, isLoading, error } = useInfiniteQuery({
+		queryKey: ['logs', selectedResourceId],
+		queryFn: async () => queryFn(),
+		initialPageParam: 0,
+		getNextPageParam: () => null,
+		enabled: !!queryFn && autoScrollEnabled,
+		refetchInterval: autoScrollEnabled ? 3000 : false,
+	});
+
+	const logs = logsData?.pages?.[0] || "";
+
 	const currentLogs = logs || "";
 	const currentError = error;
 	const currentIsLoading = isLoading;
+
+	// Sync ref with state
+	useEffect(() => {
+		autoScrollEnabledRef.current = autoScrollEnabled;
+	}, [autoScrollEnabled]);
 
 	// Handle Cmd+F / Ctrl+F to focus search input
 	useEffect(() => {
@@ -158,13 +168,14 @@ export function LogsViewer({
 		if (!pre || !container) return;
 
 		const observer = new ResizeObserver(() => {
-			if (autoScrollEnabled) {
+			if (autoScrollEnabledRef.current) {
+				// Scroll to bottom, accounting for any padding
 				container.scrollTop = container.scrollHeight;
 			}
 		});
 		observer.observe(pre);
 		return () => observer.disconnect();
-	}, [autoScrollEnabled]);
+	}, [filteredLines]);
 
 	// Detect manual scroll and disable auto-scroll
 	useEffect(() => {
@@ -173,14 +184,14 @@ export function LogsViewer({
 
 		const handleScroll = () => {
 			const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
-			if (!isAtBottom && autoScrollEnabled) {
+			if (!isAtBottom && autoScrollEnabledRef.current) {
 				setAutoScrollEnabled(false);
 			}
 		};
 
 		container.addEventListener('scroll', handleScroll);
 		return () => container.removeEventListener('scroll', handleScroll);
-	}, [autoScrollEnabled]);
+	}, []);
 
 
 	const handleCopy = async () => {

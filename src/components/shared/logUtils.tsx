@@ -14,7 +14,7 @@ export function stripAnsiCodes(text: string): string {
 /**
  * Resalta una línea de log con colores según timestamps, niveles de log y filtros
  */
-export function highlightLogLine(line: string, filter?: string): React.ReactNode {
+export function highlightLogLine(line: string, filter?: string, customHighlight?: string): React.ReactNode {
 	if (!line) return line;
 
 	// Limpiar ANSI color codes antes de resaltar
@@ -50,6 +50,17 @@ export function highlightLogLine(line: string, filter?: string): React.ReactNode
 		const escapedFilter = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 		const filterPattern = new RegExp(`(${escapedFilter})`, 'gi');
 		highlighted = highlighted.replace(filterPattern, '<mark class="bg-yellow-500/30 text-yellow-200 rounded px-0.5">$1</mark>');
+	}
+
+	// Resaltar término personalizado
+	if (customHighlight && customHighlight.trim()) {
+		try {
+			const escapedCustom = customHighlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			const customPattern = new RegExp(`(${escapedCustom})`, 'gi');
+			highlighted = highlighted.replace(customPattern, '<mark class="bg-purple-500/40 text-purple-200 rounded px-0.5 border border-purple-500/20">$1</mark>');
+		} catch (e) {
+			console.warn('[logUtils] Invalid custom highlight regex/pattern:', e);
+		}
 	}
 
 	return <span dangerouslySetInnerHTML={{ __html: highlighted }} />;

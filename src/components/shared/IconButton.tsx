@@ -1,13 +1,15 @@
+import { cn } from "@/lib/utils";
 import * as Tooltip from "@radix-ui/react-tooltip";
 
- interface IconButtonProps {
+interface IconButtonProps {
 	icon: React.ReactNode;
 	onClick: () => void;
 	tooltip: string;
 	disabled?: boolean;
+	active?: boolean;
 }
 
-export function IconButton({ icon, onClick, tooltip, disabled = false }: IconButtonProps) {
+export function IconButton({ icon, onClick, tooltip, disabled = false, active = false }: IconButtonProps) {
 	return (
 		<Tooltip.Root>
 			<Tooltip.Trigger asChild>
@@ -16,7 +18,13 @@ export function IconButton({ icon, onClick, tooltip, disabled = false }: IconBut
 					onClick={onClick}
 					disabled={disabled}
 					aria-label={tooltip}
-					className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+					data-active={active || undefined}
+					className={cn(
+						"p-1.5 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1",
+						active
+							? "text-primary bg-primary/10 hover:bg-primary/20"
+							: "text-muted-foreground hover:text-foreground hover:bg-muted"
+					)}
 				>
 					{icon}
 				</button>

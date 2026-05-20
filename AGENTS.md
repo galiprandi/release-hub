@@ -234,3 +234,23 @@ try {
 - `processedError: string | null` - Último error procesado
 - `isAvailable: boolean` - Si AI está disponible y el hook está habilitado
 
+## Vista de Logs (LogsViewer)
+
+El componente `LogsViewer` maneja visualización y filtrado de logs en tiempo real. Posee las siguientes características clave:
+
+### 1. Búsqueda y Navegación de Coincidencias
+* **No destructiva**: La búsqueda no oculta líneas para mantener el contexto completo. En su lugar, resalta las coincidencias del término buscado y permite navegar secuencialmente entre ellas.
+* **Contador de coincidencia**: Muestra el indicador `actual/total` de coincidencias al realizar una búsqueda.
+* **Botones de Navegación**: Usa los botones de flecha arriba/abajo (Chevron) al lado de la búsqueda para navegar por las coincidencias con scroll suave (`scrollIntoView` seguro para ambientes de testing).
+
+### 2. Opciones de Barra de Herramientas (Compacta e Iconográfica)
+Para maximizar el espacio útil en la barra de herramientas, se utilizan exclusivamente botones iconográficos para los siguientes toggles:
+* **Resaltado Personalizado (Highlighter)**: Permite ingresar un término alternativo para resaltar en color morado de manera paralela a la búsqueda general.
+* **Ajuste de Línea (Word Wrap)**: Ajusta el texto de los logs al ancho de la pantalla (`whitespace-pre-wrap`) o habilita scroll horizontal (`whitespace-pre`).
+* **Numeración de Líneas (Line Numbers)**: Renderiza el número de línea respectivo en un gutter para facilitar la referenciación y debugging.
+* **Expandir/Contraer Tamaño (Fullscreen)**: Disponible en modo modal. Permite alternar dinámicamente entre una vista de modal centrada con márgenes elegantes (`max-w-7xl`, `w-[90vw]`, `h-[90vh]`) para no pegarse a los bordes de la pantalla en laptops (como MacBooks), y una vista a pantalla completa (`w-screen`, `h-screen`, sin bordes redondeados) que maximiza el área de lectura de logs.
+
+### 3. Explicación de Errores con IA (Local API)
+* Las líneas que contienen patrones de error o advertencia (`ERROR`, `WARN`, `FATAL`, etc.) muestran un botón de chispa (`Sparkles`) al hacer hover.
+* Al hacer clic, se realiza una consulta a la API de IA local (`useAISummarize`) y se muestra una explicación concisa del error directamente debajo de la línea del log sin interrumpir la lectura.
+

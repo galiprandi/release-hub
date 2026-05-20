@@ -66,15 +66,17 @@ describe('LogsViewer', () => {
 		});
 	});
 
-	it('filters logs by text', async () => {
+	it('highlights search term and calculates match count', async () => {
 		renderLogsViewer();
 		await waitFor(() => expect(screen.getByText(/Log 1/)).toBeTruthy());
 
 		const searchInput = screen.getByLabelText(/Buscar logs/);
 		fireEvent.change(searchInput, { target: { value: 'ERROR' } });
 
-		expect(screen.queryByText(/Log 1/)).toBeNull();
-		expect(screen.getByText(/Log 2/)).toBeTruthy();
+		// Since we no longer hide non-matching lines, Log 1 must still be present
+		expect(screen.getByText(/Log 1/)).toBeTruthy();
+		// Match counter should show 1/1
+		expect(screen.getByText('1/1')).toBeTruthy();
 	});
 
 	it('filters logs by level', async () => {
@@ -173,4 +175,92 @@ describe('LogsViewer', () => {
         const title = screen.getByRole('heading', { name: /Logs/i });
         expect(title).toBeTruthy();
     });
+
+	it('toggles word wrap option', async () => {
+		renderLogsViewer();
+		const wrapButton = screen.getByRole('button', { name: /Ajuste de línea/i });
+		expect(wrapButton.getAttribute('data-active')).toBeNull();
+
+		fireEvent.click(wrapButton);
+		expect(wrapButton.getAttribute('data-active')).toBe('true');
+	});
+
+	it('toggles line numbers option', async () => {
+		renderLogsViewer();
+		await waitFor(() => expect(screen.getByText(/Log 1/)).toBeTruthy());
+
+		const hashButton = screen.getByRole('button', { name: /Mostrar números de línea/i });
+		expect(hashButton.getAttribute('data-active')).toBeNull();
+
+		fireEvent.click(hashButton);
+		expect(hashButton.getAttribute('data-active')).toBe('true');
+		
+		// Line numbers should be visible
+		expect(screen.getByText('1')).toBeTruthy();
+	});
+
+	it('toggles custom highlighter option and accepts input', async () => {
+		renderLogsViewer();
+		const highlightButton = screen.getByRole('button', { name: /Resaltado personalizado/i });
+		expect(highlightButton.getAttribute('data-active')).toBeNull();
+
+		fireEvent.click(highlightButton);
+		expect(highlightButton.getAttribute('data-active')).toBe('true');
+
+		const highlightInput = screen.getByLabelText(/Término para resaltar/i);
+		fireEvent.change(highlightInput, { target: { value: 'custom-term' } });
+		expect(highlightInput.getAttribute('value')).toBe('custom-term');
+	});
+
+	it('toggles expand/collapse full screen option in modal mode', async () => {
+		renderLogsViewer({ asModal: true });
+		
+		const dialog = await screen.findByRole('dialog');
+		expect(dialog).toBeTruthy();
+
+		// Initially, we should find the button "Expandir a pantalla completa"
+		const expandButton = screen.getByRole('button', { name: /Expandir a pantalla completa/i });
+		expect(expandButton).toBeTruthy();
+
+		// Click to expand
+		fireEvent.click(expandButton);
+
+		// Now, the button should have name "Contraer tamaño"
+		const contractButton = screen.getByRole('button', { name: /Contraer tamaño/i });
+		expect(contractButton).toBeTruthy();
+
+		// Click to collapse/contract
+		fireEvent.click(contractButton);
+		expect(screen.getByRole('button', { name: /Expandir a pantalla completa/i })).toBeTruthy();
+	});
+
+	it('persists options to and loads them from localStorage', async () => {
+		const store: Record<string, string> = {
+			"release_hub_logs_word_wrap": "true",
+			"release_hub_logs_line_numbers": "true",
+			"release_hub_logs_expanded": "true"
+		};
+
+		vi.spyOn(localStorage, 'getItem').mockImplementation((key) => store[key] || null);
+		vi.spyOn(localStorage, 'setItem').mockImplementation((key, val) => {
+			store[key] = val;
+		});
+
+		const { unmount } = renderLogsViewer({ asModal: true });
+
+		const wrapButton = screen.getByRole('button', { name: /Ajuste de línea/i });
+		const hashButton = screen.getByRole('button', { name: /Mostrar números de línea/i });
+		const contractButton = screen.getByRole('button', { name: /Contraer tamaño/i });
+
+		expect(wrapButton.getAttribute('data-active')).toBe('true');
+		expect(hashButton.getAttribute('data-active')).toBe('true');
+		expect(contractButton).toBeTruthy();
+
+		fireEvent.click(wrapButton);
+		expect(wrapButton.getAttribute('data-active')).toBeNull();
+		expect(store["release_hub_logs_word_wrap"]).toBe("false");
+
+		unmount();
+		vi.restoreAllMocks();
+	});
 });

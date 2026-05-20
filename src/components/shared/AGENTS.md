@@ -46,12 +46,14 @@ export interface LogsViewerProps {
 - Triggers `onResourceChange` callback when selection changes
 - Query automatically invalidates when `selectedResourceId` changes
 
-### 3. Auto-Scroll
+#### 3. Auto-Scroll and Polling
 
-- Automatically scrolls to bottom when new logs arrive
-- **Manual scroll detection**: When user scrolls up from bottom, auto-scroll is automatically disabled
-- **Re-enabling**: User can re-enable auto-scroll via Pause/Play button (existing IconButton)
-- Uses ResizeObserver to detect content expansion and scroll
+- **Auto-scroll to Bottom**: When auto-scroll is enabled, the logs viewer automatically scrolls to the bottom to display the newest logs as they arrive.
+- **Manual Scroll Detection**: Any manual scroll interaction by the user (up, down, etc.) automatically disables auto-scroll.
+- **Programmatic Scroll Tracking**: Uses a ref flag (`isProgrammaticScrollRef`) to distinguish programmatic scrolling from user-initiated scrolls so that auto-scroll isn't accidentally disabled by automatic scroll adjustments.
+- **Polling Interruption**: When auto-scroll is disabled (either manually or via the Pause button), the background polling (refetchInterval) is completely stopped to prevent unnecessary network requests. When re-enabled, polling resumes.
+- **Immediate Scroll on Re-enable**: Enabling auto-scroll immediately scrolls the container to the bottom.
+- **ResizeObserver**: Listens to size changes on the logs `<pre>` element to scroll down as new content is rendered by `LazyRender`.
 
 ### 4. Log Filtering
 

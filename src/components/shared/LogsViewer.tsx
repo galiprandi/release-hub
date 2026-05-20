@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, Search, X, ClipboardCopy, Check, Sparkles, AlertCircle, Pause, Play, Terminal } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -41,8 +41,17 @@ export function LogsViewer({
 	const [isGeneratingLocal, setIsGeneratingLocal] = useState(false);
 	const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 	const autoScrollEnabledRef = useRef(autoScrollEnabled);
-	const logsContainerRef = useRef<HTMLDivElement>(null);
-	const preRef = useRef<HTMLPreElement>(null);
+	const [containerElement, setContainerElement] = useState<HTMLDivElement | null>(null);
+	const [preElement, setPreElement] = useState<HTMLPreElement | null>(null);
+
+	const logsContainerRef = useCallback((node: HTMLDivElement | null) => {
+		setContainerElement(node);
+	}, []);
+
+	const preRef = useCallback((node: HTMLPreElement | null) => {
+		setPreElement(node);
+	}, []);
+
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
 	const { data: logsData, isLoading, error } = useLogsAccumulator({
@@ -165,37 +174,49 @@ export function LogsViewer({
 		return matchingGroups.flatMap(group => group.split("\n"));
 	})();
 
+	const scrollToBottom = useCallback(() => {
+		if (containerElement) {
+			containerElement.scrollTop = containerElement.scrollHeight;
+		}
+	}, [containerElement]);
+
 	// ResizeObserver on <pre> to scroll when LazyRender content actually expands
 	useEffect(() => {
-		const pre = preRef.current;
-		const container = logsContainerRef.current;
-		if (!pre || !container) return;
+		if (!preElement || !containerElement) return;
 
 		const observer = new ResizeObserver(() => {
 			if (autoScrollEnabledRef.current) {
-				// Scroll to bottom, accounting for any padding
-				container.scrollTop = container.scrollHeight;
+				scrollToBottom();
 			}
 		});
-		observer.observe(pre);
+		observer.observe(preElement);
 		return () => observer.disconnect();
-	}, [filteredLines]);
+	}, [preElement, containerElement, scrollToBottom]);
 
 	// Detect manual scroll and disable auto-scroll
 	useEffect(() => {
-		const container = logsContainerRef.current;
-		if (!container) return;
+		if (!containerElement) return;
 
 		const handleScroll = () => {
-			const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
+			// Disable auto-scroll if user scrolled away from the bottom.
+			// We use a threshold of 10px to account for subpixel rounding.
+			const isAtBottom = containerElement.scrollHeight - containerElement.scrollTop <= containerElement.clientHeight + 10;
 			if (!isAtBottom && autoScrollEnabledRef.current) {
 				setAutoScrollEnabled(false);
 			}
 		};
+		containerElement.addEventListener('scroll', handleScroll, { passive: true });
+		return () => {
+			containerElement.removeEventListener('scroll', handleScroll);
+		};
+	}, [containerElement]);
 
-		container.addEventListener('scroll', handleScroll);
-		return () => container.removeEventListener('scroll', handleScroll);
-	}, []);
+	// Scroll to bottom immediately when auto-scroll is enabled
+	useEffect(() => {
+		if (autoScrollEnabled) {
+			scrollToBottom();
+		}
+	}, [autoScrollEnabled, scrollToBottom]);
 
 
 	const handleCopy = async () => {

@@ -10,26 +10,26 @@ export interface StatusCardProps {
 export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps) {
 	const styles = {
 		loading: {
-			borderClass: 'border-gray-200',
-			textClass: 'text-gray-600',
+			borderClass: 'border-border/50',
+			textClass: 'text-muted-foreground',
 			icon: Loader2,
 			iconClass: 'animate-spin',
 		},
 		error: {
-			borderClass: 'border-red-200',
-			textClass: 'text-red-600',
+			borderClass: 'border-destructive/20',
+			textClass: 'text-destructive',
 			icon: XCircle,
 			iconClass: '',
 		},
 		warn: {
-			borderClass: 'border-amber-200',
-			textClass: 'text-amber-700',
+			borderClass: 'border-warning/20',
+			textClass: 'text-warning',
 			icon: AlertTriangle,
 			iconClass: '',
 		},
 		offline: {
-			borderClass: 'border-gray-300',
-			textClass: 'text-gray-500',
+			borderClass: 'border-border',
+			textClass: 'text-muted-foreground',
 			icon: WifiOff,
 			iconClass: '',
 		},
@@ -49,9 +49,9 @@ export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps)
 					<button
 						type="button"
 						onClick={onRetry}
-						className={`text-xs px-2 py-1 rounded transition-colors ${
-							type === 'error' ? 'bg-red-100 text-red-700 hover:bg-red-200' :
-							type === 'warn' ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' :
+						className={`text-xs px-2 py-1 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
+							type === 'error' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' :
+							type === 'warn' ? 'bg-warning/10 text-warning hover:bg-warning/20' :
 							'bg-muted text-muted-foreground hover:bg-accent'
 						}`}
 					>

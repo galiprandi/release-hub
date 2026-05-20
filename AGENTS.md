@@ -125,7 +125,7 @@ Los archivos de test unitarios deben ubicarse en el mismo directorio que el arch
 
 ⚠️ **CRÍTICO**: Para asegurar la consistencia visual y el soporte de temas (claro/oscuro), seguir estas reglas:
 
-1. **Priorizar clases semánticas**: Usar tokens semánticos de Tailwind (ej: `text-muted-foreground`, `bg-muted`, `text-primary`, `border-input`) en lugar de colores hardcodeados (ej: `text-gray-600`, `bg-blue-500`).
+1. **Priorizar clases semánticas**: Usar tokens semánticos de Tailwind (ej: `text-muted-foreground`, `bg-muted`, `text-primary`, `border-input`) en lugar de colores hardcodeados (ej: `text-gray-600`, `bg-blue-500`). Se prohíbe el uso de colores hardcodeados en componentes de estado o feedback; utilizar exclusivamente tokens como `text-success`, `text-destructive`, `text-info` y `text-warning`.
 2. **Anillos de Foco Estándar**: Todos los elementos interactivos deben usar el patrón: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1`.
 3. **Componentes Compartidos**: Antes de crear un nuevo componente visual, verificar si puede ser una extensión de `FilterBar`, `PageHeader`, `BaseDialog` o `DisplayInfo`. Especialmente, todos los diálogos deben migrarse a `BaseDialog` para asegurar consistencia en transiciones y accesibilidad.
 4. **Referencia de Diseño**: Consultar `DESIGN.md` para la lista completa de tokens y principios de accesibilidad.
@@ -256,3 +256,11 @@ Para maximizar el espacio útil en la barra de herramientas, se utilizan exclusi
 * Las líneas que contienen patrones de error o advertencia (`ERROR`, `WARN`, `FATAL`, etc.) muestran un botón de chispa (`Sparkles`) al hacer hover.
 * Al hacer clic, se realiza una consulta a la API de IA local (`useAISummarize`) y se muestra una explicación concisa del error directamente debajo de la línea del log sin interrumpir la lectura.
 
+
+## Estados de Feedback (StatusCard)
+
+El componente `StatusCard` es el estándar para mostrar estados globales de carga, error y advertencia.
+
+1. **Tokens Semánticos**: NUNCA usar colores hardcoded. Usar `text-destructive`, `text-warning`, etc., con opacidades para fondos (ej: `bg-destructive/10`).
+2. **Interactividad**: Los botones de reintento deben heredar el color semántico del estado para mantener la resonancia visual.
+3. **Accesibilidad**: Todos los botones iconográficos (como el de cierre) deben incluir `aria-label` descriptivo y usar el anillo de enfoque estándar del sistema.

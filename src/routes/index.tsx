@@ -289,44 +289,31 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 
 	if (isLoading) {
 		return (
-			<tr className="border-t">
+			<tr className="border-t animate-pulse">
 				<td className="px-4 py-3 w-auto">
-					<Link
-						to="/product/$org/$product"
-						params={{ org, product: name }}
-						search={{ view: "commits" }}
-						className="font-medium hover:text-primary"
-					>
-						{repo.fullName}
-					</Link>
-				</td>
-				<td colSpan={4} className="px-4 py-3">
-					<div className="flex items-center gap-2 text-muted-foreground text-sm">
-						<Loader2 className="w-4 h-4 animate-spin" />
-						Cargando información...
+					<div className="flex items-center gap-2">
+						<div className="w-4 h-4 bg-muted rounded-full flex-shrink-0 flex items-center justify-center">
+							<Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
+						</div>
+						<div className="h-4 bg-muted rounded w-32" />
 					</div>
+				</td>
+				<td className="px-4 py-3 w-20">
+					<div className="h-4 bg-muted rounded w-16" />
+				</td>
+				<td className="px-4 py-3 w-20">
+					<div className="h-4 bg-muted rounded w-16" />
+				</td>
+				<td className="px-4 py-3 w-36">
+					<div className="h-4 bg-muted rounded w-24" />
+				</td>
+				<td className="px-4 py-3" style={{ width: '250px' }}>
+					<div className="h-4 bg-muted rounded w-40" />
 				</td>
 				<td className="px-4 py-3 text-center w-16">
 					<div className="flex items-center justify-center gap-2">
-						<a
-							href={`https://github.com/${org}/${name}`}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-muted-foreground hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm transition-all"
-							aria-label="Abrir en GitHub"
-							title="Abrir en GitHub"
-						>
-							<Github className="w-5 h-5" />
-						</a>
-						<button
-							type="button"
-							onClick={() => onToggleFavorite(repo.fullName)}
-							className={`${isFavorite ? "text-yellow-500" : "text-muted-foreground"} hover:text-yellow-600 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm transition-all`}
-							aria-label={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
-							title={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
-						>
-							<Star className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
-						</button>
+						<div className="w-5 h-5 bg-muted rounded" />
+						<div className="w-5 h-5 bg-muted rounded" />
 					</div>
 				</td>
 			</tr>
@@ -342,7 +329,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 							to="/product/$org/$product"
 							params={{ org, product: name }}
 							search={{ view: "commits" }}
-							className="font-medium hover:text-primary"
+							className="font-medium hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md"
 						>
 							{name}
 						</Link>
@@ -353,7 +340,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 									<button
 										type="button"
 										onClick={() => setIsCommitsModalOpen(true)}
-										className="inline-flex items-center gap-0.5 text-[10px] bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded border border-orange-200 font-medium cursor-pointer hover:bg-orange-100 transition-colors"
+										className="inline-flex items-center gap-0.5 text-[10px] bg-warning/10 text-warning px-1.5 py-0.5 rounded border border-warning/20 font-medium cursor-pointer hover:bg-warning/20 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 									>
 										<GitPullRequestCreateArrow className="w-3 h-3" />
 										{pendingCount}
@@ -413,7 +400,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 							href={`https://github.com/${org}/${name}`}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-muted-foreground hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm transition-all"
+							className="text-muted-foreground hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-0.5"
 							aria-label="Abrir en GitHub"
 							title="Abrir en GitHub"
 						>
@@ -422,7 +409,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 						<button
 							type="button"
 							onClick={() => onToggleFavorite(repo.fullName)}
-							className={`${isFavorite ? "text-yellow-500" : "text-muted-foreground"} hover:text-yellow-600 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm transition-all`}
+							className={`${isFavorite ? "text-yellow-500" : "text-muted-foreground"} hover:text-yellow-600 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-0.5`}
 							aria-label={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
 							title={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
 						>

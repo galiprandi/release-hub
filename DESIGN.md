@@ -26,7 +26,11 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 ### StatusCard
 - Utilizado para estados globales de carga, error o advertencia en monitores y paneles.
 - Soporta tipos: `loading`, `error`, `warn`, y `offline`.
-- Los botones de acción deben usar colores semánticos (ej: `bg-red-100` para reintentos en errores).
+- Los botones de acción deben usar colores semánticos (ej: `bg-destructive/10` para reintentos en errores).
+- Utiliza bordes sutiles con opacidad (ej: `border-destructive/20`).
+
+### DeployStatusIndicator
+- Implementación estricta de tokens semánticos: `text-success` (completado), `text-destructive` (fallido), `text-info` (en progreso), `text-warning` (advertencia).
 
 ## Refinamiento de Componentes
 
@@ -73,3 +77,8 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 ### DisplayInfo
 - Abstracción para mostrar metadatos (commits, tags, autores) con iconos y colores semánticos.
 - Soporta tooltips automáticos para contenido truncado o fechas.
+
+### StatusCard (Blindaje y Resonancia)
+- **Estados**: Soporta `loading`, `error`, `warn` y `offline`.
+- **Visual**: Bordes sutiles con opacidad (`border-destructive/20`) y fondos lavados (`bg-destructive/10`) para evitar fatiga visual mientras se mantiene la categorización clara.
+- **Robustez**: Implementa `truncate` en el mensaje para prevenir desbordamientos en layouts densos.

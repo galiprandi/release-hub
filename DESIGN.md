@@ -67,3 +67,8 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 ### DisplayInfo
 - Abstracción para mostrar metadatos (commits, tags, autores) con iconos y colores semánticos.
 - Soporta tooltips automáticos para contenido truncado o fechas.
+
+### StatusCard (Blindaje y Resonancia)
+- **Estados**: Soporta `loading`, `error`, `warn` y `offline`.
+- **Visual**: Bordes sutiles con opacidad (`border-destructive/20`) y fondos lavados (`bg-destructive/10`) para evitar fatiga visual mientras se mantiene la categorización clara.
+- **Robustez**: Implementa `truncate` en el mensaje para prevenir desbordamientos en layouts densos.

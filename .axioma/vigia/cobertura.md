@@ -12,3 +12,4 @@
 ## 2026-05-18 - src/components/shared/LogsViewer.tsx | Cobertura Ganada: [+93%] | Aprendizaje: El testeo de componentes con ResizeObserver requiere mocking global para evitar fallos en entornos de JSDOM.
 ## 2026-05-19 - src/api/exec.ts | Cobertura Ganada: [+100%] | Aprendizaje: Blidaje total del adaptador base de comandos. La exportación de la instancia de axios permite el testeo unitario sin mocks globales de red.
 ## 2026-05-19 - src/components/shared/LogsViewer.test.tsx | Cobertura Recuperada | Aprendizaje: Ajuste de selectores para Radix Portals en JSDOM usando roles ARIA (dialog, heading) en lugar de selectores de estilo/DOM directo para mayor resiliencia.
+## 2026-05-20 - src/components/ui/StatusCard.tsx | Cobertura Ganada: [+100%] | Aprendizaje: La estandarización de componentes de feedback con tokens semánticos y tests de regresión visual asegura una UX coherente y blindada ante cambios de tema.

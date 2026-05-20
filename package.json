@@ -45,6 +45,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.3.14",
     "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.60.0",
     "@tanstack/router-plugin": "^1.158.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",

@@ -50,3 +50,11 @@ We target **100% statement coverage** for all API adapters. This includes testin
 - Command execution failures.
 - Sanitization edge cases.
 - Malformed/Unexpected output parsing.
+
+## 5. Testing UI Components (Resonance and Accessibility)
+
+For shared UI components like `StatusCard`:
+- **States**: Test all visual variants and their respective CSS classes.
+- **Callbacks**: Verify that `onClose`, `onRetry`, or other interaction props are called correctly.
+- **Accessibility**: Ensure `aria-*` attributes and focus rings (`focus-visible`) are present and correct.
+- **Coverage**: Maintain 100% statement coverage for core UI utilities and shared components.

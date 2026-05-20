@@ -7,29 +7,31 @@ export interface StatusCardProps {
 	onRetry?: () => void;
 }
 
+const FOCUS_RING = "focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1";
+
 export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps) {
 	const styles = {
 		loading: {
-			borderClass: 'border-gray-200',
-			textClass: 'text-gray-600',
+			borderClass: 'border-border',
+			textClass: 'text-muted-foreground',
 			icon: Loader2,
 			iconClass: 'animate-spin',
 		},
 		error: {
-			borderClass: 'border-red-200',
-			textClass: 'text-red-600',
+			borderClass: 'border-destructive/20',
+			textClass: 'text-destructive',
 			icon: XCircle,
 			iconClass: '',
 		},
 		warn: {
-			borderClass: 'border-amber-200',
-			textClass: 'text-amber-700',
+			borderClass: 'border-warning/20',
+			textClass: 'text-warning',
 			icon: AlertTriangle,
 			iconClass: '',
 		},
 		offline: {
-			borderClass: 'border-gray-300',
-			textClass: 'text-gray-500',
+			borderClass: 'border-border',
+			textClass: 'text-muted-foreground',
 			icon: WifiOff,
 			iconClass: '',
 		},
@@ -40,19 +42,19 @@ export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps)
 
 	return (
 		<div className={`bg-card border-2 ${style.borderClass} rounded-xl p-4 h-[82px] flex items-center justify-between`}>
-			<div className="flex items-center gap-2 text-sm">
-				<Icon className={`w-4 h-4 ${style.iconClass} ${style.textClass}`} />
-				<p className={style.textClass}>{message}</p>
+			<div className="flex items-center gap-2 text-sm overflow-hidden">
+				<Icon className={`w-4 h-4 shrink-0 ${style.iconClass} ${style.textClass}`} aria-hidden="true" />
+				<p className={`${style.textClass} font-medium truncate`}>{message}</p>
 			</div>
-			<div className="flex items-center gap-2">
+			<div className="flex items-center gap-2 shrink-0">
 				{onRetry && (
 					<button
 						type="button"
 						onClick={onRetry}
-						className={`text-xs px-2 py-1 rounded transition-colors ${
-							type === 'error' ? 'bg-red-100 text-red-700 hover:bg-red-200' :
-							type === 'warn' ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' :
-							'bg-muted text-muted-foreground hover:bg-accent'
+						className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${FOCUS_RING} ${
+							type === 'error' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' :
+							type === 'warn' ? 'bg-warning/10 text-warning hover:bg-warning/20' :
+							'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
 						}`}
 					>
 						Reintentar
@@ -62,7 +64,8 @@ export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps)
 					<button
 						type="button"
 						onClick={onClose}
-						className="text-muted-foreground hover:text-foreground transition-colors"
+						className={`text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md ${FOCUS_RING}`}
+						aria-label="Cerrar"
 						title="Cerrar"
 					>
 						<X className="w-4 h-4" />

@@ -106,11 +106,18 @@ export async function getContainers(): Promise<ContainerInfo[]> {
 
 /**
  * Gets logs from a container (fallback for when SSE is not available).
+ * @param since - Unix timestamp (seconds) to get logs only after this time (optional)
  */
-export async function getContainerLogs(containerId: string, tail = 100): Promise<string> {
+export async function getContainerLogs(containerId: string, tail = 100, since?: number): Promise<string> {
 	try {
 		const sanitizedId = sanitizeContainerId(containerId);
-		const result = await runCommand(`docker logs --tail=${tail} ${sanitizedId}`);
+		let command = `docker logs --tail=${tail} ${sanitizedId}`;
+		if (since) {
+			// Convert Unix timestamp to ISO format for Docker --since
+			const sinceDate = new Date(since * 1000);
+			command = `docker logs --since="${sinceDate.toISOString()}" ${sanitizedId}`;
+		}
+		const result = await runCommand(command);
 		// Some containers use stdout, others use stderr
 		// Use stderr if it has content, otherwise use stdout
 		const logs = (result.stderr || '').trim() || (result.stdout || '').trim();

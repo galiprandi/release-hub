@@ -27,8 +27,11 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 		...applyCachePolicy("docker"),
 	})
 
-	// Query function for logs
-	const queryFn = () => selectedContainer ? getContainerLogs(selectedContainer.id, 100) : Promise.resolve('')
+	// Fetch function for logs with cursor support
+	const fetchFn = (cursor?: number) => {
+		if (!selectedContainer) return Promise.resolve('')
+		return getContainerLogs(selectedContainer.id, 100, cursor)
+	}
 
 	// Build resources list for LogsViewer select
 	const resources = useMemo(() => {
@@ -151,7 +154,7 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 				createPortal(
 					<LogsViewer
 						key={selectedContainer.id}
-						queryFn={queryFn}
+						fetchFn={fetchFn}
 						onClose={() => setIsLogsModalOpen(false)}
 						asModal={true}
 						resources={resources}

@@ -27,8 +27,8 @@ export function K8sSection({ namespace }: K8sSectionProps) {
 	// Use the auto-detected context if user hasn't manually selected one
 	const activeContext = selectedContext || access?.validContext || undefined;
 
-	// Query function for logs
-	const queryFn = () => getResourceLogs(currentType, currentName, namespace, 100, activeContext);
+	// Fetch function for logs with cursor support
+	const fetchFn = (cursor?: number) => getResourceLogs(currentType, currentName, namespace, 100, activeContext, cursor);
 
 	// Query deployments for the namespace
 	const { data: deployments } = useQuery({
@@ -178,7 +178,7 @@ export function K8sSection({ namespace }: K8sSectionProps) {
 
 			{isLogsModalOpen && selectedDeployment && (
 				<LogsViewer
-					queryFn={queryFn}
+					fetchFn={fetchFn}
 					onClose={() => setIsLogsModalOpen(false)}
 					resources={resources}
 					selectedResourceId={selectedResourceId}

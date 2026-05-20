@@ -20,15 +20,15 @@ import DayJS from "@/lib/dayjs";
 const timelineStatusTextColor = (state: string) => {
 	switch (state) {
 		case "SUCCESS":
-			return "text-emerald-600";
+			return "text-success";
 		case "FAILED":
-			return "text-red-600";
+			return "text-destructive";
 		case "WARN":
-			return "text-amber-600";
+			return "text-warning";
 		case "RUNNING":
 		case "PENDING":
 		case "STARTED":
-			return "text-blue-600";
+			return "text-info";
 		default:
 			return "text-muted-foreground";
 	}
@@ -55,15 +55,15 @@ const timelineStatusIcon = (state: string) => {
 const timelineStatusColor = (state: string) => {
 	switch (state) {
 		case "SUCCESS":
-			return "bg-green-500";
+			return "bg-success";
 		case "FAILED":
-			return "bg-red-500";
+			return "bg-destructive";
 		case "WARN":
-			return "bg-amber-500";
+			return "bg-warning";
 		case "RUNNING":
 		case "PENDING":
 		case "STARTED":
-			return "bg-blue-500 animate-pulse-slow shadow-[0_0_8px_rgba(59,130,246,0.4)]";
+			return "bg-info animate-pulse-slow shadow-[0_0_8px_var(--color-info)]/40";
 		default:
 			return "bg-muted";
 	}
@@ -161,11 +161,11 @@ function CopyButton({ url }: CopyButtonProps) {
 		<button
 			type="button"
 			onClick={handleCopy}
-			className={`p-1 text-xs rounded transition-colors ${
+			className={`p-1 text-xs rounded-md transition-all border ${
 				copied
-					? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-					: "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
-			}`}
+					? "bg-success/10 text-success border-success/20"
+					: "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted border-transparent hover:border-border"
+			} focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-none`}
 			title={copied ? "¡Copiado!" : "Copiar URL"}
 		>
 			{copied ? (
@@ -230,7 +230,7 @@ export function MiniTimeline({ events, runningEventId }: MiniTimelineProps) {
 											setRunningTooltipClosed(true);
 										}
 									}}
-									className={`h-2 w-7 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-md focus-visible:scale-110 focus-visible:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${timelineStatusColor(
+									className={`h-2.5 w-8 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-md focus-visible:scale-110 focus-visible:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${timelineStatusColor(
 										event.state,
 									)}`}
 									aria-label={`Evento: ${event.label.es}, Estado: ${event.state}`}
@@ -238,22 +238,24 @@ export function MiniTimeline({ events, runningEventId }: MiniTimelineProps) {
 							</HoverCardTrigger>
 							<HoverCardContent
 								align="center"
-								sideOffset={6}
-								className="p-4 w-fit min-w-[300px] max-w-[90vw] max-h-[80vh] overflow-y-auto"
+								sideOffset={8}
+								className="p-0 w-fit min-w-[320px] max-w-[90vw] max-h-[80vh] overflow-hidden shadow-xl border-border/50"
 							>
-								<div className="space-y-3">
-									<div className="flex items-center justify-between gap-2">
-										<div className="flex items-center gap-2">
-											{timelineStatusIcon(event.state)}
+								<div className="p-4 space-y-4">
+									<div className="flex items-center justify-between gap-4">
+										<div className="flex items-center gap-2.5">
+											<div className={`p-1.5 rounded-lg ${timelineStatusColor(event.state)} bg-opacity-10`}>
+												{timelineStatusIcon(event.state)}
+											</div>
 											<span
-												className={`text-sm font-semibold ${timelineStatusTextColor(
+												className={`text-sm font-bold tracking-tight ${timelineStatusTextColor(
 													event.state,
 												)}`}
 											>
 												{event.label.es}
 											</span>
 										</div>
-										<div className="text-xs text-muted-foreground">
+										<div className="text-[11px] font-medium text-muted-foreground bg-muted/30 px-2 py-0.5 rounded-full">
 											{`${DayJS(event.updated_at || event.created_at).fromNow()} (${formatDuration(
 												event.created_at,
 												event.updated_at,
@@ -261,38 +263,40 @@ export function MiniTimeline({ events, runningEventId }: MiniTimelineProps) {
 										</div>
 									</div>
 									{event.subevents && event.subevents.length > 0 && (
-										<div className="border-t pt-2">
-											<div className="flex items-center gap-3 mb-2">
-												<div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+										<div className="border-t border-border/40 pt-3">
+											<div className="flex items-center gap-3 mb-3">
+												<div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
 													<div
-														className="h-full bg-emerald-500 transition-all duration-500"
+														className="h-full bg-success transition-all duration-500 shadow-[0_0_8px_var(--color-success)]/20"
 														style={{
 															width: `${(event.subevents.filter(s => ['SUCCESS', 'FAILED', 'WARN'].includes(s.state)).length / event.subevents.length) * 100}%`,
 														}}
 													/>
 												</div>
-												<span className="text-xs text-muted-foreground">
+												<span className="text-[10px] font-bold text-muted-foreground tabular-nums">
 													{event.subevents.filter(s => ['SUCCESS', 'FAILED', 'WARN'].includes(s.state)).length}/{event.subevents.length}
 												</span>
 											</div>
-											<div className="space-y-1">
+											<div className="space-y-0.5">
 												{event.subevents.map((sub) => (
 													<div key={sub.id}>
 														<button
 															type="button"
-															className="flex items-center gap-2 text-xs p-1 rounded hover:bg-muted/50 cursor-pointer transition-colors w-full text-left"
+															className="flex items-center gap-2.5 text-[11px] p-1.5 rounded-md hover:bg-muted/50 cursor-pointer transition-colors w-full text-left focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-none"
 															onClick={() => sub.markdown && setSelectedSubEvent({ id: sub.id, label: sub.label, markdown: sub.markdown })}
 															disabled={!sub.markdown}
 														>
-															{timelineStatusIcon(sub.state)}
-															<span className={`flex-1 ${timelineStatusTextColor(sub.state)}`}>
+															<div className="flex-shrink-0">
+																{timelineStatusIcon(sub.state)}
+															</div>
+															<span className={`flex-1 font-medium ${timelineStatusTextColor(sub.state)}`}>
 																{sub.label}
 															</span>
-															<span className="text-muted-foreground text-[10px]">
+															<span className="text-muted-foreground/70 tabular-nums">
 																{formatDuration(sub.created_at, sub.updated_at)}
 															</span>
 															{sub.markdown && (
-																<span className="text-[10px] text-muted-foreground ml-1">📄</span>
+																<span className="text-[10px] opacity-60 ml-1">📄</span>
 															)}
 														</button>
 													</div>
@@ -301,18 +305,18 @@ export function MiniTimeline({ events, runningEventId }: MiniTimelineProps) {
 										</div>
 									)}
 									{eventUrls.length > 0 && (
-										<div className="border-t pt-2">
-											<div className="text-xs font-medium text-foreground mb-2">
-												URLs relacionadas:
+										<div className="border-t border-border/40 pt-3">
+											<div className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">
+												URLs relacionadas
 											</div>
-											<div className="space-y-1 max-w-[250px]">
+											<div className="space-y-1.5 max-w-[280px]">
 												{eventUrls.map((url) => (
-													<div key={url} className="flex items-center gap-1">
+													<div key={url} className="flex items-center gap-1.5">
 														<a
 															href={url}
 															target="_blank"
 															rel="noreferrer"
-															className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 transition flex-1 min-w-0"
+															className="inline-flex items-center gap-2 px-2.5 py-1.5 text-[11px] font-medium rounded-md bg-muted/40 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all flex-1 min-w-0 border border-transparent hover:border-primary/20"
 														>
 															<ExternalLink className="w-3 h-3 flex-shrink-0" />
 															<span className="truncate">{url}</span>
@@ -324,7 +328,7 @@ export function MiniTimeline({ events, runningEventId }: MiniTimelineProps) {
 										</div>
 									)}
 									{event.markdown && (
-										<div className="border-t pt-2 prose prose-sm max-w-none dark:prose-invert">
+										<div className="border-t border-border/40 pt-3 prose prose-sm max-w-none dark:prose-invert text-[11px] leading-relaxed">
 											<Streamdown>{event.markdown}</Streamdown>
 										</div>
 									)}

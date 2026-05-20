@@ -228,10 +228,12 @@ export async function getPodsForDeployment(deploymentName: string, namespace?: s
   return parsePods(result.stdout);
 }
 
-export async function getResourceLogs(resourceType: 'deployment' | 'pod', name: string, namespace?: string, tail = 100, context?: string): Promise<string> {
+export async function getResourceLogs(resourceType: 'deployment' | 'pod', name: string, namespace?: string, tail = 100, context?: string, since?: number): Promise<string> {
   const sanitizedName = sanitizeK8sName(name);
   const nsFlag = namespace ? `-n ${sanitizeNamespace(namespace)}` : '';
   const ctxFlag = context ? `--context=${sanitizeContext(context)}` : '';
+  const sinceFlag = since ? `--since-time="${new Date(since * 1000).toISOString()}"` : '';
+  
   if (resourceType === 'deployment') {
     // Get deployment selector and use label selector for logs
     const selectorResult = await runCommand(`kubectl get deployment ${sanitizedName} ${nsFlag} ${ctxFlag} -o jsonpath='{.spec.selector.matchLabels}'`.trim());
@@ -242,10 +244,10 @@ export async function getResourceLogs(resourceType: 'deployment' | 'pod', name: 
     // Convert selector JSON to format -l key=value,key2=value2
     const labels = JSON.parse(selector);
     const labelSelector = Object.entries(labels).map(([k, v]) => `${k}=${v}`).join(',');
-    const result = await runCommand(`kubectl logs ${nsFlag} ${ctxFlag} -l ${labelSelector} --tail=${tail} --ignore-errors`.trim());
+    const result = await runCommand(`kubectl logs ${nsFlag} ${ctxFlag} -l ${labelSelector} --tail=${tail} ${sinceFlag} --ignore-errors`.trim());
     return cleanLogs(result.stdout);
   }
-  const result = await runCommand(`kubectl logs ${sanitizedName} ${nsFlag} ${ctxFlag} --tail=${tail}`.trim());
+  const result = await runCommand(`kubectl logs ${sanitizedName} ${nsFlag} ${ctxFlag} --tail=${tail} ${sinceFlag}`.trim());
   return cleanLogs(result.stdout);
 }
 

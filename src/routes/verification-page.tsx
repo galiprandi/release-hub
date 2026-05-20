@@ -138,7 +138,7 @@ function VerificationPage() {
                         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
                             <div className="w-full max-w-4xl h-[80vh]">
                                 <LogsViewer
-                                    queryFn={async () => "2024-05-20 INFO: Application started\n2024-05-20 WARN: Low memory\n2024-05-20 ERROR: Connection failed\n2024-05-20 DEBUG: Initializing components"}
+                                    fetchFn={async () => "2024-05-20 INFO: Application started\n2024-05-20 WARN: Low memory\n2024-05-20 ERROR: Connection failed\n2024-05-20 DEBUG: Initializing components"}
                                     onClose={() => setIsLogsViewerOpen(false)}
                                     asModal={false}
                                     resources={[{ id: "main", name: "Main Container", type: "pod" }]}
@@ -148,7 +148,7 @@ function VerificationPage() {
                     )}
                     {isLogsViewerModalOpen && (
                         <LogsViewer
-                            queryFn={async () => "2024-05-20 INFO: Application started\n2024-05-20 WARN: Low memory\n2024-05-20 ERROR: Connection failed\n2024-05-20 DEBUG: Initializing components"}
+                            fetchFn={async () => "2024-05-20 INFO: Application started\n2024-05-20 WARN: Low memory\n2024-05-20 ERROR: Connection failed\n2024-05-20 DEBUG: Initializing components"}
                             onClose={() => setIsLogsViewerModalOpen(false)}
                             asModal={true}
                             resources={[{ id: "main", name: "Main Container", type: "pod" }]}

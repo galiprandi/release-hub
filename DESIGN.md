@@ -11,6 +11,8 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Accent**: `bg-accent`, `text-accent-foreground`. Utilizado para estados de hover y resaltado interactivo.
 - **AI**: `text-ai`. Color distintivo para funcionalidades potenciadas por IA (púrpura/indigo).
 - **Success**: `text-success`. Utilizado para estados positivos y finalizaciones exitosas.
+- **Warning**: `text-warning`. Utilizado para estados de advertencia o precaución.
+- **Info**: `text-info`. Utilizado para información neutral o estados en progreso.
 - **Destructive**: `text-destructive`. Utilizado para acciones críticas o errores.
 
 ## Componentes de Feedback
@@ -21,6 +23,11 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - Los botones de acción deben usar colores semánticos (ej: `bg-red-100` para reintentos en errores).
 
 ## Refinamiento de Componentes
+
+### MiniTimeline
+- Uso estricto de tokens semánticos (`text-success`, `bg-info`, etc.) evitando colores hardcodeados.
+- Los dots de la línea de tiempo tienen un tamaño estándar de `h-2.5 w-8` y utilizan `focus-visible:ring-offset-1` para accesibilidad.
+- El `HoverCardContent` se presenta sin padding interno base (`p-0`) para permitir secciones con bordes limpios y fondos sutiles.
 
 ### AISummaryCard
 - Utiliza `bg-ai` para el fondo y `text-ai-foreground` para el texto.

@@ -78,8 +78,8 @@ describe("MiniTimeline", () => {
 		const successBtn = screen.getByLabelText("Evento: Build, Estado: SUCCESS");
 		const runningBtn = screen.getByLabelText("Evento: Deploy, Estado: RUNNING");
 
-		expect(successBtn.className).toContain("bg-green-500");
-		expect(runningBtn.className).toContain("bg-blue-500");
+		expect(successBtn.className).toContain("bg-success");
+		expect(runningBtn.className).toContain("bg-info");
 	});
 
 	it("opens dialog when clicking a subevent with markdown", async () => {

@@ -1,16 +1,21 @@
 import { useState, useEffect, useRef } from "react";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, Search, X, ClipboardCopy, Check, Sparkles, AlertCircle, Pause, Play, Terminal } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { LazyRender, useAISummarize } from "@galiprandi/react-tools";
 import { useAIErrorProcessor } from "@/hooks/useAIErrorProcessor";
+import { useLogsAccumulator } from "@/hooks/useLogsAccumulator";
 import { AISummaryCard } from "@/components/AISummaryCard";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { highlightLogLine, groupLogs, logLevelPattern } from "./logUtils";
 import { IconButton } from "./IconButton";
 
 export interface LogsViewerProps {
-	queryFn: () => Promise<string>;
+	/**
+	 * Function to fetch logs. Accepts an optional cursor (timestamp) parameter.
+	 * Returns the logs as a string.
+	 */
+	fetchFn: (cursor?: number) => Promise<string>;
 	onClose: () => void;
 	asModal?: boolean;
 	resources?: { id: string; name: string; type: string }[];
@@ -19,7 +24,7 @@ export interface LogsViewerProps {
 }
 
 export function LogsViewer({
-	queryFn,
+	fetchFn,
 	onClose,
 	asModal = true,
 	resources,
@@ -40,16 +45,15 @@ export function LogsViewer({
 	const preRef = useRef<HTMLPreElement>(null);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
-	const { data: logsData, isLoading, error } = useInfiniteQuery({
-		queryKey: ['logs', selectedResourceId],
-		queryFn: async () => queryFn(),
-		initialPageParam: 0,
-		getNextPageParam: () => null,
-		enabled: !!queryFn && autoScrollEnabled,
-		refetchInterval: autoScrollEnabled ? 3000 : false,
+	const { data: logsData, isLoading, error } = useLogsAccumulator({
+		fetchFn,
+		resourceId: selectedResourceId || '',
+		autoScrollEnabled,
+		refetchInterval: 3000,
 	});
 
-	const logs = logsData?.pages?.[0] || "";
+	// Concatenate all pages to get accumulated logs
+	const logs = logsData?.pages?.join('\n') || "";
 
 	const currentLogs = logs || "";
 	const currentError = error;
@@ -337,7 +341,7 @@ export function LogsViewer({
 			<IconButton
 				icon={autoScrollEnabled ? <Pause className="w-4 h-4 text-red-500" /> : <Play className="w-4 h-4" />}
 				onClick={() => setAutoScrollEnabled(!autoScrollEnabled)}
-				tooltip={autoScrollEnabled ? "Detener auto-scroll" : "Activar auto-scroll"}
+				tooltip={autoScrollEnabled ? "Detener scroll automático (polling continúa)" : "Activar scroll automático"}
 			/>
 			<IconButton
 				icon={copied ? <Check className="w-4 h-4 text-green-500" /> : <ClipboardCopy className="w-4 h-4" />}

@@ -12,7 +12,7 @@ const FOCUS_RING = "focus-visible:ring-2 focus-visible:ring-primary focus-visibl
 export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps) {
 	const styles = {
 		loading: {
-			borderClass: 'border-border',
+			borderClass: 'border-border/50',
 			textClass: 'text-muted-foreground',
 			icon: Loader2,
 			iconClass: 'animate-spin',
@@ -51,10 +51,10 @@ export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps)
 					<button
 						type="button"
 						onClick={onRetry}
-						className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${FOCUS_RING} ${
+						className={`text-xs px-2 py-1 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
 							type === 'error' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' :
 							type === 'warn' ? 'bg-warning/10 text-warning hover:bg-warning/20' :
-							'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+							'bg-muted text-muted-foreground hover:bg-accent'
 						}`}
 					>
 						Reintentar

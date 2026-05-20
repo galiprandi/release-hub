@@ -22,25 +22,25 @@ export function DeployStatusIndicator({
 	// Siempre mostrar el indicador cuando se llama al componente
 
 	const getStatusColor = () => {
-		if (isLoading) return "text-gray-400"
+		if (isLoading) return "text-muted-foreground"
 
 		switch (status?.toLowerCase()) {
 			case "success":
 			case "completed":
-				return "text-green-500"
+				return "text-success"
 			case "failed":
 			case "error":
-				return "text-red-500"
+				return "text-destructive"
 			case "in_progress":
 			case "running":
 			case "pending":
 			case "started":
-				return "text-yellow-500 animate-pulse-slow"
+				return "text-info animate-pulse-slow"
 			case "warn":
 			case "warning":
-				return "text-orange-500"
+				return "text-warning"
 			default:
-				return "text-gray-400"
+				return "text-muted-foreground"
 		}
 	}
 
@@ -81,7 +81,7 @@ export function DeployStatusIndicator({
 			case "error":
 				return (
 					<div className="text-xs space-y-1">
-						<div className="font-medium text-red-600">Deploy falló</div>
+						<div className="font-medium text-destructive">Deploy falló</div>
 						{failedStage && (
 							<div className="text-muted-foreground">
 								Stage: {failedStage}
@@ -110,7 +110,7 @@ export function DeployStatusIndicator({
 			case "warning":
 				return (
 					<div className="text-xs space-y-1">
-						<div className="font-medium text-orange-600">Deploy con advertencias</div>
+						<div className="font-medium text-warning">Deploy con advertencias</div>
 						{updatedAt && (
 							<div className="text-muted-foreground">
 								{DayJS(updatedAt).fromNow()}

@@ -15,6 +15,13 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Info**: `text-info`. Utilizado para información neutral o estados en progreso.
 - **Destructive**: `text-destructive`. Utilizado para acciones críticas o errores.
 
+## Componentes de Feedback
+
+### StatusCard
+- Utilizado para estados globales de carga, error o advertencia en monitores y paneles.
+- Soporta tipos: `loading`, `error`, `warn`, y `offline`.
+- Los botones de acción deben usar colores semánticos (ej: `bg-red-100` para reintentos en errores).
+
 ## Refinamiento de Componentes
 
 ### MiniTimeline

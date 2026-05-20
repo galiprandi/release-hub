@@ -108,7 +108,7 @@ export function StageCommitsTable({
 							</tr>
 						) : isCommits ? (
 							commits?.map((c: GitCommit) => (
-								<tr key={c.hash} className="border-t hover:bg-muted/50 transition-colors">
+								<tr key={c.hash} className="border-t hover:bg-muted/30 transition-colors group">
 									<td className="px-4 py-3">
 										<CommitLink hash={c.hash} org={org} repo={product} showStatus={showStatus} />
 									</td>
@@ -130,7 +130,7 @@ export function StageCommitsTable({
 						) : (
 							tags
 								?.map((t: GitTag) => (
-									<tr key={t.name} className="border-t hover:bg-muted/50 transition-colors">
+									<tr key={t.name} className="border-t hover:bg-muted/30 transition-colors group">
 										<td className="px-4 py-3">
 											<TagLink tagName={t.name} org={org} repo={product} showStatus={showStatus} />
 										</td>

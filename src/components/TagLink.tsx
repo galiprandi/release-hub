@@ -24,7 +24,7 @@ export function TagLink({ tagName, org, repo, pipelineStatus, isLoading, showSta
 				href={githubUrl}
 				target="_blank"
 				rel="noopener noreferrer"
-				className="flex items-center gap-1.5 text-sm font-mono text-purple-500 hover:text-purple-600"
+				className="flex items-center gap-1.5 text-sm font-mono text-ai hover:text-ai/80 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
 			>
 				<Tag className="w-4 h-4" />
 				{tagName}

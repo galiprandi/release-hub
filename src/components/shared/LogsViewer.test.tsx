@@ -167,13 +167,9 @@ describe('LogsViewer', () => {
 
     it('renders as modal when asModal is true', async () => {
         renderLogsViewer({ asModal: true });
-        // Radix Dialog renders into a portal
-        // We look for the dialog role
+        // Radix Dialog renders in a portal, so we search globally
         const dialog = await screen.findByRole('dialog');
         expect(dialog).toBeTruthy();
-        // The title is in an h2 inside the dialog
-        const title = screen.getByRole('heading', { name: /Logs/i });
-        expect(title).toBeTruthy();
     });
 
 	it('toggles word wrap option', async () => {

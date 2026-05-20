@@ -1,4 +1,4 @@
-import { GitCommit, Loader2, XCircle, X, AlertTriangle, WifiOff } from "lucide-react";
+import { GitCommit, XCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import DayJS from "@/lib/dayjs";
 import { Streamdown } from "streamdown";
@@ -11,6 +11,7 @@ import { MiniTimeline } from "./MiniTimeline";
 import type { MetaPart, SekiMonitorProps } from "./types";
 import type { FlattenedSubEvent } from "./helpers";
 import { PipelineCard } from "@/components/pipeline/PipelineCard";
+import { StatusCard } from "@/components/ui/StatusCard";
 
 function ErrorCard({ sub, parent }: FlattenedSubEvent) {
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -37,75 +38,6 @@ function ErrorCard({ sub, parent }: FlattenedSubEvent) {
 					<Streamdown>{sub.markdown}</Streamdown>
 				</div>
 			)}
-		</div>
-	);
-}
-
-interface StatusCardProps {
-	type: 'loading' | 'error' | 'warn' | 'offline';
-	message: string;
-	onClose?: () => void;
-	onRetry?: () => void;
-}
-
-function StatusCard({ type, message, onClose, onRetry }: StatusCardProps) {
-	const styles = {
-		loading: {
-			borderClass: 'border-gray-200',
-			textClass: 'text-gray-600',
-			icon: Loader2,
-			iconClass: 'animate-spin',
-		},
-		error: {
-			borderClass: 'border-red-200',
-			textClass: 'text-red-600',
-			icon: XCircle,
-			iconClass: '',
-		},
-		warn: {
-			borderClass: 'border-amber-200',
-			textClass: 'text-amber-700',
-			icon: AlertTriangle,
-			iconClass: '',
-		},
-		offline: {
-			borderClass: 'border-gray-300',
-			textClass: 'text-gray-500',
-			icon: WifiOff,
-			iconClass: '',
-		},
-	};
-
-	const style = styles[type];
-	const Icon = style.icon;
-
-	return (
-		<div className={`bg-card border-2 ${style.borderClass} rounded-xl p-4 h-[82px] flex items-center justify-between`}>
-			<div className="flex items-center gap-2 text-sm">
-				<Icon className={`w-4 h-4 ${style.iconClass} ${style.textClass}`} />
-				<p className={style.textClass}>{message}</p>
-			</div>
-			<div className="flex items-center gap-2">
-				{onRetry && type === 'error' && (
-					<button
-						type="button"
-						onClick={onRetry}
-						className="text-xs bg-red-100 text-red-700 hover:bg-red-200 px-2 py-1 rounded transition-colors"
-					>
-						Reintentar
-					</button>
-				)}
-				{onClose && (
-					<button
-						type="button"
-						onClick={onClose}
-						className="text-muted-foreground hover:text-foreground transition-colors"
-						title="Cerrar"
-					>
-						<X className="w-4 h-4" />
-					</button>
-				)}
-			</div>
 		</div>
 	);
 }

@@ -131,7 +131,7 @@ EOF`
 									isLocked
 										? "bg-orange-600 text-white hover:bg-orange-700"
 										: "bg-slate-500 text-white hover:bg-slate-600"
-								} disabled:opacity-50 disabled:cursor-not-allowed`}
+								} disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none`}
 							>
 								{isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
 								{!iconOnly && <span>{isLocked ? "Desbloquear" : "Bloquear"}</span>}
@@ -192,7 +192,7 @@ EOF`
 							<button
 								onClick={handleToggleFreeze}
 								disabled={isToggling}
-								className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 ${
+								className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none ${
 									isLocked ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-600 hover:bg-gray-700"
 								}`}
 							>

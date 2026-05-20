@@ -7,6 +7,8 @@ export interface StatusCardProps {
 	onRetry?: () => void;
 }
 
+const FOCUS_RING = "focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1";
+
 export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps) {
 	const styles = {
 		loading: {
@@ -40,11 +42,11 @@ export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps)
 
 	return (
 		<div className={`bg-card border-2 ${style.borderClass} rounded-xl p-4 h-[82px] flex items-center justify-between`}>
-			<div className="flex items-center gap-2 text-sm">
-				<Icon className={`w-4 h-4 ${style.iconClass} ${style.textClass}`} />
-				<p className={style.textClass}>{message}</p>
+			<div className="flex items-center gap-2 text-sm overflow-hidden">
+				<Icon className={`w-4 h-4 shrink-0 ${style.iconClass} ${style.textClass}`} aria-hidden="true" />
+				<p className={`${style.textClass} font-medium truncate`}>{message}</p>
 			</div>
-			<div className="flex items-center gap-2">
+			<div className="flex items-center gap-2 shrink-0">
 				{onRetry && (
 					<button
 						type="button"
@@ -62,7 +64,8 @@ export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps)
 					<button
 						type="button"
 						onClick={onClose}
-						className="text-muted-foreground hover:text-foreground transition-colors"
+						className={`text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md ${FOCUS_RING}`}
+						aria-label="Cerrar"
 						title="Cerrar"
 					>
 						<X className="w-4 h-4" />

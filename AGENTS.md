@@ -255,3 +255,11 @@ Para maximizar el espacio útil en la barra de herramientas, se utilizan exclusi
 * Las líneas que contienen patrones de error o advertencia (`ERROR`, `WARN`, `FATAL`, etc.) muestran un botón de chispa (`Sparkles`) al hacer hover.
 * Al hacer clic, se realiza una consulta a la API de IA local (`useAISummarize`) y se muestra una explicación concisa del error directamente debajo de la línea del log sin interrumpir la lectura.
 
+
+## Estados de Feedback (StatusCard)
+
+El componente `StatusCard` es el estándar para mostrar estados globales de carga, error y advertencia.
+
+1. **Tokens Semánticos**: NUNCA usar colores hardcoded. Usar `text-destructive`, `text-warning`, etc., con opacidades para fondos (ej: `bg-destructive/10`).
+2. **Interactividad**: Los botones de reintento deben heredar el color semántico del estado para mantener la resonancia visual.
+3. **Accesibilidad**: Todos los botones iconográficos (como el de cierre) deben incluir `aria-label` descriptivo y usar el anillo de enfoque estándar del sistema.

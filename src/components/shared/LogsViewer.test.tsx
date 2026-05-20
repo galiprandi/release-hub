@@ -47,7 +47,7 @@ describe('LogsViewer', () => {
 
 	const renderLogsViewer = (props = {}) => {
 		const defaultProps = {
-			queryFn: vi.fn().mockResolvedValue('2024-04-30 INFO Log 1\n2024-04-30 ERROR Log 2'),
+			fetchFn: vi.fn().mockResolvedValue('2024-04-30 INFO Log 1\n2024-04-30 ERROR Log 2'),
 			onClose: vi.fn(),
 			asModal: false,
 		};
@@ -90,10 +90,10 @@ describe('LogsViewer', () => {
 
 	it('toggles auto-scroll', async () => {
 		renderLogsViewer();
-		const pauseButton = screen.getByRole('button', { name: /Detener auto-scroll/i });
+		const pauseButton = screen.getByRole('button', { name: /Detener scroll automático/i });
 		fireEvent.click(pauseButton);
 
-		expect(screen.getByRole('button', { name: /Activar auto-scroll/i })).toBeTruthy();
+		expect(screen.getByRole('button', { name: /Activar scroll automático/i })).toBeTruthy();
 	});
 
 	it('calls onResourceChange when resource is selected', async () => {
@@ -112,7 +112,7 @@ describe('LogsViewer', () => {
 	});
 
     it('shows empty message when no logs', async () => {
-        renderLogsViewer({ queryFn: vi.fn().mockResolvedValue('') });
+        renderLogsViewer({ fetchFn: vi.fn().mockResolvedValue('') });
         await waitFor(() => {
             expect(screen.getByText(/No hay logs disponibles/i)).toBeTruthy();
         });

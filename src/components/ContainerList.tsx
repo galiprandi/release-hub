@@ -107,26 +107,30 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 
 	if (isLoading) {
 		return (
-			<div className="flex items-center justify-center p-8 text-muted-foreground">
-				Cargando contenedores...
+			<div className="flex items-center justify-center p-12 text-muted-foreground bg-muted/10 rounded-xl border border-dashed animate-pulse">
+				<RefreshCw className="w-6 h-6 mr-3 animate-spin opacity-50" />
+				<span className="text-lg font-medium">Cargando contenedores...</span>
 			</div>
 		)
 	}
 
 	if (!Array.isArray(filteredContainers) || filteredContainers.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
-				<Terminal className="w-12 h-12 mb-4 opacity-50" />
-				<p>No hay contenedores disponibles</p>
+			<div className="flex flex-col items-center justify-center p-12 text-muted-foreground bg-muted/10 rounded-xl border border-dashed">
+				<Terminal className="w-12 h-12 mb-4 opacity-20" />
+				<h3 className="text-lg font-medium text-foreground">No hay contenedores</h3>
+				<p className="text-sm max-w-xs text-center mt-1">
+					No se encontraron contenedores que coincidan con los filtros actuales.
+				</p>
 			</div>
 		)
 	}
 
 	return (
 		<>
-			<div className="border rounded-lg overflow-hidden">
+			<div className="border border-border rounded-lg overflow-hidden shadow-sm bg-card">
 				<table className="w-full table-fixed">
-					<thead className="bg-muted">
+					<thead className="bg-muted/50 border-b border-border">
 						<tr>
 							<th className="text-left p-3 text-sm font-medium w-[25%]">Contenedor</th>
 							<th className="text-left p-3 text-sm font-medium w-[15%]">Estado</th>
@@ -236,7 +240,7 @@ function ContainerRow({
 				<select
 					value={selectedPort}
 					onChange={(e) => setSelectedPort(e.target.value)}
-					className="text-xs border rounded px-2 py-1 bg-background"
+					className="text-xs border border-input rounded px-2 py-1 bg-background focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 					aria-label="Seleccionar puerto"
 				>
 					{externalPorts.map((port, index) => (
@@ -248,8 +252,9 @@ function ContainerRow({
 				<button
 					type="button"
 					onClick={() => handlePortClick(selectedPort)}
-					className="p-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
+					className="p-1 text-primary hover:bg-primary/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 					title={`Abrir puerto ${selectedPort}`}
+					aria-label={`Abrir puerto ${selectedPort}`}
 					disabled={!selectedPort}
 				>
 					<ExternalLink className="w-4 h-4" />
@@ -264,14 +269,14 @@ function ContainerRow({
 	}
 
 	return (
-		<tr className="border-b hover:bg-muted/50 transition-colors">
-			<td className="p-3 font-medium">{container.name}</td>
+		<tr className="border-b border-border hover:bg-muted/30 transition-colors">
+			<td className="p-3 font-medium text-foreground">{container.name}</td>
 			<td className="p-3">
 				<span
-					className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+					className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase ${
 						running
-							? 'bg-green-100 text-green-800'
-							: 'bg-gray-100 text-gray-800'
+							? 'bg-success/20 text-success'
+							: 'bg-muted text-muted-foreground'
 					}`}
 				>
 					{running ? 'Running' : 'Stopped'}
@@ -287,7 +292,7 @@ function ContainerRow({
 								<button
 									type="button"
 									onClick={onViewLogs}
-									className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
+									className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 									aria-label="Ver logs"
 								>
 									<Terminal className="w-4 h-4" />
@@ -307,7 +312,7 @@ function ContainerRow({
 								<button
 									type="button"
 									onClick={onStart}
-									className="p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-green-600"
+									className="p-1.5 text-success hover:bg-success/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 									disabled={running}
 									aria-label="Iniciar contenedor"
 								>
@@ -328,7 +333,7 @@ function ContainerRow({
 								<button
 									type="button"
 									onClick={onRestart}
-									className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+									className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 									disabled={!running}
 									aria-label="Reiniciar contenedor"
 								>
@@ -349,7 +354,7 @@ function ContainerRow({
 								<button
 									type="button"
 									onClick={onStop}
-									className="p-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-red-600"
+									className="p-1.5 text-destructive hover:bg-destructive/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none focus-visible:ring-offset-1"
 									disabled={!running}
 									aria-label="Detener contenedor"
 								>

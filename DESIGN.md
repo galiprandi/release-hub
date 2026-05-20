@@ -15,6 +15,12 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Info**: `text-info`. Utilizado para información neutral o estados en progreso.
 - **Destructive**: `text-destructive`. Utilizado para acciones críticas o errores.
 
+## Docker UI Pattern
+
+- **Badges de Estado**: Usar `bg-success/20 text-success` para estados activos y `bg-muted text-muted-foreground` para estados inactivos o detenidos. Aplicar `font-bold uppercase tracking-wider text-[10px]` para mayor legibilidad y resonancia industrial.
+- **Acciones de Fila**: Botones iconográficos con `hover:bg-accent` y colores semánticos (verde para `Play`, rojo/destructivo para `Stop`).
+- **Feedback de Carga/Acceso**: Implementar `StatusCard` como componente estándar para estados de verificación de acceso y errores de conexión, eliminando placeholders manuales.
+
 ## Componentes de Feedback
 
 ### StatusCard

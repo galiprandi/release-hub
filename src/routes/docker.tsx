@@ -1,10 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useRef, useState, useEffect } from 'react';
-import { Blocks, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { useDockerAccess } from '@/hooks/useDockerAccess';
 import { useQuery } from '@tanstack/react-query';
 import { ContainerList, type ContainerListRef } from '@/components/ContainerList';
 import { FilterBar } from '@/components/shared/FilterBar';
+import { StatusCard } from '@/components/ui/StatusCard';
 import { getContainers } from '@/api/docker';
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys';
 
@@ -75,7 +76,7 @@ function DockerManagerPage() {
           <button
             type="button"
             onClick={handleRefresh}
-            className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-gray-300 text-gray-600 rounded-md hover:bg-gray-50 transition-colors"
+            className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-input text-muted-foreground rounded-md hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             Recargar
@@ -85,18 +86,15 @@ function DockerManagerPage() {
 
       {/* Contenido */}
       {checkingAccess ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed">
-          <Blocks className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">Verificando acceso a Docker...</p>
-        </div>
+        <StatusCard type="loading" message="Verificando acceso a Docker..." />
       ) : access?.hasAccess ? (
         <ContainerList ref={containerListRef} statusFilter={statusFilter} searchQuery={searchQuery} />
       ) : (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed">
-          <Blocks className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">No se tiene acceso a Docker</p>
-          <p className="text-sm text-gray-400 mt-1">Asegúrate de que Docker esté instalado y en ejecución</p>
-        </div>
+        <StatusCard
+          type="error"
+          message="No se tiene acceso a Docker. Asegúrate de que Docker esté instalado y en ejecución."
+          onRetry={handleRefresh}
+        />
       )}
     </div>
   );

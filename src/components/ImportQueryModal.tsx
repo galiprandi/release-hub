@@ -4,7 +4,7 @@ import { BaseDialog } from '@/components/ui/BaseDialog';
 import { parseCurlCommand, formatJSON, minifyJSON } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 import { executeCurlCommand } from '@/api/curl';
-import { useQueriesHistory } from '@/hooks/useQueriesHistory';
+import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import DayJS from '@/lib/dayjs';
 
 interface ImportQueryModalProps {
@@ -44,7 +44,7 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 	const [headersExpanded, setHeadersExpanded] = useState(false);
 	const [bodySearchQuery, setBodySearchQuery] = useState('');
 
-	const { addQueryRecord } = useQueriesHistory();
+	const { addQueryRecord } = useFetcherHistory();
 	const curl = query?.curl || null;
 
 	// Memorize the initial curl value to keep modal open during execution

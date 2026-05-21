@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
 import { Send, Trash2, Copy } from 'lucide-react';
-import { useQueriesHistory } from '@/hooks/useQueriesHistory';
+import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
 import { FilterBar } from '@/components/shared/FilterBar';
 import { StatusCard } from '@/components/ui/StatusCard';
@@ -9,8 +9,8 @@ import { ImportQueryModal } from '@/components/ImportQueryModal';
 import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 
-export const Route = createFileRoute('/queries')({
-	component: QueriesPage,
+export const Route = createFileRoute('/fetcher')({
+	component: FetcherPage,
 });
 
 // Function to format relative time
@@ -57,9 +57,9 @@ function getResponseTimeBadgeColor(responseTime: number): string {
 	return 'bg-muted text-muted-foreground';
 }
 
-function QueriesPage() {
+function FetcherPage() {
 	const { data: access, isLoading: checkingAccess } = useCurlAccess();
-	const { history, isLoading: loadingHistory, deleteQueryRecord, isDeleting } = useQueriesHistory();
+	const { history, isLoading: loadingHistory, deleteQueryRecord, isDeleting } = useFetcherHistory();
 	const [activeQuery, setActiveQuery] = useState<QueryRecord | undefined>();
 	const [editingQuery, setEditingQuery] = useState<QueryRecord | undefined>();
 	const [curlInput, setCurlInput] = useState('');

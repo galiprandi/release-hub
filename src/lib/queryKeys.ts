@@ -23,7 +23,7 @@ type QueryKeyDomain =
 	| "user"
 	| "settings"
 	| "tools"
-	| "queries";
+	| "fetcher";
 
 interface BaseQueryKey {
 	domain: QueryKeyDomain;
@@ -392,9 +392,9 @@ export const queryKeys = {
 		curlAccess: (): readonly ["tools", "curl", "access"] => ["tools", "curl", "access"],
 	},
 
-	// Queries
-	queries: {
-		history: (): readonly ["queries", "history"] => ["queries", "history"],
+	// Fetcher
+	fetcher: {
+		history: (): readonly ["fetcher", "history"] => ["fetcher", "history"],
 	},
 } as const;
 
@@ -521,11 +521,11 @@ export const cachePolicies: Record<QueryKeyDomain, CachePolicy> = {
 		retry: 1,
 	},
 
-	// QUERIES: NO cachear, PERSISTIR en LS (historial de queries)
-	queries: {
+	// FETCHER: NO cachear, PERSISTIR en LS (historial de fetcher)
+	fetcher: {
 		staleTime: 0, // Siempre fresco (leer de localStorage real)
 		gcTime: Infinity,
-		persistInLocalStorage: true, // PERSISTIR (historial de queries)
+		persistInLocalStorage: true, // PERSISTIR (historial de fetcher)
 		refetchOnWindowFocus: false,
 		refetchInterval: false,
 		retry: 0,

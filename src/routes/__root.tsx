@@ -67,19 +67,19 @@ function DockerLink() {
 	);
 }
 
-function QueriesLink() {
+function FetcherLink() {
 	const { data: access, isLoading: checkingAccess } = useCurlAccess();
 
-	// Don't show the Queries icon if curl is not installed or accessible
+	// Don't show the Fetcher icon if curl is not installed or accessible
 	if (!checkingAccess && !access?.hasAccess) {
 		return null;
 	}
 
 	return (
 		<Link
-			to="/queries"
+			to="/fetcher"
 			className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-			title="Queries"
+			title="Fetcher"
 		>
 			<Send className="w-5 h-5" />
 		</Link>
@@ -112,8 +112,8 @@ function RootLayout() {
 	const isHealthPage = pathname === '/health';
 	// Detect if on docker page
 	const isDockerPage = pathname === '/docker';
-	// Detect if on queries page
-	const isQueriesPage = pathname === '/queries';
+	// Detect if on fetcher page
+	const isFetcherPage = pathname === '/fetcher';
 
 	useEffect(() => {
 		// Si gh cli no está instalado o no está autenticado, redirigir a setup
@@ -144,13 +144,13 @@ function RootLayout() {
 								<Github className="w-6 h-6" />
 								ReleaseHub
 							</Link>
-							{(product || isHealthPage || isDockerPage || isQueriesPage) && (
+							{(product || isHealthPage || isDockerPage || isFetcherPage) && (
 								<>
 									<span className="text-muted-foreground text-lg">/</span>
 									<span className="text-lg font-normal text-muted-foreground flex items-center gap-2">
 										{isHealthPage && <Activity className="w-5 h-5 text-blue-600" />}
 										{isDockerPage && <Blocks className="w-5 h-5 text-blue-600" />}
-										{isQueriesPage && <Send className="w-5 h-5 text-blue-600" />}
+										{isFetcherPage && <Send className="w-5 h-5 text-blue-600" />}
 										{product && (
 											<button
 												type="button"
@@ -161,7 +161,7 @@ function RootLayout() {
 												<Star className={`w-5 h-5 ${favorite ? "fill-current" : ""}`} />
 											</button>
 										)}
-										{isHealthPage ? 'Health Monitor' : isDockerPage ? 'Docker Manager' : isQueriesPage ? 'Queries' : product}
+										{isHealthPage ? 'Health Monitor' : isDockerPage ? 'Docker Manager' : isFetcherPage ? 'Fetcher' : product}
 									</span>
 								</>
 							)}
@@ -171,7 +171,7 @@ function RootLayout() {
 							<NovedadesDialog />
 							<RepoSearch />
 							<DockerLink />
-							<QueriesLink />
+							<FetcherLink />
 							<Link
 								to="/health"
 								className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"

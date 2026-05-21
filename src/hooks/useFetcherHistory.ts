@@ -3,7 +3,7 @@ import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
 import type { QueryRecord } from "@/types/queries";
 import { generateQueryId, parseCurlCommand, generateQueryHash } from "@/utils/curlParser";
 
-const STORAGE_KEY = "queries-history";
+const STORAGE_KEY = "fetcher-history";
 
 /**
  * Loads queries history from localStorage
@@ -24,18 +24,18 @@ function saveHistoryToStorage(history: QueryRecord[]): void {
 	try {
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
 	} catch (error) {
-		console.error("[Queries] Failed to save history to localStorage:", error);
+		console.error("[Fetcher] Failed to save history to localStorage:", error);
 	}
 }
 
-export function useQueriesHistory() {
+export function useFetcherHistory() {
 	const queryClient = useQueryClient();
 
 	// Query to fetch history
 	const query = useQuery({
-		queryKey: queryKeys.queries.history(),
+		queryKey: queryKeys.fetcher.history(),
 		queryFn: () => loadHistoryFromStorage(),
-		...applyCachePolicy("queries"),
+		...applyCachePolicy("fetcher"),
 	});
 
 	// Mutation to add or update a query record
@@ -83,10 +83,10 @@ export function useQueriesHistory() {
 		},
 		onMutate: async (newRecord) => {
 			// Cancel outgoing refetches
-			await queryClient.cancelQueries({ queryKey: queryKeys.queries.history() });
+			await queryClient.cancelQueries({ queryKey: queryKeys.fetcher.history() });
 
 			// Snapshot previous value
-			const previousHistory = queryClient.getQueryData<QueryRecord[]>(queryKeys.queries.history());
+			const previousHistory = queryClient.getQueryData<QueryRecord[]>(queryKeys.fetcher.history());
 
 			// Parse curl to generate hash for comparison
 			const parsed = parseCurlCommand(newRecord.curl);
@@ -115,19 +115,19 @@ export function useQueriesHistory() {
 				optimisticHistory = [optimisticRecord, ...currentHistory].slice(0, 60);
 			}
 
-			queryClient.setQueryData(queryKeys.queries.history(), optimisticHistory);
+			queryClient.setQueryData(queryKeys.fetcher.history(), optimisticHistory);
 
 			return { previousHistory };
 		},
 		onError: (_err, _newRecord, context) => {
 			// Rollback to previous value
 			if (context?.previousHistory) {
-				queryClient.setQueryData(queryKeys.queries.history(), context.previousHistory);
+				queryClient.setQueryData(queryKeys.fetcher.history(), context.previousHistory);
 			}
 		},
 		onSuccess: () => {
 			// Refetch to ensure consistency
-			queryClient.invalidateQueries({ queryKey: queryKeys.queries.history() });
+			queryClient.invalidateQueries({ queryKey: queryKeys.fetcher.history() });
 		},
 	});
 
@@ -141,15 +141,15 @@ export function useQueriesHistory() {
 		},
 		onMutate: async (id) => {
 			// Cancel outgoing refetches
-			await queryClient.cancelQueries({ queryKey: queryKeys.queries.history() });
+			await queryClient.cancelQueries({ queryKey: queryKeys.fetcher.history() });
 
 			// Snapshot previous value
-			const previousHistory = queryClient.getQueryData<QueryRecord[]>(queryKeys.queries.history());
+			const previousHistory = queryClient.getQueryData<QueryRecord[]>(queryKeys.fetcher.history());
 
 			// Optimistically remove the record
 			if (previousHistory) {
 				queryClient.setQueryData(
-					queryKeys.queries.history(),
+					queryKeys.fetcher.history(),
 					previousHistory.filter((q) => q.id !== id)
 				);
 			}
@@ -159,12 +159,12 @@ export function useQueriesHistory() {
 		onError: (_err, _id, context) => {
 			// Rollback to previous value
 			if (context?.previousHistory) {
-				queryClient.setQueryData(queryKeys.queries.history(), context.previousHistory);
+				queryClient.setQueryData(queryKeys.fetcher.history(), context.previousHistory);
 			}
 		},
 		onSuccess: () => {
 			// Refetch to ensure consistency
-			queryClient.invalidateQueries({ queryKey: queryKeys.queries.history() });
+			queryClient.invalidateQueries({ queryKey: queryKeys.fetcher.history() });
 		},
 	});
 

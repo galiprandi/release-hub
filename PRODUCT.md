@@ -1,10 +1,16 @@
+# Directivas de Producto - ReleaseHub
 
-## Evolution (Recent Improvements)
-- **Standardized Interactions**: Migrated complex UI components (LogsViewer) to a unified dialog system (`BaseDialog`) to ensure predictable navigation and accessibility.
-- **UI Resonance**: Refined Kubernetes management interface with semantic tokens and standardized focus states, improving the "Time to Value" for DevOps tasks.
-- **AI-Powered Insights**: Integrated Chrome AI for log summarization and error explanation, helping users identify issues faster.
-- **Unified Feedback System**: Standardized pipeline and data status communication using a shared `StatusCard` component, reducing visual noise and providing consistent error recovery paths.
-- **Semantic Resonance**: Enforced use of semantic tokens across all feedback components (StatusCard, DeployStatusIndicator) to ensure visual consistency and accessibility.
+## Visión
 
-## Future Focus
-I would like to concentrate my effort on the new `Fetcher` module. This module will provide a standardized and efficient way to fetch data from various sources (e.g., APIs, databases, files), ensuring a consistent and optimized data flow throughout the application.
+ReleaseHub es una aplicación web **stateless** para visualizar pipelines CI/CD y gestionar releases GitHub sin clonación local de repositorios.
+
+## Prioridad Activa
+
+- **Fetcher Module**: Desarrollar un módulo estandarizado para obtener datos de múltiples fuentes (APIs, bases de datos, archivos) con un flujo de datos consistente y optimizado.
+
+## Decisiones de Producto
+
+- Todas las operaciones sobre repositorios se realizarán exclusivamente a través de la API de GitHub, sin requerir ni modificar la versión clonada de los repositorios que el usuario puede tener en su equipo. De esta manera, se evita cualquier posibilidad de pérdida de cambios que el usuario puede estar trabajando localmente.
+
+- El color principal de la marca de ReleaseHub será el amarillo #F59E0B, utilizado tanto en el favicon como en todo el diseño de la aplicación. Esto ayudará a diferenciarnos claramente de otras aplicaciones GitHub en la barra de navegación del navegador de Github.
+*(Espacio reservado para directivas globales del equipo de producto.)*

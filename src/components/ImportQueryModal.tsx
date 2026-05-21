@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Send, Loader2, Copy } from 'lucide-react';
+import { Send, Loader2, Copy, AlertTriangle } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
 import { parseCurlCommand, formatJSON, minifyJSON, type ParsedCurl } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
@@ -50,7 +50,7 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 	// Derive isEditMode from initialQuery and open
 	const isEditMode = !!(initialQuery && open);
 
-	// Derive manualParsedQuery from initialQuery when in edit mode
+	// Derive initialParsedQuery from initialQuery when in edit mode
 	const initialParsedQuery = useMemo(() => {
 		if (!initialQuery || !open) return null;
 		try {
@@ -61,8 +61,9 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 		}
 	}, [initialQuery, open]);
 
-	// Use initialParsedQuery when in edit mode, otherwise use manualParsedQuery
-	const effectiveManualParsedQuery = isEditMode ? initialParsedQuery : manualParsedQuery;
+	// Use manualParsedQuery in edit mode (if user made changes), otherwise use initialParsedQuery
+	// In non-edit mode, use manualParsedQuery from curl input parsing
+	const effectiveManualParsedQuery = isEditMode ? (manualParsedQuery || initialParsedQuery) : manualParsedQuery;
 
 	// Derive parsedQuery from curlInput when not in edit mode, otherwise use effectiveManualParsedQuery
 	const parsedQuery = useMemo(() => {
@@ -187,8 +188,13 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 							value={curlInput}
 							onChange={(e) => setCurlInput(e.target.value)}
 							placeholder="curl -X POST https://api.example.com/users -H Content-Type: application/json -d data"
-							className="w-full h-32 px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
+							className={`w-full h-32 px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono ${
+								parsedQuery?.isTokenExpired ? 'border-destructive' : ''
+							}`}
 						/>
+						{parsedQuery?.isTokenExpired && (
+							<p className="mt-1 text-xs text-destructive">⚠️ Token de autenticación vencido</p>
+						)}
 					</div>
 				)}
 
@@ -256,7 +262,7 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 										{Object.entries(parsedQuery.headers)
 											.slice(0, headersExpanded ? undefined : MAX_HEADERS_DISPLAY)
 											.map(([key, value]) => (
-												<div key={key} className="flex gap-2">
+												<div key={key} className="grid grid-cols-[3fr_7fr_auto] gap-4 items-center">
 													<input
 														type="text"
 														value={key}
@@ -267,18 +273,38 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 															setManualParsedQuery({ ...parsedQuery, headers: newHeaders });
 														}}
 														placeholder="Header name"
-														className="flex-1 px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+														className="w-full px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
 													/>
-													<input
-														type="text"
-														value={value}
-														onChange={(e) => setManualParsedQuery({
-															...parsedQuery,
-															headers: { ...parsedQuery.headers, [key]: e.target.value }
-														})}
-														placeholder="Value"
-														className="flex-1 px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-													/>
+													{key.toLowerCase() === 'authorization' ? (
+														<div className="relative">
+															<input
+																type="text"
+																value={value}
+																onChange={(e) => setManualParsedQuery({
+																	...parsedQuery,
+																	headers: { ...parsedQuery.headers, [key]: e.target.value }
+																})}
+																placeholder="Value"
+																className={`w-full px-2 py-1 pr-8 text-xs border rounded-md focus:outline-none focus:ring-2 ${
+																	parsedQuery.isTokenExpired
+																		? 'bg-warning/10 border-warning text-warning-foreground'
+																		: 'focus:ring-primary border'
+																}`}
+															/>
+															<AlertTriangle className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-warning" />
+														</div>
+													) : (
+														<input
+															type="text"
+															value={value}
+															onChange={(e) => setManualParsedQuery({
+																...parsedQuery,
+																headers: { ...parsedQuery.headers, [key]: e.target.value }
+															})}
+															placeholder="Value"
+															className="w-full px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+														/>
+													)}
 													<button
 														type="button"
 														onClick={() => {

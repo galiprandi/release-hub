@@ -1,3 +1,5 @@
+import { isTokenExpired, getExpirationDate } from '@/hooks/useToken';
+
 export interface ParsedCurl {
 	method: string;
 	url: string;
@@ -6,6 +8,8 @@ export interface ParsedCurl {
 	headers: Record<string, string>;
 	queryParams: Record<string, string>;
 	body: string;
+	isTokenExpired: boolean;
+	tokenExpirationDate: string | null;
 }
 
 /**
@@ -52,6 +56,20 @@ export function parseCurlCommand(curlString: string): ParsedCurl {
 		}
 	}
 
+	// Check if Authorization header has an expired JWT token
+	let tokenExpired = false;
+	let tokenExpirationDate: string | null = null;
+	const authHeaderKey = Object.keys(headers).find(key => key.toLowerCase() === 'authorization');
+	if (authHeaderKey) {
+		const authValue = headers[authHeaderKey];
+		// Extract token from "Bearer <token>" or just the token
+		const token = authValue.replace(/^Bearer\s+/i, '').trim();
+		if (token) {
+			tokenExpired = isTokenExpired(token);
+			tokenExpirationDate = getExpirationDate(token);
+		}
+	}
+
 	// Extract body
 	let body = '';
 	const bodyMatches = cleaned.match(/-d\s+['"]?([^'"]+)['"]?|--data\s+['"]?([^'"]+)['"]?|--data-raw\s+['"]?([^'"]+)['"]?|--data-binary\s+['"]?([^'"]+)['"]?/gi);
@@ -81,6 +99,8 @@ export function parseCurlCommand(curlString: string): ParsedCurl {
 		headers,
 		queryParams,
 		body,
+		isTokenExpired: tokenExpired,
+		tokenExpirationDate,
 	};
 }
 

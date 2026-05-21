@@ -143,64 +143,64 @@ function ProductIndex() {
 
 			{/* Toolbar de acciones */}
 			<div className="flex items-center gap-2 mb-4 flex-wrap">
-				{/* Links externos */}
-				<a
-					href={openPRs?.repoUrl}
-					target="_blank"
-					rel="noopener noreferrer"
-					className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-				>
-					<GitPullRequest className="w-4 h-4" />
-					<span>Pull Requests</span>
-					{openPRs && openPRs.count > 0 && (
-						<span className="inline-flex items-center justify-center px-1.5 py-0 text-[10px] font-bold bg-primary/10 text-primary rounded-full min-w-[1.25rem] h-4">
-							{openPRs.count}
-						</span>
-					)}
-				</a>
-				<a
-					href={actionsSummary?.repoUrl}
-					target="_blank"
-					rel="noopener noreferrer"
-					className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-				>
-					<Play className="w-4 h-4" />
-					<span>Actions</span>
-					{actionsSummary && actionsSummary.total > 0 && (
-						<div className="flex items-center gap-1 ml-0.5">
-							{actionsSummary.running > 0 && (
-								<span className="inline-flex items-center gap-0.5 px-1.5 py-0 text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 rounded-full h-4">
-									<span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-									{actionsSummary.running}
-								</span>
-							)}
-							{actionsSummary.failed > 0 && (
-								<span className="inline-flex items-center justify-center px-1.5 py-0 text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 rounded-full min-w-[1rem] h-4">
-									{actionsSummary.failed}
-								</span>
-							)}
-						</div>
-					)}
-				</a>
-
-				{/* Separador flexible que empuja todo a la derecha */}
-				<div className="flex-1 min-w-4" />
-
-				<div className="flex items-center gap-3">
-					{/* Configuración */}
+				<div className="flex items-center gap-2">
+					{/* Metadata/Configuración */}
 					<ProjectSelector repo={fullProduct} />
 
 					<div className="w-px h-5 bg-border mx-1" />
 
-					{/* Operaciones */}
-					<div className="flex items-center gap-2">
-						<FreezeDialog repo={fullProduct} iconOnly={false} />
-						{isCommits ? (
-							<ForceRedeployDialog repo={fullProduct} />
-						) : (
-							<PromoteDialog repo={fullProduct} latestTag={latestTag?.name} />
+					{/* Links externos */}
+					<a
+						href={openPRs?.repoUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground bg-muted/40 hover:bg-muted rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 border border-transparent hover:border-border/50"
+					>
+						<GitPullRequest className="w-4 h-4" />
+						<span>PRs</span>
+						{openPRs && openPRs.count > 0 && (
+							<span className="inline-flex items-center justify-center px-1.5 py-0 text-[10px] font-bold bg-primary/10 text-primary rounded-full min-w-[1.25rem] h-4">
+								{openPRs.count}
+							</span>
 						)}
-					</div>
+					</a>
+					<a
+						href={actionsSummary?.repoUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground bg-muted/40 hover:bg-muted rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 border border-transparent hover:border-border/50"
+					>
+						<Play className="w-4 h-4" />
+						<span>Actions</span>
+						{actionsSummary && actionsSummary.total > 0 && (
+							<div className="flex items-center gap-1 ml-0.5">
+								{actionsSummary.running > 0 && (
+									<span className="inline-flex items-center gap-0.5 px-1.5 py-0 text-[10px] font-bold bg-warning/10 text-warning rounded-full h-4">
+										<span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
+										{actionsSummary.running}
+									</span>
+								)}
+								{actionsSummary.failed > 0 && (
+									<span className="inline-flex items-center justify-center px-1.5 py-0 text-[10px] font-bold bg-destructive/10 text-destructive rounded-full min-w-[1rem] h-4">
+										{actionsSummary.failed}
+									</span>
+								)}
+							</div>
+						)}
+					</a>
+				</div>
+
+				{/* Separador flexible que empuja todo a la derecha */}
+				<div className="flex-1 min-w-4" />
+
+				{/* Operaciones */}
+				<div className="flex items-center gap-2">
+					<FreezeDialog repo={fullProduct} iconOnly={false} />
+					{isCommits ? (
+						<ForceRedeployDialog repo={fullProduct} />
+					) : (
+						<PromoteDialog repo={fullProduct} latestTag={latestTag?.name} />
+					)}
 				</div>
 			</div>
 

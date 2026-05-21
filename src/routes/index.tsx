@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Loader2, Star, Github, Building2, GitPullRequestCreateArrow, FolderOpen, FolderPlus } from "lucide-react";
+import { Loader2, Star, Github, Building2, GitPullRequestCreateArrow, FolderOpen, FolderPlus, Search } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { DisplayInfo } from "@/components/DisplayInfo";
 import { CommitLink } from "@/components/CommitLink";
@@ -105,28 +105,43 @@ function Dashboard() {
 							<>
 								<Star className="w-10 h-10 mx-auto mb-4 opacity-20" />
 								<h3 className="text-lg font-medium text-foreground mb-1">Sin favoritos</h3>
-								<p className="text-sm max-w-xs mx-auto">
-									Busca repositorios usando la barra superior para agregarlos a tu panel principal.
-									{summaryData && (
-										<span className="block mt-2 text-xs text-muted-foreground/70">
-											{summaryData.total} repositorios disponibles
+								<p className="text-sm max-w-xs mx-auto mb-6">
+									Agrega repositorios a tus favoritos para verlos aquí y monitorear sus despliegues.
+								</p>
+								<button
+									type="button"
+									onClick={() => {
+										const input = document.querySelector('input[placeholder*="Búsqueda"]') as HTMLInputElement;
+										if (input) {
+											input.focus();
+											// Disparar Cmd+K visualmente o simplemente abrir el dropdown si el componente lo soporta
+											// En este caso, el foco en RepoSearch ya activa el estado isEditable
+										}
+									}}
+									className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+								>
+									<Search className="w-4 h-4" />
+									Buscar Repositorios
+								</button>
+								{summaryData && (
+									<div className="mt-8 pt-6 border-t border-dashed border-border/50 max-w-xs mx-auto">
+										<p className="text-xs text-muted-foreground/70 mb-2">
+											{summaryData.total} repositorios disponibles en tus organizaciones
+										</p>
+										<div className="flex flex-wrap justify-center gap-2">
 											{summaryData.personal > 0 && (
-												<span className="block mt-1">
+												<span className="px-2 py-0.5 rounded-full bg-muted text-[10px] font-medium">
 													Personales: {summaryData.personal}
 												</span>
 											)}
-											{summaryData.orgs.length > 0 && (
-												<>
-													{summaryData.orgs.map(org => (
-														<span key={org.login} className="block mt-1">
-															{org.login}: {org.count}
-														</span>
-													))}
-												</>
-											)}
-										</span>
-									)}
-								</p>
+											{summaryData.orgs.map(org => (
+												<span key={org.login} className="px-2 py-0.5 rounded-full bg-muted text-[10px] font-medium">
+													{org.login}: {org.count}
+												</span>
+											))}
+										</div>
+									</div>
+								)}
 							</>
 						)
 					) : (
@@ -322,7 +337,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 
 	return (
 		<>
-			<tr className="border-t hover:bg-muted/50">
+			<tr className="border-t hover:bg-muted/50 group">
 				<td className="px-4 py-3 w-auto">
 					<div className="flex items-center gap-2">
 						<Link
@@ -392,7 +407,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 					</div>
 				</td>
 				<td className="px-4 py-3 text-center w-16">
-					<div className="flex items-center justify-center gap-2">
+					<div className="flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
 						<FreezeDialog repo={repo.fullName} iconOnly={true} />
 						<ForceRedeployDialog repo={repo.fullName} iconOnly={true} />
 						<PromoteDialog repo={repo.fullName} latestTag={latestTag?.name} iconOnly={true} />
@@ -409,7 +424,7 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 						<button
 							type="button"
 							onClick={() => onToggleFavorite(repo.fullName)}
-							className={`${isFavorite ? "text-yellow-500" : "text-muted-foreground"} hover:text-yellow-600 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-0.5`}
+							className={`${isFavorite ? "text-warning" : "text-muted-foreground"} hover:text-warning/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-0.5`}
 							aria-label={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
 							title={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
 						>

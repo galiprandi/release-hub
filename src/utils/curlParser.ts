@@ -47,7 +47,8 @@ export function parseCurlCommand(curlString: string): ParsedCurl {
 	}
 
 	// Extract URL - support both direct URL and --url flag
-	const urlMatch = cleaned.match(/--url\s+['"]?([^'"\s]+)['"]?|curl\s+(?:['"]?)(https?:\/\/[^'"\s]+)/);
+	// Handle URLs in quotes after curl command or --url flag
+	const urlMatch = cleaned.match(/--url\s+['"]?([^'"\s]+)['"]?|curl\s+(?:-X\s+\w+\s+)?['"]?(https?:\/\/[^'"\s]+)['"]?/);
 	if (!urlMatch) {
 		throw new Error('Could not extract URL from cURL command');
 	}

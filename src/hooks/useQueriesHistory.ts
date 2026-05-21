@@ -41,6 +41,11 @@ export function useQueriesHistory() {
 	// Mutation to add or update a query record
 	const addQueryRecord = useMutation({
 		mutationFn: async (record: Omit<QueryRecord, 'id' | 'createdAt' | 'updatedAt'>): Promise<QueryRecord> => {
+			// Validate that curl is not empty
+			if (!record.curl || record.curl.trim() === '') {
+				throw new Error('Cannot save query with empty curl');
+			}
+
 			const currentHistory = loadHistoryFromStorage();
 
 			// Parse curl to generate hash for comparison

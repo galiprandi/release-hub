@@ -51,6 +51,13 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 	const [initialCurl, setInitialCurl] = useState(curl);
 	const parsed = initialCurl ? parseCurlCommand(initialCurl) : null;
 
+	// Sync curlInput when query changes externally (modal opened from outside)
+	useEffect(() => {
+		if (query?.curl && curlInput !== query.curl) {
+			setCurlInput(query.curl);
+		}
+	}, [query?.curl, curlInput]);
+
 	// Sync initialCurl when curl changes externally (modal opened from outside)
 	useEffect(() => {
 		if (curl && initialCurl === null) {

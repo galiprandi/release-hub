@@ -49,7 +49,7 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 
 	// Memorize the initial curl value to keep modal open during execution
 	const [initialCurl, setInitialCurl] = useState(curl);
-	const parsed = initialCurl ? parseCurlCommand(initialCurl) : null;
+	const parsed = curlInput ? parseCurlCommand(curlInput) : null;
 
 	// Sync curlInput when query changes externally (modal opened from outside)
 	useEffect(() => {

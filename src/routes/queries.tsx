@@ -46,6 +46,17 @@ function getMethodBadgeColor(method: string): string {
 	}
 }
 
+// Response time badge colors
+function getResponseTimeBadgeColor(responseTime: number): string {
+	if (responseTime < 200) {
+		return 'bg-success/20 text-success';
+	}
+	if (responseTime > 1000) {
+		return 'bg-destructive/20 text-destructive';
+	}
+	return 'bg-muted text-muted-foreground';
+}
+
 function QueriesPage() {
 	const { data: access, isLoading: checkingAccess } = useCurlAccess();
 	const { history, isLoading: loadingHistory, deleteQueryRecord, isDeleting } = useQueriesHistory();
@@ -219,6 +230,7 @@ function QueriesPage() {
 									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Método</th>
 									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Path</th>
 									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Dominio</th>
+									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Tiempo</th>
 									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Enviado</th>
 									<th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Acciones</th>
 								</tr>
@@ -239,6 +251,15 @@ function QueriesPage() {
 												{parsed.path.length > 20 ? `${parsed.path.slice(0, 20)}...` : parsed.path}
 											</td>
 											<td className="px-4 py-3 text-sm text-muted-foreground">{parsed.domain}</td>
+											<td className="px-4 py-3 text-sm">
+												{query.response?.responseTime ? (
+													<span className={`px-2 py-1 rounded text-xs font-medium ${getResponseTimeBadgeColor(query.response.responseTime)}`}>
+														{query.response.responseTime}ms
+													</span>
+												) : (
+													<span className="text-muted-foreground">-</span>
+												)}
+											</td>
 											<td className="px-4 py-3 text-sm text-muted-foreground" title={query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}>{query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}</td>
 											<td className="px-4 py-3 text-right">
 												<div className="flex items-center justify-end gap-2">

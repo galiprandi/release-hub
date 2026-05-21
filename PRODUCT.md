@@ -1,12 +1,3 @@
-# ReleaseHub - Product Vision
-
-## Purpose
-ReleaseHub is a centralized platform for managing and monitoring software releases across multiple environments and repositories. It aims to reduce developer friction and provide total visibility into the release process.
-
-## Core Values
-1. **Efficiency Cognitive**: Minimize the mental load required to understand release status and perform release operations.
-2. **Contextual Organization**: Group and surface information relevant to the current task or project.
-3. **Total Visibility**: Provide a single source of truth for deployments, pipelines, and logs.
 
 ## Evolution (Recent Improvements)
 - **Standardized Interactions**: Migrated complex UI components (LogsViewer) to a unified dialog system (`BaseDialog`) to ensure predictable navigation and accessibility.
@@ -14,3 +5,6 @@ ReleaseHub is a centralized platform for managing and monitoring software releas
 - **AI-Powered Insights**: Integrated Chrome AI for log summarization and error explanation, helping users identify issues faster.
 - **Unified Feedback System**: Standardized pipeline and data status communication using a shared `StatusCard` component, reducing visual noise and providing consistent error recovery paths.
 - **Semantic Resonance**: Enforced use of semantic tokens across all feedback components (StatusCard, DeployStatusIndicator) to ensure visual consistency and accessibility.
+
+## Future Focus
+I would like to concentrate my effort on the new `Fetcher` module. This module will provide a standardized and efficient way to fetch data from various sources (e.g., APIs, databases, files), ensuring a consistent and optimized data flow throughout the application.

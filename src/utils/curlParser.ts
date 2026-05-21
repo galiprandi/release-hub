@@ -1,9 +1,17 @@
-import type { QueryRecord } from '@/types/queries';
+export interface ParsedCurl {
+	method: string;
+	url: string;
+	domain: string;
+	path: string;
+	headers: Record<string, string>;
+	queryParams: Record<string, string>;
+	body: string;
+}
 
 /**
  * Parses a cURL command string and extracts its components
  */
-export function parseCurlCommand(curlString: string): Omit<QueryRecord, 'id' | 'lastSent'> {
+export function parseCurlCommand(curlString: string): ParsedCurl {
 	// Remove unnecessary backslash escapes from brackets in URL/query params FIRST
 	// When inside single quotes, brackets don't need escaping
 	let cleaned = curlString.replace(/\\\[/g, '[').replace(/\\\]/g, ']');
@@ -77,16 +85,51 @@ export function parseCurlCommand(curlString: string): Omit<QueryRecord, 'id' | '
 }
 
 /**
- * Generates a unique ID for a query based on domain and path
+ * Generates a unique ID for a query based on curl string
  */
-export function generateQueryId(domain: string, path: string): string {
-	const base = `${domain}${path}`;
+export function generateQueryId(curl: string): string {
 	// Simple hash function
 	let hash = 0;
-	for (let i = 0; i < base.length; i++) {
-		const char = base.charCodeAt(i);
+	for (let i = 0; i < curl.length; i++) {
+		const char = curl.charCodeAt(i);
 		hash = ((hash << 5) - hash) + char;
 		hash = hash & hash; // Convert to 32bit integer
 	}
 	return `query-${Math.abs(hash).toString(16)}`;
+}
+
+/**
+ * Helper to parse curl on-demand for display in table and modal
+ * Returns null if parsing fails
+ */
+export function parseCurlForDisplay(curl: string): ParsedCurl | null {
+	try {
+		return parseCurlCommand(curl);
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Formats a string as JSON if it's valid JSON, otherwise returns the original string
+ */
+export function formatJSON(text: string): string {
+	try {
+		const parsed = JSON.parse(text);
+		return JSON.stringify(parsed, null, 2);
+	} catch {
+		return text;
+	}
+}
+
+/**
+ * Minifies a string as JSON if it's valid JSON, otherwise returns the original string
+ */
+export function minifyJSON(text: string): string {
+	try {
+		const parsed = JSON.parse(text);
+		return JSON.stringify(parsed);
+	} catch {
+		return text;
+	}
 }

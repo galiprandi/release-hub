@@ -1,11 +1,12 @@
 export interface QueryRecord {
 	id: string;
-	method: string;
-	url: string;
-	domain: string;
-	path: string;
-	headers: Record<string, string>;
-	queryParams: Record<string, string>;
-	body: string;
+	curl: string;
 	lastSent: string;
+	lastResponse?: {
+		status: number;
+		statusText: string;
+		headers: Record<string, string>;
+		body: string;
+		responseTime: number;
+	};
 }

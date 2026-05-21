@@ -6,6 +6,7 @@ import { useCurlAccess } from '@/hooks/useCurlAccess';
 import { FilterBar } from '@/components/shared/FilterBar';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { ImportQueryModal } from '@/components/ImportQueryModal';
+import { parseCurlForDisplay } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 
 export const Route = createFileRoute('/queries')({
@@ -60,23 +61,38 @@ function QueriesPage() {
 	// Calculate filter counts
 	const filterCounts = {
 		all: history.length,
-		GET: history.filter((q) => q.method === 'GET').length,
-		POST: history.filter((q) => q.method === 'POST').length,
-		PATCH: history.filter((q) => q.method === 'PATCH').length,
-		PUT: history.filter((q) => q.method === 'PUT').length,
+		GET: history.filter((q) => {
+			const parsed = parseCurlForDisplay(q.curl);
+			return parsed?.method === 'GET';
+		}).length,
+		POST: history.filter((q) => {
+			const parsed = parseCurlForDisplay(q.curl);
+			return parsed?.method === 'POST';
+		}).length,
+		PATCH: history.filter((q) => {
+			const parsed = parseCurlForDisplay(q.curl);
+			return parsed?.method === 'PATCH';
+		}).length,
+		PUT: history.filter((q) => {
+			const parsed = parseCurlForDisplay(q.curl);
+			return parsed?.method === 'PUT';
+		}).length,
 	};
 
 	// Filter history based on method and search
 	const filteredHistory = history.filter((query) => {
+		const parsed = parseCurlForDisplay(query.curl);
+		if (!parsed) return false;
+
 		// Method filter
-		if (methodFilter !== 'all' && query.method !== methodFilter) return false;
+		if (methodFilter !== 'all' && parsed.method !== methodFilter) return false;
 
 		// Search filter (URL, domain, or path)
 		if (searchQuery) {
 			const queryLower = searchQuery.toLowerCase();
-			const urlMatch = query.url.toLowerCase().includes(queryLower);
-			const domainMatch = query.domain.toLowerCase().includes(queryLower);
-			const pathMatch = query.path.toLowerCase().includes(queryLower);
+			const urlMatch = parsed.url.toLowerCase().includes(queryLower);
+			const domainMatch = parsed.domain.toLowerCase().includes(queryLower);
+			const pathMatch = parsed.path.toLowerCase().includes(queryLower);
 			if (!urlMatch && !domainMatch && !pathMatch) return false;
 		}
 
@@ -98,8 +114,12 @@ function QueriesPage() {
 		setIsModalOpen(true);
 	};
 
-	const handleImport = (record: Omit<QueryRecord, 'id' | 'lastSent'>) => {
-		addQueryRecord(record);
+	const handleImport = (curl: string) => {
+		// Parse the curl to get the parts for display
+		const parsed = parseCurlForDisplay(curl);
+		if (parsed) {
+			addQueryRecord({ curl });
+		}
 	};
 
 	return (
@@ -124,7 +144,7 @@ function QueriesPage() {
 				rightContent={
 					<button
 						type="button"
-						className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-input text-muted-foreground rounded-md hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm bg-success text-success-foreground rounded-md hover:bg-success/90 transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
 						onClick={() => handleOpenModal()}
 					>
 						<Send className="w-3.5 h-3.5" />
@@ -160,41 +180,46 @@ function QueriesPage() {
 								</tr>
 							</thead>
 							<tbody>
-								{paginatedHistory.map((query) => (
-									<tr key={query.id} className="border-b hover:bg-muted/30 transition-colors">
-										<td className="px-4 py-3">
-											<span className={`px-2 py-1 rounded text-xs font-semibold uppercase ${getMethodBadgeColor(query.method)}`}>
-												{query.method}
-											</span>
-										</td>
-										<td className="px-4 py-3 text-sm text-muted-foreground">
-											{query.path.length > 20 ? `${query.path.slice(0, 20)}...` : query.path}
-										</td>
-										<td className="px-4 py-3 text-sm text-muted-foreground">{query.domain}</td>
-										<td className="px-4 py-3 text-sm text-muted-foreground">{formatTimeAgo(query.lastSent)}</td>
-										<td className="px-4 py-3 text-right">
-											<div className="flex items-center justify-end gap-2">
-												<button
-													type="button"
-													className="p-1.5 text-muted-foreground hover:text-primary hover:bg-accent rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-													title="Enviar"
-													onClick={() => handleOpenModal(query)}
-												>
-													<Send className="w-4 h-4" />
-												</button>
-												<button
-													type="button"
-													className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none focus-visible:ring-offset-1"
-													title="Eliminar"
-													onClick={() => handleDelete(query.id)}
-													disabled={isDeleting}
-												>
-													<Trash2 className="w-4 h-4" />
-												</button>
-											</div>
-										</td>
-									</tr>
-								))}
+								{paginatedHistory.map((query) => {
+									const parsed = parseCurlForDisplay(query.curl);
+									if (!parsed) return null;
+
+									return (
+										<tr key={query.id} className="border-b hover:bg-muted/30 transition-colors">
+											<td className="px-4 py-3">
+												<span className={`px-2 py-1 rounded text-xs font-semibold uppercase ${getMethodBadgeColor(parsed.method)}`}>
+													{parsed.method}
+												</span>
+											</td>
+											<td className="px-4 py-3 text-sm text-muted-foreground">
+												{parsed.path.length > 20 ? `${parsed.path.slice(0, 20)}...` : parsed.path}
+											</td>
+											<td className="px-4 py-3 text-sm text-muted-foreground">{parsed.domain}</td>
+											<td className="px-4 py-3 text-sm text-muted-foreground" title={formatTimeAgo(query.lastSent)}>{formatTimeAgo(query.lastSent)}</td>
+											<td className="px-4 py-3 text-right">
+												<div className="flex items-center justify-end gap-2">
+													<button
+														type="button"
+														className="p-1.5 text-muted-foreground hover:text-primary hover:bg-accent rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+														title="Enviar"
+														onClick={() => handleOpenModal(query)}
+													>
+														<Send className="w-4 h-4" />
+													</button>
+													<button
+														type="button"
+														className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none focus-visible:ring-offset-1"
+														title="Eliminar"
+														onClick={() => handleDelete(query.id)}
+														disabled={isDeleting}
+													>
+														<Trash2 className="w-4 h-4" />
+													</button>
+												</div>
+											</td>
+										</tr>
+									);
+								})}
 							</tbody>
 						</table>
 

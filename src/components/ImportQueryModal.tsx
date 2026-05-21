@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Send, Loader2, Copy } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
-import { parseCurlCommand } from '@/utils/curlParser';
+import { parseCurlCommand, formatJSON, minifyJSON, type ParsedCurl } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 import { executeCurlCommand } from '@/api/curl';
+import { useQueriesHistory } from '@/hooks/useQueriesHistory';
 
 interface ImportQueryModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onImport?: (record: Omit<QueryRecord, 'id' | 'lastSent'>) => void;
+	onImport?: (curl: string) => void;
 	initialQuery?: QueryRecord;
 }
 
@@ -20,20 +21,37 @@ interface CurlResponse {
 	responseTime: number;
 }
 
+const MAX_HEADERS_DISPLAY = 7;
+
 export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }: ImportQueryModalProps) {
 	const [curlInput, setCurlInput] = useState('');
-	const [parsedQuery, setParsedQuery] = useState<QueryRecord | null>(null);
+	const [parsedQuery, setParsedQuery] = useState<ParsedCurl | null>(null);
 	const [isEditMode, setIsEditMode] = useState(false);
 	const [isExecuting, setIsExecuting] = useState(false);
 	const [response, setResponse] = useState<CurlResponse | null>(null);
 	const [activeTab, setActiveTab] = useState<'body' | 'headers'>('body');
+	const [headersExpanded, setHeadersExpanded] = useState(false);
+	const [bodySearchQuery, setBodySearchQuery] = useState('');
+
+	const { addQueryRecord } = useQueriesHistory();
 
 	// Initialize with initial query if provided
 	useEffect(() => {
 		if (initialQuery && open) {
-			setParsedQuery(initialQuery);
+			setCurlInput(initialQuery.curl);
 			setIsEditMode(true);
-			setCurlInput('');
+			// Parse the curl to get the parts
+			try {
+				const parsed = parseCurlCommand(initialQuery.curl);
+				setParsedQuery({ ...parsed, body: formatJSON(parsed.body) });
+			} catch (error) {
+				console.error('Failed to parse curl from history:', error);
+				setParsedQuery(null);
+			}
+			// Preload last response if available
+			if (initialQuery.lastResponse) {
+				setResponse(initialQuery.lastResponse);
+			}
 		} else if (!open) {
 			// Reset on close - batch all state updates
 			setCurlInput('');
@@ -48,12 +66,7 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 		if (curlInput.trim() && !isEditMode) {
 			try {
 				const parsed = parseCurlCommand(curlInput);
-				const record: QueryRecord = {
-					...parsed,
-					id: '', // Will be generated on save
-					lastSent: new Date().toISOString(),
-				};
-				setParsedQuery(record);
+				setParsedQuery({ ...parsed, body: formatJSON(parsed.body) });
 			} catch (error) {
 				console.error('Failed to parse curl:', error);
 				setParsedQuery(null);
@@ -75,7 +88,9 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 				.map(([key, value]) => `-H "${key}: ${value}"`)
 				.join(' ');
 
-			const data = parsedQuery.body ? `-d '${parsedQuery.body}'` : '';
+			// Minify JSON body before sending
+			const bodyToSend = parsedQuery.body ? minifyJSON(parsedQuery.body) : '';
+			const data = bodyToSend ? `-d '${bodyToSend}'` : '';
 			// Use single quotes for URL to preserve special characters without escaping
 			const command = `-X ${parsedQuery.method} '${parsedQuery.url}' ${headers} ${data}`.trim();
 
@@ -110,6 +125,18 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 				body: bodyText,
 				responseTime,
 			});
+
+			// Save to history with response after successful execution
+			addQueryRecord({
+				curl: curlInput,
+				lastResponse: {
+					status,
+					statusText,
+					headers: headersObj,
+					body: bodyText,
+					responseTime,
+				},
+			});
 		} catch (error) {
 			console.error('Failed to execute curl:', error);
 			setResponse({
@@ -125,8 +152,8 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 	};
 
 	const handleImport = () => {
-		if (parsedQuery && onImport) {
-			onImport(parsedQuery);
+		if (curlInput && onImport) {
+			onImport(curlInput);
 			onOpenChange(false);
 		}
 	};
@@ -164,27 +191,48 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 						{/* Left side: Editable form */}
 						<div className="w-1/2 p-4 border-r overflow-y-auto">
 							<div className="space-y-4">
-								<div>
-									<label className="text-xs font-medium block mb-1.5">Método</label>
-									<select
-										value={parsedQuery.method}
-										onChange={(e) => setParsedQuery({ ...parsedQuery, method: e.target.value })}
-										className="w-full px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-									>
-										{['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
-											<option key={m} value={m}>{m}</option>
-										))}
-									</select>
-								</div>
-
-								<div>
-									<label className="text-xs font-medium block mb-1.5">URL</label>
-									<input
-										type="text"
-										value={parsedQuery.url}
-										onChange={(e) => setParsedQuery({ ...parsedQuery, url: e.target.value })}
-										className="w-full px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
-									/>
+								<div className="flex gap-2">
+									<div className="w-24">
+										<label className="text-xs font-medium block mb-1.5">Método</label>
+										<select
+											value={parsedQuery.method}
+											onChange={(e) => setParsedQuery({ ...parsedQuery, method: e.target.value })}
+											className="w-full px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											{['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
+												<option key={m} value={m}>{m}</option>
+											))}
+										</select>
+									</div>
+									<div className="flex-1">
+										<label className="text-xs font-medium block mb-1.5">URL</label>
+										<input
+											type="text"
+											value={parsedQuery.url}
+											onChange={(e) => setParsedQuery({ ...parsedQuery, url: e.target.value })}
+											className="w-full px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
+										/>
+									</div>
+									<div className="flex items-end">
+										<button
+											type="button"
+											onClick={handleExecute}
+											disabled={isExecuting}
+											className="flex items-center justify-center gap-2 px-4 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+										>
+											{isExecuting ? (
+												<>
+													<Loader2 className="w-3.5 h-3.5 animate-spin" />
+													Ejecutando...
+												</>
+											) : (
+												<>
+													<Send className="w-3.5 h-3.5" />
+													Send
+												</>
+											)}
+										</button>
+									</div>
 								</div>
 
 								<div>
@@ -199,43 +247,54 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 										</button>
 									</div>
 									<div className="space-y-2">
-										{Object.entries(parsedQuery.headers).map(([key, value]) => (
-											<div key={key} className="flex gap-2">
-												<input
-													type="text"
-													value={key}
-													onChange={(e) => {
-														const newHeaders = { ...parsedQuery.headers };
-														delete newHeaders[key];
-														newHeaders[e.target.value] = value;
-														setParsedQuery({ ...parsedQuery, headers: newHeaders });
-													}}
-													placeholder="Header name"
-													className="flex-1 px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-												/>
-												<input
-													type="text"
-													value={value}
-													onChange={(e) => setParsedQuery({
-														...parsedQuery,
-														headers: { ...parsedQuery.headers, [key]: e.target.value }
-													})}
-													placeholder="Value"
-													className="flex-1 px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-												/>
-												<button
-													type="button"
-													onClick={() => {
-														const newHeaders = { ...parsedQuery.headers };
-														delete newHeaders[key];
-														setParsedQuery({ ...parsedQuery, headers: newHeaders });
-													}}
-													className="px-2 py-1 text-xs text-destructive hover:bg-destructive/10 rounded"
-												>
-													×
-												</button>
-											</div>
-										))}
+										{Object.entries(parsedQuery.headers)
+											.slice(0, headersExpanded ? undefined : MAX_HEADERS_DISPLAY)
+											.map(([key, value]) => (
+												<div key={key} className="flex gap-2">
+													<input
+														type="text"
+														value={key}
+														onChange={(e) => {
+															const newHeaders = { ...parsedQuery.headers };
+															delete newHeaders[key];
+															newHeaders[e.target.value] = value;
+															setParsedQuery({ ...parsedQuery, headers: newHeaders });
+														}}
+														placeholder="Header name"
+														className="flex-1 px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+													/>
+													<input
+														type="text"
+														value={value}
+														onChange={(e) => setParsedQuery({
+															...parsedQuery,
+															headers: { ...parsedQuery.headers, [key]: e.target.value }
+														})}
+														placeholder="Value"
+														className="flex-1 px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+													/>
+													<button
+														type="button"
+														onClick={() => {
+															const newHeaders = { ...parsedQuery.headers };
+															delete newHeaders[key];
+															setParsedQuery({ ...parsedQuery, headers: newHeaders });
+														}}
+														className="px-2 py-1 text-xs text-destructive hover:bg-destructive/10 rounded"
+													>
+														×
+													</button>
+												</div>
+											))}
+										{Object.keys(parsedQuery.headers).length > MAX_HEADERS_DISPLAY && (
+											<button
+												type="button"
+												onClick={() => setHeadersExpanded(!headersExpanded)}
+												className="text-xs text-primary hover:underline"
+											>
+												{headersExpanded ? 'Mostrar menos' : `Mostrar ${Object.keys(parsedQuery.headers).length - MAX_HEADERS_DISPLAY} más`}
+											</button>
+										)}
 									</div>
 								</div>
 
@@ -245,29 +304,11 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 										value={parsedQuery.body}
 										onChange={(e) => setParsedQuery({ ...parsedQuery, body: e.target.value })}
 										placeholder='{"key": "value"}'
-										className="w-full h-24 px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
+										className="w-full h-60 px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
 									/>
 								</div>
 
 								<div className="flex gap-2 pt-2">
-									<button
-										type="button"
-										onClick={handleExecute}
-										disabled={isExecuting}
-										className="flex items-center justify-center gap-2 px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-									>
-										{isExecuting ? (
-											<>
-												<Loader2 className="w-3.5 h-3.5 animate-spin" />
-												Ejecutando...
-											</>
-										) : (
-											<>
-												<Send className="w-3.5 h-3.5" />
-												Send
-											</>
-										)}
-									</button>
 									{!isEditMode && onImport && (
 										<button
 											type="button"
@@ -310,18 +351,7 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 									</div>
 
 									{/* Tabs */}
-									<div className="flex gap-2 mb-3">
-										<button
-											type="button"
-											onClick={() => setActiveTab('body')}
-											className={`px-3 py-1 text-xs rounded-md transition-colors ${
-												activeTab === 'body'
-													? 'bg-primary text-primary-foreground'
-													: 'bg-muted text-muted-foreground hover:bg-accent'
-											}`}
-										>
-											Body
-										</button>
+									<div className="flex gap-2 mb-3 items-center">
 										<button
 											type="button"
 											onClick={() => setActiveTab('headers')}
@@ -333,13 +363,40 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 										>
 											Headers
 										</button>
+										<button
+											type="button"
+											onClick={() => setActiveTab('body')}
+											className={`px-3 py-1 text-xs rounded-md transition-colors ${
+												activeTab === 'body'
+													? 'bg-primary text-primary-foreground'
+													: 'bg-muted text-muted-foreground hover:bg-accent'
+											}`}
+										>
+											Body
+										</button>
+										<input
+											type="text"
+											value={bodySearchQuery}
+											onChange={(e) => setBodySearchQuery(e.target.value)}
+											placeholder="Buscar en body..."
+											className="ml-auto px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-48"
+										/>
 									</div>
 
 									{/* Response content */}
 									<div className="flex-1 overflow-auto bg-muted/50 rounded-md p-3">
 										{activeTab === 'body' ? (
 											<pre className="text-xs font-mono whitespace-pre-wrap break-all">
-												{response.body || '(Sin respuesta)'}
+												{response.body
+													? bodySearchQuery
+														? formatJSON(response.body)
+																.split('\n')
+																.filter((line) =>
+																	line.toLowerCase().includes(bodySearchQuery.toLowerCase()),
+																)
+																.join('\n') || '(Sin coincidencias)'
+														: formatJSON(response.body)
+													: '(Sin respuesta)'}
 											</pre>
 										) : (
 											<div className="text-xs font-mono space-y-1">

@@ -42,13 +42,11 @@ export function useQueriesHistory() {
 	const addQueryRecord = useMutation({
 		mutationFn: async (record: Omit<QueryRecord, 'id' | 'lastSent'>): Promise<QueryRecord> => {
 			const currentHistory = loadHistoryFromStorage();
-			const existingIndex = currentHistory.findIndex(
-				(q) => q.domain === record.domain && q.path === record.path
-			);
+			const existingIndex = currentHistory.findIndex((q) => q.curl === record.curl);
 
 			const newRecord: QueryRecord = {
 				...record,
-				id: generateQueryId(record.domain, record.path),
+				id: generateQueryId(record.curl),
 				lastSent: new Date().toISOString(),
 			};
 

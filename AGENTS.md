@@ -37,6 +37,12 @@ Antes de cualquier cambio, revisar los docs relevantes para evaluar impacto y ev
 
 ## REGLAS CRÍTICAS DE DESARROLLO
 
+### 0. Higiene y Refactorización (Fiona's Standard)
+⚠️ **MÁXIMA PRIORIDAD**: El sistema debe mantenerse libre de entropía técnica.
+1. **Eliminación de Código Muerto**: Cualquier componente, ruta o utilidad que no tenga referencias activas debe ser eliminado inmediatamente. No comentar, BORRAR.
+2. **React Hooks Hygiene**: Prohibido usar `useEffect` para sincronizar estados derivados o realizar mutaciones directas del DOM que puedan ser manejadas mediante `useRef` o controladores de eventos. Evitar renders en cascada.
+3. **Resonancia Semántica**: No se permiten colores hardcodeados (ej: `text-zinc-500`, `bg-red-500`) en componentes de estado o feedback. Usar exclusivamente los tokens definidos en `DESIGN.md`.
+
 ### 1. Operaciones por Repositorio
 
 ⚠️ **IMPORTANT**: ReleaseHub works with multiple repositories simultaneously. Todas las operaciones deben cumplir estas reglas:
@@ -202,6 +208,18 @@ When testing modules that use a pre-configured axios instance (e.g., `apiSeki` i
 - Test endpoints with authentication: `curl -H "Authorization: bearer <token>" <url>`
 - Useful for verifying API responses independently of the frontend
 - Note: Tokens from localStorage may expire, use fresh tokens for testing
+
+## Mantenimiento de Skills
+
+⚠️ **IMPORTANTE**: Debo mantener las skills en `.windsurf/skills/` con instrucciones que ahorren tiempo y eviten la necesidad de hacer snapshots repetitivos.
+
+**Reglas**:
+1. **Documentar flujos comunes**: Agregar instrucciones paso a paso para tareas recurrentes (ej: navegar a vistas específicas, abrir modales, etc.)
+2. **Incluir referencias de elementos**: Cuando sea posible, incluir los refs de elementos (ej: `ref=e132`) para evitar snapshots
+3. **Actualizar después de usar**: Si encuentro un patrón nuevo que requiere snapshots repetitivos, debo agregarlo a la skill correspondiente inmediatamente
+4. **Skill e2e-testing**: Mantener actualizada con instrucciones de navegación a vistas comunes (Queries, Docker, Health, etc.)
+
+**Ejemplo**: La skill `e2e-testing` debe tener instrucciones para navegar a cada vista principal sin necesidad de snapshots.
 
 ## Hooks Personalizados
 

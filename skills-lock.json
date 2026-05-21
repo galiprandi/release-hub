@@ -1,11 +1,17 @@
 {
   "version": 1,
   "skills": {
+    "context-organizer": {
+      "source": "galiprandi/skills",
+      "sourceType": "github",
+      "skillPath": "context-organizer/SKILL.md",
+      "computedHash": "b5ff3abb6732c2dc0767f8727b2163d1ad8ae5f3d2103bada959d803bec4abef"
+    },
     "react-tools": {
       "source": "galiprandi/skills",
       "sourceType": "github",
-      "skillPath": "skills/react-tools/SKILL.md",
-      "computedHash": "810245aa88b3f9ac53ce60abdb1e711ee74fbe3dbea436ddb3323a508f1f152d"
+      "skillPath": "react-tools/SKILL.md",
+      "computedHash": "abdcd7b9660be6ec5e937ffed00d2ac0d87c581a7ca4c9df5f4da9ce41441359"
     }
   }
 }

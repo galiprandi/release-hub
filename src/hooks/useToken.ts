@@ -89,7 +89,7 @@ function getExpirationDate(token: string): string | null {
 
 /**
  * Hook to manage Seki API token in localStorage
- * Handles token storage, expiration check, and provides fallback to env token
+ * Handles token storage and expiration check
  */
 export function useToken() {
   const [token, setTokenState] = useState<string | null>(() => {
@@ -132,16 +132,13 @@ export function useToken() {
     setExpirationDate(null)
   }
 
-  // Get effective token (localStorage first, then fallback to env)
-  const effectiveToken = token || import.meta.env.VITE_SEKI_API_TOKEN || ''
-
   return {
-    token: effectiveToken,
+    token: token || '',
     hasStoredToken: !!token,
     isExpired,
     expirationDate,
     saveToken,
     clearToken,
-    needsToken: !token && !import.meta.env.VITE_SEKI_API_TOKEN,
+    needsToken: !token,
   }
 }

@@ -34,11 +34,10 @@ const serializeParams = (params: Record<string, unknown>): string => {
   return parts.join('&')
 }
 
-// Helper to get token from releasehub_settings or fallback to env
+// Helper to get token from releasehub_settings
 const getToken = (): string => {
   const token = getSekiToken()
-  if (token) return token
-  return import.meta.env.VITE_SEKI_API_TOKEN || ''
+  return token || ''
 }
 
 export const apiSeki = axios.create({

@@ -49,12 +49,6 @@ if [ ! -f ".env" ]; then
     echo -e "  - Config: ${C_YELLOW}.env file missing${NC} (Suggested: cp .env.example .env)"
 fi
 
-if [ -z "$VITE_SEKI_API_TOKEN" ]; then
-    echo -e "  - Token: ${C_YELLOW}VITE_SEKI_API_TOKEN not set${NC} (Optional)"
-else
-    echo -e "  - Token: ${C_GREEN}VITE_SEKI_API_TOKEN OK${NC}"
-fi
-
 if [[ "$*" == *"--deps"* ]] && [ ! -d "node_modules" ]; then echo -e "  - deps: ${C_RED}MISSING${NC}"; E=1; fi
 if [[ "$*" == *"--build"* ]] && [ ! -d "dist" ]; then echo -e "  - build: ${C_RED}MISSING${NC}"; E=1; fi
 [ $E -eq 0 ] && echo -e "✅ ${C_GREEN}OK${NC}" || echo -e "❌ ${C_RED}FAILED${NC}"

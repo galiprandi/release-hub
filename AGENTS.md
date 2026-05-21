@@ -37,6 +37,12 @@ Antes de cualquier cambio, revisar los docs relevantes para evaluar impacto y ev
 
 ## REGLAS CRÍTICAS DE DESARROLLO
 
+### 0. Higiene y Refactorización (Fiona's Standard)
+⚠️ **MÁXIMA PRIORIDAD**: El sistema debe mantenerse libre de entropía técnica.
+1. **Eliminación de Código Muerto**: Cualquier componente, ruta o utilidad que no tenga referencias activas debe ser eliminado inmediatamente. No comentar, BORRAR.
+2. **React Hooks Hygiene**: Prohibido usar `useEffect` para sincronizar estados derivados o realizar mutaciones directas del DOM que puedan ser manejadas mediante `useRef` o controladores de eventos. Evitar renders en cascada.
+3. **Resonancia Semántica**: No se permiten colores hardcodeados (ej: `text-zinc-500`, `bg-red-500`) en componentes de estado o feedback. Usar exclusivamente los tokens definidos en `DESIGN.md`.
+
 ### 1. Operaciones por Repositorio
 
 ⚠️ **IMPORTANT**: ReleaseHub works with multiple repositories simultaneously. Todas las operaciones deben cumplir estas reglas:

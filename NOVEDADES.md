@@ -2,6 +2,52 @@
 
 ---
 
+### 🗓️ 21 de Mayo de 2026
+
+- ♻️ Configuración: Mejoras internas en gestión de tokens para mayor estabilidad.
+
+### 🗓️ 20 de Mayo de 2026
+
+- ✨ Docker: Mejoras de consistencia visual en la interfaz de gestión.
+- ✨ MiniTimeline: Refinamiento visual con tokens semánticos para mejor adaptación de temas.
+- ✨ Índice de Productos: Estandarización de estados de feedback para una experiencia más coherente.
+- ✨ Logs: Mejoras en detección de scroll manual y compatibilidad con modales.
+- 🐛 Logs: Corrección de condiciones de carrera en auto-scroll para mejor estabilidad.
+- 🎨 LogsViewer: Mejora en jerarquía visual y espaciado para mejor legibilidad.
+
+### 🗓️ 19 de Mayo de 2026
+
+- ✨ IA y Búsqueda: Mejoras visuales en tarjeta de IA para mejor claridad.
+- ✨ Logs: Estandarización de diálogos para una experiencia más consistente.
+- ✨ Filtros y Header: Refinamiento visual para mejor coherencia con el sistema de diseño.
+
+### 🗓️ 18 de Mayo de 2026
+
+- ♻️ API Docker: Fortalecimiento y mejoras de resiliencia para mayor estabilidad.
+- ✨ Filtros y Header: Mejoras visuales para mejor consistencia.
+- ✨ Diálogos: Estandarización global para una experiencia más fluida y accesible.
+
+### 🗓️ 17 de Mayo de 2026
+
+- 🎨 LogsViewer: Mejoras de accesibilidad y estados de foco para mejor navegación por teclado.
+- ✨ Diálogos: Estandarización y accesibilidad mejoradas.
+
+### 🗓️ 16 de Mayo de 2026
+
+- ♻️ Healthcheck: Refuerzo de verificaciones y utilidades de flota para mayor robustez.
+- 🎨 IA y Diálogos: Mejoras de accesibilidad y estados de foco.
+
+### 🗓️ 15 de Mayo de 2026
+
+- 🎨 Fondos: Estandarización y mejora de accesibilidad para mejor adaptación de temas.
+- 🎨 DisplayInfo: Mejora de accesibilidad para mejor compatibilidad con lectores de pantalla.
+- ✨ ProjectSelector: Estandarización y accesibilidad mejoradas para mejor experiencia de selección.
+
+### 🗓️ 14 de Mayo de 2026
+
+- ♻️ Healthchecks: Mejora de observabilidad para mejor detección de problemas.
+- ✨ ProjectSelector: Mejora de accesibilidad e interacción para mejor usabilidad.
+
 ### 🗓️ 13 de Mayo de 2026
 
 - ✨ UI/UX: Estandarización de diálogos con `BaseDialog` para una experiencia más fluida y accesible.

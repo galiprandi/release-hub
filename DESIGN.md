@@ -48,6 +48,7 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 ### RepoSearch
 - Dropdown con `bg-popover` y sombras pronunciadas (`shadow-xl`).
 - Acciones de fila (favoritos, external links) visibles en focus mediante `focus-within:opacity-100`.
+- **Product Toolbar**: Jerarquía dual para reducir la carga cognitiva. Metadata y configuración a la izquierda (separados por `border-border`), operaciones críticas a la derecha para un flujo de trabajo intuitivo.
 
 ## Accesibilidad (a11y)
 

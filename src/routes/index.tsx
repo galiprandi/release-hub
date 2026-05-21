@@ -70,10 +70,10 @@ function Dashboard() {
 							key={tab.id}
 							type="button"
 							onClick={() => setActiveTab(tab.id)}
-							className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-all whitespace-nowrap ${
+								className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-all whitespace-nowrap focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
 								isActive
 									? "bg-background shadow-sm text-foreground font-medium"
-									: "text-muted-foreground hover:text-foreground"
+										: "text-muted-foreground hover:text-foreground hover:bg-background/50"
 							}`}
 							title={tab.description}
 						>
@@ -340,10 +340,10 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 									<button
 										type="button"
 										onClick={() => setIsCommitsModalOpen(true)}
-										className="inline-flex items-center gap-0.5 text-[10px] bg-warning/10 text-warning px-1.5 py-0.5 rounded border border-warning/20 font-medium cursor-pointer hover:bg-warning/20 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+											className="inline-flex items-center gap-1 text-[10px] bg-warning/10 text-warning px-2 py-0.5 rounded-full border border-warning/20 font-bold cursor-pointer hover:bg-warning/20 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 									>
-										<GitPullRequestCreateArrow className="w-3 h-3" />
-										{pendingCount}
+											<GitPullRequestCreateArrow className="w-2.5 h-2.5" />
+											<span>{pendingCount}</span>
 									</button>
 								</Tooltip.Trigger>
 								<Tooltip.Portal>
@@ -400,20 +400,20 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 							href={`https://github.com/${org}/${name}`}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-muted-foreground hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-0.5"
+							className="text-muted-foreground hover:text-foreground hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-1.5"
 							aria-label="Abrir en GitHub"
 							title="Abrir en GitHub"
 						>
-							<Github className="w-5 h-5" />
+							<Github className="w-4 h-4" />
 						</a>
 						<button
 							type="button"
 							onClick={() => onToggleFavorite(repo.fullName)}
-							className={`${isFavorite ? "text-yellow-500" : "text-muted-foreground"} hover:text-yellow-600 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-0.5`}
+							className={`${isFavorite ? "text-yellow-500" : "text-muted-foreground"} hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-1.5`}
 							aria-label={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
 							title={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
 						>
-							<Star className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
+							<Star className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`} />
 						</button>
 					</div>
 				</td>

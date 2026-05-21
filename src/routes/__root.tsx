@@ -59,7 +59,7 @@ function DockerLink() {
 	return (
 		<Link
 			to="/docker"
-			className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+			className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 			title="Docker Manager"
 		>
 			<Blocks className="w-5 h-5" />
@@ -140,8 +140,10 @@ function RootLayout() {
 				<header className="border-b px-4 py-3">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2">
-							<Link to="/" className="text-2xl font-bold hover:text-primary flex items-center gap-2">
-								<Github className="w-6 h-6" />
+							<Link to="/" className="text-2xl font-bold hover:text-primary flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-colors">
+								<div className="p-1.5 rounded-lg bg-primary/10">
+									<Github className="w-6 h-6 text-primary" />
+								</div>
 								ReleaseHub
 							</Link>
 							{(product || isHealthPage || isDockerPage || isFetcherPage) && (
@@ -155,7 +157,7 @@ function RootLayout() {
 											<button
 												type="button"
 												onClick={() => fullProduct && toggleFavorite(fullProduct)}
-												className={`${favorite ? "text-yellow-500" : "text-muted-foreground"} hover:text-yellow-600`}
+												className={`${favorite ? "text-yellow-500" : "text-muted-foreground"} hover:text-yellow-600 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all`}
 												title={favorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
 											>
 												<Star className={`w-5 h-5 ${favorite ? "fill-current" : ""}`} />
@@ -174,7 +176,7 @@ function RootLayout() {
 							<FetcherLink />
 							<Link
 								to="/health"
-								className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+								className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 								title="Health Monitor"
 							>
 								<Activity className="w-5 h-5" />

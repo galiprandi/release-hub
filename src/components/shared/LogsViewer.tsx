@@ -42,8 +42,8 @@ export function LogsViewer({
 	const [isGeneratingLocal, setIsGeneratingLocal] = useState(false);
 	const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 	const autoScrollEnabledRef = useRef(autoScrollEnabled);
-	const [containerElement, setContainerElement] = useState<HTMLDivElement | null>(null);
-	const [preElement, setPreElement] = useState<HTMLPreElement | null>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const preRef = useRef<HTMLPreElement>(null);
 
 	const [wordWrap, setWordWrap] = useState(() => {
 		try {
@@ -127,14 +127,6 @@ Log: ${cleanLine}`;
 			console.error("Error explaining line:", err);
 		}
 	}, [summarizeLine, resetLineAI]);
-
-	const logsContainerRef = useCallback((node: HTMLDivElement | null) => {
-		setContainerElement(node);
-	}, []);
-
-	const preRef = useCallback((node: HTMLPreElement | null) => {
-		setPreElement(node);
-	}, []);
 
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -258,66 +250,59 @@ Log: ${cleanLine}`;
 		return indices;
 	}, [filteredLines, filter]);
 
-	useEffect(() => {
-		setCurrentMatchIndex(0);
-	}, [filter]);
-
 	const scrollToMatch = useCallback((matchIdx: number) => {
 		const lineIdx = matchingLineIndices[matchIdx];
-		if (lineIdx === undefined || !containerElement) return;
+		if (lineIdx === undefined || !containerRef.current) return;
 
 		setAutoScrollEnabled(false);
 
+		const container = containerRef.current;
 		setTimeout(() => {
-			const element = containerElement.querySelector(`[data-line-idx="${lineIdx}"]`);
+			const element = container.querySelector(`[data-line-idx="${lineIdx}"]`);
 			if (element && typeof element.scrollIntoView === "function") {
 				element.scrollIntoView({ block: "center", behavior: "smooth" });
 			}
 		}, 50);
-	}, [matchingLineIndices, containerElement]);
-
-	useEffect(() => {
-		if (matchingLineIndices.length > 0) {
-			scrollToMatch(currentMatchIndex);
-		}
-	}, [currentMatchIndex, matchingLineIndices, scrollToMatch]);
+	}, [matchingLineIndices]);
 
 	const scrollToBottom = useCallback(() => {
-		if (containerElement) {
-			containerElement.scrollTop = containerElement.scrollHeight;
+		if (containerRef.current) {
+			containerRef.current.scrollTop = containerRef.current.scrollHeight;
 		}
-	}, [containerElement]);
+	}, []);
 
 	// ResizeObserver on <pre> to scroll when LazyRender content actually expands
 	useEffect(() => {
-		if (!preElement || !containerElement) return;
+		if (!preRef.current || !containerRef.current) return;
 
+		const pre = preRef.current;
 		const observer = new ResizeObserver(() => {
 			if (autoScrollEnabledRef.current) {
 				scrollToBottom();
 			}
 		});
-		observer.observe(preElement);
+		observer.observe(pre);
 		return () => observer.disconnect();
-	}, [preElement, containerElement, scrollToBottom]);
+	}, [scrollToBottom]);
 
 	// Detect manual scroll and disable auto-scroll
 	useEffect(() => {
-		if (!containerElement) return;
+		if (!containerRef.current) return;
 
+		const container = containerRef.current;
 		const handleScroll = () => {
 			// Disable auto-scroll if user scrolled away from the bottom.
 			// We use a threshold of 10px to account for subpixel rounding.
-			const isAtBottom = containerElement.scrollHeight - containerElement.scrollTop <= containerElement.clientHeight + 10;
+			const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 10;
 			if (!isAtBottom && autoScrollEnabledRef.current) {
 				setAutoScrollEnabled(false);
 			}
 		};
-		containerElement.addEventListener('scroll', handleScroll, { passive: true });
+		container.addEventListener('scroll', handleScroll, { passive: true });
 		return () => {
-			containerElement.removeEventListener('scroll', handleScroll);
+			container.removeEventListener('scroll', handleScroll);
 		};
-	}, [containerElement]);
+	}, []);
 
 	// Scroll to bottom immediately when auto-scroll is enabled
 	useEffect(() => {
@@ -389,8 +374,8 @@ Log: ${cleanLine}`;
 		<Tooltip.Provider>
 		<div className="flex items-center gap-0">
 			{!isLoading && logs && (
-				<span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-green-600 bg-green-50 rounded">
-					<span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+				<span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-success bg-success/10 rounded">
+					<span className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
 					Live
 				</span>
 			)}
@@ -449,7 +434,10 @@ Log: ${cleanLine}`;
 								ref={searchInputRef}
 								type="text"
 								value={filter}
-								onChange={(e) => setFilter(e.target.value)}
+								onChange={(e) => {
+									setFilter(e.target.value);
+									setCurrentMatchIndex(0);
+								}}
 								placeholder="Buscar (Cmd+F)"
 								aria-label="Buscar logs"
 								className="pl-7 pr-2 py-1 text-sm bg-background border rounded w-48 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
@@ -468,14 +456,18 @@ Log: ${cleanLine}`;
 
 				{/* Match Navigation (Iconos compactos) */}
 				{filter.trim() !== "" && (
-					<div className="flex items-center gap-0.5 border border-zinc-700 rounded px-1.5 bg-zinc-900 h-8 ml-2">
-						<span className="text-[10px] text-zinc-400 select-none font-mono min-w-[2.5rem] text-center">
+					<div className="flex items-center gap-0.5 border border-border rounded px-1.5 bg-muted h-8 ml-2">
+						<span className="text-[10px] text-muted-foreground select-none font-mono min-w-[2.5rem] text-center">
 							{matchingLineIndices.length > 0 ? `${currentMatchIndex + 1}/${matchingLineIndices.length}` : "0/0"}
 						</span>
 						<IconButton
 							icon={<ChevronUp className="w-3.5 h-3.5" />}
 							onClick={() => {
-								setCurrentMatchIndex((prev) => (matchingLineIndices.length > 0 ? (prev - 1 + matchingLineIndices.length) % matchingLineIndices.length : 0));
+								setCurrentMatchIndex((prev) => {
+									const next = matchingLineIndices.length > 0 ? (prev - 1 + matchingLineIndices.length) % matchingLineIndices.length : 0;
+									scrollToMatch(next);
+									return next;
+								});
 							}}
 							tooltip="Coincidencia anterior"
 							disabled={matchingLineIndices.length === 0}
@@ -483,7 +475,11 @@ Log: ${cleanLine}`;
 						<IconButton
 							icon={<ChevronDown className="w-3.5 h-3.5" />}
 							onClick={() => {
-								setCurrentMatchIndex((prev) => (matchingLineIndices.length > 0 ? (prev + 1) % matchingLineIndices.length : 0));
+								setCurrentMatchIndex((prev) => {
+									const next = matchingLineIndices.length > 0 ? (prev + 1) % matchingLineIndices.length : 0;
+									scrollToMatch(next);
+									return next;
+								});
 							}}
 							tooltip="Coincidencia siguiente"
 							disabled={matchingLineIndices.length === 0}
@@ -510,7 +506,7 @@ Log: ${cleanLine}`;
 							placeholder="Resaltar..."
 							value={customHighlight}
 							onChange={(e) => setCustomHighlight(e.target.value)}
-							className="h-8 w-24 bg-zinc-900 border border-zinc-700 text-xs px-2 rounded text-zinc-100 placeholder-zinc-500 focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-none"
+							className="h-8 w-24 bg-muted border border-border text-xs px-2 rounded text-foreground placeholder-muted-foreground focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-none"
 							aria-label="Término para resaltar"
 						/>
 					)}
@@ -532,12 +528,12 @@ Log: ${cleanLine}`;
 			</div>
 			<div className="w-px h-6 bg-border mx-2" />
 			<IconButton
-				icon={autoScrollEnabled ? <Pause className="w-4 h-4 text-red-500" /> : <Play className="w-4 h-4" />}
+				icon={autoScrollEnabled ? <Pause className="w-4 h-4 text-destructive" /> : <Play className="w-4 h-4" />}
 				onClick={() => setAutoScrollEnabled(!autoScrollEnabled)}
 				tooltip={autoScrollEnabled ? "Detener scroll automático (polling continúa)" : "Activar scroll automático"}
 			/>
 			<IconButton
-				icon={copied ? <Check className="w-4 h-4 text-green-500" /> : <ClipboardCopy className="w-4 h-4" />}
+				icon={copied ? <Check className="w-4 h-4 text-success" /> : <ClipboardCopy className="w-4 h-4" />}
 				onClick={handleCopy}
 				tooltip={copied ? "¡Copiado!" : "Copiar logs al portapapeles"}
 			/>
@@ -554,29 +550,29 @@ Log: ${cleanLine}`;
 
 	const innerContent = (
 		<div
-			ref={logsContainerRef}
+			ref={containerRef}
 			tabIndex={0}
 			role="log"
 			aria-label="Panel de logs"
-			className="flex-1 min-h-0 overflow-auto bg-black text-green-400 p-4 font-mono text-xs p-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset focus-visible:outline-none rounded-b-md"
+			className="flex-1 min-h-0 overflow-auto bg-black text-green-400 font-mono text-xs p-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset focus-visible:outline-none rounded-b-md"
 		>
 				{processedError && (
-					<div className="mb-4 p-3 bg-red-900 border border-red-500/30 rounded-lg sticky top-0 z-10">
+					<div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg sticky top-0 z-10">
 						<div className="flex items-center justify-between gap-2 mb-2">
 							<div className="flex items-center gap-2">
-								<AlertCircle className="w-4 h-4 text-red-400" />
-								<span className="text-red-300 font-semibold text-sm">Error</span>
+								<AlertCircle className="w-4 h-4 text-destructive" />
+								<span className="text-destructive font-semibold text-sm">Error</span>
 							</div>
 							<button
 								type="button"
 								onClick={() => setProcessedError(null)}
-								className="text-xs text-red-300 hover:text-red-200 hover:bg-red-800/30 rounded px-2 py-1 transition-colors focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none focus-visible:ring-offset-1"
+								className="text-xs text-destructive/80 hover:text-destructive hover:bg-destructive/10 rounded px-2 py-1 transition-colors focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none focus-visible:ring-offset-1"
 								aria-label="Cerrar error"
 							>
 								<X className="w-3 h-3" />
 							</button>
 						</div>
-						<p className="text-red-100 text-xs whitespace-pre-wrap">{processedError}</p>
+						<p className="text-destructive/90 text-xs whitespace-pre-wrap">{processedError}</p>
 					</div>
 				)}
 				<AISummaryCard
@@ -598,12 +594,12 @@ Log: ${cleanLine}`;
 					)}
 				>
 					{currentIsLoading ? (
-						<div className="flex items-center justify-center gap-2 h-full text-gray-400 py-8">
+						<div className="flex items-center justify-center gap-2 h-full text-muted-foreground py-8">
 							<Loader2 className="w-4 h-4 animate-spin" />
 							<span>Cargando logs...</span>
 						</div>
 					) : !currentLogs ? (
-						<span className="text-yellow-500 px-2 py-1 block">No hay logs disponibles</span>
+						<span className="text-warning px-2 py-1 block">No hay logs disponibles</span>
 					) : filteredLines.length > 0 ? (
 						filteredLines.map((line: string, idx: number) => {
 							const isCurrentMatch = matchingLineIndices.includes(idx) && matchingLineIndices[currentMatchIndex] === idx;
@@ -618,13 +614,13 @@ Log: ${cleanLine}`;
 									key={idx}
 									data-line-idx={idx}
 									className={cn(
-										"group flex items-start gap-2 py-0.5 px-2 rounded hover:bg-zinc-900/30 transition-colors duration-150 relative min-w-0 w-full",
-										isCurrentMatch ? "bg-yellow-950/40 border-l-2 border-yellow-500" : ""
+										"group flex items-start gap-2 py-0.5 px-2 rounded hover:bg-muted transition-colors duration-150 relative min-w-0 w-full",
+										isCurrentMatch ? "bg-warning/20 border-l-2 border-warning" : ""
 									)}
 								>
 									{/* Line Number Gutter */}
 									{showLineNumbers && (
-										<span className="text-zinc-600 text-[10px] select-none text-right min-w-[2rem] pr-2 font-mono flex-shrink-0 border-r border-zinc-800 mr-1">
+										<span className="text-muted-foreground/60 text-[10px] select-none text-right min-w-[2rem] pr-2 font-mono flex-shrink-0 border-r border-border mr-1">
 											{idx + 1}
 										</span>
 									)}
@@ -637,10 +633,10 @@ Log: ${cleanLine}`;
 
 										{/* AI Explanation Sub-Box */}
 										{explainingLineIndex === idx && (
-											<div className="mt-1.5 p-2 bg-zinc-900/90 border border-zinc-800 rounded-md text-xs text-zinc-300 font-sans relative max-w-2xl shadow-lg z-10 animate-in fade-in slide-in-from-top-1">
-												<div className="flex items-center justify-between gap-2 mb-1.5 font-semibold text-zinc-400">
+											<div className="mt-1.5 p-2 bg-muted border border-border rounded-md text-xs text-muted-foreground font-sans relative max-w-2xl shadow-lg z-10 animate-in fade-in slide-in-from-top-1">
+												<div className="flex items-center justify-between gap-2 mb-1.5 font-semibold text-muted-foreground">
 													<div className="flex items-center gap-1.5">
-														<Sparkles className="w-3.5 h-3.5 text-yellow-500 animate-pulse" />
+														<Sparkles className="w-3.5 h-3.5 text-warning animate-pulse" />
 														<span>Explicación del Error (IA)</span>
 													</div>
 													<button
@@ -650,23 +646,23 @@ Log: ${cleanLine}`;
 															setExplainingLineIndex(null);
 															resetLineAI();
 														}}
-														className="text-zinc-500 hover:text-zinc-300 rounded transition-colors focus-visible:outline-none"
+														className="text-muted-foreground hover:text-foreground rounded transition-colors focus-visible:outline-none"
 														aria-label="Cerrar explicación"
 													>
 														<X className="w-3 h-3" />
 													</button>
 												</div>
 												{lineExplanationStatus === "summarizing" ? (
-													<div className="flex items-center gap-1.5 text-zinc-500 italic">
-														<Loader2 className="w-3.5 h-3.5 animate-spin text-yellow-500" />
+													<div className="flex items-center gap-1.5 text-muted-foreground italic">
+														<Loader2 className="w-3.5 h-3.5 animate-spin text-warning" />
 														<span>Analizando error con IA local...</span>
 													</div>
 												) : lineExplanationStatus === "error" || lineAIError ? (
-													<span className="text-red-400">Error al consultar el modelo de IA local: {lineAIError?.message || "Servicio no disponible"}</span>
+													<span className="text-destructive">Error al consultar el modelo de IA local: {lineAIError?.message || "Servicio no disponible"}</span>
 												) : lineExplanationData ? (
 													<span className="whitespace-pre-wrap">{lineExplanationData}</span>
 												) : (
-													<span className="text-zinc-500">Preparando explicación...</span>
+													<span className="text-muted-foreground">Preparando explicación...</span>
 												)}
 											</div>
 										)}
@@ -680,7 +676,7 @@ Log: ${cleanLine}`;
 												e.stopPropagation();
 												handleExplainLine(idx, line);
 											}}
-											className="opacity-0 group-hover:opacity-100 absolute right-2 top-0.5 p-1 bg-zinc-800 text-yellow-400 hover:text-yellow-300 rounded border border-zinc-700 shadow-md transition-opacity duration-150 z-10"
+											className="opacity-0 group-hover:opacity-100 absolute right-2 top-0.5 p-1 bg-muted text-warning hover:text-warning/80 rounded border border-border shadow-md transition-opacity duration-150 z-10"
 											title="Explicar error con IA"
 											aria-label="Explicar error con IA"
 										>
@@ -691,7 +687,7 @@ Log: ${cleanLine}`;
 							);
 						})
 					) : (filter || logLevelFilter !== "all") ? (
-						<span className="text-gray-500 px-2 py-1 block">No se encontraron logs que coincidan con los filtros.</span>
+						<span className="text-muted-foreground px-2 py-1 block">No se encontraron logs que coincidan con los filtros.</span>
 					) : (
 						<span className="px-2 py-1 block">{currentLogs || "No logs disponibles"}</span>
 					)}
@@ -706,7 +702,7 @@ Log: ${cleanLine}`;
 				onOpenChange={(open) => !open && onClose()}
 				title={
 					<div className="flex items-center gap-2">
-						<Terminal className="w-4 h-4 text-blue-600" />
+					<Terminal className="w-4 h-4 text-primary" />
 						{resources && resources.length > 0 ? (
 							<select
 								value={selectedResourceId || resources[0].id}
@@ -744,7 +740,7 @@ Log: ${cleanLine}`;
 		<div className="bg-background rounded-lg shadow-lg w-full h-full max-h-[80vh] flex flex-col overflow-hidden">
 			<div className="flex items-center justify-between gap-0 mb-2 px-4 pt-4 flex-shrink-0">
 				<div className="flex items-center gap-2">
-					<Terminal className="w-4 h-4 text-blue-600" />
+					<Terminal className="w-4 h-4 text-primary" />
 					{resources && resources.length > 0 && (
 						<select
 							value={selectedResourceId || resources[0].id}

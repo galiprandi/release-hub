@@ -37,7 +37,7 @@ function loadSettings(): Settings {
 /**
  * Decodes a JWT token without verification (for exp check only)
  */
-function decodeJWT(token: string): JWTPayload | null {
+export function decodeJWT(token: string): JWTPayload | null {
   try {
     const parts = token.split('.')
     if (parts.length !== 3) return null
@@ -66,7 +66,7 @@ function decodeJWT(token: string): JWTPayload | null {
 /**
  * Checks if a JWT token is expired
  */
-function isTokenExpired(token: string): boolean {
+export function isTokenExpired(token: string): boolean {
   const payload = decodeJWT(token)
   if (!payload || !payload.exp) return false
 
@@ -77,14 +77,13 @@ function isTokenExpired(token: string): boolean {
 /**
  * Gets formatted expiration date from token
  */
-function getExpirationDate(token: string): string | null {
+export function getExpirationDate(token: string): string | null {
   const payload = decodeJWT(token)
   if (!payload || !payload.exp) return null
 
   const expDate = dayjs.unix(payload.exp)
-  const now = dayjs()
 
-  return `El token de autenticación expira ${expDate.from(now)}`
+  return expDate.fromNow()
 }
 
 /**

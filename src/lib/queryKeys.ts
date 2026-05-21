@@ -22,7 +22,8 @@ type QueryKeyDomain =
 	| "repo"
 	| "user"
 	| "settings"
-	| "tools";
+	| "tools"
+	| "fetcher";
 
 interface BaseQueryKey {
 	domain: QueryKeyDomain;
@@ -388,6 +389,12 @@ export const queryKeys = {
 		jqVersion: (): readonly ["tools", "jq", "version"] => ["tools", "jq", "version"],
 		ghCliVersion: (): readonly ["tools", "gh-cli", "version"] => ["tools", "gh-cli", "version"],
 		ghCliAuth: (): readonly ["tools", "gh-cli", "auth"] => ["tools", "gh-cli", "auth"],
+		curlAccess: (): readonly ["tools", "curl", "access"] => ["tools", "curl", "access"],
+	},
+
+	// Fetcher
+	fetcher: {
+		history: (): readonly ["fetcher", "history"] => ["fetcher", "history"],
 	},
 } as const;
 
@@ -512,6 +519,16 @@ export const cachePolicies: Record<QueryKeyDomain, CachePolicy> = {
 		refetchOnWindowFocus: false,
 		refetchInterval: false,
 		retry: 1,
+	},
+
+	// FETCHER: NO cachear, PERSISTIR en LS (historial de fetcher)
+	fetcher: {
+		staleTime: 0, // Siempre fresco (leer de localStorage real)
+		gcTime: Infinity,
+		persistInLocalStorage: true, // PERSISTIR (historial de fetcher)
+		refetchOnWindowFocus: false,
+		refetchInterval: false,
+		retry: 0,
 	},
 };
 

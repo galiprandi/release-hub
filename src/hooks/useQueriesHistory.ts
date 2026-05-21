@@ -114,7 +114,7 @@ export function useQueriesHistory() {
 
 			return { previousHistory };
 		},
-		onError: (err, newRecord, context) => {
+		onError: (_err, _newRecord, context) => {
 			// Rollback to previous value
 			if (context?.previousHistory) {
 				queryClient.setQueryData(queryKeys.queries.history(), context.previousHistory);

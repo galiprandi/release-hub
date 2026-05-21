@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerificationPageRouteImport } from './routes/verification-page'
 import { Route as SetupRouteImport } from './routes/setup'
+import { Route as QueriesRouteImport } from './routes/queries'
 import { Route as MockSekiRouteImport } from './routes/mock-seki'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as DockerRouteImport } from './routes/docker'
@@ -26,6 +27,11 @@ const VerificationPageRoute = VerificationPageRouteImport.update({
 const SetupRoute = SetupRouteImport.update({
   id: '/setup',
   path: '/setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QueriesRoute = QueriesRouteImport.update({
+  id: '/queries',
+  path: '/queries',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MockSekiRoute = MockSekiRouteImport.update({
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/docker': typeof DockerRoute
   '/health': typeof HealthRoute
   '/mock-seki': typeof MockSekiRoute
+  '/queries': typeof QueriesRoute
   '/setup': typeof SetupRoute
   '/verification-page': typeof VerificationPageRoute
   '/product/$org/$product': typeof ProductOrgProductRouteWithChildren
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/docker': typeof DockerRoute
   '/health': typeof HealthRoute
   '/mock-seki': typeof MockSekiRoute
+  '/queries': typeof QueriesRoute
   '/setup': typeof SetupRoute
   '/verification-page': typeof VerificationPageRoute
   '/product/$org/$product': typeof ProductOrgProductIndexRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/docker': typeof DockerRoute
   '/health': typeof HealthRoute
   '/mock-seki': typeof MockSekiRoute
+  '/queries': typeof QueriesRoute
   '/setup': typeof SetupRoute
   '/verification-page': typeof VerificationPageRoute
   '/product/$org/$product': typeof ProductOrgProductRouteWithChildren
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/docker'
     | '/health'
     | '/mock-seki'
+    | '/queries'
     | '/setup'
     | '/verification-page'
     | '/product/$org/$product'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/docker'
     | '/health'
     | '/mock-seki'
+    | '/queries'
     | '/setup'
     | '/verification-page'
     | '/product/$org/$product'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/docker'
     | '/health'
     | '/mock-seki'
+    | '/queries'
     | '/setup'
     | '/verification-page'
     | '/product/$org/$product'
@@ -126,6 +138,7 @@ export interface RootRouteChildren {
   DockerRoute: typeof DockerRoute
   HealthRoute: typeof HealthRoute
   MockSekiRoute: typeof MockSekiRoute
+  QueriesRoute: typeof QueriesRoute
   SetupRoute: typeof SetupRoute
   VerificationPageRoute: typeof VerificationPageRoute
   ProductOrgProductRoute: typeof ProductOrgProductRouteWithChildren
@@ -145,6 +158,13 @@ declare module '@tanstack/react-router' {
       path: '/setup'
       fullPath: '/setup'
       preLoaderRoute: typeof SetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/queries': {
+      id: '/queries'
+      path: '/queries'
+      fullPath: '/queries'
+      preLoaderRoute: typeof QueriesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mock-seki': {
@@ -208,6 +228,7 @@ const rootRouteChildren: RootRouteChildren = {
   DockerRoute: DockerRoute,
   HealthRoute: HealthRoute,
   MockSekiRoute: MockSekiRoute,
+  QueriesRoute: QueriesRoute,
   SetupRoute: SetupRoute,
   VerificationPageRoute: VerificationPageRoute,
   ProductOrgProductRoute: ProductOrgProductRouteWithChildren,

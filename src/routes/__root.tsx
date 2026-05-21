@@ -1,12 +1,13 @@
 import { createRootRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { Github, Star, Activity, Loader2, Blocks } from "lucide-react";
+import { Github, Star, Activity, Loader2, Blocks, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { RepoSearch } from "@/components/RepoSearch";
 import { NovedadesDialog } from "@/components/NovedadesDialog";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
 import { SettingsDialog } from "@/components/SettingsDialog";
 import { useDockerAccess } from "@/hooks/useDockerAccess";
+import { useCurlAccess } from "@/hooks/useCurlAccess";
 import { useGitUser } from "@/hooks/useGitUser";
 import { useGhCliSetup } from "@/hooks/useGhCliSetup";
 import { useUserCollections } from "@/hooks/useUserCollections";
@@ -66,6 +67,25 @@ function DockerLink() {
 	);
 }
 
+function QueriesLink() {
+	const { data: access, isLoading: checkingAccess } = useCurlAccess();
+
+	// Don't show the Queries icon if curl is not installed or accessible
+	if (!checkingAccess && !access?.hasAccess) {
+		return null;
+	}
+
+	return (
+		<Link
+			to="/queries"
+			className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+			title="Queries"
+		>
+			<Send className="w-5 h-5" />
+		</Link>
+	);
+}
+
 function RootLayout() {
 	const { isInstalled, isAuthenticated, isLoading } = useGhCliSetup();
 	const navigate = useNavigate();
@@ -92,6 +112,8 @@ function RootLayout() {
 	const isHealthPage = pathname === '/health';
 	// Detect if on docker page
 	const isDockerPage = pathname === '/docker';
+	// Detect if on queries page
+	const isQueriesPage = pathname === '/queries';
 
 	useEffect(() => {
 		// Si gh cli no está instalado o no está autenticado, redirigir a setup
@@ -122,12 +144,13 @@ function RootLayout() {
 								<Github className="w-6 h-6" />
 								ReleaseHub
 							</Link>
-							{(product || isHealthPage || isDockerPage) && (
+							{(product || isHealthPage || isDockerPage || isQueriesPage) && (
 								<>
 									<span className="text-muted-foreground text-lg">/</span>
 									<span className="text-lg font-normal text-muted-foreground flex items-center gap-2">
 										{isHealthPage && <Activity className="w-5 h-5 text-blue-600" />}
 										{isDockerPage && <Blocks className="w-5 h-5 text-blue-600" />}
+										{isQueriesPage && <Send className="w-5 h-5 text-blue-600" />}
 										{product && (
 											<button
 												type="button"
@@ -138,16 +161,17 @@ function RootLayout() {
 												<Star className={`w-5 h-5 ${favorite ? "fill-current" : ""}`} />
 											</button>
 										)}
-										{isHealthPage ? 'Health Monitor' : isDockerPage ? 'Docker Manager' : product}
+										{isHealthPage ? 'Health Monitor' : isDockerPage ? 'Docker Manager' : isQueriesPage ? 'Queries' : product}
 									</span>
 								</>
 							)}
 						</div>
 						<div className="flex items-center gap-4">
 							<FeedbackDialog />
-							<NovedadesDialog />							
+							<NovedadesDialog />
 							<RepoSearch />
 							<DockerLink />
+							<QueriesLink />
 							<Link
 								to="/health"
 								className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"

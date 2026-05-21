@@ -521,9 +521,9 @@ export const cachePolicies: Record<QueryKeyDomain, CachePolicy> = {
 		retry: 1,
 	},
 
-	// QUERIES: Cachear infinito, PERSISTIR en LS (historial de queries)
+	// QUERIES: NO cachear, PERSISTIR en LS (historial de queries)
 	queries: {
-		staleTime: Infinity,
+		staleTime: 0, // Siempre fresco (leer de localStorage real)
 		gcTime: Infinity,
 		persistInLocalStorage: true, // PERSISTIR (historial de queries)
 		refetchOnWindowFocus: false,

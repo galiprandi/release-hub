@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
-import { Send, Trash2 } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Send, Trash2, Copy } from 'lucide-react';
 import { useQueriesHistory } from '@/hooks/useQueriesHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
 import { FilterBar } from '@/components/shared/FilterBar';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { ImportQueryModal } from '@/components/ImportQueryModal';
-import { parseCurlForDisplay } from '@/utils/curlParser';
+import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 
 export const Route = createFileRoute('/queries')({
@@ -48,9 +48,21 @@ function getMethodBadgeColor(method: string): string {
 
 function QueriesPage() {
 	const { data: access, isLoading: checkingAccess } = useCurlAccess();
-	const { history, isLoading: loadingHistory, deleteQueryRecord, isDeleting, addQueryRecord } = useQueriesHistory();
-	const [isModalOpen, setIsModalOpen] = useState(false);
+	const { history, isLoading: loadingHistory, deleteQueryRecord, isDeleting } = useQueriesHistory();
+	const [activeQuery, setActiveQuery] = useState<QueryRecord | undefined>();
 	const [editingQuery, setEditingQuery] = useState<QueryRecord | undefined>();
+	const [curlInput, setCurlInput] = useState('');
+
+	// Validate curl in real-time
+	const isCurlValid = useMemo(() => {
+		if (!curlInput.trim()) return false;
+		try {
+			parseCurlCommand(curlInput);
+			return true;
+		} catch {
+			return false;
+		}
+	}, [curlInput]);
 
 	// State for filters
 	const [methodFilter, setMethodFilter] = useState<'all' | 'GET' | 'POST' | 'PATCH' | 'PUT'>('all');
@@ -111,14 +123,38 @@ function QueriesPage() {
 
 	const handleOpenModal = (query?: QueryRecord) => {
 		setEditingQuery(query);
-		setIsModalOpen(true);
+		if (query) {
+			setActiveQuery(query);
+		}
 	};
 
-	const handleImport = (curl: string) => {
-		// Parse the curl to get the parts for display
-		const parsed = parseCurlForDisplay(curl);
-		if (parsed) {
-			addQueryRecord({ curl });
+	const handleSendCurl = () => {
+		if (curlInput.trim()) {
+			try {
+				// Validate that the curl is parseable
+				parseCurlCommand(curlInput);
+				setActiveQuery({ id: '', curl: curlInput });
+				setCurlInput('');
+			} catch (error) {
+				console.error('Invalid curl:', error);
+				// Optionally show an error message to the user
+			}
+		}
+	};
+
+	const handleCloseModal = () => {
+		setActiveQuery(undefined);
+		setEditingQuery(undefined);
+	};
+
+	const handleCopyResponse = async (query: QueryRecord) => {
+		if (query.response?.body) {
+			try {
+				await navigator.clipboard.writeText(query.response.body);
+				// Optionally show a toast notification
+			} catch (error) {
+				console.error('Failed to copy to clipboard:', error);
+			}
 		}
 	};
 
@@ -142,14 +178,22 @@ function QueriesPage() {
 				searchValue={searchQuery}
 				onSearchChange={setSearchQuery}
 				rightContent={
-					<button
-						type="button"
-						className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm bg-success text-success-foreground rounded-md hover:bg-success/90 transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
-						onClick={() => handleOpenModal()}
-					>
-						<Send className="w-3.5 h-3.5" />
-						Import cURL
-					</button>
+					<form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); handleSendCurl(); }}>
+						<input
+							type="text"
+							value={curlInput}
+							onChange={(e) => setCurlInput(e.target.value)}
+							placeholder="Importart cURL"
+							className="w-64 px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
+						/>
+						<button
+							type="submit"
+							disabled={!isCurlValid}
+							className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm bg-success text-success-foreground rounded-md hover:bg-success/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
+						>
+							<Send className="w-3.5 h-3.5" />
+						</button>
+					</form>
 				}
 			/>
 
@@ -195,17 +239,27 @@ function QueriesPage() {
 												{parsed.path.length > 20 ? `${parsed.path.slice(0, 20)}...` : parsed.path}
 											</td>
 											<td className="px-4 py-3 text-sm text-muted-foreground">{parsed.domain}</td>
-											<td className="px-4 py-3 text-sm text-muted-foreground" title={formatTimeAgo(query.lastSent)}>{formatTimeAgo(query.lastSent)}</td>
+											<td className="px-4 py-3 text-sm text-muted-foreground" title={query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}>{query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}</td>
 											<td className="px-4 py-3 text-right">
 												<div className="flex items-center justify-end gap-2">
 													<button
 														type="button"
-														className="p-1.5 text-muted-foreground hover:text-primary hover:bg-accent rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+														className="p-1.5 bg-success text-success-foreground hover:bg-success/90 rounded transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
 														title="Enviar"
 														onClick={() => handleOpenModal(query)}
 													>
 														<Send className="w-4 h-4" />
 													</button>
+													{query.response?.body && (
+														<button
+															type="button"
+															className="p-1.5 text-muted-foreground hover:text-primary hover:bg-accent rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+															title="Copiar respuesta"
+															onClick={() => handleCopyResponse(query)}
+														>
+															<Copy className="w-4 h-4" />
+														</button>
+													)}
 													<button
 														type="button"
 														className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none focus-visible:ring-offset-1"
@@ -262,10 +316,9 @@ function QueriesPage() {
 			)}
 
 			<ImportQueryModal
-				open={isModalOpen}
-				onOpenChange={setIsModalOpen}
-				initialQuery={editingQuery}
-				onImport={handleImport}
+				setQuery={setActiveQuery}
+				query={activeQuery || editingQuery}
+				onClose={handleCloseModal}
 			/>
 		</div>
 	);

@@ -13,6 +13,22 @@ export interface ParsedCurl {
 }
 
 /**
+ * Generates a hash ID based on method + domain + path (without query params)
+ * Used to identify if a query already exists in history
+ */
+export function generateQueryHash(parsed: ParsedCurl): string {
+	const key = `${parsed.method}:${parsed.domain}${parsed.path}`;
+	// Simple hash function
+	let hash = 0;
+	for (let i = 0; i < key.length; i++) {
+		const char = key.charCodeAt(i);
+		hash = ((hash << 5) - hash) + char;
+		hash = hash & hash; // Convert to 32bit integer
+	}
+	return Math.abs(hash).toString(36);
+}
+
+/**
  * Parses a cURL command string and extracts its components
  */
 export function parseCurlCommand(curlString: string): ParsedCurl {
@@ -30,12 +46,12 @@ export function parseCurlCommand(curlString: string): ParsedCurl {
 		method = (methodMatch[1] || methodMatch[2]).toUpperCase();
 	}
 
-	// Extract URL - capture everything from http/https until next quote or space
-	const urlMatch = cleaned.match(/curl\s+(?:['"]?)(https?:\/\/[^'"\s]+)/);
+	// Extract URL - support both direct URL and --url flag
+	const urlMatch = cleaned.match(/--url\s+['"]?([^'"\s]+)['"]?|curl\s+(?:['"]?)(https?:\/\/[^'"\s]+)/);
 	if (!urlMatch) {
 		throw new Error('Could not extract URL from cURL command');
 	}
-	let url = urlMatch[1];
+	let url = urlMatch[1] || urlMatch[2];
 
 	// Remove backslash escapes from brackets
 	url = url.replace(/\\\[/g, '[').replace(/\\\]/g, ']');
@@ -70,14 +86,16 @@ export function parseCurlCommand(curlString: string): ParsedCurl {
 		}
 	}
 
-	// Extract body
+	// Extract body - handle both single and double quotes
 	let body = '';
-	const bodyMatches = cleaned.match(/-d\s+['"]?([^'"]+)['"]?|--data\s+['"]?([^'"]+)['"]?|--data-raw\s+['"]?([^'"]+)['"]?|--data-binary\s+['"]?([^'"]+)['"]?/gi);
-	if (bodyMatches) {
-		for (const match of bodyMatches) {
-			body = match[1] || match[2] || match[3] || match[4] || '';
-			if (body) break;
+	const bodyMatch = cleaned.match(/(?:-d|--data|--data-raw|--data-binary)\s+'([^']+)'/i);
+	if (!bodyMatch) {
+		const bodyMatchDouble = cleaned.match(/(?:-d|--data|--data-raw|--data-binary)\s+"([^"]+)"/i);
+		if (bodyMatchDouble) {
+			body = bodyMatchDouble[1];
 		}
+	} else {
+		body = bodyMatch[1];
 	}
 
 	// Parse URL to extract domain and path

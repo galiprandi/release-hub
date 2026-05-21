@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
 import type { QueryRecord } from "@/types/queries";
-import { generateQueryId } from "@/utils/curlParser";
+import { generateQueryId, parseCurlCommand, generateQueryHash } from "@/utils/curlParser";
 
 const STORAGE_KEY = "queries-history";
 
@@ -40,14 +40,27 @@ export function useQueriesHistory() {
 
 	// Mutation to add or update a query record
 	const addQueryRecord = useMutation({
-		mutationFn: async (record: Omit<QueryRecord, 'id' | 'lastSent'>): Promise<QueryRecord> => {
+		mutationFn: async (record: Omit<QueryRecord, 'id' | 'createdAt' | 'updatedAt'>): Promise<QueryRecord> => {
 			const currentHistory = loadHistoryFromStorage();
-			const existingIndex = currentHistory.findIndex((q) => q.curl === record.curl);
+
+			// Parse curl to generate hash for comparison
+			const parsed = parseCurlCommand(record.curl);
+			const hash = generateQueryHash(parsed);
+
+			// Find existing record by hash instead of exact curl match
+			const existingIndex = currentHistory.findIndex((q) => {
+				const existingParsed = parseCurlCommand(q.curl);
+				const existingHash = generateQueryHash(existingParsed);
+				return existingHash === hash;
+			});
+
+			const now = new Date().toISOString();
 
 			const newRecord: QueryRecord = {
 				...record,
 				id: generateQueryId(record.curl),
-				lastSent: new Date().toISOString(),
+				createdAt: existingIndex !== -1 ? currentHistory[existingIndex].createdAt : now,
+				updatedAt: now,
 			};
 
 			if (existingIndex !== -1) {
@@ -63,7 +76,52 @@ export function useQueriesHistory() {
 				return newRecord;
 			}
 		},
+		onMutate: async (newRecord) => {
+			// Cancel outgoing refetches
+			await queryClient.cancelQueries({ queryKey: queryKeys.queries.history() });
+
+			// Snapshot previous value
+			const previousHistory = queryClient.getQueryData<QueryRecord[]>(queryKeys.queries.history());
+
+			// Parse curl to generate hash for comparison
+			const parsed = parseCurlCommand(newRecord.curl);
+			const hash = generateQueryHash(parsed);
+
+			// Optimistically update
+			const currentHistory = previousHistory || [];
+			const existingIndex = currentHistory.findIndex((q) => {
+				const existingParsed = parseCurlCommand(q.curl);
+				const existingHash = generateQueryHash(existingParsed);
+				return existingHash === hash;
+			});
+			const now = new Date().toISOString();
+
+			const optimisticRecord: QueryRecord = {
+				...newRecord,
+				id: generateQueryId(newRecord.curl),
+				createdAt: existingIndex !== -1 ? currentHistory[existingIndex].createdAt : now,
+				updatedAt: now,
+			};
+
+			let optimisticHistory;
+			if (existingIndex !== -1) {
+				optimisticHistory = [optimisticRecord, ...currentHistory.filter((_, i) => i !== existingIndex)];
+			} else {
+				optimisticHistory = [optimisticRecord, ...currentHistory].slice(0, 60);
+			}
+
+			queryClient.setQueryData(queryKeys.queries.history(), optimisticHistory);
+
+			return { previousHistory };
+		},
+		onError: (err, newRecord, context) => {
+			// Rollback to previous value
+			if (context?.previousHistory) {
+				queryClient.setQueryData(queryKeys.queries.history(), context.previousHistory);
+			}
+		},
 		onSuccess: () => {
+			// Refetch to ensure consistency
 			queryClient.invalidateQueries({ queryKey: queryKeys.queries.history() });
 		},
 	});
@@ -76,7 +134,31 @@ export function useQueriesHistory() {
 			saveHistoryToStorage(updatedHistory);
 			return id;
 		},
+		onMutate: async (id) => {
+			// Cancel outgoing refetches
+			await queryClient.cancelQueries({ queryKey: queryKeys.queries.history() });
+
+			// Snapshot previous value
+			const previousHistory = queryClient.getQueryData<QueryRecord[]>(queryKeys.queries.history());
+
+			// Optimistically remove the record
+			if (previousHistory) {
+				queryClient.setQueryData(
+					queryKeys.queries.history(),
+					previousHistory.filter((q) => q.id !== id)
+				);
+			}
+
+			return { previousHistory };
+		},
+		onError: (_err, _id, context) => {
+			// Rollback to previous value
+			if (context?.previousHistory) {
+				queryClient.setQueryData(queryKeys.queries.history(), context.previousHistory);
+			}
+		},
 		onSuccess: () => {
+			// Refetch to ensure consistency
 			queryClient.invalidateQueries({ queryKey: queryKeys.queries.history() });
 		},
 	});

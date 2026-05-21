@@ -203,6 +203,18 @@ When testing modules that use a pre-configured axios instance (e.g., `apiSeki` i
 - Useful for verifying API responses independently of the frontend
 - Note: Tokens from localStorage may expire, use fresh tokens for testing
 
+## Mantenimiento de Skills
+
+⚠️ **IMPORTANTE**: Debo mantener las skills en `.windsurf/skills/` con instrucciones que ahorren tiempo y eviten la necesidad de hacer snapshots repetitivos.
+
+**Reglas**:
+1. **Documentar flujos comunes**: Agregar instrucciones paso a paso para tareas recurrentes (ej: navegar a vistas específicas, abrir modales, etc.)
+2. **Incluir referencias de elementos**: Cuando sea posible, incluir los refs de elementos (ej: `ref=e132`) para evitar snapshots
+3. **Actualizar después de usar**: Si encuentro un patrón nuevo que requiere snapshots repetitivos, debo agregarlo a la skill correspondiente inmediatamente
+4. **Skill e2e-testing**: Mantener actualizada con instrucciones de navegación a vistas comunes (Queries, Docker, Health, etc.)
+
+**Ejemplo**: La skill `e2e-testing` debe tener instrucciones para navegar a cada vista principal sin necesidad de snapshots.
+
 ## Hooks Personalizados
 
 ### useAIErrorProcessor

@@ -1,16 +1,16 @@
-import { useState, useMemo } from 'react';
-import { Send, Loader2, Copy, AlertTriangle } from 'lucide-react';
+import { useState, useEffect,  type Dispatch, type SetStateAction } from 'react';
+import { Send, Copy, AlertTriangle, SendHorizontal } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
-import { parseCurlCommand, formatJSON, minifyJSON, type ParsedCurl } from '@/utils/curlParser';
+import { parseCurlCommand, formatJSON, minifyJSON } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 import { executeCurlCommand } from '@/api/curl';
 import { useQueriesHistory } from '@/hooks/useQueriesHistory';
+import DayJS from '@/lib/dayjs';
 
 interface ImportQueryModalProps {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-	onImport?: (curl: string) => void;
-	initialQuery?: QueryRecord;
+	query?: QueryRecord;
+	setQuery: Dispatch<SetStateAction<QueryRecord | undefined>>
+	onClose?: () => void
 }
 
 interface CurlResponse {
@@ -37,52 +37,33 @@ function formatTimeAgo(dateString: string): string {
 	return `hace ${diffDays} días`;
 }
 
-export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }: ImportQueryModalProps) {
-	const [curlInput, setCurlInput] = useState(() => initialQuery?.curl || '');
-	const [manualParsedQuery, setManualParsedQuery] = useState<ParsedCurl | null>(null);
+export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalProps) {
+	const [curlInput, setCurlInput] = useState(query?.curl || '');
 	const [isExecuting, setIsExecuting] = useState(false);
 	const [activeTab, setActiveTab] = useState<'body' | 'headers'>('body');
 	const [headersExpanded, setHeadersExpanded] = useState(false);
 	const [bodySearchQuery, setBodySearchQuery] = useState('');
 
 	const { addQueryRecord } = useQueriesHistory();
+	const curl = query?.curl || null;
 
-	// Derive isEditMode from initialQuery and open
-	const isEditMode = !!(initialQuery && open);
+	// Memorize the initial curl value to keep modal open during execution
+	const [initialCurl, setInitialCurl] = useState(curl);
+	const parsed = initialCurl ? parseCurlCommand(initialCurl) : null;
 
-	// Derive initialParsedQuery from initialQuery when in edit mode
-	const initialParsedQuery = useMemo(() => {
-		if (!initialQuery || !open) return null;
-		try {
-			const parsed = parseCurlCommand(initialQuery.curl);
-			return { ...parsed, body: formatJSON(parsed.body) };
-		} catch {
-			return null;
+	// Sync initialCurl when curl changes externally (modal opened from outside)
+	useEffect(() => {
+		if (curl && initialCurl === null) {
+			setInitialCurl(curl);
 		}
-	}, [initialQuery, open]);
-
-	// Use manualParsedQuery in edit mode (if user made changes), otherwise use initialParsedQuery
-	// In non-edit mode, use manualParsedQuery from curl input parsing
-	const effectiveManualParsedQuery = isEditMode ? (manualParsedQuery || initialParsedQuery) : manualParsedQuery;
-
-	// Derive parsedQuery from curlInput when not in edit mode, otherwise use effectiveManualParsedQuery
-	const parsedQuery = useMemo(() => {
-		if (isEditMode) return effectiveManualParsedQuery;
-		if (!curlInput.trim()) return null;
-		try {
-			const parsed = parseCurlCommand(curlInput);
-			return { ...parsed, body: formatJSON(parsed.body) };
-		} catch {
-			return null;
-		}
-	}, [curlInput, isEditMode, effectiveManualParsedQuery]);
+	}, [curl, initialCurl]);
 
 	// Derive response from initialQuery or execution result
 	const [executedResponse, setExecutedResponse] = useState<CurlResponse | null>(null);
-	const response = initialQuery?.lastResponse || executedResponse;
+	const response = query?.response || executedResponse;
 
 	const handleExecute = async () => {
-		if (!parsedQuery) return;
+		if (!parsed) return;
 
 		setIsExecuting(true);
 		setExecutedResponse(null);
@@ -91,15 +72,15 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 			const startTime = Date.now();
 
 			// Build curl command from parsed query
-			const headers = Object.entries(parsedQuery.headers)
+			const headers = Object.entries(parsed.headers)
 				.map(([key, value]) => `-H "${key}: ${value}"`)
 				.join(' ');
 
 			// Minify JSON body before sending
-			const bodyToSend = parsedQuery.body ? minifyJSON(parsedQuery.body) : '';
+			const bodyToSend = parsed.body ? minifyJSON(parsed.body) : '';
 			const data = bodyToSend ? `-d '${bodyToSend}'` : '';
 			// Use single quotes for URL to preserve special characters without escaping
-			const command = `-X ${parsedQuery.method} '${parsedQuery.url}' ${headers} ${data}`.trim();
+			const command = `-X ${parsed.method} '${parsed.url}' ${headers} ${data}`.trim();
 
 			const result = await executeCurlCommand(command);
 			const responseTime = Date.now() - startTime;
@@ -133,10 +114,35 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 				responseTime,
 			});
 
+			// Update query with new response
+			setQuery(prev => prev ? {
+				...prev,
+				curl: curlInput,
+				updatedAt: new Date().toISOString(),
+				response: {
+					status,
+					statusText,
+					headers: headersObj,
+					body: bodyText,
+					responseTime,
+				},
+			} : {
+				id: '',
+				curl: curlInput,
+				updatedAt: new Date().toISOString(),
+				response: {
+					status,
+					statusText,
+					headers: headersObj,
+					body: bodyText,
+					responseTime,
+				},
+			});
+
 			// Save to history with response after successful execution
 			addQueryRecord({
 				curl: curlInput,
-				lastResponse: {
+				response: {
 					status,
 					statusText,
 					headers: headersObj,
@@ -158,47 +164,42 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 		}
 	};
 
-	const handleImport = () => {
-		if (curlInput && onImport) {
-			onImport(curlInput);
-			onOpenChange(false);
-		}
-	};
-
 	const handleCopyResponse = () => {
 		if (response) {
 			navigator.clipboard.writeText(response.body);
 		}
 	};
 
+	// Helper to update curlInput when form fields change
+	const updateCurlInput = (updates: Partial<typeof parsed>) => {
+			if (!parsed) return;
+		const updated = { ...parsed, ...updates };
+		const headers = Object.entries(updated.headers)
+			.map(([key, value]) => `-H "${key}: ${value}"`)
+			.join(' ');
+		const bodyToSend = updated.body ? minifyJSON(updated.body) : '';
+		const data = bodyToSend ? `-d '${bodyToSend}'` : '';
+		const newCurl = `curl -X ${updated.method} '${updated.url}' ${headers} ${data}`.trim();
+		setCurlInput(newCurl);
+		setQuery(prev => prev ? { ...prev, curl: newCurl } : { id: '', curl: newCurl });
+	};
+
 	return (
 		<BaseDialog
-			open={open}
-			onOpenChange={onOpenChange}
-			title={<><Send className="w-5 h-5" /> {isEditMode ? 'Editar Query' : 'Importar cURL'}</>}
-			description="Importa o edita un comando cURL para ejecutarlo"
+			open={!!initialCurl}
+			onOpenChange={(open) => {
+				if (!open) {
+					setInitialCurl(null);
+					setQuery(undefined);
+					onClose?.();
+				}
+			}}
+			title={<><Send className="w-5 h-5" /> Enviar Query</>}
+			description="Enviar query"
 			maxWidth="max-w-6xl"
 			maxHeight="max-h-[90vh]"
 		>
-			<div className="flex-1 overflow-hidden flex flex-col">
-				{!isEditMode && (
-					<div className="p-4 border-b">
-						<label className="text-sm font-medium block mb-2">Pega el comando cURL</label>
-						<textarea
-							value={curlInput}
-							onChange={(e) => setCurlInput(e.target.value)}
-							placeholder="curl -X POST https://api.example.com/users -H Content-Type: application/json -d data"
-							className={`w-full h-32 px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono ${
-								parsedQuery?.isTokenExpired ? 'border-destructive' : ''
-							}`}
-						/>
-						{parsedQuery?.isTokenExpired && (
-							<p className="mt-1 text-xs text-destructive">⚠️ Token de autenticación vencido</p>
-						)}
-					</div>
-				)}
-
-				{parsedQuery && (
+				{parsed ? (
 					<div className="flex-1 flex overflow-hidden">
 						{/* Left side: Editable form */}
 						<div className="w-1/2 p-4 border-r overflow-y-auto">
@@ -207,8 +208,8 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 									<div className="w-24">
 										<label className="text-xs font-medium block mb-1.5">Método</label>
 										<select
-											value={parsedQuery.method}
-											onChange={(e) => setManualParsedQuery({ ...parsedQuery, method: e.target.value })}
+											value={parsed.method}
+											onChange={(e) => updateCurlInput({ method: e.target.value })}
 											className="w-full px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
 										>
 											{['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
@@ -220,8 +221,8 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 										<label className="text-xs font-medium block mb-1.5">URL</label>
 										<input
 											type="text"
-											value={parsedQuery.url}
-											onChange={(e) => setManualParsedQuery({ ...parsedQuery, url: e.target.value })}
+											value={parsed.url}
+											onChange={(e) => updateCurlInput({ url: e.target.value })}
 											className="w-full px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
 										/>
 									</div>
@@ -234,13 +235,13 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 										>
 											{isExecuting ? (
 												<>
-													<Loader2 className="w-3.5 h-3.5 animate-spin" />
-													Ejecutando...
+													<SendHorizontal className="w-3.5 h-3.5" />
+													Enviar
 												</>
 											) : (
 												<>
 													<Send className="w-3.5 h-3.5" />
-													Send
+													Enviar
 												</>
 											)}
 										</button>
@@ -252,14 +253,14 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 										<label className="text-xs font-medium">Headers</label>
 										<button
 											type="button"
-											onClick={() => setManualParsedQuery({ ...parsedQuery, headers: { ...parsedQuery.headers, '': '' } })}
+											onClick={() => updateCurlInput({ headers: { ...parsed.headers, '': '' } })}
 											className="text-xs text-primary hover:underline"
 										>
 											+ Agregar
 										</button>
 									</div>
 									<div className="space-y-2">
-										{Object.entries(parsedQuery.headers)
+										{Object.entries(parsed.headers)
 											.slice(0, headersExpanded ? undefined : MAX_HEADERS_DISPLAY)
 											.map(([key, value]) => (
 												<div key={key} className="grid grid-cols-[3fr_7fr_auto] gap-4 items-center">
@@ -267,10 +268,10 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 														type="text"
 														value={key}
 														onChange={(e) => {
-															const newHeaders = { ...parsedQuery.headers };
+															const newHeaders = { ...parsed.headers };
 															delete newHeaders[key];
 															newHeaders[e.target.value] = value;
-															setManualParsedQuery({ ...parsedQuery, headers: newHeaders });
+															updateCurlInput({ headers: newHeaders });
 														}}
 														placeholder="Header name"
 														className="w-full px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
@@ -280,13 +281,12 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 															<input
 																type="text"
 																value={value}
-																onChange={(e) => setManualParsedQuery({
-																	...parsedQuery,
-																	headers: { ...parsedQuery.headers, [key]: e.target.value }
+																onChange={(e) => updateCurlInput({
+																	headers: { ...parsed.headers, [key]: e.target.value }
 																})}
 																placeholder="Value"
 																className={`w-full px-2 py-1 pr-8 text-xs border rounded-md focus:outline-none focus:ring-2 ${
-																	parsedQuery.isTokenExpired
+																	parsed.isTokenExpired
 																		? 'bg-warning/10 border-warning text-warning-foreground'
 																		: 'focus:ring-primary border'
 																}`}
@@ -297,9 +297,8 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 														<input
 															type="text"
 															value={value}
-															onChange={(e) => setManualParsedQuery({
-																...parsedQuery,
-																headers: { ...parsedQuery.headers, [key]: e.target.value }
+															onChange={(e) => updateCurlInput({
+																headers: { ...parsed.headers, [key]: e.target.value }
 															})}
 															placeholder="Value"
 															className="w-full px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
@@ -308,9 +307,9 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 													<button
 														type="button"
 														onClick={() => {
-															const newHeaders = { ...parsedQuery.headers };
+															const newHeaders = { ...parsed.headers };
 															delete newHeaders[key];
-															setManualParsedQuery({ ...parsedQuery, headers: newHeaders });
+															updateCurlInput({ headers: newHeaders });
 														}}
 														className="px-2 py-1 text-xs text-destructive hover:bg-destructive/10 rounded"
 													>
@@ -318,13 +317,13 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 													</button>
 												</div>
 											))}
-										{Object.keys(parsedQuery.headers).length > MAX_HEADERS_DISPLAY && (
+										{Object.keys(parsed.headers).length > MAX_HEADERS_DISPLAY && (
 											<button
 												type="button"
 												onClick={() => setHeadersExpanded(!headersExpanded)}
 												className="text-xs text-primary hover:underline"
 											>
-												{headersExpanded ? 'Mostrar menos' : `Mostrar ${Object.keys(parsedQuery.headers).length - MAX_HEADERS_DISPLAY} más`}
+												{headersExpanded ? 'Mostrar menos' : `Mostrar ${Object.keys(parsed.headers).length - MAX_HEADERS_DISPLAY} más`}
 											</button>
 										)}
 									</div>
@@ -333,23 +332,11 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 								<div>
 									<label className="text-xs font-medium block mb-1.5">Body</label>
 									<textarea
-										value={parsedQuery.body}
-										onChange={(e) => setManualParsedQuery({ ...parsedQuery, body: e.target.value })}
+										value={parsed.body}
+										onChange={(e) => updateCurlInput({ body: e.target.value })}
 										placeholder='{"key": "value"}'
 										className="w-full h-60 px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
 									/>
-								</div>
-
-								<div className="flex gap-2 pt-2">
-									{!isEditMode && onImport && (
-										<button
-											type="button"
-											onClick={handleImport}
-											className="flex items-center justify-center gap-2 px-4 py-2 text-sm border border-input rounded-md hover:bg-accent transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-										>
-											Guardar en historial
-										</button>
-									)}
 								</div>
 							</div>
 						</div>
@@ -438,10 +425,11 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 													: response.status >= 400
 														? 'bg-red-100 text-red-700'
 														: 'bg-yellow-100 text-yellow-700'
-											}`} title={initialQuery?.lastSent ? formatTimeAgo(initialQuery.lastSent) : new Date().toLocaleString()}>
+											}`} title={query?.updatedAt ? formatTimeAgo(query.updatedAt) : new Date().toLocaleString()}>
 												{response.status} {response.statusText}
 											</span>
 										<span>{response.responseTime}ms</span>
+										<span>{DayJS(query?.updatedAt || new Date()).fromNow()}</span>
 									</div>
 								</>
 							) : (
@@ -451,14 +439,11 @@ export function ImportQueryModal({ open, onOpenChange, onImport, initialQuery }:
 							)}
 						</div>
 					</div>
-				)}
-
-				{!parsedQuery && curlInput && (
-					<div className="p-4 text-center text-sm text-muted-foreground">
-						Pega un comando cURL válido para comenzar
-					</div>
-				)}
-			</div>
+				):
+				<div className="p-4 text-center text-sm text-muted-foreground">
+					El cURL ingresado no es válido
+				</div>
+				}
 		</BaseDialog>
 	);
 }

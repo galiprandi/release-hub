@@ -4,6 +4,7 @@
 
 ### 🗓️ 21 de Mayo de 2026
 
+- 🎉 Queries: Nuevo sistema completo para importar, editar y ejecutar comandos curl con historial automático, detección de tokens expirados, búsqueda en tiempo real, visualización mejorada de headers y formateo automático de JSON.
 - ♻️ Configuración: Mejoras internas en gestión de tokens para mayor estabilidad.
 
 ### 🗓️ 20 de Mayo de 2026

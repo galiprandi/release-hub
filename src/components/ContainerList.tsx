@@ -6,6 +6,7 @@ import * as Tooltip from "@radix-ui/react-tooltip"
 import { getContainers, getContainerLogs, startContainer, restartContainer, stopContainer, type ContainerInfo } from "@/api/docker"
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys"
 import { LogsViewer } from "@/components/shared/LogsViewer"
+import { StatusCard } from "@/components/ui/StatusCard"
 
 export interface ContainerListRef {
 	refetch: () => void
@@ -106,37 +107,29 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 	}
 
 	if (isLoading) {
-		return (
-			<div className="flex items-center justify-center p-12 text-muted-foreground bg-muted/10 rounded-xl border border-dashed animate-pulse">
-				<RefreshCw className="w-6 h-6 mr-3 animate-spin opacity-50" />
-				<span className="text-lg font-medium">Cargando contenedores...</span>
-			</div>
-		)
+		return <StatusCard type="loading" message="Cargando contenedores..." />
 	}
 
 	if (!Array.isArray(filteredContainers) || filteredContainers.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center p-12 text-muted-foreground bg-muted/10 rounded-xl border border-dashed">
-				<Terminal className="w-12 h-12 mb-4 opacity-20" />
-				<h3 className="text-lg font-medium text-foreground">No hay contenedores</h3>
-				<p className="text-sm max-w-xs text-center mt-1">
-					No se encontraron contenedores que coincidan con los filtros actuales.
-				</p>
-			</div>
+			<StatusCard
+				type="offline"
+				message={searchQuery ? "No se encontraron contenedores que coincidan con la búsqueda." : "No hay contenedores disponibles."}
+			/>
 		)
 	}
 
 	return (
 		<>
-			<div className="border border-border rounded-lg overflow-hidden shadow-sm bg-card">
+			<div className="border border-border/60 rounded-xl overflow-hidden shadow-sm bg-card transition-all">
 				<table className="w-full table-fixed">
-					<thead className="bg-muted/50 border-b border-border">
+					<thead className="bg-muted/40 border-b border-border/60">
 						<tr>
-							<th className="text-left p-3 text-sm font-medium w-[25%]">Contenedor</th>
-							<th className="text-left p-3 text-sm font-medium w-[15%]">Estado</th>
-							<th className="text-left p-3 text-sm font-medium w-[20%]">Iniciado</th>
-							<th className="text-left p-3 text-sm font-medium w-[25%]">Puertos</th>
-							<th className="text-right p-3 text-sm font-medium w-[15%]">Acciones</th>
+							<th className="text-left px-4 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-[25%]">Contenedor</th>
+							<th className="text-left px-4 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-[15%]">Estado</th>
+							<th className="text-left px-4 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-[20%]">Iniciado</th>
+							<th className="text-left px-4 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-[25%]">Puertos</th>
+							<th className="text-right px-4 py-3.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-[15%]">Acciones</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -240,7 +233,7 @@ function ContainerRow({
 				<select
 					value={selectedPort}
 					onChange={(e) => setSelectedPort(e.target.value)}
-					className="text-xs border border-input rounded px-2 py-1 bg-background focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+					className="text-xs border border-input rounded-md px-2 py-1 bg-background focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
 					aria-label="Seleccionar puerto"
 				>
 					{externalPorts.map((port, index) => (
@@ -269,9 +262,9 @@ function ContainerRow({
 	}
 
 	return (
-		<tr className="border-b border-border hover:bg-muted/30 transition-colors">
-			<td className="p-3 font-medium text-foreground">{container.name}</td>
-			<td className="p-3">
+		<tr className="border-b border-border/50 hover:bg-muted/20 transition-colors group">
+			<td className="px-4 py-3 font-medium text-foreground text-sm">{container.name}</td>
+			<td className="px-4 py-3">
 				<span
 					className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase ${
 						running
@@ -282,10 +275,10 @@ function ContainerRow({
 					{running ? 'Running' : 'Stopped'}
 				</span>
 			</td>
-			<td className="p-3 text-xs text-muted-foreground">{parseRunningTime(container.runningFor)}</td>
-			<td className="p-3 text-xs">{renderPorts()}</td>
-			<td className="p-3">
-				<div className="flex items-center justify-end gap-2">
+			<td className="px-4 py-3 text-xs text-muted-foreground">{parseRunningTime(container.runningFor)}</td>
+			<td className="px-4 py-3 text-xs">{renderPorts()}</td>
+			<td className="px-4 py-3">
+				<div className="flex items-center justify-end gap-1.5">
 					<Tooltip.Provider>
 						<Tooltip.Root>
 							<Tooltip.Trigger asChild>
@@ -354,7 +347,7 @@ function ContainerRow({
 								<button
 									type="button"
 									onClick={onStop}
-									className="p-1.5 text-destructive hover:bg-destructive/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none focus-visible:ring-offset-1"
+									className="p-1.5 text-destructive hover:bg-destructive/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 									disabled={!running}
 									aria-label="Detener contenedor"
 								>

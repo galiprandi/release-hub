@@ -130,7 +130,7 @@ Los archivos de test unitarios deben ubicarse en el mismo directorio que el arch
 3. **Componentes Compartidos**: Antes de crear un nuevo componente visual, verificar si puede ser una extensión de `FilterBar`, `PageHeader`, `BaseDialog` o `DisplayInfo`. Especialmente, todos los diálogos deben migrarse a `BaseDialog` para asegurar consistencia en transiciones y accesibilidad.
 4. **Referencia de Diseño**: Consultar `DESIGN.md` para la lista completa de tokens y principios de accesibilidad.
 5. **Feedback de Estado**: Utilizar el componente `StatusCard` para todos los estados de carga, error y advertencia en monitores de pipeline y gestión de Docker, asegurando una experiencia de feedback consistente y coherente.
-6. **Docker UI Refinement**: Aplicar badges semánticos (`bg-success/20 text-success` para Running, `bg-muted text-muted-foreground` para Stopped) y asegurar que todas las acciones (puertos, logs, control) usen anillos de enfoque estándar y estados hover consistentes con el diseño semántico.
+6. **Docker UI Refinement**: Aplicar badges semánticos (`bg-success/20 text-success` para Running, `bg-muted text-muted-foreground` para Stopped), usar `StatusCard` para feedback de estado, y asegurar que todas las acciones usen anillos de enfoque estándar.
 
 ## Local Requirements
 

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerificationPageRouteImport } from './routes/verification-page'
+import { Route as V2RouteImport } from './routes/v2'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as FetcherRouteImport } from './routes/fetcher'
@@ -21,6 +22,11 @@ import { Route as ProductOrgProductIndexRouteImport } from './routes/product.$or
 const VerificationPageRoute = VerificationPageRouteImport.update({
   id: '/verification-page',
   path: '/verification-page',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2Route = V2RouteImport.update({
+  id: '/v2',
+  path: '/v2',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SetupRoute = SetupRouteImport.update({
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/fetcher': typeof FetcherRoute
   '/health': typeof HealthRoute
   '/setup': typeof SetupRoute
+  '/v2': typeof V2Route
   '/verification-page': typeof VerificationPageRoute
   '/product/$org/$product': typeof ProductOrgProductRouteWithChildren
   '/product/$org/$product/': typeof ProductOrgProductIndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/fetcher': typeof FetcherRoute
   '/health': typeof HealthRoute
   '/setup': typeof SetupRoute
+  '/v2': typeof V2Route
   '/verification-page': typeof VerificationPageRoute
   '/product/$org/$product': typeof ProductOrgProductIndexRoute
 }
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/fetcher': typeof FetcherRoute
   '/health': typeof HealthRoute
   '/setup': typeof SetupRoute
+  '/v2': typeof V2Route
   '/verification-page': typeof VerificationPageRoute
   '/product/$org/$product': typeof ProductOrgProductRouteWithChildren
   '/product/$org/$product/': typeof ProductOrgProductIndexRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/fetcher'
     | '/health'
     | '/setup'
+    | '/v2'
     | '/verification-page'
     | '/product/$org/$product'
     | '/product/$org/$product/'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/fetcher'
     | '/health'
     | '/setup'
+    | '/v2'
     | '/verification-page'
     | '/product/$org/$product'
   id:
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/fetcher'
     | '/health'
     | '/setup'
+    | '/v2'
     | '/verification-page'
     | '/product/$org/$product'
     | '/product/$org/$product/'
@@ -127,6 +139,7 @@ export interface RootRouteChildren {
   FetcherRoute: typeof FetcherRoute
   HealthRoute: typeof HealthRoute
   SetupRoute: typeof SetupRoute
+  V2Route: typeof V2Route
   VerificationPageRoute: typeof VerificationPageRoute
   ProductOrgProductRoute: typeof ProductOrgProductRouteWithChildren
 }
@@ -138,6 +151,13 @@ declare module '@tanstack/react-router' {
       path: '/verification-page'
       fullPath: '/verification-page'
       preLoaderRoute: typeof VerificationPageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2': {
+      id: '/v2'
+      path: '/v2'
+      fullPath: '/v2'
+      preLoaderRoute: typeof V2RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/setup': {
@@ -209,6 +229,7 @@ const rootRouteChildren: RootRouteChildren = {
   FetcherRoute: FetcherRoute,
   HealthRoute: HealthRoute,
   SetupRoute: SetupRoute,
+  V2Route: V2Route,
   VerificationPageRoute: VerificationPageRoute,
   ProductOrgProductRoute: ProductOrgProductRouteWithChildren,
 }

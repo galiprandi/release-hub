@@ -117,10 +117,13 @@ function RootLayout() {
 
 	useEffect(() => {
 		// Si gh cli no está instalado o no está autenticado, redirigir a setup
+		// Ignorar redirección para la ruta v2 (experimental)
+		if (pathname === '/v2') return;
+
 		if (!showSpinner && !isLoading && (!isInstalled || !isAuthenticated)) {
 			navigate({ to: "/setup" });
 		}
-	}, [isInstalled, isAuthenticated, isLoading, showSpinner, navigate]);
+	}, [isInstalled, isAuthenticated, isLoading, showSpinner, navigate, pathname]);
 
 	// Show loading spinner during initial load
 	if (showSpinner) {
@@ -131,6 +134,16 @@ function RootLayout() {
 					<p className="text-muted-foreground text-sm">Verificando configuración de GitHub CLI...</p>
 				</div>
 			</div>
+		);
+	}
+
+	// Renderizado experimental para v2 (sin el layout estándar)
+	if (pathname === '/v2') {
+		return (
+			<>
+				<Outlet />
+				<TanStackRouterDevtools />
+			</>
 		);
 	}
 

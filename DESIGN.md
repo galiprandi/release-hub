@@ -84,3 +84,160 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 - **Estados**: Soporta `loading`, `error`, `warn` y `offline`.
 - **Visual**: Bordes sutiles con opacidad (`border-destructive/20`) y fondos lavados (`bg-destructive/10`) para evitar fatiga visual mientras se mantiene la categorización clara.
 - **Robustez**: Implementa `truncate` en el mensaje para prevenir desbordamientos en layouts densos.
+
+## Layout V2 - Patrones y Guía de Uso
+
+### Estructura del Layout
+
+El layout V2 sigue un patrón de sidebar fijo + contenido principal con header sticky:
+
+```tsx
+<div className="flex min-h-screen bg-background text-foreground">
+  {/* Sidebar fijo */}
+  <aside className="w-[50px] h-screen sticky top-0 flex flex-col items-center py-4 bg-muted/30 border-r border-border/40 shrink-0">
+    {/* Navegación */}
+  </aside>
+
+  {/* Contenido principal */}
+  <main className="flex-1 flex flex-col min-w-0 gap-5">
+    {/* Header sticky con degradado */}
+    <div className="sticky top-0 z-10">
+      <header className="h-14 bg-background/80 backdrop-blur-sm border-b border-border/40">
+        {/* Contenido del header */}
+      </header>
+      {/* Barra de degradado */}
+      <div className="h-4 bg-gradient-to-b from-border/30 to-transparent shrink-0" />
+    </div>
+
+    {/* Contenido scrollable */}
+    <div className="flex flex-col gap-6 px-8">
+      {/* Widgets/Métricas */}
+      {/* Tabla de datos */}
+    </div>
+  </main>
+</div>
+```
+
+### Header Sticky con Degradado
+
+**Patrón crítico**: El header sticky debe estar envuelto en un contenedor `sticky` que incluya tanto el header como la barra de degradado.
+
+```tsx
+<div className="sticky top-0 z-10">
+  <header className="h-14 bg-background/80 backdrop-blur-sm border-b border-border/40">
+    {/* Breadcrumb, búsqueda, acciones */}
+  </header>
+  <div className="h-4 bg-gradient-to-b from-border/30 to-transparent shrink-0" />
+</div>
+```
+
+**Reglas importantes**:
+- El contenedor padre (`main`) NO debe tener `overflow-hidden` o el sticky no funcionará.
+- La barra de degradado crea una transición suave entre el header y el contenido que scrollea.
+- `backdrop-blur-sm` + `bg-background/80` para efecto de vidrio esmerilado.
+
+### Jerarquía Tipográfica
+
+Usar negritas (`font-bold`, `font-semibold`) solo para elementos críticos:
+
+- **Breadcrumb**: `text-sm font-semibold uppercase tracking-wider text-muted-foreground/80`
+- **Headers de tabla**: `text-xs font-bold uppercase tracking-wider text-muted-foreground`
+- **Status badges**: `text-xs font-bold uppercase tracking-wider`
+- **Labels de métricas**: `text-xs font-bold uppercase tracking-tighter`
+- **Tags**: `text-xs font-mono font-medium`
+- **Nombres de repos**: `font-medium` (no bold)
+
+### Espaciado
+
+- **Gap entre secciones principales**: `gap-5` o `gap-6` en el `main`
+- **Padding horizontal del contenido**: `px-8` en el contenedor de widgets/tabla
+- **Padding del header**: `px-6`
+- **Altura del header**: `h-14` (56px)
+- **Altura de la barra de degradado**: `h-4` (16px)
+
+### HTML Semántico y Accesibilidad
+
+**Estructura semántica**:
+- `aside` para la barra lateral de navegación
+- `nav` con `aria-label` para menús de navegación
+- `header` para la barra superior
+- `section` con `aria-label` para áreas de contenido (widgets, tabla)
+- `article` para widgets individuales
+- `h1` para breadcrumb/título principal
+- `h2` (con `sr-only`) para títulos de secciones de contenido
+
+**ARIA attributes**:
+- `aria-label` en botones de icono y áreas de navegación
+- `aria-hidden="true"` en elementos decorativos (iconos, indicadores visuales)
+- `aria-current="page"` en el item de navegación activo
+- `sr-only` para labels de inputs (usar `<label htmlFor="...">` con `className="sr-only"`)
+- `role="list"` y `role="listitem"` para listas de navegación
+
+### Atajos de Teclado
+
+- **Búsqueda**: Placeholder debe indicar el shortcut correcto: `placeholder="Buscar... (CMD+K)"`
+
+### Widgets/Métricas Bar
+
+```tsx
+<section aria-label="Widgets del sistema">
+  <article className="h-16 bg-muted/10 border-border/20 flex items-center gap-4">
+    {/* Widget individual */}
+  </article>
+</section>
+```
+
+- Usar `article` para cada widget individual
+- `section` con `aria-label` para el contenedor
+- Bordes sutiles: `border-border/20` o `border-border/30`
+- Fondo lavado: `bg-muted/10`
+
+### Tabla de Datos
+
+```tsx
+<table className="w-full text-left border-collapse">
+  <thead>
+    <tr className="bg-muted/40 border-b border-border/60">
+      <th scope="col" className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+        {/* Header */}
+      </th>
+    </tr>
+  </thead>
+  <tbody className="divide-y divide-border/40">
+    {/* Filas */}
+  </tbody>
+</table>
+```
+
+- `scope="col"` en headers de tabla
+- Bordes sutiles: `border-border/60` (thead), `divide-border/40` (tbody)
+- Fondo de header: `bg-muted/40`
+
+### Componentes Compartidos
+
+Antes de crear componentes nuevos, verificar si extienden:
+- **FilterBar**: Para barras de filtros
+- **PageHeader**: Para headers de página
+- **BaseDialog**: Para todos los diálogos modales
+- **DisplayInfo**: Para mostrar metadatos con iconos
+
+### Reglas de Negritas
+
+**Usar negritas para**:
+- Headers de tabla
+- Badges de estado
+- Labels de métricas
+- Nombres de repos (opcional, según contexto)
+
+**NO usar negritas para**:
+- Texto descriptivo general
+- Metadata secundaria
+- Contenido de cuerpo
+
+### Debug de Sticky
+
+Si el header sticky no funciona:
+1. Verificar que el contenedor padre NO tenga `overflow-hidden`
+2. Verificar que el elemento con `sticky` tenga un ancestro con scroll
+3. Usar `sticky top-0` (no `top-4` u otro valor a menos que sea intencional)
+4. Verificar `z-index` (debe ser mayor que elementos detrás)

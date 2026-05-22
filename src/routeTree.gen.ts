@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VerificationPageRouteImport } from './routes/verification-page'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as FetcherRouteImport } from './routes/fetcher'
@@ -18,11 +17,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductOrgProductRouteImport } from './routes/product.$org.$product'
 import { Route as ProductOrgProductIndexRouteImport } from './routes/product.$org.$product.index'
 
-const VerificationPageRoute = VerificationPageRouteImport.update({
-  id: '/verification-page',
-  path: '/verification-page',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SetupRoute = SetupRouteImport.update({
   id: '/setup',
   path: '/setup',
@@ -65,7 +59,6 @@ export interface FileRoutesByFullPath {
   '/fetcher': typeof FetcherRoute
   '/health': typeof HealthRoute
   '/setup': typeof SetupRoute
-  '/verification-page': typeof VerificationPageRoute
   '/product/$org/$product': typeof ProductOrgProductRouteWithChildren
   '/product/$org/$product/': typeof ProductOrgProductIndexRoute
 }
@@ -75,7 +68,6 @@ export interface FileRoutesByTo {
   '/fetcher': typeof FetcherRoute
   '/health': typeof HealthRoute
   '/setup': typeof SetupRoute
-  '/verification-page': typeof VerificationPageRoute
   '/product/$org/$product': typeof ProductOrgProductIndexRoute
 }
 export interface FileRoutesById {
@@ -85,7 +77,6 @@ export interface FileRoutesById {
   '/fetcher': typeof FetcherRoute
   '/health': typeof HealthRoute
   '/setup': typeof SetupRoute
-  '/verification-page': typeof VerificationPageRoute
   '/product/$org/$product': typeof ProductOrgProductRouteWithChildren
   '/product/$org/$product/': typeof ProductOrgProductIndexRoute
 }
@@ -97,7 +88,6 @@ export interface FileRouteTypes {
     | '/fetcher'
     | '/health'
     | '/setup'
-    | '/verification-page'
     | '/product/$org/$product'
     | '/product/$org/$product/'
   fileRoutesByTo: FileRoutesByTo
@@ -107,7 +97,6 @@ export interface FileRouteTypes {
     | '/fetcher'
     | '/health'
     | '/setup'
-    | '/verification-page'
     | '/product/$org/$product'
   id:
     | '__root__'
@@ -116,7 +105,6 @@ export interface FileRouteTypes {
     | '/fetcher'
     | '/health'
     | '/setup'
-    | '/verification-page'
     | '/product/$org/$product'
     | '/product/$org/$product/'
   fileRoutesById: FileRoutesById
@@ -127,19 +115,11 @@ export interface RootRouteChildren {
   FetcherRoute: typeof FetcherRoute
   HealthRoute: typeof HealthRoute
   SetupRoute: typeof SetupRoute
-  VerificationPageRoute: typeof VerificationPageRoute
   ProductOrgProductRoute: typeof ProductOrgProductRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/verification-page': {
-      id: '/verification-page'
-      path: '/verification-page'
-      fullPath: '/verification-page'
-      preLoaderRoute: typeof VerificationPageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/setup': {
       id: '/setup'
       path: '/setup'
@@ -209,7 +189,6 @@ const rootRouteChildren: RootRouteChildren = {
   FetcherRoute: FetcherRoute,
   HealthRoute: HealthRoute,
   SetupRoute: SetupRoute,
-  VerificationPageRoute: VerificationPageRoute,
   ProductOrgProductRoute: ProductOrgProductRouteWithChildren,
 }
 export const routeTree = rootRouteImport

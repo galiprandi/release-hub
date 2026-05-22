@@ -50,8 +50,9 @@ Después de escrituras, invalidar queries relevantes. Nunca `window.location.rel
 Ubicar archivos `.test.ts[x]` junto al archivo que prueban. Evitar carpetas `__tests__`.
 
 ### 9. UI y Tematización
-- **Anillos de foco**: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1`.
+- **Anillos de foco**: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1`. Siempre aplicar a elementos interactivos personalizados.
 - **Componentes compartidos**: Antes de crear uno nuevo, verificar si extiende `FilterBar`, `PageHeader`, `BaseDialog` o `DisplayInfo`. Todos los diálogos migrar a `BaseDialog`.
+- **Industrial Resonance**: Las tablas de datos deben usar `rounded-xl`, bordes `border-border/60`, y encabezados `bg-muted/40`.
 - **Feedback**: Usar `StatusCard` para estados de carga, error y advertencia en monitores y Docker.
 - **Docker badges**: `bg-success/20 text-success` (Running), `bg-muted text-muted-foreground` (Stopped).
 

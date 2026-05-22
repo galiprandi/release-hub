@@ -28,18 +28,18 @@ export function FilterBar({
 		<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
 			<div className="flex flex-wrap items-center gap-4">
 				<div className="flex items-center gap-2">
-					<span className="text-sm font-medium text-muted-foreground">Filtrar:</span>
-					<div className="flex items-center gap-1.5">
+					<span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Filtrar:</span>
+					<div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border/60 shadow-sm">
 						{filters.map((filter) => (
 							<button
 								key={filter.value}
 								type="button"
 								onClick={() => onFilterChange(filter.value)}
 								aria-pressed={activeFilter === filter.value}
-								className={`px-3 py-1.5 text-sm rounded-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 font-medium ${
+								className={`px-3 py-1 text-xs rounded-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 font-bold tracking-tight ${
 									activeFilter === filter.value
-										? 'bg-primary text-primary-foreground shadow-sm'
-										: 'bg-muted text-foreground hover:bg-accent hover:text-accent-foreground'
+										? 'bg-background text-foreground shadow-sm'
+										: 'text-muted-foreground hover:text-foreground hover:bg-background/50'
 								}`}
 							>
 								{filter.label}
@@ -54,7 +54,7 @@ export function FilterBar({
 						placeholder={searchPlaceholder}
 						value={searchValue}
 						onChange={(e) => onSearchChange(e.target.value)}
-						className="px-3 py-1.5 text-sm bg-background border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground w-64"
+						className="px-3 py-1.5 text-sm bg-background border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground w-64 shadow-sm"
 					/>
 				</div>
 			</div>

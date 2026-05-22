@@ -73,8 +73,9 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 - Título con `tracking-tight` para mayor elegancia.
 
 ### FilterBar
-- Uso de `bg-muted` para botones inactivos y `bg-primary` para el activo.
-- Inputs con `border-input` y `bg-background`.
+- Estética industrial con contenedor `bg-muted/40` y botones con `bg-background` (activo) y `text-muted-foreground` (inactivo).
+- Uso de `font-bold tracking-tight` y `text-xs` para los botones de filtro.
+- Inputs con `border-input`, `bg-background` y `shadow-sm`.
 
 ### DisplayInfo
 - Abstracción para mostrar metadatos (commits, tags, autores) con iconos y colores semánticos.

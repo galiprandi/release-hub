@@ -78,7 +78,7 @@ function FetcherLink() {
 	return (
 		<Link
 			to="/fetcher"
-			className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+			className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 			title="Fetcher"
 		>
 			<Send className="w-5 h-5" />
@@ -150,14 +150,14 @@ function RootLayout() {
 								<>
 									<span className="text-muted-foreground text-lg">/</span>
 									<span className="text-lg font-normal text-muted-foreground flex items-center gap-2">
-										{isHealthPage && <Activity className="w-5 h-5 text-blue-600" />}
-										{isDockerPage && <Blocks className="w-5 h-5 text-blue-600" />}
-										{isFetcherPage && <Send className="w-5 h-5 text-blue-600" />}
+										{isHealthPage && <Activity className="w-5 h-5 text-primary" />}
+										{isDockerPage && <Blocks className="w-5 h-5 text-primary" />}
+										{isFetcherPage && <Send className="w-5 h-5 text-primary" />}
 										{product && (
 											<button
 												type="button"
 												onClick={() => fullProduct && toggleFavorite(fullProduct)}
-												className={`${favorite ? "text-yellow-500" : "text-muted-foreground"} hover:text-yellow-600 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all`}
+												className={`${favorite ? "text-warning" : "text-muted-foreground"} hover:text-warning/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all`}
 												title={favorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
 											>
 												<Star className={`w-5 h-5 ${favorite ? "fill-current" : ""}`} />

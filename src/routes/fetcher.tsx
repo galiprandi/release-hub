@@ -33,16 +33,16 @@ function formatTimeAgo(dateString: string): string {
 function getMethodBadgeColor(method: string): string {
 	switch (method.toUpperCase()) {
 		case 'GET':
-			return 'bg-green-100 text-green-700';
+			return 'bg-success/20 text-success';
 		case 'POST':
-			return 'bg-blue-100 text-blue-700';
+			return 'bg-info/20 text-info';
 		case 'PUT':
 		case 'PATCH':
-			return 'bg-yellow-100 text-yellow-700';
+			return 'bg-warning/20 text-warning';
 		case 'DELETE':
-			return 'bg-red-100 text-red-700';
+			return 'bg-destructive/20 text-destructive';
 		default:
-			return 'bg-gray-100 text-gray-700';
+			return 'bg-muted text-muted-foreground';
 	}
 }
 
@@ -194,13 +194,14 @@ function FetcherPage() {
 							type="text"
 							value={curlInput}
 							onChange={(e) => setCurlInput(e.target.value)}
-							placeholder="Importart cURL"
-							className="w-64 px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
+							placeholder="Importar cURL"
+							className="w-64 px-3 py-1.5 text-sm bg-background border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground font-mono"
 						/>
 						<button
 							type="submit"
 							disabled={!isCurlValid}
-							className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm bg-success text-success-foreground rounded-md hover:bg-success/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
+							className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm bg-success text-success-foreground rounded-md hover:bg-success/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 shadow-sm"
+							aria-label="Importar comando cURL"
 						>
 							<Send className="w-3.5 h-3.5" />
 						</button>
@@ -223,16 +224,16 @@ function FetcherPage() {
 						</p>
 					</div>
 				) : (
-					<div className="bg-white rounded-lg border overflow-hidden">
+					<div className="border border-border/60 rounded-xl overflow-hidden shadow-sm bg-card transition-all">
 						<table className="w-full">
-							<thead>
-								<tr className="border-b bg-muted/50">
-									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Método</th>
-									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Path</th>
-									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Dominio</th>
-									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Enviado</th>
-									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Tiempo</th>
-									<th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Acciones</th>
+							<thead className="bg-muted/40 border-b border-border/60">
+								<tr>
+									<th className="px-4 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Método</th>
+									<th className="px-4 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Path</th>
+									<th className="px-4 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dominio</th>
+									<th className="px-4 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Enviado</th>
+									<th className="px-4 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tiempo</th>
+									<th className="px-4 py-3.5 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Acciones</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -241,20 +242,24 @@ function FetcherPage() {
 									if (!parsed) return null;
 
 									return (
-										<tr key={query.id} className="border-b hover:bg-muted/30 transition-colors">
+										<tr key={query.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors group">
 											<td className="px-4 py-3">
-												<span className={`px-2 py-1 rounded text-xs font-semibold uppercase ${getMethodBadgeColor(parsed.method)}`}>
+												<span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase ${getMethodBadgeColor(parsed.method)}`}>
 													{parsed.method}
 												</span>
 											</td>
-											<td className="px-4 py-3 text-sm text-muted-foreground">
-												{parsed.path.length > 100 ? `${parsed.path.slice(0, 100)}...` : parsed.path}
+											<td className="px-4 py-3 text-sm text-foreground font-medium">
+												<div className="truncate max-w-md" title={parsed.path}>
+													{parsed.path}
+												</div>
 											</td>
 											<td className="px-4 py-3 text-sm text-muted-foreground">{parsed.domain}</td>
-											<td className="px-4 py-3 text-sm text-muted-foreground" title={query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}>{query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}</td>
+											<td className="px-4 py-3 text-sm text-muted-foreground" title={query.updatedAt ? new Date(query.updatedAt).toLocaleString() : 'Nunca'}>
+												{query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}
+											</td>
 											<td className="px-4 py-3 text-sm">
 												{query.response?.responseTime ? (
-													<span className={`px-2 py-1 rounded text-xs font-medium ${getResponseTimeBadgeColor(query.response.responseTime)}`}>
+													<span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase ${getResponseTimeBadgeColor(query.response.responseTime)}`}>
 														{query.response.responseTime}ms
 													</span>
 												) : (
@@ -262,11 +267,12 @@ function FetcherPage() {
 												)}
 											</td>
 											<td className="px-4 py-3 text-right">
-												<div className="flex items-center justify-end gap-2">
+												<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
 													<button
 														type="button"
-														className="p-1.5 bg-success text-success-foreground hover:bg-success/90 rounded transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
-														title="Enviar"
+														className="p-1.5 text-success hover:bg-success/10 rounded transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+														title="Enviar de nuevo"
+														aria-label="Enviar de nuevo"
 														onClick={() => handleOpenModal(query)}
 													>
 														<Send className="w-4 h-4" />
@@ -274,8 +280,9 @@ function FetcherPage() {
 													{query.response?.body && (
 														<button
 															type="button"
-															className="p-1.5 text-muted-foreground hover:text-primary hover:bg-accent rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+															className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 															title="Copiar respuesta"
+															aria-label="Copiar respuesta"
 															onClick={() => handleCopyResponse(query)}
 														>
 															<Copy className="w-4 h-4" />
@@ -283,8 +290,9 @@ function FetcherPage() {
 													)}
 													<button
 														type="button"
-														className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none focus-visible:ring-offset-1"
-														title="Eliminar"
+														className="p-1.5 text-destructive hover:bg-destructive/10 rounded transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+														title="Eliminar del historial"
+														aria-label="Eliminar del historial"
 														onClick={() => handleDelete(query.id)}
 														disabled={isDeleting}
 													>
@@ -300,27 +308,27 @@ function FetcherPage() {
 
 						{/* Pagination */}
 						{totalPages > 1 && (
-							<div className="flex items-center justify-between px-4 py-3 border-t bg-muted/30">
+							<div className="flex items-center justify-between px-4 py-3 border-t border-border/60 bg-muted/20">
 								<div className="text-sm text-muted-foreground">
-									Mostrando {page * pageSize + 1} - {Math.min((page + 1) * pageSize, filteredHistory.length)} de {filteredHistory.length}
+									Mostrando <span className="font-medium text-foreground">{page * pageSize + 1}</span> - <span className="font-medium text-foreground">{Math.min((page + 1) * pageSize, filteredHistory.length)}</span> de <span className="font-medium text-foreground">{filteredHistory.length}</span>
 								</div>
 								<div className="flex items-center gap-2">
 									<button
 										type="button"
 										onClick={() => setPage(p => Math.max(0, p - 1))}
 										disabled={page === 0}
-										className="px-3 py-1 text-sm border border-input rounded-md hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+										className="px-3 py-1.5 text-sm font-medium border border-input rounded-md hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 									>
 										Anterior
 									</button>
-									<span className="text-sm text-muted-foreground">
+									<div className="px-3 py-1.5 text-sm font-medium bg-muted rounded-md border border-transparent">
 										Página {page + 1} de {totalPages}
-									</span>
+									</div>
 									<button
 										type="button"
 										onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
 										disabled={page === totalPages - 1}
-										className="px-3 py-1 text-sm border border-input rounded-md hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+										className="px-3 py-1.5 text-sm font-medium border border-input rounded-md hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 									>
 										Siguiente
 									</button>

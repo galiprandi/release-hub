@@ -1,5 +1,5 @@
 import { useState, useEffect,  type Dispatch, type SetStateAction } from 'react';
-import { Send, Copy, AlertTriangle, SendHorizontal } from 'lucide-react';
+import { Send, Copy, AlertTriangle, SendHorizontal, Loader2, Plus, X } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
 import { parseCurlCommand, formatJSON, minifyJSON } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
@@ -213,11 +213,12 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 							<div className="space-y-4">
 								<div className="flex gap-2">
 									<div className="w-24">
-										<label className="text-xs font-medium block mb-1.5">Método</label>
+										<label htmlFor="fetcher-method" className="text-xs font-medium block mb-1.5">Método</label>
 										<select
+											id="fetcher-method"
 											value={parsed.method}
 											onChange={(e) => updateCurlInput({ method: e.target.value })}
-											className="w-full px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-2.5 py-1.5 text-sm border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
 										>
 											{['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
 												<option key={m} value={m}>{m}</option>
@@ -225,12 +226,13 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 										</select>
 									</div>
 									<div className="flex-1">
-										<label className="text-xs font-medium block mb-1.5">URL</label>
+										<label htmlFor="fetcher-url" className="text-xs font-medium block mb-1.5">URL</label>
 										<input
+											id="fetcher-url"
 											type="text"
 											value={parsed.url}
 											onChange={(e) => updateCurlInput({ url: e.target.value })}
-											className="w-full px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
+											className="w-full px-2.5 py-1.5 text-sm border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 font-mono transition-all"
 										/>
 									</div>
 									<div className="flex items-end">
@@ -238,12 +240,13 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 											type="button"
 											onClick={handleExecute}
 											disabled={isExecuting}
-											className="flex items-center justify-center gap-2 px-4 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+											aria-label={isExecuting ? "Enviando query" : "Enviar query"}
+											className="flex items-center justify-center gap-2 px-4 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 shadow-sm font-medium"
 										>
 											{isExecuting ? (
 												<>
-													<SendHorizontal className="w-3.5 h-3.5" />
-													Enviar
+													<Loader2 className="w-3.5 h-3.5 animate-spin" />
+													Enviando
 												</>
 											) : (
 												<>
@@ -260,10 +263,11 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 										<label className="text-xs font-medium">Headers</label>
 										<button
 											type="button"
+											aria-label="Agregar header"
 											onClick={() => updateCurlInput({ headers: { ...parsed.headers, '': '' } })}
-											className="text-xs text-primary hover:underline"
+											className="text-xs text-primary hover:underline flex items-center gap-1"
 										>
-											+ Agregar
+											<Plus className="w-3 h-3" /> Agregar
 										</button>
 									</div>
 									<div className="space-y-2">
@@ -281,7 +285,7 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 															updateCurlInput({ headers: newHeaders });
 														}}
 														placeholder="Header name"
-														className="w-full px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+														className="w-full px-2 py-1 text-xs border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
 													/>
 													{key.toLowerCase() === 'authorization' ? (
 														<div className="relative">
@@ -292,10 +296,10 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 																	headers: { ...parsed.headers, [key]: e.target.value }
 																})}
 																placeholder="Value"
-																className={`w-full px-2 py-1 pr-8 text-xs border rounded-md focus:outline-none focus:ring-2 ${
+																className={`w-full px-2 py-1 pr-8 text-xs border rounded-md focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-offset-1 transition-all ${
 																	parsed.isTokenExpired
 																		? 'bg-warning/10 border-warning text-warning-foreground'
-																		: 'focus:ring-primary border'
+																		: 'focus:ring-primary border-input'
 																}`}
 															/>
 															<AlertTriangle className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-warning" />
@@ -308,19 +312,20 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 																headers: { ...parsed.headers, [key]: e.target.value }
 															})}
 															placeholder="Value"
-															className="w-full px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+															className="w-full px-2 py-1 text-xs border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
 														/>
 													)}
 													<button
 														type="button"
+														aria-label="Eliminar header"
 														onClick={() => {
 															const newHeaders = { ...parsed.headers };
 															delete newHeaders[key];
 															updateCurlInput({ headers: newHeaders });
 														}}
-														className="px-2 py-1 text-xs text-destructive hover:bg-destructive/10 rounded"
+														className="p-1 text-destructive hover:bg-destructive/10 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none focus-visible:ring-offset-1"
 													>
-														×
+														<X className="w-3.5 h-3.5" />
 													</button>
 												</div>
 											))}
@@ -337,12 +342,13 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 								</div>
 
 								<div>
-									<label className="text-xs font-medium block mb-1.5">Body</label>
+									<label htmlFor="fetcher-body" className="text-xs font-medium block mb-1.5">Body</label>
 									<textarea
+										id="fetcher-body"
 										value={parsed.body}
 										onChange={(e) => updateCurlInput({ body: e.target.value })}
 										placeholder='{"key": "value"}'
-										className="w-full h-60 px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
+										className="w-full h-60 px-2.5 py-1.5 text-sm border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 font-mono transition-all resize-none"
 									/>
 								</div>
 							</div>
@@ -383,7 +389,7 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 											value={bodySearchQuery}
 											onChange={(e) => setBodySearchQuery(e.target.value)}
 											placeholder="Buscar en body..."
-											className="ml-auto px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-48"
+											className="ml-auto px-2 py-1 text-xs border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 w-48 transition-all"
 										/>
 									</div>
 
@@ -393,8 +399,9 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 											<>
 											<button
 												type="button"
+												aria-label="Copiar respuesta"
 												onClick={handleCopyResponse}
-												className="absolute top-4 right-4 p-1.5 text-muted-foreground hover:text-primary hover:bg-accent rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+												className="absolute top-4 right-4 p-1.5 text-muted-foreground hover:text-primary hover:bg-accent rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 shadow-sm"
 												title="Copiar respuesta"
 											>
 												<Copy className="w-4 h-4" />
@@ -425,18 +432,20 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 
 									{/* Response footer with timing info */}
 									
-									<div className="mt-3 text-xs text-muted-foreground flex items-center justify-between">
-										<span className={`px-2 py-1 rounded text-xs font-semibold ${
+									<div className="mt-3 text-xs text-muted-foreground flex items-center justify-between font-medium">
+										<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
 												response.status >= 200 && response.status < 300
-													? 'bg-green-100 text-green-700'
-													: response.status >= 400
-														? 'bg-red-100 text-red-700'
-														: 'bg-yellow-100 text-yellow-700'
-											}`} title={query?.updatedAt ? formatTimeAgo(query.updatedAt) : new Date().toLocaleString()}>
+													? 'bg-success/10 text-success'
+													: response.status >= 400 || response.status === 0
+														? 'bg-destructive/10 text-destructive'
+														: 'bg-warning/10 text-warning'
+											}`} title={query?.updatedAt ? new Date(query.updatedAt).toLocaleString() : new Date().toLocaleString()}>
 												{response.status} {response.statusText}
 											</span>
-										<span>{response.responseTime}ms</span>
-										<span>{DayJS(query?.updatedAt || new Date()).fromNow()}</span>
+										<span className="flex items-center gap-4">
+											<span>{response.responseTime}ms</span>
+											<span className="text-[10px] text-muted-foreground/60">{DayJS(query?.updatedAt || new Date()).fromNow()}</span>
+										</span>
 									</div>
 								</>
 							) : (

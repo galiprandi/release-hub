@@ -22,6 +22,16 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Feedback de Carga/Acceso**: Implementar `StatusCard` como componente estándar para todos los estados de carga, error y "offline".
 - **Tabla de Contenedores**: Bordes sutiles `border-border/60` y encabezados con `text-xs uppercase tracking-wider` para una estética profesional.
 
+## Industrial Resonance Table Styling
+
+Patrón de diseño para tablas de alta densidad de información (Fetcher, Docker, Kubernetes):
+- **Contenedor**: `rounded-xl`, `border border-border/60`, `overflow-hidden`, `shadow-sm`.
+- **Encabezados**: `bg-muted/40`, `border-b border-border/60`, texto `text-xs font-semibold uppercase tracking-wider`.
+- **Filas**: `group`, `border-b border-border/50`, `hover:bg-muted/20`, `transition-colors`.
+- **Celdas de Datos**: Texto `text-sm`, fuentes mono para paths/URLs.
+- **Acciones de Fila**: `opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity`.
+- **Badges**: Uso de tokens semánticos con opacidad (ej. `bg-success/10 text-success`) y texto `text-[10px] font-bold uppercase tracking-wider`.
+
 ## Componentes de Feedback
 
 ### StatusCard

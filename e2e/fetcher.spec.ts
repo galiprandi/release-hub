@@ -26,13 +26,13 @@ test.describe('Fetcher Module', () => {
 	});
 
 	test('should show curl import input', async ({ page }) => {
-		const curlInput = page.getByPlaceholder('Importart cURL');
+		const curlInput = page.getByPlaceholder('Importar cURL');
 		await expect(curlInput).toBeVisible();
 	});
 
 	test('should show empty state message', async ({ page }) => {
 		await expect(page.getByText('No hay queries en el historial')).toBeVisible();
-		await expect(page.getByText('Importa un comando cURL para comenzar')).toBeVisible();
+		await expect(page.getByText('Importa un comando cURL para comenzar a trabajar')).toBeVisible();
 	});
 
 	test('should navigate to fetcher from header link', async ({ page }) => {

@@ -89,44 +89,49 @@ function V2Layout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden gap-5">
+      <main className="flex-1 flex flex-col min-w-0 gap-5">
         {/* Header Bar */}
-        <header className="h-14 sticky top-0 bg-background/80 backdrop-blur-sm border-b border-border/40 flex items-center justify-between px-6 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-          <nav className="flex items-center gap-4" aria-label="Navegación de breadcrumb">
-            <h1 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground/80">Dashboard / Repositorios</h1>
+        <div className="sticky top-0 z-10">
+          <header className="h-14 bg-background/80 backdrop-blur-sm border-b border-border/40 flex items-center justify-between px-6 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+            <nav className="flex items-center gap-4" aria-label="Navegación de breadcrumb">
+              <h1 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground/80">Dashboard / Repositorios</h1>
 
-            <div className="relative group">
-              <label htmlFor="search-input" className="sr-only">Buscar repositorios</label>
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-              <input
-                id="search-input"
-                type="search"
-                placeholder="Buscar... (CMD+F)"
-                className="h-9 w-64 bg-muted/40 border-none rounded-md px-9 text-sm focus:ring-1 focus:ring-primary/30 transition-all outline-none"
-              />
+              <div className="relative group">
+                <label htmlFor="search-input" className="sr-only">Buscar repositorios</label>
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
+                <input
+                  id="search-input"
+                  type="search"
+                  placeholder="Buscar... (CMD+K)"
+                  className="h-9 w-64 bg-muted/40 border-none rounded-md px-9 text-sm focus:ring-1 focus:ring-primary/30 transition-all outline-none"
+                />
+              </div>
+            </nav>
+
+            <div className="flex items-center gap-3">
+              <button className="flex items-center gap-1.5 h-9 px-3 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
+                <Plus className="w-4 h-4" aria-hidden="true" />
+                Nuevo Repo
+              </button>
+              <button
+                onClick={() => setIsDark(!isDark)}
+                className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label={isDark ? "Activar modo claro" : "Activar modo oscuro"}
+              >
+                {isDark ? <Sun className="w-4 h-4" aria-hidden="true" /> : <Moon className="w-4 h-4" aria-hidden="true" />}
+              </button>
+              <button className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Más opciones">
+                <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
+              </button>
             </div>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-1.5 h-9 px-3 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
-              <Plus className="w-4 h-4" aria-hidden="true" />
-              Nuevo Repo
-            </button>
-            <button
-              onClick={() => setIsDark(!isDark)}
-              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-              aria-label={isDark ? "Activar modo claro" : "Activar modo oscuro"}
-            >
-              {isDark ? <Sun className="w-4 h-4" aria-hidden="true" /> : <Moon className="w-4 h-4" aria-hidden="true" />}
-            </button>
-            <button className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Más opciones">
-              <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
-            </button>
-          </div>
-        </header>
-        <div className='flex flex-col gap-8 px-8'>
+          </header>
+          {/* Gradient separator for sticky header */}
+          <div className="h-4 bg-gradient-to-b from-border/30 to-transparent shrink-0" aria-hidden="true" />
+        </div>
+        <div className='flex flex-col gap-6 px-8'>
         {/* Metrics/Widgets Bar */}
-        <section className="h-16 bg-muted/10 border-b border-border/20 flex items-center gap-4 overflow-x-auto no-scrollbar shrink-0" aria-label="Métricas del sistema">
+        <section aria-label="Widgets del sistema">
+        <article className="h-16 bg-muted/10 border-border/20 flex items-center gap-4 overflow-x-auto no-scrollbar shrink-0">
           <div className="flex items-center gap-3 bg-background/60 border border-border/30 rounded-lg px-4 py-2 shrink-0">
             <div className="w-2.5 h-2.5 rounded-full bg-success animate-pulse" aria-hidden="true" />
             <div className="flex flex-col">
@@ -154,6 +159,7 @@ function V2Layout() {
               </div>
             </div>
           </div>
+          </article>
         </section>
 
         {/* Data Section */}
@@ -172,6 +178,36 @@ function V2Layout() {
               </thead>
               <tbody className="divide-y divide-border/40">
                 <RepoRow name="release-hub" commit="Merge pull request #12" author="galiprandi" tag="v1.2.4" status="success" />
+                <RepoRow name="seki-api" commit="feat: add e2e tests for bff" author="jdoe" tag="v0.8.2" status="running" />
+                <RepoRow name="pulsar-monitor" commit="fix: memory leak in logs" author="alex_smith" tag="v2.1.0" status="error" />
+                <RepoRow name="yumi-ticket" commit="chore: update dependencies" author="m_garcia" tag="v1.0.5" status="success" />
+                <RepoRow name="infra-k8s" commit="deploy: update configmap" author="sysadm" tag="v1.12.0" status="warning" />
+                   <RepoRow name="release-hub" commit="Merge pull request #12" author="galiprandi" tag="v1.2.4" status="success" />
+                <RepoRow name="seki-api" commit="feat: add e2e tests for bff" author="jdoe" tag="v0.8.2" status="running" />
+                <RepoRow name="pulsar-monitor" commit="fix: memory leak in logs" author="alex_smith" tag="v2.1.0" status="error" />
+                <RepoRow name="yumi-ticket" commit="chore: update dependencies" author="m_garcia" tag="v1.0.5" status="success" />
+                <RepoRow name="infra-k8s" commit="deploy: update configmap" author="sysadm" tag="v1.12.0" status="warning" />
+                   <RepoRow name="release-hub" commit="Merge pull request #12" author="galiprandi" tag="v1.2.4" status="success" />
+                <RepoRow name="seki-api" commit="feat: add e2e tests for bff" author="jdoe" tag="v0.8.2" status="running" />
+                <RepoRow name="pulsar-monitor" commit="fix: memory leak in logs" author="alex_smith" tag="v2.1.0" status="error" />
+                <RepoRow name="yumi-ticket" commit="chore: update dependencies" author="m_garcia" tag="v1.0.5" status="success" />
+                <RepoRow name="infra-k8s" commit="deploy: update configmap" author="sysadm" tag="v1.12.0" status="warning" />
+                   <RepoRow name="release-hub" commit="Merge pull request #12" author="galiprandi" tag="v1.2.4" status="success" />
+                <RepoRow name="seki-api" commit="feat: add e2e tests for bff" author="jdoe" tag="v0.8.2" status="running" />
+                <RepoRow name="pulsar-monitor" commit="fix: memory leak in logs" author="alex_smith" tag="v2.1.0" status="error" />
+                <RepoRow name="yumi-ticket" commit="chore: update dependencies" author="m_garcia" tag="v1.0.5" status="success" />
+                <RepoRow name="infra-k8s" commit="deploy: update configmap" author="sysadm" tag="v1.12.0" status="warning" />
+                   <RepoRow name="release-hub" commit="Merge pull request #12" author="galiprandi" tag="v1.2.4" status="success" />
+                <RepoRow name="seki-api" commit="feat: add e2e tests for bff" author="jdoe" tag="v0.8.2" status="running" />
+                <RepoRow name="pulsar-monitor" commit="fix: memory leak in logs" author="alex_smith" tag="v2.1.0" status="error" />
+                <RepoRow name="yumi-ticket" commit="chore: update dependencies" author="m_garcia" tag="v1.0.5" status="success" />
+                <RepoRow name="infra-k8s" commit="deploy: update configmap" author="sysadm" tag="v1.12.0" status="warning" />
+                   <RepoRow name="release-hub" commit="Merge pull request #12" author="galiprandi" tag="v1.2.4" status="success" />
+                <RepoRow name="seki-api" commit="feat: add e2e tests for bff" author="jdoe" tag="v0.8.2" status="running" />
+                <RepoRow name="pulsar-monitor" commit="fix: memory leak in logs" author="alex_smith" tag="v2.1.0" status="error" />
+                <RepoRow name="yumi-ticket" commit="chore: update dependencies" author="m_garcia" tag="v1.0.5" status="success" />
+                <RepoRow name="infra-k8s" commit="deploy: update configmap" author="sysadm" tag="v1.12.0" status="warning" />
+                   <RepoRow name="release-hub" commit="Merge pull request #12" author="galiprandi" tag="v1.2.4" status="success" />
                 <RepoRow name="seki-api" commit="feat: add e2e tests for bff" author="jdoe" tag="v0.8.2" status="running" />
                 <RepoRow name="pulsar-monitor" commit="fix: memory leak in logs" author="alex_smith" tag="v2.1.0" status="error" />
                 <RepoRow name="yumi-ticket" commit="chore: update dependencies" author="m_garcia" tag="v1.0.5" status="success" />

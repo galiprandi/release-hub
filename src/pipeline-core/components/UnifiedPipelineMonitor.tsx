@@ -13,6 +13,7 @@ import {
 	HoverCardContent,
 	HoverCardTrigger,
 } from '@/components/ui/hover-card'
+import { StatusCard } from '@/components/ui/StatusCard'
 
 interface UnifiedPipelineMonitorProps {
 	org: string
@@ -20,102 +21,6 @@ interface UnifiedPipelineMonitorProps {
 	viewMode: ViewMode
 	/** Commit hash for commits view, tag name for tags view */
 	ref: string
-}
-
-/**
- * Error display component
- */
-function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
-	return (
-		<div className="flex items-center justify-between p-4 border-2 border-red-200 rounded-lg">
-			<div className="flex items-center gap-2">
-				<div className="text-red-600">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-						<circle cx="12" cy="12" r="10" />
-						<path d="m15 9-6 6" />
-						<path d="m9 9 6 6" />
-					</svg>
-				</div>
-				<span className="text-red-600 text-sm">Error: {message}</span>
-			</div>
-			{onRetry && (
-				<button
-					onClick={onRetry}
-					className="px-3 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-colors"
-				>
-					Reintentar
-				</button>
-			)}
-		</div>
-	)
-}
-
-/**
- * Loading state component
- */
-function LoadingState() {
-	return (
-		<div className="flex items-center gap-2 p-4 border-2 border-gray-200 rounded-lg">
-			<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600" />
-			<span className="text-gray-600 text-sm">Cargando información del pipeline...</span>
-		</div>
-	)
-}
-
-/**
- * No provider detected state
- */
-function NoProviderState({ org, repo, onRetry }: { org: string; repo: string; onRetry?: () => void }) {
-	return (
-		<div className="flex items-center justify-between gap-2 p-4 border-2 border-gray-200 rounded-lg">
-			<div className="flex items-center gap-2">
-				<div className="text-gray-500">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-						<circle cx="12" cy="12" r="10" />
-						<path d="M12 16v-4" />
-						<path d="M12 8h.01" />
-					</svg>
-				</div>
-				<div className="flex-1">
-					<div className="text-sm text-gray-600">No se detectó un pipeline compatible</div>
-					<div className="text-xs text-gray-500">{org}/{repo}</div>
-				</div>
-			</div>
-			{onRetry && (
-				<button
-					onClick={onRetry}
-					className="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
-				>
-					Reintentar
-				</button>
-			)}
-		</div>
-	)
-}
-
-/**
- * No data available state
- */
-function NoDataState({ org, repo, tagName }: { org: string; repo: string; tagName?: string }) {
-	return (
-		<div className="flex items-center justify-between gap-2 p-4 border-2 border-gray-200 rounded-lg">
-			<div className="flex items-center gap-2">
-				<div className="text-gray-500">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-						<circle cx="12" cy="12" r="10" />
-						<path d="M12 16v-4" />
-						<path d="M12 8h.01" />
-					</svg>
-				</div>
-				<div className="flex-1">
-					<div className="text-sm text-gray-600">
-						No hay datos de pipeline disponibles para {tagName ? `el tag ${tagName}` : 'este stage'}
-					</div>
-					<div className="text-xs text-gray-500">{org}/{repo}</div>
-				</div>
-			</div>
-		</div>
-	)
 }
 
 export function UnifiedPipelineMonitor({ org, repo, viewMode, ref }: UnifiedPipelineMonitorProps) {
@@ -136,22 +41,27 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref }: UnifiedPipe
 
 	// Loading state
 	if (isLoading) {
-		return <LoadingState />
+		return <StatusCard type="loading" message="Cargando información del pipeline..." />
 	}
 
 	// Error state
 	if (error) {
-		return <ErrorState message={error.message} onRetry={refetch} />
+		return <StatusCard type="error" message={error.message} onRetry={refetch} />
 	}
 
 	// No provider detected
 	if (!provider) {
-		return <NoProviderState org={org} repo={repo} onRetry={handleRetry} />
+		return <StatusCard type="warn" message={`No se detectó un pipeline compatible (${org}/${repo})`} onRetry={handleRetry} />
 	}
 
 	// Provider detected but no data available
 	if (!data) {
-		return <NoDataState org={org} repo={repo} tagName={viewMode === 'tags' ? ref : undefined} />
+		return (
+			<StatusCard
+				type="warn"
+				message={`No hay datos de pipeline disponibles para ${viewMode === 'tags' ? `el tag ${ref}` : 'este stage'} (${org}/${repo})`}
+			/>
+		)
 	}
 
 	// Build metadata parts
@@ -220,12 +130,12 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref }: UnifiedPipe
 										</span>
 									</div>
 									<div className="text-xs text-muted-foreground">
-										{data.state === 'COMPLETED' && 'Exitoso'}
-										{data.state === 'FAILED' && 'Fallido'}
-										{data.state === 'STARTED' && 'En progreso'}
-										{data.state === 'RUNNING' && 'En progreso'}
-										{data.state === 'IDLE' && 'Pendiente'}
-										{data.state === 'CANCELLED' && 'Cancelado'}
+										{data.state === 'COMPLETED' && <span className="text-success font-medium">Exitoso</span>}
+										{data.state === 'FAILED' && <span className="text-destructive font-medium">Fallido</span>}
+										{data.state === 'STARTED' && <span className="text-info font-medium">En progreso</span>}
+										{data.state === 'RUNNING' && <span className="text-info font-medium">En progreso</span>}
+										{data.state === 'IDLE' && <span className="text-muted-foreground font-medium">Pendiente</span>}
+										{data.state === 'CANCELLED' && <span className="text-warning font-medium">Cancelado</span>}
 									</div>
 								</div>
 							</HoverCardContent>

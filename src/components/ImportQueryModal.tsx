@@ -1,4 +1,4 @@
-import { useState, useEffect,  type Dispatch, type SetStateAction } from 'react';
+import React, { useState, useEffect,  type Dispatch, type SetStateAction } from 'react';
 import { Send, Copy, AlertTriangle, SendHorizontal } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
 import { parseCurlCommand, formatJSON, minifyJSON } from '@/utils/curlParser';
@@ -47,23 +47,30 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 	const { addQueryRecord } = useFetcherHistory();
 	const curl = query?.curl || null;
 
+	// Use refs to track the last synced query curl to avoid redundant updates
+	// and unnecessary effect triggers that cause cascading renders
+	const lastSyncedCurl = React.useRef<string | undefined>(undefined);
+
 	// Memorize the initial curl value to keep modal open during execution
 	const [initialCurl, setInitialCurl] = useState(curl);
+
+	// Reset state when modal is opened from a fresh query
+	useEffect(() => {
+		if (query?.curl && query.curl !== lastSyncedCurl.current) {
+			lastSyncedCurl.current = query.curl;
+
+			// Avoid setting state in body of effect if we can do it during initialization
+			// but since it's a sync from props, we use a more resilient pattern
+			setTimeout(() => {
+				setCurlInput(query.curl || '');
+				if (initialCurl === null) {
+					setInitialCurl(query.curl || null);
+				}
+			}, 0);
+		}
+	}, [query?.curl, initialCurl]);
+
 	const parsed = curlInput ? parseCurlCommand(curlInput) : null;
-
-	// Sync curlInput when query changes externally (modal opened from outside)
-	useEffect(() => {
-		if (query?.curl && curlInput !== query.curl) {
-			setCurlInput(query.curl);
-		}
-	}, [query?.curl, curlInput]);
-
-	// Sync initialCurl when curl changes externally (modal opened from outside)
-	useEffect(() => {
-		if (curl && initialCurl === null) {
-			setInitialCurl(curl);
-		}
-	}, [curl, initialCurl]);
 
 	// Derive response from initialQuery or execution result
 	const [executedResponse, setExecutedResponse] = useState<CurlResponse | null>(null);

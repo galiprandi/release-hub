@@ -15,6 +15,12 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Info**: `text-info`. Utilizado para información neutral o estados en progreso.
 - **Destructive**: `text-destructive`. Utilizado para acciones críticas o errores.
 
+## Jerarquía de Monitoreo (Unified Pipeline)
+
+- **Arquitectura**: Se ha consolidado el monitoreo de pipelines en `UnifiedPipelineMonitor`, eliminando la lógica redundante entre Seki y Pulsar.
+- **Feedback**: El uso de `StatusCard` es obligatorio para estados de carga, error y advertencia en todos los monitores.
+- **Consistencia Visual**: Los estados de pipeline (`IDLE`, `STARTED`, `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED`) deben usar exclusivamente tokens semánticos y pesos `font-medium` para garantizar la resonancia visual y accesibilidad.
+
 ## Docker UI Pattern (Resonancia Industrial)
 
 - **Badges de Estado**: Usar `bg-success/20 text-success` para estados activos y `bg-muted text-muted-foreground` para estados inactivos o detenidos. Aplicar `font-bold uppercase tracking-wider text-[10px]` para mayor legibilidad.

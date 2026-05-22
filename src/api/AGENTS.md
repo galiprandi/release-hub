@@ -238,14 +238,15 @@ Test files:
 ### Migration from Old System
 
 Old components (kept for backward compatibility):
-- `PipelineMonitor` - Routes to appropriate monitor
-- `SekiMonitor` - Seki-specific implementation
-- `PulsarMonitor` - GitHub Actions implementation
+- `PipelineMonitor` - Now delegates to `UnifiedPipelineMonitor`.
+- `SekiMonitor` - Seki-specific implementation (Legacy).
+- `PulsarMonitor` - GitHub Actions implementation (Legacy).
 
 New unified approach:
-- Use `UnifiedPipelineMonitor` for new code
-- Adapters handle provider-specific logic
-- Single hook `useUnifiedPipeline` replaces multiple hooks
+- Use `UnifiedPipelineMonitor` as the primary implementation.
+- Adapters handle provider-specific logic.
+- Single hook `useUnifiedPipeline` replaces multiple hooks.
+- Feedback standardized via `StatusCard`.
 
 ## Workflow Preferences
 

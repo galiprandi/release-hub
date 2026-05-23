@@ -84,3 +84,8 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 - **Estados**: Soporta `loading`, `error`, `warn` y `offline`.
 - **Visual**: Bordes sutiles con opacidad (`border-destructive/20`) y fondos lavados (`bg-destructive/10`) para evitar fatiga visual mientras se mantiene la categorización clara.
 - **Robustez**: Implementa `truncate` en el mensaje para prevenir desbordamientos en layouts densos.
+
+### UnifiedPipelineMonitor (Agnosticismo)
+- Arquitectura basada en adaptadores para soportar múltiples proveedores (Seki, Pulsar, etc.).
+- Delegación total de estados de feedback a `StatusCard` para consistencia sistémica.
+- Visualización de eventos mediante `SimpleTimeline` o enlaces directos al proveedor.

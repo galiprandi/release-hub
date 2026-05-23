@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es";
 import { useQueryClient } from "@tanstack/react-query";
-import { PipelineMonitor } from "@/components/PipelineMonitor/PipelineMonitor";
+import { UnifiedPipelineMonitor } from "@/pipeline-core";
 import { StageCommitsTable } from "@/components/StageCommitsTable";
 import { PromoteDialog } from "@/components/PromoteDialog";
 import { ForceRedeployDialog } from "@/components/ForceRedeployDialog";
@@ -12,8 +12,6 @@ import { RefetchButton } from "@/components/ui/RefetchButton";
 import { ProjectSelector } from "@/components/ProjectSelector";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTags } from "@/hooks/useGitTags";
-import { usePipelineDetector } from "@/hooks/usePipelineDetector";
-import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
 import { useOpenPullRequests } from "@/hooks/useOpenPullRequests";
 import { useGitHubActionsSummary } from "@/hooks/useGitHubActionsSummary";
 import { GitPullRequest, Play } from "lucide-react";
@@ -40,39 +38,7 @@ function ProductIndex() {
 	const { data: openPRs } = useOpenPullRequests(fullProduct);
 	const { data: actionsSummary } = useGitHubActionsSummary(fullProduct);
 
-	// Detect pipeline type
-	const { plugin: detectedPlugin } = usePipelineDetector({
-		org,
-		repo: product,
-	});
-
-	const isSeki = detectedPlugin === "seki";
-
-	const commitsPipeline = usePipelineWithHealth({
-		product: fullProduct,
-		commit: latestCommit?.hash ?? "",
-		enabled: isSeki && isCommits && !!latestCommit?.hash,
-	});
-
-	const tagsPipeline = usePipelineWithHealth({
-		product: fullProduct,
-		commit: latestTag?.commit ?? "",
-		tag: latestTag?.name ?? "",
-		enabled: isSeki && !isCommits && !!latestTag?.commit && !!latestTag?.name,
-	});
-
-	const pipeline = isCommits ? commitsPipeline.data : tagsPipeline.data;
-	const isPipelineLoading = isCommits ? commitsPipeline.isLoading : tagsPipeline.isLoading;
-	const isPipelineFetching = isCommits ? commitsPipeline.isFetching : tagsPipeline.isFetching;
-	const dataUpdatedAt = isCommits ? commitsPipeline.dataUpdatedAt : tagsPipeline.dataUpdatedAt;
-	const currentPipeline = isCommits ? commitsPipeline : tagsPipeline;
-
-	const handleRefetchPipeline = () => {
-		currentPipeline.refetch();
-	};
-
-	// Usar fecha del commit/tag para consistencia con la tabla
-	const gitDate = isCommits ? latestCommit?.date : latestTag?.date;
+	const currentRef = isCommits ? latestCommit?.hash : latestTag?.name;
 
 	return (
 		<div>
@@ -83,26 +49,25 @@ function ProductIndex() {
 						queryClient.invalidateQueries({ queryKey: ["git", "commits", fullProduct] });
 						queryClient.invalidateQueries({ queryKey: ["git", "tags", fullProduct] });
 						queryClient.invalidateQueries({ queryKey: ["pipeline", fullProduct] });
+						// Invalida detección de pipeline
+						queryClient.invalidateQueries({ queryKey: ["pipeline-detection", org, product] });
 					}}
-					isRefetching={isPipelineFetching}
+					isRefetching={false} // UnifiedPipelineMonitor handles its own loading state
 					showFeedback={true}
-					targetTime={dataUpdatedAt}
 				/>
 			</div>
 
 			<div className="space-y-2 mb-6">
-				<PipelineMonitor
-					org={org}
-					repo={product}
-					sekiData={{
-						pipeline,
-						viewMode,
-						gitDate,
-						isLoading: isPipelineLoading || isPipelineFetching,
-						refetch: handleRefetchPipeline,
-						tagName: latestTag?.name,
-					}}
-				/>
+				{currentRef ? (
+					<UnifiedPipelineMonitor
+						org={org}
+						repo={product}
+						viewMode={viewMode === "tags" ? "tags" : "commits"}
+						ref={currentRef}
+					/>
+				) : (
+					<div className="h-[82px] animate-pulse bg-muted/20 rounded-xl border border-border/50" />
+				)}
 			</div>
 
 			<div className="space-y-2 mb-6">

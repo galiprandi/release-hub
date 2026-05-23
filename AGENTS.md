@@ -54,6 +54,7 @@ Ubicar archivos `.test.ts[x]` junto al archivo que prueban. Evitar carpetas `__t
 - **Componentes compartidos**: Antes de crear uno nuevo, verificar si extiende `FilterBar`, `PageHeader`, `BaseDialog` o `DisplayInfo`. Todos los diálogos migrar a `BaseDialog`.
 - **Feedback**: Usar `StatusCard` para estados de carga, error y advertencia en monitores y Docker.
 - **Docker badges**: `bg-success/20 text-success` (Running), `bg-muted text-muted-foreground` (Stopped).
+- **Pipeline Monitoring**: Usar `UnifiedPipelineMonitor` (en `@/pipeline-core`) para mostrar el estado de despliegue de forma agnóstica al proveedor.
 
 ## Mantenimiento de Skills
 

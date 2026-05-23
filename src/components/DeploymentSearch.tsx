@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { Search, Star, ExternalLink, Loader2, GitBranch, X } from 'lucide-react'
-import { useRepoSearch } from '@/hooks/useRepoSearch'
+import { Search, Star, Loader2, X, Terminal } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { getDeployments } from '@/api/kubectl'
+import { applyCachePolicy } from '@/lib/queryKeys'
 import { useUserCollections } from '@/hooks/useUserCollections'
-import { useUserReposSummary } from '@/hooks/useUserReposSummary'
-import { Link, useNavigate } from '@tanstack/react-router'
 
-export function RepoSearch() {
+export function DeploymentSearch() {
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(-1)
@@ -13,20 +13,44 @@ export function RepoSearch() {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isEditable, setIsEditable] = useState(false)
   const searchWidth = 'w-[35dvw]'
-  const navigate = useNavigate()
 
-  // Load summary for total count
-  const { data: summaryData } = useUserReposSummary()
+  // Search deployments on-demand with debounce
+  const { data: allDeployments, isLoading } = useQuery({
+    queryKey: ['kubectl', 'all-deployments-search'],
+    queryFn: async () => {
+      const contexts = await (await import('@/api/kubectl')).getContexts()
+      if (!contexts || contexts.length === 0) return []
 
-  // Search repos on-demand with debounce
-  const { data: searchData, isLoading } = useRepoSearch({ searchTerm: query })
+      const deploymentsByContext = await Promise.all(
+        contexts.map(async (ctx) => {
+          try {
+            const deployments = await getDeployments(undefined, ctx)
+            return { context: ctx, deployments }
+          } catch {
+            return { context: ctx, deployments: [] }
+          }
+        })
+      )
 
-  const { toggleFavorite, isFavorite } = useUserCollections()
+      return deploymentsByContext.flatMap(({ context: ctx, deployments }) =>
+        deployments.map(d => ({ ...d, context: ctx }))
+      )
+    },
+    ...applyCachePolicy('kubectl'),
+  })
 
-  // Results from search API
+  // Filter deployments based on query
   const results = useMemo(() => {
-    return searchData?.results || []
-  }, [searchData?.results])
+    if (!query || !allDeployments) return []
+    const lowerQuery = query.toLowerCase()
+    return allDeployments.filter(d => 
+      d.name.toLowerCase().includes(lowerQuery) ||
+      d.namespace.toLowerCase().includes(lowerQuery) ||
+      `${d.namespace}/${d.name}`.toLowerCase().includes(lowerQuery)
+    ).slice(0, 50) // Limit to 50 results
+  }, [query, allDeployments])
+
+  const { toggleDeploymentFavorite, isDeploymentFavorite } = useUserCollections()
 
   const handleSelect = () => {
     setQuery('')
@@ -38,10 +62,6 @@ export function RepoSearch() {
     setQuery('')
     setSelectedIndex(-1)
     inputRef.current?.focus()
-  }
-
-  const handleOpenInNewTab = (fullName: string) => {
-    window.open(`https://github.com/${fullName}`, '_blank')
   }
 
   // Close when clicking outside
@@ -83,14 +103,9 @@ export function RepoSearch() {
         }
         if (event.key === 'Enter' && selectedIndex >= 0) {
           event.preventDefault()
-          const repo = results[selectedIndex]
-          if (repo) {
-            const [org, name] = repo.fullName.split('/')
-            navigate({
-              to: '/product/$org/$product',
-              params: { org, product: name },
-              search: { stage: 'staging', event: 'commit' },
-            })
+          const deployment = results[selectedIndex]
+          if (deployment) {
+            toggleDeploymentFavorite(`${deployment.context}/${deployment.namespace}/${deployment.name}`)
             handleSelect()
           }
         }
@@ -99,12 +114,12 @@ export function RepoSearch() {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, results, selectedIndex, navigate])
+  }, [isOpen, results, selectedIndex, toggleDeploymentFavorite])
 
   // Scroll selected item into view
   useEffect(() => {
     if (selectedIndex >= 0 && isOpen) {
-      const selectedElement = document.getElementById(`repo-option-${selectedIndex}`)
+      const selectedElement = document.getElementById(`deployment-option-${selectedIndex}`)
       if (selectedElement) {
         selectedElement.scrollIntoView({
           block: 'nearest',
@@ -118,7 +133,7 @@ export function RepoSearch() {
   return (
     <div ref={containerRef} className="relative">
       {/* Search Input */}
-      <div className="relative" role="combobox" aria-expanded={isOpen} aria-haspopup="listbox" aria-controls="repo-search-results">
+      <div className="relative" role="combobox" aria-expanded={isOpen} aria-haspopup="listbox" aria-controls="deployment-search-results">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
           ref={inputRef}
@@ -134,14 +149,14 @@ export function RepoSearch() {
             if (query.length >= 2) setIsOpen(true);
           }}
           onBlur={() => setIsEditable(false)}
-          placeholder={`Búsqueda en ${summaryData?.total || 0} repositorios... (Cmd+K)`}
-          aria-label="Búsqueda de repositorios"
+          placeholder={`Búsqueda de deployments... (Cmd+K)`}
+          aria-label="Búsqueda de deployments"
           className={`${searchWidth} pl-9 pr-14 py-2 bg-muted rounded-md text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
           spellCheck="false"
-          name="search-repos-not-credentials"
+          name="search-deployments"
           readOnly={!isEditable}
         />
         {query && (
@@ -165,11 +180,11 @@ export function RepoSearch() {
           {isLoading ? (
             <div className="p-4 text-center text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
-              <p className="text-sm">Cargando información de repositorios...</p>
+              <p className="text-sm">Cargando deployments...</p>
             </div>
           ) : !hasResults ? (
             <div className="p-4 text-center text-muted-foreground">
-              <GitBranch className="w-5 h-5 mx-auto mb-2 opacity-50" />
+              <Terminal className="w-5 h-5 mx-auto mb-2 opacity-50" />
               <p className="text-sm">
                 {query.length >= 2
                   ? 'Sin resultados coincidentes'
@@ -177,54 +192,43 @@ export function RepoSearch() {
               </p>
             </div>
           ) : (
-            <div id="repo-search-results" role="listbox" className="max-h-80 overflow-y-auto">
-              {results.map((repo, index) => {
-                const isFav = isFavorite(repo.fullName)
-                const [org, name] = repo.fullName.split('/')
+            <div id="deployment-search-results" role="listbox" className="max-h-80 overflow-y-auto">
+              {results.map((deployment, index) => {
+                const deploymentId = `${deployment.context}/${deployment.namespace}/${deployment.name}`
+                const isFav = isDeploymentFavorite(deploymentId)
                 const isSelected = index === selectedIndex
 
                 return (
                   <div
-                    key={repo.fullName}
+                    key={deploymentId}
                     role="option"
                     aria-selected={isSelected}
-                    id={`repo-option-${index}`}
+                    id={`deployment-option-${index}`}
                     className={`group p-3 border-b last:border-b-0 transition-colors ${
                       isSelected ? 'bg-muted' : 'hover:bg-muted/50'
                     }`}
                   >
                     <div className="flex items-start gap-3">
                       <div className="flex-1 min-w-0">
-                        <Link
-                          to="/github/$org/$repo"
-                          params={{ org, repo: name }}
-                          search={{ view: 'commits' }}
-                          onClick={() => handleSelect()}
-                          className="block"
-                        >
-                          <div className="flex items-center gap-2">
-                            <GitBranch className="w-4 h-4 text-primary" />
-                            <span className="font-medium text-sm truncate">
-                              {repo.fullName}
-                            </span>
-                          </div>
-                          {repo.description && (
-                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                              {repo.description}
-                            </p>
-                          )}
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Actualización:{' '}
-                            {new Date(repo.updatedAt).toLocaleDateString()}
-                          </p>
-                        </Link>
+                        <div className="flex items-center gap-2">
+                          <Terminal className="w-4 h-4 text-primary" />
+                          <span className="font-medium text-sm truncate">
+                            {deployment.namespace}/{deployment.name}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {deployment.context}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Ready: {deployment.ready} • Up-to-date: {deployment.upToDate}
+                        </p>
                       </div>
 
                       {/* Actions */}
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
                         <button
                           type="button"
-                          onClick={() => toggleFavorite(repo.fullName)}
+                          onClick={() => toggleDeploymentFavorite(deploymentId)}
                           className={`p-1.5 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
                             isFav
                               ? 'text-yellow-500 hover:text-yellow-600'
@@ -232,8 +236,8 @@ export function RepoSearch() {
                           }`}
                           aria-label={
                             isFav
-                              ? `Eliminar ${repo.fullName} de favoritos`
-                              : `Agregar ${repo.fullName} a favoritos`
+                              ? `Eliminar ${deployment.name} de favoritos`
+                              : `Agregar ${deployment.name} a favoritos`
                           }
                           title={
                             isFav
@@ -244,15 +248,6 @@ export function RepoSearch() {
                           <Star
                             className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`}
                           />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleOpenInNewTab(repo.fullName)}
-                          className="p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-                          aria-label={`Abrir ${repo.fullName} en GitHub`}
-                          title="Abrir en GitHub"
-                        >
-                          <ExternalLink className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -269,7 +264,7 @@ export function RepoSearch() {
                 <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">↑↓</kbd> Navegar
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">↵</kbd> Seleccionar
+                <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">↵</kbd> Agregar
               </span>
               <span className="flex items-center gap-1">
                 <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">Esc</kbd> Cerrar

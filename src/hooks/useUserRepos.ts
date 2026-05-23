@@ -19,15 +19,18 @@ interface CmdResponseDTO {
   viewerPermission: string
 }
 
-// Legacy type for compatibility
-interface RepoSearchResponse {
-  results: Array<{
-    fullName: string
-    name: string
-    description: string
-    updatedAt: string
-    viewerPermission: string
-  }>
+// Type for repo data
+export interface Repo {
+  fullName: string
+  name: string
+  description: string
+  updatedAt: string
+  viewerPermission: string
+  // Extended fields (optional - fetched on demand)
+  latestTag?: string
+  latestCommitSha?: string
+  latestCommitAuthor?: string
+  commitCount?: number
 }
 
 interface UseUserReposOptions extends ParamsDTO {
@@ -46,7 +49,7 @@ export function useUserRepos({
   // Additional users to include (configurable)
   const ADDITIONAL_USERS = ['galiprandi']
 
-  return useQuery<RepoSearchResponse>({
+  return useQuery<Repo[]>({
     queryKey: queryKeys.user.repos(org || 'all'),
     queryFn: async () => {
       const commands: string[] = []
@@ -86,15 +89,21 @@ export function useUserRepos({
       const result = await runCommand(combinedCommand)
       const repos = JSON.parse(result.stdout) as CmdResponseDTO[]
 
-      return {
-        results: repos.map((repo) => ({
-          fullName: repo.fullName || repo.nameWithOwner || '',
-          name: repo.name,
-          description: repo.description || '',
-          updatedAt: repo.pushedAt || repo.updatedAt || '',
-          viewerPermission: repo.viewerPermission,
-        })),
+      return (repos || []).map((repo) => ({
+        fullName: repo.fullName || repo.nameWithOwner || '',
+        name: repo.name,
+        description: repo.description || '',
+        updatedAt: repo.pushedAt || repo.updatedAt || '',
+        viewerPermission: repo.viewerPermission,
+      }))
+    },
+    select: (data) => {
+      // Handle both old format {results: []} and new format []
+      if (Array.isArray(data)) return data;
+      if (data && typeof data === 'object' && 'results' in data) {
+        return (data as { results: Repo[] }).results;
       }
+      return [];
     },
     enabled,
     ...applyCachePolicy("user"),

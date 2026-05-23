@@ -23,8 +23,10 @@ const generateFallbackTitle = (description: string): string => {
 	return title
 }
 
-export function FeedbackDialog() {
-	const [open, setOpen] = useState(false)
+export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpenChange }: { showTrigger?: boolean, open?: boolean, onOpenChange?: (open: boolean) => void }) {
+	const [internalOpen, setInternalOpen] = useState(false)
+	const open = controlledOpen !== undefined ? controlledOpen : internalOpen
+	const setOpen = onOpenChange || setInternalOpen
 	const [step, setStep] = useState<Step>("describe")
 	const [description, setDescription] = useState("")
 	const [aiTitle, setAiTitle] = useState("")
@@ -231,15 +233,17 @@ export function FeedbackDialog() {
 
 	return (
 		<>
-			<button
-				type="button"
-				onClick={() => handleOpenChange(true)}
-				aria-haspopup="dialog"
-				className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-			>
-				<MessageSquare className="w-4 h-4" />
-				Feedback
-			</button>
+			{showTrigger && (
+				<button
+					type="button"
+					onClick={() => handleOpenChange(true)}
+					aria-haspopup="dialog"
+					className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+				>
+					<MessageSquare className="w-4 h-4" />
+					Feedback
+				</button>
+			)}
 			<BaseDialog
 				open={open}
 				onOpenChange={handleOpenChange}

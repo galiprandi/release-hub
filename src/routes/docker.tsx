@@ -8,6 +8,7 @@ import { FilterBar } from '@/components/shared/FilterBar';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { getContainers } from '@/api/docker';
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys';
+import { PageLayout } from '../layouts/PageLayout';
 
 export const Route = createFileRoute('/docker')({
   component: DockerManagerPage,
@@ -18,7 +19,7 @@ function DockerManagerPage() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { data: access, isLoading: checkingAccess } = useDockerAccess();
   const [statusFilter, setStatusFilter] = useState<'all' | 'running' | 'stopped' | 'exited'>('running');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery] = useState('');
 
   // Obtener contenedores para calcular contadores
   const { data: containers } = useQuery({
@@ -62,26 +63,29 @@ function DockerManagerPage() {
     setStatusFilter(value as 'all' | 'running' | 'stopped' | 'exited');
   };
 
+  const headerActions = (
+    <button
+      type="button"
+      onClick={handleRefresh}
+      className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-input text-muted-foreground rounded-md hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+    >
+      <RefreshCw className="w-3.5 h-3.5" />
+      Recargar
+    </button>
+  );
+
   return (
-    <div className="space-y-6">
-      {/* Filtros y búsqueda */}
+    <PageLayout 
+      header={{ title: "Docker" }}
+      actions={[headerActions]}
+      refreshFn={handleRefresh}
+    >
+      <div className="space-y-6">
+      {/* Filtros */}
       <FilterBar
         filters={filters}
         activeFilter={statusFilter}
         onFilterChange={handleFilterChange}
-        searchPlaceholder="Buscar contenedor... (Cmd+F)"
-        searchValue={searchQuery}
-        onSearchChange={setSearchQuery}
-        rightContent={
-          <button
-            type="button"
-            onClick={handleRefresh}
-            className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-input text-muted-foreground rounded-md hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            Recargar
-          </button>
-        }
       />
 
       {/* Contenido */}
@@ -96,6 +100,7 @@ function DockerManagerPage() {
           onRetry={handleRefresh}
         />
       )}
-    </div>
+      </div>
+    </PageLayout>
   );
 }

@@ -8,6 +8,7 @@ import { StatusCard } from '@/components/ui/StatusCard';
 import { ImportQueryModal } from '@/components/ImportQueryModal';
 import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
+import { PageLayout } from '../layouts/PageLayout';
 
 export const Route = createFileRoute('/fetcher')({
 	component: FetcherPage,
@@ -77,7 +78,7 @@ function FetcherPage() {
 
 	// State for filters
 	const [methodFilter, setMethodFilter] = useState<'all' | 'GET' | 'POST' | 'PATCH' | 'PUT'>('all');
-	const [searchQuery, setSearchQuery] = useState('');
+	const [searchQuery] = useState('');
 	const [page, setPage] = useState(0);
 	const pageSize = 20;
 
@@ -169,9 +170,32 @@ function FetcherPage() {
 		}
 	};
 
+	const headerActions = (
+		<form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); handleSendCurl(); }}>
+			<input
+				type="text"
+				value={curlInput}
+				onChange={(e) => setCurlInput(e.target.value)}
+				placeholder="Importar cURL"
+				className="w-64 px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
+			/>
+			<button
+				type="submit"
+				disabled={!isCurlValid}
+				className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm bg-success text-success-foreground rounded-md hover:bg-success/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
+			>
+				<Send className="w-3.5 h-3.5" />
+			</button>
+		</form>
+	);
+
 	return (
-		<div className="space-y-6">
-			{/* Filters and search */}
+		<PageLayout 
+			header={{ title: "Fetcher" }}
+			actions={[headerActions]}
+		>
+			<div className="space-y-6">
+			{/* Filters */}
 			<FilterBar
 				filters={[
 					{ value: 'all', label: `Todos (${filterCounts.all})` },
@@ -185,27 +209,6 @@ function FetcherPage() {
 					setMethodFilter(value as typeof methodFilter);
 					setPage(0); // Reset to first page on filter change
 				}}
-				searchPlaceholder="Buscar query..."
-				searchValue={searchQuery}
-				onSearchChange={setSearchQuery}
-				rightContent={
-					<form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); handleSendCurl(); }}>
-						<input
-							type="text"
-							value={curlInput}
-							onChange={(e) => setCurlInput(e.target.value)}
-							placeholder="Importart cURL"
-							className="w-64 px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
-						/>
-						<button
-							type="submit"
-							disabled={!isCurlValid}
-							className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm bg-success text-success-foreground rounded-md hover:bg-success/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
-						>
-							<Send className="w-3.5 h-3.5" />
-						</button>
-					</form>
-				}
 			/>
 
 			{/* Content */}
@@ -342,5 +345,6 @@ function FetcherPage() {
 				onClose={handleCloseModal}
 			/>
 		</div>
+		</PageLayout>
 	);
 }

@@ -26,7 +26,7 @@ export function CommitLink({ hash, org, repo, short = true, pipelineStatus, isLo
 				href={githubUrl}
 				target="_blank"
 				rel="noopener noreferrer"
-				className="flex items-center gap-1.5 text-sm font-mono text-primary hover:text-primary/80 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+				className="flex items-center gap-1.5 text-sm font-mono text-commit hover:text-commit/80 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
 			>
 				<GitCommit className="w-4 h-4" />
 				{displayHash}

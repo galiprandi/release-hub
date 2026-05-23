@@ -2,13 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es";
-import { useQueryClient } from "@tanstack/react-query";
 import { PipelineMonitor } from "@/components/PipelineMonitor/PipelineMonitor";
 import { StageCommitsTable } from "@/components/StageCommitsTable";
 import { PromoteDialog } from "@/components/PromoteDialog";
 import { ForceRedeployDialog } from "@/components/ForceRedeployDialog";
 import { FreezeDialog } from "@/components/FreezeDialog";
-import { RefetchButton } from "@/components/ui/RefetchButton";
 import { ProjectSelector } from "@/components/ProjectSelector";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTags } from "@/hooks/useGitTags";
@@ -18,21 +16,24 @@ import { useOpenPullRequests } from "@/hooks/useOpenPullRequests";
 import { useGitHubActionsSummary } from "@/hooks/useGitHubActionsSummary";
 import { GitPullRequest, Play } from "lucide-react";
 import { K8sSection } from "@/components/K8sSection";
+import { PageLayout } from "@/layouts/PageLayout";
 
 dayjs.extend(relativeTime);
 dayjs.locale("es");
 
-export const Route = createFileRoute("/product/$org/$product/")({
+export const Route = createFileRoute("/github/$org/$repo")({
 	component: ProductIndex,
+	validateSearch: (search: Record<string, unknown>) => ({
+		view: search.view === "tags" ? "tags" : "commits",
+	}),
 });
 
 function ProductIndex() {
-	const { org, product } = Route.useParams();
+	const { org, repo } = Route.useParams();
 	const navigate = Route.useNavigate();
 	const search = Route.useSearch();
-	const queryClient = useQueryClient();
 	const viewMode = search.view || "commits";
-	const fullProduct = `${org}/${product}`;
+	const fullProduct = `${org}/${repo}`;
 	const isCommits = viewMode === "commits";
 
 	const { latestCommit } = useGitCommits({ repo: fullProduct });
@@ -43,7 +44,7 @@ function ProductIndex() {
 	// Detect pipeline type
 	const { plugin: detectedPlugin } = usePipelineDetector({
 		org,
-		repo: product,
+		repo,
 	});
 
 	const isSeki = detectedPlugin === "seki";
@@ -64,7 +65,6 @@ function ProductIndex() {
 	const pipeline = isCommits ? commitsPipeline.data : tagsPipeline.data;
 	const isPipelineLoading = isCommits ? commitsPipeline.isLoading : tagsPipeline.isLoading;
 	const isPipelineFetching = isCommits ? commitsPipeline.isFetching : tagsPipeline.isFetching;
-	const dataUpdatedAt = isCommits ? commitsPipeline.dataUpdatedAt : tagsPipeline.dataUpdatedAt;
 	const currentPipeline = isCommits ? commitsPipeline : tagsPipeline;
 
 	const handleRefetchPipeline = () => {
@@ -75,25 +75,17 @@ function ProductIndex() {
 	const gitDate = isCommits ? latestCommit?.date : latestTag?.date;
 
 	return (
-		<div>
-			<div className="flex justify-between items-center gap-4 px-4 mb-2">
-				<RefetchButton
-					onRefetch={() => {
-						// Invalida todas las queries relacionadas con este repo
-						queryClient.invalidateQueries({ queryKey: ["git", "commits", fullProduct] });
-						queryClient.invalidateQueries({ queryKey: ["git", "tags", fullProduct] });
-						queryClient.invalidateQueries({ queryKey: ["pipeline", fullProduct] });
-					}}
-					isRefetching={isPipelineFetching}
-					showFeedback={true}
-					targetTime={dataUpdatedAt}
-				/>
-			</div>
-
+		<PageLayout
+			header={{
+				title: fullProduct,
+			}}
+			refreshFn={handleRefetchPipeline}
+			isLoading={isPipelineLoading || isPipelineFetching}
+		>
 			<div className="space-y-2 mb-6">
 				<PipelineMonitor
 					org={org}
-					repo={product}
+					repo={repo}
 					sekiData={{
 						pipeline,
 						viewMode,
@@ -106,7 +98,7 @@ function ProductIndex() {
 			</div>
 
 			<div className="space-y-2 mb-6">
-				<K8sSection namespace={product} />
+				<K8sSection namespace={repo} />
 			</div>
 
 			{/* Tabs de navegación */}
@@ -207,9 +199,9 @@ function ProductIndex() {
 			<StageCommitsTable
 				viewMode={viewMode}
 				org={org}
-				product={product}
+				product={repo}
 				showStatus={false}
 			/>
-		</div>
+		</PageLayout>
 	);
 }

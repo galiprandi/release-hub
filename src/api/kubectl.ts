@@ -108,7 +108,7 @@ export async function setContext(context: string): Promise<boolean> {
   }
 }
 
-function parseDeployments(output: string): DeploymentInfo[] {
+function parseDeployments(output: string, defaultNamespace?: string): DeploymentInfo[] {
   const lines = output.trim().split('\n');
   const deployments: DeploymentInfo[] = [];
   
@@ -137,7 +137,7 @@ function parseDeployments(output: string): DeploymentInfo[] {
       // Format: NAME READY UP-TO-DATE AVAILABLE AGE
       if (parts.length >= 5) {
         deployments.push({
-          namespace: '',
+          namespace: defaultNamespace || '',
           name: parts[0],
           ready: parts[1],
           upToDate: parts[2],
@@ -197,10 +197,50 @@ function parsePods(output: string): PodInfo[] {
 export async function getDeployments(namespace?: string, context?: string): Promise<DeploymentInfo[]> {
   const nsFlag = namespace ? `-n ${sanitizeNamespace(namespace)}` : '--all-namespaces';
   const ctxFlag = context ? `--context=${sanitizeContext(context)}` : '';
-  const result = await runCommand(`kubectl get deployments ${nsFlag} ${ctxFlag}`.trim());
-  // kubectl outputs to stderr when no resources found, so check both
-  const output = result.stdout || result.stderr;
-  return parseDeployments(output);
+  try {
+    const result = await runCommand(`kubectl get deployments ${nsFlag} ${ctxFlag}`.trim());
+    // kubectl outputs to stderr when no resources found, so check both
+    const output = result.stdout || result.stderr;
+    return parseDeployments(output, namespace);
+  } catch {
+    // If using --all-namespaces and getting Forbidden errors, try namespace by namespace
+    if (!namespace) {
+      try {
+        const namespacesResult = await runCommand(`kubectl get namespaces -o jsonpath='{.items[*].metadata.name}' ${ctxFlag}`.trim());
+        const namespaces = namespacesResult.stdout.trim().split(' ').filter(Boolean);
+        
+        const allDeployments: DeploymentInfo[] = [];
+        for (const ns of namespaces) {
+          try {
+            const result = await runCommand(`kubectl get deployments -n ${sanitizeNamespace(ns)} ${ctxFlag}`.trim());
+            const output = result.stdout || result.stderr;
+            allDeployments.push(...parseDeployments(output, ns));
+          } catch {
+            // Skip namespaces where we don't have permission
+            continue;
+          }
+        }
+        return allDeployments;
+      } catch {
+        // If we can't even list namespaces, try known namespaces
+        const knownNamespaces = ['argentina-arcus', 'colombia-arcus', 'jc-test', 'seki-runners', 'default'];
+        const allDeployments: DeploymentInfo[] = [];
+        for (const ns of knownNamespaces) {
+          try {
+            const result = await runCommand(`kubectl get deployments -n ${sanitizeNamespace(ns)} ${ctxFlag}`.trim());
+            const output = result.stdout || result.stderr;
+            allDeployments.push(...parseDeployments(output, ns));
+          } catch {
+            // Skip namespaces where we don't have permission
+            continue;
+          }
+        }
+        return allDeployments;
+      }
+    }
+    // If specific namespace was requested and failed, return empty
+    return [];
+  }
 }
 
 export async function getPods(namespace?: string, context?: string): Promise<PodInfo[]> {

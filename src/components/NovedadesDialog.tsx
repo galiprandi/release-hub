@@ -4,8 +4,10 @@ import { Streamdown } from "streamdown"
 import { BaseDialog } from "@/components/ui/BaseDialog"
 import novedadesContent from "../../NOVEDADES.md?raw"
 
-export function NovedadesDialog() {
-	const [open, setOpen] = useState(false)
+export function NovedadesDialog({ showTrigger = true, open: controlledOpen, onOpenChange }: { showTrigger?: boolean, open?: boolean, onOpenChange?: (open: boolean) => void }) {
+	const [internalOpen, setInternalOpen] = useState(false)
+	const open = controlledOpen !== undefined ? controlledOpen : internalOpen
+	const setOpen = onOpenChange || setInternalOpen
 
 	useEffect(() => {
 		// Add custom scrollbar styles
@@ -45,15 +47,17 @@ export function NovedadesDialog() {
 
 	return (
 		<>
-			<button
-				type="button"
-				onClick={() => setOpen(true)}
-				className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-				aria-label="Ver novedades"
-			>
-				<Newspaper className="w-4 h-4" />
-				Novedades
-			</button>
+			{showTrigger && (
+				<button
+					type="button"
+					onClick={() => setOpen(true)}
+					className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+					aria-label="Ver novedades"
+				>
+					<Newspaper className="w-4 h-4" />
+					Novedades
+				</button>
+			)}
 			<BaseDialog
 				open={open}
 				onOpenChange={setOpen}

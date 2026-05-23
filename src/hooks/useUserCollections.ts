@@ -11,12 +11,13 @@ export interface Project {
 
 export interface UserCollections {
 	favorites: string[];
+	deploymentFavorites: string[];
 	projects: Project[];
 	activeTab: string;
 }
 
 function getInitialCollections(): UserCollections {
-	return { favorites: [], projects: [], activeTab: "favorites" };
+	return { favorites: [], deploymentFavorites: [], projects: [], activeTab: "favorites" };
 }
 
 export function useUserCollections() {
@@ -51,7 +52,7 @@ export function useUserCollections() {
 	/* ---------- Favorites ---------- */
 	const toggleFavorite = useCallback(
 		(product: string) => {
-			const next = { ...data };
+			const next = { ...data, favorites: data.favorites || [] };
 			if (next.favorites.includes(product)) {
 				next.favorites = next.favorites.filter((f) => f !== product);
 			} else {
@@ -63,8 +64,27 @@ export function useUserCollections() {
 	);
 
 	const isFavorite = useCallback(
-		(product: string) => data.favorites.includes(product),
+		(product: string) => (data.favorites || []).includes(product),
 		[data.favorites]
+	);
+
+	/* ---------- Deployment Favorites ---------- */
+	const toggleDeploymentFavorite = useCallback(
+		(deployment: string) => {
+			const next = { ...data, deploymentFavorites: data.deploymentFavorites || [] };
+			if (next.deploymentFavorites.includes(deployment)) {
+				next.deploymentFavorites = next.deploymentFavorites.filter((f) => f !== deployment);
+			} else {
+				next.deploymentFavorites = [...next.deploymentFavorites, deployment];
+			}
+			setCollections(next);
+		},
+		[data, setCollections]
+	);
+
+	const isDeploymentFavorite = useCallback(
+		(deployment: string) => (data.deploymentFavorites || []).includes(deployment),
+		[data.deploymentFavorites]
 	);
 
 	/* ---------- Projects ---------- */
@@ -74,11 +94,11 @@ export function useUserCollections() {
 				.toLowerCase()
 				.replace(/[^a-z0-9]+/g, "-")
 				.replace(/(^-|-$)/g, "");
-			if (data.projects.some((p) => p.id === id)) return id;
+			if ((data.projects || []).some((p) => p.id === id)) return id;
 			const next = {
 				...data,
 				projects: [
-					...data.projects,
+					...(data.projects || []),
 					{
 						id,
 						name,
@@ -97,7 +117,7 @@ export function useUserCollections() {
 		(id: string, updates: Partial<Omit<Project, "id">>) => {
 			const next = {
 				...data,
-				projects: data.projects.map((p) =>
+				projects: (data.projects || []).map((p) =>
 					p.id === id ? { ...p, ...updates } : p
 				),
 			};
@@ -110,7 +130,7 @@ export function useUserCollections() {
 		(id: string) => {
 			const next = {
 				...data,
-				projects: data.projects.filter((p) => p.id !== id),
+				projects: (data.projects || []).filter((p) => p.id !== id),
 				activeTab: data.activeTab === id ? "favorites" : data.activeTab,
 			};
 			setCollections(next);
@@ -122,7 +142,7 @@ export function useUserCollections() {
 		(projectId: string, repo: string) => {
 			const next = {
 				...data,
-				projects: data.projects.map((p) =>
+				projects: (data.projects || []).map((p) =>
 					p.id === projectId && !p.repos.includes(repo)
 						? { ...p, repos: [...p.repos, repo] }
 						: p
@@ -137,7 +157,7 @@ export function useUserCollections() {
 		(projectId: string, repo: string) => {
 			const next = {
 				...data,
-				projects: data.projects.map((p) =>
+				projects: (data.projects || []).map((p) =>
 					p.id === projectId
 						? { ...p, repos: p.repos.filter((r) => r !== repo) }
 						: p
@@ -152,7 +172,7 @@ export function useUserCollections() {
 		(projectId: string, repo: string) => {
 			const next = {
 				...data,
-				projects: data.projects.map((p) => {
+				projects: (data.projects || []).map((p) => {
 					if (p.id !== projectId) return p;
 					const hasRepo = p.repos.includes(repo);
 					return {
@@ -169,13 +189,13 @@ export function useUserCollections() {
 	);
 
 	const getProjectsForRepo = useCallback(
-		(repo: string) => data.projects.filter((p) => p.repos.includes(repo)),
+		(repo: string) => (data.projects || []).filter((p) => p.repos.includes(repo)),
 		[data.projects]
 	);
 
 	const isRepoInProject = useCallback(
 		(projectId: string, repo: string) =>
-			data.projects.some(
+			(data.projects || []).some(
 				(p) => p.id === projectId && p.repos.includes(repo)
 			),
 		[data.projects]
@@ -184,17 +204,20 @@ export function useUserCollections() {
 	/* ---------- Active tab ---------- */
 	const setActiveTab = useCallback(
 		(tab: string) => {
-			setCollections({ ...data, activeTab: tab });
+			setCollections({ ...data, activeTab: tab || "favorites" });
 		},
 		[data, setCollections]
 	);
 
 	return {
-		favorites: data.favorites,
-		projects: data.projects,
-		activeTab: data.activeTab,
+		favorites: data.favorites || [],
+		deploymentFavorites: data.deploymentFavorites || [],
+		projects: data.projects || [],
+		activeTab: data.activeTab || "favorites",
 		toggleFavorite,
 		isFavorite,
+		toggleDeploymentFavorite,
+		isDeploymentFavorite,
 		createProject,
 		updateProject,
 		deleteProject,

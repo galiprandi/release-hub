@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Activity, RefreshCw, Trash2, ExternalLink, ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import { useHealthMonitor } from '@/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
+import { PageLayout } from '../layouts/PageLayout';
 
 export const Route = createFileRoute('/health')({
   component: HealthMonitorPage,
@@ -102,8 +103,8 @@ function ProductSection({
         <div className="flex items-center justify-between py-3 bg-gray-50 border-b -mx-4 px-4">
           <div className="flex items-center gap-2">
             <Link
-              to="/product/$org/$product"
-              params={{ org, product: productName }}
+              to="/github/$org/$repo"
+              params={{ org, repo: productName }}
               className="font-semibold text-gray-800 hover:text-blue-600 transition-colors"
             >
               {productName}
@@ -363,7 +364,7 @@ function HealthMonitorPage() {
 
   // Estado para filtros
   const [environmentFilter, setEnvironmentFilter] = useState<'all' | 'staging' | 'production' | 'unhealthy'>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'default' | 'errors' | 'recent'>('default');
 
   // Filtrar endpoints según el filtro seleccionado y búsqueda
@@ -441,9 +442,40 @@ function HealthMonitorPage() {
     return a.localeCompare(b);
   });
 
+  const headerActions = (
+    <div className="flex gap-2">
+      {stats.unhealthy > 0 && (
+        <button
+          onClick={() => {
+            const unhealthy = filteredEndpoints.filter((ep) => ep.isHealthy === false);
+            unhealthy.forEach((ep) => checkEndpoint(ep.id));
+          }}
+          disabled={isChecking}
+          className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded-md hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
+          {isChecking ? 'Verificando...' : `Verificar ${stats.unhealthy}`}
+        </button>
+      )}
+      <button
+        onClick={() => checkAllEndpoints()}
+        disabled={isChecking}
+        className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-gray-300 text-gray-600 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
+        {isChecking ? 'Verificando...' : 'Verificar todos'}
+      </button>
+    </div>
+  );
+
   return (
-    <div className="space-y-6">
-      {/* Filtros por ambiente + CTAs */}
+    <PageLayout 
+      header={{ title: "Health Monitor" }}
+      actions={[headerActions]}
+      refreshFn={checkAllEndpoints}
+    >
+      <div className="space-y-6">
+      {/* Filtros por ambiente */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
@@ -468,17 +500,6 @@ function HealthMonitorPage() {
             ))}
           </div>
 
-          {/* Búsqueda de servicios */}
-          <div>
-            <input
-              type="text"
-              placeholder="Buscar servicio o URL..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
           {/* Ordenamiento */}
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-600">Ordenar:</span>
@@ -495,23 +516,7 @@ function HealthMonitorPage() {
         </div>
 
         {/* CTAs */}
-        <div className="flex gap-2">
-          {/* CTA Principal: Verificar solo los con fallo */}
-          {stats.unhealthy > 0 && (
-            <button
-              onClick={() => {
-                const unhealthy = filteredEndpoints.filter((ep) => ep.isHealthy === false);
-                unhealthy.forEach((ep) => checkEndpoint(ep.id));
-              }}
-              disabled={isChecking}
-              className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded-md hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
-              {isChecking ? 'Verificando...' : `Verificar ${stats.unhealthy}`}
-            </button>
-          )}
-
-          {/* CTA Secundario: Verificar todos */}
+        <div className="flex items-center gap-2">
           <button
             onClick={() => checkAllEndpoints()}
             disabled={isChecking}
@@ -536,7 +541,7 @@ function HealthMonitorPage() {
           </p>
           {environmentFilter === 'all' && (
             <Link
-              to="/"
+              to="/github"
               className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               Ir al inicio
@@ -557,6 +562,7 @@ function HealthMonitorPage() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </PageLayout>
   );
 }

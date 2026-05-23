@@ -10,23 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerificationPageRouteImport } from './routes/verification-page'
-import { Route as V2RouteImport } from './routes/v2'
 import { Route as SetupRouteImport } from './routes/setup'
+import { Route as NovedadesRouteImport } from './routes/novedades'
+import { Route as KubernetesRouteImport } from './routes/kubernetes'
 import { Route as HealthRouteImport } from './routes/health'
+import { Route as GithubRouteImport } from './routes/github'
 import { Route as FetcherRouteImport } from './routes/fetcher'
 import { Route as DockerRouteImport } from './routes/docker'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProductOrgProductRouteImport } from './routes/product.$org.$product'
-import { Route as ProductOrgProductIndexRouteImport } from './routes/product.$org.$product.index'
+import { Route as GithubOrgRepoRouteImport } from './routes/github.$org.$repo'
 
 const VerificationPageRoute = VerificationPageRouteImport.update({
   id: '/verification-page',
   path: '/verification-page',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const V2Route = V2RouteImport.update({
-  id: '/v2',
-  path: '/v2',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SetupRoute = SetupRouteImport.update({
@@ -34,9 +29,24 @@ const SetupRoute = SetupRouteImport.update({
   path: '/setup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NovedadesRoute = NovedadesRouteImport.update({
+  id: '/novedades',
+  path: '/novedades',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KubernetesRoute = KubernetesRouteImport.update({
+  id: '/kubernetes',
+  path: '/kubernetes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HealthRoute = HealthRouteImport.update({
   id: '/health',
   path: '/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GithubRoute = GithubRouteImport.update({
+  id: '/github',
+  path: '/github',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FetcherRoute = FetcherRouteImport.update({
@@ -49,99 +59,91 @@ const DockerRoute = DockerRouteImport.update({
   path: '/docker',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductOrgProductRoute = ProductOrgProductRouteImport.update({
-  id: '/product/$org/$product',
-  path: '/product/$org/$product',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductOrgProductIndexRoute = ProductOrgProductIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ProductOrgProductRoute,
+const GithubOrgRepoRoute = GithubOrgRepoRouteImport.update({
+  id: '/$org/$repo',
+  path: '/$org/$repo',
+  getParentRoute: () => GithubRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/docker': typeof DockerRoute
   '/fetcher': typeof FetcherRoute
+  '/github': typeof GithubRouteWithChildren
   '/health': typeof HealthRoute
+  '/kubernetes': typeof KubernetesRoute
+  '/novedades': typeof NovedadesRoute
   '/setup': typeof SetupRoute
-  '/v2': typeof V2Route
   '/verification-page': typeof VerificationPageRoute
-  '/product/$org/$product': typeof ProductOrgProductRouteWithChildren
-  '/product/$org/$product/': typeof ProductOrgProductIndexRoute
+  '/github/$org/$repo': typeof GithubOrgRepoRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/docker': typeof DockerRoute
   '/fetcher': typeof FetcherRoute
+  '/github': typeof GithubRouteWithChildren
   '/health': typeof HealthRoute
+  '/kubernetes': typeof KubernetesRoute
+  '/novedades': typeof NovedadesRoute
   '/setup': typeof SetupRoute
-  '/v2': typeof V2Route
   '/verification-page': typeof VerificationPageRoute
-  '/product/$org/$product': typeof ProductOrgProductIndexRoute
+  '/github/$org/$repo': typeof GithubOrgRepoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/docker': typeof DockerRoute
   '/fetcher': typeof FetcherRoute
+  '/github': typeof GithubRouteWithChildren
   '/health': typeof HealthRoute
+  '/kubernetes': typeof KubernetesRoute
+  '/novedades': typeof NovedadesRoute
   '/setup': typeof SetupRoute
-  '/v2': typeof V2Route
   '/verification-page': typeof VerificationPageRoute
-  '/product/$org/$product': typeof ProductOrgProductRouteWithChildren
-  '/product/$org/$product/': typeof ProductOrgProductIndexRoute
+  '/github/$org/$repo': typeof GithubOrgRepoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/docker'
     | '/fetcher'
+    | '/github'
     | '/health'
+    | '/kubernetes'
+    | '/novedades'
     | '/setup'
-    | '/v2'
     | '/verification-page'
-    | '/product/$org/$product'
-    | '/product/$org/$product/'
+    | '/github/$org/$repo'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/docker'
     | '/fetcher'
+    | '/github'
     | '/health'
+    | '/kubernetes'
+    | '/novedades'
     | '/setup'
-    | '/v2'
     | '/verification-page'
-    | '/product/$org/$product'
+    | '/github/$org/$repo'
   id:
     | '__root__'
-    | '/'
     | '/docker'
     | '/fetcher'
+    | '/github'
     | '/health'
+    | '/kubernetes'
+    | '/novedades'
     | '/setup'
-    | '/v2'
     | '/verification-page'
-    | '/product/$org/$product'
-    | '/product/$org/$product/'
+    | '/github/$org/$repo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   DockerRoute: typeof DockerRoute
   FetcherRoute: typeof FetcherRoute
+  GithubRoute: typeof GithubRouteWithChildren
   HealthRoute: typeof HealthRoute
+  KubernetesRoute: typeof KubernetesRoute
+  NovedadesRoute: typeof NovedadesRoute
   SetupRoute: typeof SetupRoute
-  V2Route: typeof V2Route
   VerificationPageRoute: typeof VerificationPageRoute
-  ProductOrgProductRoute: typeof ProductOrgProductRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -153,13 +155,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerificationPageRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/v2': {
-      id: '/v2'
-      path: '/v2'
-      fullPath: '/v2'
-      preLoaderRoute: typeof V2RouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/setup': {
       id: '/setup'
       path: '/setup'
@@ -167,11 +162,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SetupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/novedades': {
+      id: '/novedades'
+      path: '/novedades'
+      fullPath: '/novedades'
+      preLoaderRoute: typeof NovedadesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kubernetes': {
+      id: '/kubernetes'
+      path: '/kubernetes'
+      fullPath: '/kubernetes'
+      preLoaderRoute: typeof KubernetesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/health': {
       id: '/health'
       path: '/health'
       fullPath: '/health'
       preLoaderRoute: typeof HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/github': {
+      id: '/github'
+      path: '/github'
+      fullPath: '/github'
+      preLoaderRoute: typeof GithubRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fetcher': {
@@ -188,50 +204,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DockerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/product/$org/$product': {
-      id: '/product/$org/$product'
-      path: '/product/$org/$product'
-      fullPath: '/product/$org/$product'
-      preLoaderRoute: typeof ProductOrgProductRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/product/$org/$product/': {
-      id: '/product/$org/$product/'
-      path: '/'
-      fullPath: '/product/$org/$product/'
-      preLoaderRoute: typeof ProductOrgProductIndexRouteImport
-      parentRoute: typeof ProductOrgProductRoute
+    '/github/$org/$repo': {
+      id: '/github/$org/$repo'
+      path: '/$org/$repo'
+      fullPath: '/github/$org/$repo'
+      preLoaderRoute: typeof GithubOrgRepoRouteImport
+      parentRoute: typeof GithubRoute
     }
   }
 }
 
-interface ProductOrgProductRouteChildren {
-  ProductOrgProductIndexRoute: typeof ProductOrgProductIndexRoute
+interface GithubRouteChildren {
+  GithubOrgRepoRoute: typeof GithubOrgRepoRoute
 }
 
-const ProductOrgProductRouteChildren: ProductOrgProductRouteChildren = {
-  ProductOrgProductIndexRoute: ProductOrgProductIndexRoute,
+const GithubRouteChildren: GithubRouteChildren = {
+  GithubOrgRepoRoute: GithubOrgRepoRoute,
 }
 
-const ProductOrgProductRouteWithChildren =
-  ProductOrgProductRoute._addFileChildren(ProductOrgProductRouteChildren)
+const GithubRouteWithChildren =
+  GithubRoute._addFileChildren(GithubRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   DockerRoute: DockerRoute,
   FetcherRoute: FetcherRoute,
+  GithubRoute: GithubRouteWithChildren,
   HealthRoute: HealthRoute,
+  KubernetesRoute: KubernetesRoute,
+  NovedadesRoute: NovedadesRoute,
   SetupRoute: SetupRoute,
-  V2Route: V2Route,
   VerificationPageRoute: VerificationPageRoute,
-  ProductOrgProductRoute: ProductOrgProductRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -6,11 +6,13 @@ import { useSettings } from "@/hooks/useSettings"
 import { useToken } from "@/hooks/useToken"
 import { BaseDialog } from "@/components/ui/BaseDialog"
 
-export function SettingsDialog() {
+export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpenChange }: { showTrigger?: boolean, open?: boolean, onOpenChange?: (open: boolean) => void }) {
 	const queryClient = useQueryClient()
 	const { settings, setSekiToken, setDiscordWebhook, isUpdating } = useSettings()
 	const { saveToken: saveSekiToken, clearToken: clearSekiToken, isExpired, expirationDate } = useToken()
-	const [open, setOpen] = useState(false)
+	const [internalOpen, setInternalOpen] = useState(false)
+	const open = controlledOpen !== undefined ? controlledOpen : internalOpen
+	const setOpen = onOpenChange || setInternalOpen
 	const [sekiTokenInput, setSekiTokenInput] = useState("")
 	const [discordWebhookInput, setDiscordWebhookInput] = useState("")
 	const [isClearingCache, setIsClearingCache] = useState(false)
@@ -62,31 +64,33 @@ export function SettingsDialog() {
 
 	return (
 		<>
-			<button
-				type="button"
-				className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2 rounded-md"
-				title="Configuración"
-				aria-label="Configuración"
-				onClick={(e) => {
-					e.stopPropagation();
-					e.preventDefault();
-					setOpen(true);
-				}}
-				onPointerDown={(e) => {
-					e.stopPropagation();
-					e.preventDefault();
-					// Blur any focused input to prevent autocomplete
-					if (document.activeElement instanceof HTMLElement) {
-						document.activeElement.blur();
-					}
-				}}
-				onMouseDown={(e) => {
-					e.stopPropagation();
-					e.preventDefault();
-				}}
-			>
-				<Settings className="w-5 h-5" />
-			</button>
+			{showTrigger && (
+				<button
+					type="button"
+					className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2 rounded-md"
+					title="Configuración"
+					aria-label="Configuración"
+					onClick={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						setOpen(true);
+					}}
+					onPointerDown={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						// Blur any focused input to prevent autocomplete
+						if (document.activeElement instanceof HTMLElement) {
+							document.activeElement.blur();
+						}
+					}}
+					onMouseDown={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+					}}
+				>
+					<Settings className="w-5 h-5" />
+				</button>
+			)}
 			<BaseDialog
 				open={open}
 				onOpenChange={handleOpenChange}

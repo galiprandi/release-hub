@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Loader2, Star, Github, Building2, GitPullRequestCreateArrow, FolderOpen, FolderPlus, Search } from "lucide-react";
+import { Loader2, Star, Box, Building2, GitPullRequestCreateArrow, FolderOpen, FolderPlus, Search } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { DisplayInfo } from "@/components/DisplayInfo";
 import { CommitLink } from "@/components/CommitLink";
@@ -9,13 +9,15 @@ import { PromoteDialog } from "@/components/PromoteDialog";
 import { ForceRedeployDialog } from "@/components/ForceRedeployDialog";
 import { FreezeDialog } from "@/components/FreezeDialog";
 import { CommitsModal } from "@/components/CommitsModal";
+import { PageLayout } from "@/layouts/PageLayout";
+import { RepoSearch } from "@/components/RepoSearch";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTagsSimple } from "@/hooks/useGitTagsSimple";
 import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/github")({
 	component: Dashboard,
 });
 
@@ -59,7 +61,42 @@ function Dashboard() {
 	const sortedOrgs = Object.keys(groupedRepos).sort();
 
 	return (
-		<div className="space-y-6">
+		<PageLayout 
+			header={{ 
+				title: "Repositorios",
+				searchComponent: <RepoSearch />
+			}}
+			isLoading={isLoadingRepos}
+			emptyState={displayRepos.length === 0 ? {
+				show: true,
+				icon: activeTab === "favorites" ? <Star className="w-10 h-10 mx-auto mb-4 opacity-20" /> : <FolderPlus className="w-10 h-10 mx-auto mb-4 opacity-20" />,
+				label: activeTab === "favorites" ? "Sin favoritos" : "Proyecto vacío",
+				caption: activeTab === "favorites" 
+					? "Agrega repositorios a tus favoritos para verlos aquí y monitorear sus despliegues."
+					: "Navega a un repositorio y agregalo a este proyecto desde la vista de detalle.",
+				action: activeTab === "favorites" ? (
+					<button
+						type="button"
+						onClick={() => {
+							const input = document.querySelector('input[placeholder*="Búsqueda"]') as HTMLInputElement;
+							if (input) {
+								input.focus();
+							}
+						}}
+						className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+					>
+						<Search className="w-4 h-4" />
+						Buscar Repositorios
+					</button>
+				) : undefined
+			} : undefined}
+			footer={summaryData ? {
+				show: true,
+				left: `${summaryData.total} repos accesibles (${summaryData.orgs.length} orgs + ${summaryData.personal} personales)`,
+				right: "ReleaseHub Open Source"
+			} : undefined}
+		>
+			<div className="space-y-6">
 			{/* Tabs */}
 			<div className="flex gap-1 bg-muted rounded-lg p-1 overflow-x-auto">
 				{tabs.map((tab) => {
@@ -83,100 +120,31 @@ function Dashboard() {
 								<span className="text-xs bg-muted-foreground/20 px-1.5 py-0.5 rounded-full">
 									{tab.count}
 								</span>
-								)}
+							)}
 						</button>
 					);
 				})}
 			</div>
 
 			{/* Content */}
-			{displayRepos.length === 0 ? (
-				<div className="border rounded-xl p-12 text-center text-muted-foreground bg-muted/20 border-dashed">
-					{activeTab === "favorites" ? (
-						isLoadingRepos ? (
-							<>
-								<Loader2 className="w-10 h-10 mx-auto mb-4 opacity-40 animate-spin" />
-								<h3 className="text-lg font-medium text-foreground mb-1">Cargando repositorios</h3>
-								<p className="text-sm max-w-xs mx-auto">
-									Consultando organizaciones y repositorios a los que tienes acceso...
-								</p>
-							</>
-						) : (
-							<>
-								<Star className="w-10 h-10 mx-auto mb-4 opacity-20" />
-								<h3 className="text-lg font-medium text-foreground mb-1">Sin favoritos</h3>
-								<p className="text-sm max-w-xs mx-auto mb-6">
-									Agrega repositorios a tus favoritos para verlos aquí y monitorear sus despliegues.
-								</p>
-								<button
-									type="button"
-									onClick={() => {
-										const input = document.querySelector('input[placeholder*="Búsqueda"]') as HTMLInputElement;
-										if (input) {
-											input.focus();
-											// Disparar Cmd+K visualmente o simplemente abrir el dropdown si el componente lo soporta
-											// En este caso, el foco en RepoSearch ya activa el estado isEditable
-										}
-									}}
-									className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-								>
-									<Search className="w-4 h-4" />
-									Buscar Repositorios
-								</button>
-								{summaryData && (
-									<div className="mt-8 pt-6 border-t border-dashed border-border/50 max-w-xs mx-auto">
-										<p className="text-xs text-muted-foreground/70 mb-2">
-											{summaryData.total} repositorios disponibles en tus organizaciones
-										</p>
-										<div className="flex flex-wrap justify-center gap-2">
-											{summaryData.personal > 0 && (
-												<span className="px-2 py-0.5 rounded-full bg-muted text-[10px] font-medium">
-													Personales: {summaryData.personal}
-												</span>
-											)}
-											{summaryData.orgs.map(org => (
-												<span key={org.login} className="px-2 py-0.5 rounded-full bg-muted text-[10px] font-medium">
-													{org.login}: {org.count}
-												</span>
-											))}
-										</div>
-									</div>
-								)}
-							</>
-						)
-					) : (
-						<>
-							<FolderPlus className="w-10 h-10 mx-auto mb-4 opacity-20" />
-							<h3 className="text-lg font-medium text-foreground mb-1">Proyecto vacío</h3>
-							<p className="text-sm max-w-xs mx-auto">
-								Navega a un repositorio y agregalo a este proyecto desde la vista de detalle.
-							</p>
-						</>
-					)}
-				</div>
-			) : (
-				<div className="space-y-10">
-					{sortedOrgs.map((org) => (
-						<section key={org} className="space-y-3">
-							<h2 className="text-lg font-semibold text-foreground px-4 flex items-center gap-2">
-								<Building2 className="w-5 h-5" />
-								{org}
-							</h2>
-							<ReposTable
-								repos={groupedRepos[org]}
-								favorites={favorites}
-								onToggleFavorite={toggleFavorite}
-							/>
-						</section>
-					))}
-				</div>
-			)}
+			<div className="space-y-10">
+				{sortedOrgs.map((org) => (
+					<section key={org} className="space-y-3">
+						<ReposTable
+							org={org}
+							repos={groupedRepos[org]}
+							favorites={favorites}
+							onToggleFavorite={toggleFavorite}
+						/>
+					</section>
+				))}
+			</div>
 		</div>
+		</PageLayout>
 	);
 }
 
-function ReposTable({ repos, favorites, onToggleFavorite }: ReposTableProps) {
-	// Ordenar repositorios alfabéticamente por name (ya que ya están filtrados por org)
+function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps) {
 	const sortedRepos = [...repos].sort((a, b) => a.name.localeCompare(b.name));
 
 	return (
@@ -185,7 +153,10 @@ function ReposTable({ repos, favorites, onToggleFavorite }: ReposTableProps) {
 				<thead className="bg-muted">
 					<tr>
 						<th className="px-4 py-2 text-left text-sm font-medium w-auto">
-							Repositorio
+							<div className="flex items-center gap-2">
+								<Building2 className="w-5 h-5" />
+								{org}
+							</div>
 						</th>
 						<th className="px-4 py-2 text-left text-sm font-medium w-20">Tag</th>
 						<th className="px-4 py-2 text-left text-sm font-medium w-20">Commit</th>
@@ -341,8 +312,8 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 				<td className="px-4 py-3 w-auto">
 					<div className="flex items-center gap-2">
 						<Link
-							to="/product/$org/$product"
-							params={{ org, product: name }}
+							to="/github/$org/$repo"
+							params={{ org, repo: name }}
 							search={{ view: "commits" }}
 							className="font-medium hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md"
 						>
@@ -415,11 +386,11 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 							href={`https://github.com/${org}/${name}`}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-muted-foreground hover:text-foreground hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-1.5"
+							className="text-primary hover:text-primary/80 hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-1.5"
 							aria-label="Abrir en GitHub"
 							title="Abrir en GitHub"
 						>
-							<Github className="w-4 h-4" />
+							<Box className="w-4 h-4" />
 						</a>
 						<button
 							type="button"
@@ -452,6 +423,7 @@ type RepoInfo = {
 	updatedAt: string;
 };
 type ReposTableProps = {
+	org: string;
 	repos: RepoInfo[];
 	favorites: string[];
 	onToggleFavorite: (product: string) => void;

@@ -35,9 +35,9 @@ export const DisplayInfo = ({
 		);
 	const iconColor =
 		type === "commit"
-			? "text-primary"
+			? "text-commit"
 			: type === "tag"
-				? "text-ai"
+				? "text-tag"
 				: "text-muted-foreground";
 
 	const displayValue =

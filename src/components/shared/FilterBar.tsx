@@ -9,9 +9,9 @@ interface FilterBarProps {
 	filters: FilterOption[];
 	activeFilter: string;
 	onFilterChange: (value: string) => void;
-	searchPlaceholder: string;
-	searchValue: string;
-	onSearchChange: (value: string) => void;
+	searchPlaceholder?: string;
+	searchValue?: string;
+	onSearchChange?: (value: string) => void;
 	rightContent?: ReactNode;
 }
 
@@ -48,15 +48,17 @@ export function FilterBar({
 					</div>
 				</div>
 
-				<div className="relative">
-					<input
-						type="text"
-						placeholder={searchPlaceholder}
-						value={searchValue}
-						onChange={(e) => onSearchChange(e.target.value)}
-						className="px-3 py-1.5 text-sm bg-background border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground w-64"
-					/>
-				</div>
+				{onSearchChange && (
+					<div className="relative">
+						<input
+							type="text"
+							placeholder={searchPlaceholder}
+							value={searchValue}
+							onChange={(e) => onSearchChange(e.target.value)}
+							className="px-3 py-1.5 text-sm bg-background border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground w-64"
+						/>
+					</div>
+				)}
 			</div>
 
 			{rightContent && <div className="flex gap-2">{rightContent}</div>}

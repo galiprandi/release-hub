@@ -36,7 +36,7 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 ## Refinamiento de Componentes
 
 ### MiniTimeline
-- Uso estricto de tokens semánticos (`text-success`, `bg-info`, etc.) evitando colores hardcodeados.
+- Uso estricto de tokens semánticos (`text-success`, `text-info`, `text-destructive`, `text-warning`, `bg-success`, `bg-info`, `bg-destructive`, `bg-warning`) evitando colores hardcodeados de Tailwind (como `text-blue-600` o `bg-green-500`).
 - Los dots de la línea de tiempo tienen un tamaño estándar de `h-2.5 w-8` y utilizan `focus-visible:ring-offset-1` para accesibilidad.
 - El `HoverCardContent` se presenta sin padding interno base (`p-0`) para permitir secciones con bordes limpios y fondos sutiles.
 

@@ -36,10 +36,8 @@ export function useGhCliSetup() {
 		enabled: !!versionCheck,
 	});
 
-	// Force bypass for verification environments
-	const isVerification = typeof window !== 'undefined' && window.location.pathname === '/verification-page';
-	const isInstalled = isVerification || !!versionCheck;
-	const isAuthenticated = isVerification || !!authCheck;
+	const isInstalled = !!versionCheck;
+	const isAuthenticated = !!authCheck;
 
 	// Extraer nombre de cuenta del output de gh auth status
 	let account: string | undefined;

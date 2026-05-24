@@ -118,8 +118,8 @@ export const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
 	viewPendingCommits: { icon: GitPullRequestCreateArrow, label: "Ver commits pendientes", color: "warning" },
 	addFavorite: { icon: Star, label: "Agregar a favoritos", color: "default" },
 	removeFavorite: { icon: Star, label: "Eliminar de favoritos", color: "warning" },
-	freezeBranch: { icon: Lock, label: "Bloquear branch", color: "warning" },
-	unfreezeBranch: { icon: Unlock, label: "Desbloquear branch", color: "success" },
+	freezeBranch: { icon: Lock, label: "Bloquear", color: "warning" },
+	unfreezeBranch: { icon: Unlock, label: "Desbloquear", color: "success" },
 	promoteToProd: { icon: Rocket, label: "Promocionar a producción", color: "destructive" },
-	forceRedeploy: { icon: RefreshCw, label: "Forzar redeploy", color: "primary" },
+	forceRedeploy: { icon: RefreshCw, label: "Redeploy", color: "primary" },
 }

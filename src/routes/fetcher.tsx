@@ -10,7 +10,7 @@ import { Table } from '@/components/ui/Table';
 import type { ColumnDef } from '@tanstack/react-table';
 import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
-import { PageLayout } from '../layouts/PageLayout';
+import { PageLayout } from '@/layouts/PageLayout';
 
 export const Route = createFileRoute('/fetcher')({
 	component: FetcherPage,
@@ -147,7 +147,8 @@ function FetcherPage() {
 			try {
 				// Validate that the curl is parseable
 				parseCurlCommand(curlInput);
-				setActiveQuery({ id: '', curl: curlInput });
+				const now = new Date().toISOString();
+				setActiveQuery({ id: '', curl: curlInput, createdAt: now, updatedAt: now });
 				setCurlInput('');
 			} catch (error) {
 				console.error('Invalid curl:', error);

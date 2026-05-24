@@ -1,7 +1,8 @@
 import { useState, useEffect,  type Dispatch, type SetStateAction } from 'react';
-import { Send, Copy, AlertTriangle, SendHorizontal } from 'lucide-react';
+import { Send, AlertTriangle, SendHorizontal } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
-import { parseCurlCommand, formatJSON, minifyJSON } from '@/utils/curlParser';
+import { JsonEditor } from '@/components/JsonEditor';
+import { parseCurlCommand, minifyJSON } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 import { executeCurlCommand } from '@/api/curl';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
@@ -43,6 +44,7 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 	const [activeTab, setActiveTab] = useState<'body' | 'headers'>('body');
 	const [headersExpanded, setHeadersExpanded] = useState(false);
 	const [bodySearchQuery, setBodySearchQuery] = useState('');
+	const [requestBodySearchQuery, setRequestBodySearchQuery] = useState('');
 
 	const { addQueryRecord } = useFetcherHistory();
 	const curl = query?.curl || null;
@@ -136,6 +138,7 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 			} : {
 				id: '',
 				curl: curlInput,
+				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
 				response: {
 					status,
@@ -171,24 +174,18 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 		}
 	};
 
-	const handleCopyResponse = () => {
-		if (response) {
-			navigator.clipboard.writeText(response.body);
-		}
-	};
-
 	// Helper to update curlInput when form fields change
-	const updateCurlInput = (updates: Partial<typeof parsed>) => {
+	const updateCurlInput = (updates: Partial<typeof parsed>, shouldMinify = true) => {
 			if (!parsed) return;
 		const updated = { ...parsed, ...updates };
 		const headers = Object.entries(updated.headers)
 			.map(([key, value]) => `-H "${key}: ${value}"`)
 			.join(' ');
-		const bodyToSend = updated.body ? minifyJSON(updated.body) : '';
+		const bodyToSend = updated.body ? (shouldMinify ? minifyJSON(updated.body) : updated.body) : '';
 		const data = bodyToSend ? `-d '${bodyToSend}'` : '';
 		const newCurl = `curl -X ${updated.method} '${updated.url}' ${headers} ${data}`.trim();
 		setCurlInput(newCurl);
-		setQuery(prev => prev ? { ...prev, curl: newCurl } : { id: '', curl: newCurl });
+		setQuery(prev => prev ? { ...prev, curl: newCurl } : { id: '', curl: newCurl, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
 	};
 
 	return (
@@ -293,12 +290,14 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 																})}
 																placeholder="Value"
 																className={`w-full px-2 py-1 pr-8 text-xs border rounded-md focus:outline-none focus:ring-2 ${
-																	parsed.isTokenExpired
+																	parsed.isTokenExpired && value.trim().length > 0
 																		? 'bg-warning/10 border-warning text-warning-foreground'
 																		: 'focus:ring-primary border'
 																}`}
 															/>
-															<AlertTriangle className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-warning" />
+															{parsed.isTokenExpired && value.trim().length > 0 && (
+																<AlertTriangle className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-warning" />
+															)}
 														</div>
 													) : (
 														<input
@@ -336,15 +335,14 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 									</div>
 								</div>
 
-								<div>
-									<label className="text-xs font-medium block mb-1.5">Body</label>
-									<textarea
-										value={parsed.body}
-										onChange={(e) => updateCurlInput({ body: e.target.value })}
-										placeholder='{"key": "value"}'
-										className="w-full h-60 px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
-									/>
-								</div>
+								<JsonEditor
+									value={parsed.body}
+									onChange={(value, shouldMinify) => updateCurlInput({ body: value }, shouldMinify)}
+									placeholder='{"key": "value"}'
+									height="h-60"
+									searchQuery={requestBodySearchQuery}
+									onSearchChange={setRequestBodySearchQuery}
+								/>
 							</div>
 						</div>
 
@@ -378,42 +376,21 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 										>
 											Body
 										</button>
-										<input
-											type="text"
-											value={bodySearchQuery}
-											onChange={(e) => setBodySearchQuery(e.target.value)}
-											placeholder="Buscar en body..."
-											className="ml-auto px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-48"
-										/>
 									</div>
 
 									{/* Response content */}
-									<div className="flex-1 overflow-auto bg-muted/50 rounded-md p-3 relative">
+									<div className="flex-1 overflow-auto">
 										{activeTab === 'body' ? (
-											<>
-											<button
-												type="button"
-												onClick={handleCopyResponse}
-												className="absolute top-4 right-4 p-1.5 text-muted-foreground hover:text-primary hover:bg-accent rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-												title="Copiar respuesta"
-											>
-												<Copy className="w-4 h-4" />
-											</button>
-											<pre className="text-xs font-mono whitespace-pre-wrap break-all">
-												{response.body
-													? bodySearchQuery
-														? formatJSON(response.body)
-																.split('\n')
-																.filter((line) =>
-																	line.toLowerCase().includes(bodySearchQuery.toLowerCase()),
-																)
-																.join('\n') || '(Sin coincidencias)'
-														: formatJSON(response.body)
-													: '(Sin respuesta)'}
-											</pre>
-											</>
+											<JsonEditor
+												value={response.body || ''}
+												onChange={() => {}}
+												readOnly
+												height="h-full"
+												searchQuery={bodySearchQuery}
+												onSearchChange={setBodySearchQuery}
+											/>
 										) : (
-											<div className="text-xs font-mono space-y-1">
+											<div className="text-xs font-mono space-y-1 bg-muted/50 rounded-md p-3">
 												{Object.entries(response.headers).map(([key, value]) => (
 													<div key={key}>
 														<span className="font-semibold">{key}:</span> {value}

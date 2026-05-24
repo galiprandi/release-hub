@@ -57,10 +57,13 @@ describe("ProjectSelector", () => {
 		vi.clearAllMocks()
 		vi.mocked(useUserCollections).mockReturnValue({
 			favorites: [],
+			deploymentFavorites: [],
 			projects: [],
 			activeTab: "favorites",
 			toggleFavorite: mockToggleFavorite,
 			isFavorite: mockIsFavorite,
+			toggleDeploymentFavorite: vi.fn(),
+			isDeploymentFavorite: vi.fn(),
 			createProject: mockCreateProject,
 			updateProject: mockUpdateProject,
 			deleteProject: mockDeleteProject,
@@ -94,10 +97,13 @@ describe("ProjectSelector", () => {
 		]
 		vi.mocked(useUserCollections).mockReturnValue({
 			favorites: [],
+			deploymentFavorites: [],
 			projects: mockProjects,
 			activeTab: "favorites",
 			toggleFavorite: mockToggleFavorite,
 			isFavorite: mockIsFavorite,
+			toggleDeploymentFavorite: vi.fn(),
+			isDeploymentFavorite: vi.fn(),
 			createProject: mockCreateProject,
 			updateProject: mockUpdateProject,
 			deleteProject: mockDeleteProject,

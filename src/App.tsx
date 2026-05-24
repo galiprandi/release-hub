@@ -13,12 +13,12 @@ function App() {
         <div className="space-y-4">
           <div className="p-4 border rounded-lg">
             <h2 className="font-semibold">
-              Repositorios encontrados: {data.results.length}
+              Repositorios encontrados: {data.length}
             </h2>
           </div>
 
           <div className="space-y-2">
-            {data.results.map((repo) => (
+            {data.map((repo) => (
               <div key={repo.fullName} className="p-3 border rounded">
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{repo.name}</span>

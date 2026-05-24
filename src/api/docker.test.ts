@@ -6,8 +6,7 @@ import {
     getContainerLogs,
     startContainer,
     restartContainer,
-    stopContainer,
-    getContainerStats
+    stopContainer
 } from './docker';
 import { runCommand } from '@/api/exec';
 
@@ -163,95 +162,6 @@ describe('docker api', () => {
             vi.mocked(runCommand).mockResolvedValueOnce({ stdout: 'abc', stderr: '', success: true });
             expect(await stopContainer('abc')).toBe(true);
             expect(runCommand).toHaveBeenCalledWith('docker stop abc');
-        });
-    });
-
-    describe('getContainerStats', () => {
-        it('parses docker stats JSON output', async () => {
-            const out = JSON.stringify({
-                CPUPerc: '1.5%',
-                MemUsage: '10MiB / 1GiB',
-                MemPerc: '1%',
-                NetIO: '1kB / 2kB',
-                BlockIO: '0B / 0B'
-            });
-            vi.mocked(runCommand).mockResolvedValueOnce({ stdout: out, stderr: '', success: true });
-
-            const stats = await getContainerStats('abc');
-            expect(runCommand).toHaveBeenCalledWith(expect.stringContaining('--format json'));
-            expect(stats).toEqual({
-                cpuPercent: '1.5%',
-                memUsage: '10MiB',
-                memPercent: '1%',
-                netIO: '1kB / 2kB',
-                blockIO: '0B / 0B'
-            });
-        });
-
-        it('handles missing fields in JSON stats', async () => {
-            const out = JSON.stringify({ CPUPerc: '2%' });
-            vi.mocked(runCommand).mockResolvedValueOnce({ stdout: out, stderr: '', success: true });
-            const stats = await getContainerStats('abc');
-            expect(stats).toMatchObject({
-                cpuPercent: '2%',
-                memUsage: 'N/A',
-                blockIO: 'N/A'
-            });
-        });
-
-        it('falls back to manual parsing for non-JSON output', async () => {
-            const out =
-                'CONTAINER CPU % MEM USAGE / LIMIT MEM % NET I/O BLOCK I/O PIDS\n' +
-                'abc 1.5% 10MiB / 1GiB 1% 1kB / 2kB 0B / 0B 1';
-            vi.mocked(runCommand).mockResolvedValueOnce({ stdout: out, stderr: '', success: true });
-
-            const stats = await getContainerStats('abc');
-            expect(stats).toMatchObject({
-                cpuPercent: '1.5%',
-                memUsage: '10MiB'
-            });
-        });
-
-        it('manual parsing handles invalid lines', async () => {
-            const out = 'HEADER\nshort_line';
-            vi.mocked(runCommand).mockResolvedValueOnce({ stdout: out, stderr: '', success: true });
-            const stats = await getContainerStats('abc');
-            expect(stats).toMatchObject({
-                cpuPercent: '0%',
-                memUsage: 'N/A'
-            });
-        });
-
-        it('manual parsing uses defaults if pattern not found', async () => {
-            const out = 'CONTAINER NO_PERCENT NO_BYTES';
-            vi.mocked(runCommand).mockResolvedValueOnce({ stdout: out, stderr: '', success: true });
-            const stats = await getContainerStats('abc');
-            expect(stats).toMatchObject({
-                cpuPercent: '0%',
-                memUsage: 'N/A'
-            });
-        });
-
-        it('returns default stats for empty output', async () => {
-            vi.mocked(runCommand).mockResolvedValueOnce({ stdout: '', stderr: '', success: true });
-            const stats = await getContainerStats('abc');
-            expect(stats).toEqual({
-                cpuPercent: '0%',
-                memUsage: 'N/A',
-                memPercent: '0%',
-                netIO: 'N/A',
-                blockIO: 'N/A'
-            });
-        });
-
-        it('returns null and logs error on command failure', async () => {
-            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-            vi.mocked(runCommand).mockRejectedValueOnce(new Error('fail'));
-
-            const stats = await getContainerStats('abc');
-            expect(stats).toBeNull();
-            expect(consoleSpy).toHaveBeenCalled();
-            consoleSpy.mockRestore();
         });
     });
 });

@@ -1,25 +1,15 @@
 import { describe, it, expect, vi } from 'vitest'
-import { fetchLatestPipeline, apiSeki } from './seki'
+import { fetchPipeline, apiSeki } from './seki'
 
 vi.mock('@/utils/sekiToken', () => ({ getSekiToken: vi.fn() }))
 
 describe('api/seki', () => {
-  it('fetchLatestPipeline retorna el primer item y maneja filtros', async () => {
+  it('fetchPipeline retorna el pipeline', async () => {
     const mockP = { id: '1' }
-    const spy = vi.spyOn(apiSeki, 'get').mockResolvedValue({ data: { items: [mockP] } })
+    const spy = vi.spyOn(apiSeki, 'get').mockResolvedValue({ data: mockP })
 
-    const res = await fetchLatestPipeline('o/r', 'staging', 'commit')
+    const res = await fetchPipeline('o/r', 'commit')
     expect(res).toBe(mockP)
-    expect(spy).toHaveBeenCalledWith('/products/o/r/pipelines', expect.objectContaining({
-      params: expect.objectContaining({
-        filters: { 'git.stage': 'staging', 'git.event': 'commit' }
-      })
-    }))
-  })
-
-  it('fetchLatestPipeline retorna null si no hay items', async () => {
-    vi.spyOn(apiSeki, 'get').mockResolvedValue({ data: { items: [] } })
-    const res = await fetchLatestPipeline('o/r', 'production')
-    expect(res).toBeNull()
+    expect(spy).toHaveBeenCalledWith('/products/o/r/pipelines/commit', expect.any(Object))
   })
 })

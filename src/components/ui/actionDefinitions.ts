@@ -38,7 +38,7 @@ import {
 	Activity,
 	Bell,
 	Link,
-	Box,
+	Github,
 	GitPullRequestCreateArrow,
 } from "lucide-react"
 
@@ -114,7 +114,7 @@ export const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
 	viewLayout: { icon: Layout, label: "Ver layout", color: "default" },
 
 	// GitHub actions
-	openGitHub: { icon: Box, label: "Abrir en GitHub", color: "primary" },
+	openGitHub: { icon: Github, label: "Abrir en GitHub", color: "primary" },
 	viewPendingCommits: { icon: GitPullRequestCreateArrow, label: "Ver commits pendientes", color: "warning" },
 	addFavorite: { icon: Star, label: "Agregar a favoritos", color: "default" },
 	removeFavorite: { icon: Star, label: "Eliminar de favoritos", color: "warning" },

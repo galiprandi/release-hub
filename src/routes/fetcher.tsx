@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Send, Trash2, Copy } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
 import { FilterBar } from '@/components/shared/FilterBar';
@@ -36,16 +37,16 @@ function formatTimeAgo(dateString: string): string {
 function getMethodBadgeColor(method: string): string {
 	switch (method.toUpperCase()) {
 		case 'GET':
-			return 'bg-green-100 text-green-700';
+			return 'bg-success/20 text-success';
 		case 'POST':
-			return 'bg-blue-100 text-blue-700';
+			return 'bg-info/20 text-info';
 		case 'PUT':
 		case 'PATCH':
-			return 'bg-yellow-100 text-yellow-700';
+			return 'bg-warning/20 text-warning';
 		case 'DELETE':
-			return 'bg-red-100 text-red-700';
+			return 'bg-destructive/20 text-destructive';
 		default:
-			return 'bg-gray-100 text-gray-700';
+			return 'bg-muted text-muted-foreground';
 	}
 }
 
@@ -66,6 +67,34 @@ function FetcherPage() {
 	const [activeQuery, setActiveQuery] = useState<QueryRecord | undefined>();
 	const [editingQuery, setEditingQuery] = useState<QueryRecord | undefined>();
 	const [curlInput, setCurlInput] = useState('');
+	const [queryToDelete, setQueryToDelete] = useState<string | null>(null);
+
+	// Auto-import from clipboard on mount
+	useEffect(() => {
+		const checkClipboard = async () => {
+			try {
+				// Only check if window is focused and we have permissions
+				if (typeof navigator !== 'undefined' && navigator.clipboard) {
+					const text = await navigator.clipboard.readText();
+					if (text && text.trim().toLowerCase().startsWith('curl')) {
+						try {
+							parseCurlCommand(text);
+							// If valid curl, open modal directly to simplify steps
+							const now = new Date().toISOString();
+							setActiveQuery({ id: '', curl: text, createdAt: now, updatedAt: now });
+						} catch {
+							// Not a valid curl, ignore
+						}
+					}
+				}
+			} catch (error) {
+				// Clipboard access might be denied, ignore silently
+				console.debug('Clipboard access denied or failed:', error);
+			}
+		};
+
+		checkClipboard();
+	}, []);
 
 	// Validate curl in real-time
 	const isCurlValid = useMemo(() => {
@@ -130,8 +159,13 @@ function FetcherPage() {
 	const totalPages = Math.ceil(filteredHistory.length / pageSize);
 
 	const handleDelete = (id: string) => {
-		if (confirm('¿Estás seguro de que quieres eliminar esta query del historial?')) {
-			deleteQueryRecord(id);
+		setQueryToDelete(id);
+	};
+
+	const confirmDelete = () => {
+		if (queryToDelete) {
+			deleteQueryRecord(queryToDelete);
+			setQueryToDelete(null);
 		}
 	};
 
@@ -180,12 +214,12 @@ function FetcherPage() {
 				value={curlInput}
 				onChange={(e) => setCurlInput(e.target.value)}
 				placeholder="Importar cURL"
-				className="w-64 px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
+				className="w-64 px-3 py-1.5 text-sm bg-background border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 font-mono transition-all placeholder:text-muted-foreground"
 			/>
 			<button
 				type="submit"
 				disabled={!isCurlValid}
-				className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm bg-success text-success-foreground rounded-md hover:bg-success/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
+				className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 			>
 				<Send className="w-3.5 h-3.5" />
 			</button>
@@ -281,6 +315,16 @@ function FetcherPage() {
 				query={activeQuery || editingQuery}
 				onClose={handleCloseModal}
 			/>
+
+			<ConfirmDialog
+				open={!!queryToDelete}
+				onOpenChange={(open) => !open && setQueryToDelete(null)}
+				title="Eliminar Query"
+				description="¿Estás seguro de que quieres eliminar esta query del historial? Esta acción no se puede deshacer."
+				confirmLabel="Eliminar"
+				onConfirm={confirmDelete}
+				variant="destructive"
+			/>
 		</div>
 		</PageLayout>
 	);
@@ -350,7 +394,7 @@ function MethodCell({ query }: { query: QueryRecord }) {
 	if (!parsed) return null
 
 	return (
-		<span className={`px-2 py-1 rounded text-xs font-semibold uppercase ${getMethodBadgeColor(parsed.method)}`}>
+		<span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${getMethodBadgeColor(parsed.method)}`}>
 			{parsed.method}
 		</span>
 	)
@@ -376,7 +420,7 @@ function DomainCell({ query }: { query: QueryRecord }) {
 
 function SentCell({ query }: { query: QueryRecord }) {
 	return (
-		<span className="text-sm text-muted-foreground" title={query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}>
+		<span className="text-sm text-muted-foreground truncate block max-w-[120px]" title={query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}>
 			{query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}
 		</span>
 	)
@@ -385,7 +429,7 @@ function SentCell({ query }: { query: QueryRecord }) {
 function ResponseTimeCell({ query }: { query: QueryRecord }) {
 	if (query.response?.responseTime) {
 		return (
-			<span className={`px-2 py-1 rounded text-xs font-medium ${getResponseTimeBadgeColor(query.response.responseTime)}`}>
+			<span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${getResponseTimeBadgeColor(query.response.responseTime)}`}>
 				{query.response.responseTime}ms
 			</span>
 		)
@@ -410,7 +454,8 @@ function ActionsCell({
 		<div className="flex items-center justify-end gap-2">
 			<button
 				type="button"
-				className="p-1.5 bg-success text-success-foreground hover:bg-success/90 rounded transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
+				className="p-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+				aria-label="Enviar query"
 				title="Enviar"
 				onClick={() => onOpenModal(query)}
 			>
@@ -419,7 +464,8 @@ function ActionsCell({
 			{query.response?.body && (
 				<button
 					type="button"
-					className="p-1.5 text-muted-foreground hover:text-primary hover:bg-accent rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+					className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+					aria-label="Copiar respuesta"
 					title="Copiar respuesta"
 					onClick={() => onCopyResponse(query)}
 				>
@@ -429,6 +475,7 @@ function ActionsCell({
 			<button
 				type="button"
 				className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none focus-visible:ring-offset-1"
+				aria-label="Eliminar query"
 				title="Eliminar"
 				onClick={() => onDelete(query.id)}
 				disabled={isDeleting}

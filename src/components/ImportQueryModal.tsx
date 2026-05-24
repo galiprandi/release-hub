@@ -210,11 +210,11 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 							<div className="space-y-4">
 								<div className="flex gap-2">
 									<div className="w-24">
-										<label className="text-xs font-medium block mb-1.5">Método</label>
+										<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-1.5">Método</label>
 										<select
 											value={parsed.method}
 											onChange={(e) => updateCurlInput({ method: e.target.value })}
-											className="w-full px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-2.5 py-1.5 text-sm bg-background border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
 										>
 											{['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
 												<option key={m} value={m}>{m}</option>
@@ -222,12 +222,12 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 										</select>
 									</div>
 									<div className="flex-1">
-										<label className="text-xs font-medium block mb-1.5">URL</label>
+										<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-1.5">URL</label>
 										<input
 											type="text"
 											value={parsed.url}
 											onChange={(e) => updateCurlInput({ url: e.target.value })}
-											className="w-full px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
+											className="w-full px-2.5 py-1.5 text-sm bg-background border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 font-mono transition-all placeholder:text-muted-foreground"
 										/>
 									</div>
 									<div className="flex items-end">
@@ -254,13 +254,13 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 
 								<div>
 									<div className="flex items-center justify-between mb-1.5">
-										<label className="text-xs font-medium">Headers</label>
+										<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Headers</label>
 										<button
 											type="button"
 											onClick={() => updateCurlInput({ headers: { ...parsed.headers, '': '' } })}
-											className="text-xs text-primary hover:underline"
+											className="text-[10px] font-bold uppercase tracking-tight text-primary hover:underline transition-all"
 										>
-											+ Agregar
+											+ Agregar Header
 										</button>
 									</div>
 									<div className="space-y-2">
@@ -278,7 +278,7 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 															updateCurlInput({ headers: newHeaders });
 														}}
 														placeholder="Header name"
-														className="w-full px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+														className="w-full px-2 py-1 text-xs bg-background border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
 													/>
 													{key.toLowerCase() === 'authorization' ? (
 														<div className="relative">
@@ -289,10 +289,10 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 																	headers: { ...parsed.headers, [key]: e.target.value }
 																})}
 																placeholder="Value"
-																className={`w-full px-2 py-1 pr-8 text-xs border rounded-md focus:outline-none focus:ring-2 ${
+																className={`w-full px-2 py-1 pr-8 text-xs bg-background border rounded-md focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-offset-1 transition-all ${
 																	parsed.isTokenExpired && value.trim().length > 0
 																		? 'bg-warning/10 border-warning text-warning-foreground'
-																		: 'focus:ring-primary border'
+																		: 'border-input focus-visible:ring-primary'
 																}`}
 															/>
 															{parsed.isTokenExpired && value.trim().length > 0 && (
@@ -307,7 +307,7 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 																headers: { ...parsed.headers, [key]: e.target.value }
 															})}
 															placeholder="Value"
-															className="w-full px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+															className="w-full px-2 py-1 text-xs bg-background border border-input rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
 														/>
 													)}
 													<button
@@ -357,10 +357,10 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 										<button
 											type="button"
 											onClick={() => setActiveTab('headers')}
-											className={`px-3 py-1 text-xs rounded-md transition-colors ${
+											className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
 												activeTab === 'headers'
-													? 'bg-primary text-primary-foreground'
-													: 'bg-muted text-muted-foreground hover:bg-accent'
+													? 'bg-primary text-primary-foreground shadow-sm'
+													: 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
 											}`}
 										>
 											Headers
@@ -368,10 +368,10 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 										<button
 											type="button"
 											onClick={() => setActiveTab('body')}
-											className={`px-3 py-1 text-xs rounded-md transition-colors ${
+											className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
 												activeTab === 'body'
-													? 'bg-primary text-primary-foreground'
-													: 'bg-muted text-muted-foreground hover:bg-accent'
+													? 'bg-primary text-primary-foreground shadow-sm'
+													: 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
 											}`}
 										>
 											Body
@@ -402,18 +402,18 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 
 									{/* Response footer with timing info */}
 									
-									<div className="mt-3 text-xs text-muted-foreground flex items-center justify-between">
-										<span className={`px-2 py-1 rounded text-xs font-semibold ${
+									<div className="mt-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+										<span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
 												response.status >= 200 && response.status < 300
-													? 'bg-green-100 text-green-700'
+													? 'bg-success/20 text-success'
 													: response.status >= 400
-														? 'bg-red-100 text-red-700'
-														: 'bg-yellow-100 text-yellow-700'
+														? 'bg-destructive/20 text-destructive'
+														: 'bg-warning/20 text-warning'
 											}`} title={query?.updatedAt ? formatTimeAgo(query.updatedAt) : new Date().toLocaleString()}>
 												{response.status} {response.statusText}
 											</span>
-										<span>{response.responseTime}ms</span>
-										<span>{DayJS(query?.updatedAt || new Date()).fromNow()}</span>
+										<span className="bg-muted px-2 py-1 rounded">{response.responseTime}ms</span>
+										<span className="bg-muted px-2 py-1 rounded">{DayJS(query?.updatedAt || new Date()).fromNow()}</span>
 									</div>
 								</>
 							) : (

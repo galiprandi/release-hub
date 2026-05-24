@@ -18,7 +18,7 @@ function RootLayout() {
 	const pathname = routerState.location.pathname;
 
 	useEffect(() => {
-		if (!showSpinner && !isLoading && (!isInstalled || !isAuthenticated)) {
+		if (!showSpinner && !isLoading && (!isInstalled || !isAuthenticated) && pathname !== '/fetcher') {
 			navigate({ to: "/setup" });
 		}
 		else if (pathname === '/') {

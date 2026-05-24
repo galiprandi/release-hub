@@ -241,6 +241,7 @@ Antes de crear componentes nuevos, verificar si extienden:
 - **FilterBar**: Para barras de filtros
 - **PageHeader**: Para headers de página
 - **BaseDialog**: Para todos los diálogos modales
+- **ConfirmDialog**: Para diálogos de confirmación críticos (eliminaciones, acciones irreversibles). Usa `AlertTriangle` y soporta variante `destructive`.
 - **DisplayInfo**: Para mostrar metadatos con iconos
 - **ActionButton**: Para botones de acción iconográficos con tooltip
 

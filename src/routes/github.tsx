@@ -12,6 +12,8 @@ import { CommitsModal } from "@/components/CommitsModal";
 import { PageLayout } from "@/layouts/PageLayout";
 import { RepoSearch } from "@/components/RepoSearch";
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
+import { Table } from "@/components/ui/Table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
 import { useGitCommits } from "@/hooks/useGitCommits";
@@ -148,39 +150,265 @@ function Dashboard() {
 function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps) {
 	const sortedRepos = [...repos].sort((a, b) => a.name.localeCompare(b.name));
 
+	const columns: ColumnDef<RepoInfo>[] = [
+		{
+			accessorKey: "name",
+			header: () => (
+				<div className="flex items-center gap-2">
+					<Building2 className="w-5 h-5" />
+					<span>{org}</span>
+				</div>
+			),
+			cell: ({ row }) => <RepoNameCell repo={row.original} />,
+		},
+		{
+			accessorKey: "tag",
+			header: "Tag",
+			cell: ({ row }) => <TagCell repo={row.original} />,
+		},
+		{
+			accessorKey: "commit",
+			header: "Commit",
+			cell: ({ row }) => <CommitCell repo={row.original} />,
+		},
+		{
+			accessorKey: "updatedAt",
+			header: "Actualización",
+			cell: ({ row }) => <DateCell repo={row.original} />,
+		},
+		{
+			accessorKey: "author",
+			header: "Autor",
+			cell: ({ row }) => <AuthorCell repo={row.original} />,
+		},
+		{
+			id: "actions",
+			accessorKey: "actions",
+			header: "Acciones",
+			enableSorting: false,
+			cell: ({ row }) => (
+				<ActionsCell
+					repo={row.original}
+					isFavorite={favorites.includes(row.original.fullName)}
+					onToggleFavorite={onToggleFavorite}
+				/>
+			),
+		},
+	];
+
+	return <Table columns={columns} data={sortedRepos} />;
+}
+
+function RepoNameCell({ repo }: { repo: RepoInfo }) {
+	const [org, name] = repo.fullName.split("/");
+	const [isCommitsModalOpen, setIsCommitsModalOpen] = useState(false);
+
+	const { commits, isLoading: isLoadingCommits } = useGitCommits({
+		repo: repo.fullName,
+	});
+	const { latestTag, isLoading: isLoadingTags } = useGitTagsSimple({
+		repo: repo.fullName,
+	});
+
+	const prodPipeline = usePipelineWithHealth({
+		product: repo.fullName,
+		commit: latestTag?.commit ?? "",
+		tag: latestTag?.name ?? "",
+		enabled: !!latestTag?.commit && !!latestTag?.name,
+	});
+
+	const pendingCount = (() => {
+		if (!commits || !prodPipeline.data?.git?.commit) return 0;
+		const prodCommitIndex = commits.findIndex(c => c.hash === prodPipeline.data!.git!.commit);
+		if (prodCommitIndex === -1) return commits.length;
+		return prodCommitIndex;
+	})();
+
+	const isLoading = isLoadingCommits || isLoadingTags;
+
+	if (isLoading) {
+		return (
+			<div className="flex items-center gap-2">
+				<div className="w-4 h-4 bg-muted rounded-full flex-shrink-0 flex items-center justify-center">
+					<Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
+				</div>
+				<div className="h-4 bg-muted rounded w-32" />
+			</div>
+		);
+	}
+
 	return (
-		<div className="border rounded-lg overflow-hidden">
-			<table className="w-full">
-				<thead className="bg-muted">
-					<tr>
-						<th className="px-4 py-2 text-left text-sm font-medium w-auto">
-							<div className="flex items-center gap-2">
-								<Building2 className="w-5 h-5" />
-								{org}
-							</div>
-						</th>
-						<th className="px-4 py-2 text-left text-sm font-medium w-20">Tag</th>
-						<th className="px-4 py-2 text-left text-sm font-medium w-20">Commit</th>
-						<th className="px-4 py-2 text-left text-sm font-medium w-36">
-							Actualización
-						</th>
-						<th className="px-4 py-2 text-left text-sm font-medium" style={{ width: '250px' }}>Autor</th>
-						<th className="px-4 py-2 text-center text-sm font-medium w-16">
-							Acciones
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					{sortedRepos.map((repo) => (
-						<RepoRow
-							key={repo.fullName}
-							repo={repo}
-							isFavorite={favorites.includes(repo.fullName)}
-							onToggleFavorite={onToggleFavorite}
-						/>
-					))}
-				</tbody>
-			</table>
+		<>
+			<div className="flex items-center gap-2">
+				<Link
+					to="/github/$org/$repo"
+					params={{ org, repo: name }}
+					search={{ view: "commits" }}
+					className="font-medium hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md"
+				>
+					{name}
+				</Link>
+				{pendingCount > 0 && (
+					<Tooltip.Provider>
+						<Tooltip.Root>
+							<Tooltip.Trigger asChild>
+								<button
+									type="button"
+									onClick={() => setIsCommitsModalOpen(true)}
+									className="inline-flex items-center gap-1 text-[10px] bg-warning/10 text-warning px-2 py-0.5 rounded-full border border-warning/20 font-bold cursor-pointer hover:bg-warning/20 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+								>
+									<GitPullRequestCreateArrow className="w-2.5 h-2.5" />
+									<span>{pendingCount}</span>
+								</button>
+							</Tooltip.Trigger>
+							<Tooltip.Portal>
+								<Tooltip.Content
+									className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs z-50"
+									sideOffset={5}
+								>
+									{pendingCount} commit{pendingCount !== 1 ? 's' : ''} pendientes de promoción a producción
+								</Tooltip.Content>
+							</Tooltip.Portal>
+						</Tooltip.Root>
+					</Tooltip.Provider>
+				)}
+			</div>
+			<CommitsModal
+				isOpen={isCommitsModalOpen}
+				onClose={() => setIsCommitsModalOpen(false)}
+				commits={commits || []}
+				prodCommitHash={prodPipeline.data?.git?.commit || ""}
+				prodTag={latestTag?.name}
+			/>
+		</>
+	);
+}
+
+function TagCell({ repo }: { repo: RepoInfo }) {
+	const [org, name] = repo.fullName.split("/");
+	const { latestTag, isLoading: isLoadingTags } = useGitTagsSimple({
+		repo: repo.fullName,
+	});
+	const prodPipeline = usePipelineWithHealth({
+		product: repo.fullName,
+		commit: latestTag?.commit ?? "",
+		tag: latestTag?.name ?? "",
+		enabled: !!latestTag?.commit && !!latestTag?.name,
+	});
+	const productionStatus = prodPipeline.data ? {
+		status: getDeployStatus(prodPipeline.data.events),
+		updatedAt: prodPipeline.data.updated_at,
+		failedStage: prodPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.label.es,
+		errorDetail: prodPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.markdown,
+	} : { status: undefined };
+	const isProdLoading = prodPipeline.isLoading;
+
+	if (isLoadingTags) {
+		return <div className="h-4 bg-muted rounded w-16" />;
+	}
+
+	return latestTag?.name ? (
+		<TagLink
+			tagName={latestTag.name}
+			org={org}
+			repo={name}
+			pipelineStatus={productionStatus}
+			isLoading={isProdLoading}
+		/>
+	) : null;
+}
+
+function CommitCell({ repo }: { repo: RepoInfo }) {
+	const [org, name] = repo.fullName.split("/");
+	const { latestCommit, isLoading: isLoadingCommits } = useGitCommits({
+		repo: repo.fullName,
+	});
+	const stagingPipeline = usePipelineWithHealth({
+		product: repo.fullName,
+		commit: latestCommit?.hash ?? "",
+		enabled: !!latestCommit?.hash,
+	});
+	const stagingStatus = stagingPipeline.data ? {
+		status: getDeployStatus(stagingPipeline.data.events),
+		updatedAt: stagingPipeline.data.updated_at,
+		failedStage: stagingPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.label.es,
+		errorDetail: stagingPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.markdown,
+	} : { status: undefined };
+	const isStagingLoading = stagingPipeline.isLoading;
+
+	if (isLoadingCommits) {
+		return <div className="h-4 bg-muted rounded w-16" />;
+	}
+
+	return latestCommit?.shortHash ? (
+		<CommitLink
+			hash={latestCommit.shortHash}
+			org={org}
+			repo={name}
+			pipelineStatus={stagingStatus}
+			isLoading={isStagingLoading}
+		/>
+	) : null;
+}
+
+function DateCell({ repo }: { repo: RepoInfo }) {
+	const { latestCommit, isLoading: isLoadingCommits } = useGitCommits({
+		repo: repo.fullName,
+	});
+	const commitDate = latestCommit?.date;
+
+	if (isLoadingCommits) {
+		return <div className="h-4 bg-muted rounded w-24" />;
+	}
+
+	return commitDate ? <DisplayInfo type="dates" value={commitDate} /> : null;
+}
+
+function AuthorCell({ repo }: { repo: RepoInfo }) {
+	const { latestCommit, isLoading: isLoadingCommits } = useGitCommits({
+		repo: repo.fullName,
+	});
+	const commitAuthor = latestCommit?.author;
+
+	if (isLoadingCommits) {
+		return <div className="h-4 bg-muted rounded w-40" />;
+	}
+
+	const truncatedAuthor = commitAuthor && commitAuthor.length > 30 
+		? commitAuthor.slice(0, 30) + "..." 
+		: commitAuthor;
+
+	return truncatedAuthor ? (
+		<span title={commitAuthor}>
+			{truncatedAuthor}
+		</span>
+	) : null;
+}
+
+function ActionsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; isFavorite: boolean; onToggleFavorite: (product: string) => void }) {
+	const [org, name] = repo.fullName.split("/");
+	const { latestTag } = useGitTagsSimple({
+		repo: repo.fullName,
+	});
+
+	return (
+		<div className="flex items-center justify-end gap-1.5">
+			<FreezeDialog repo={repo.fullName} iconOnly={true} />
+			<ForceRedeployDialog repo={repo.fullName} iconOnly={true} />
+			<PromoteDialog repo={repo.fullName} latestTag={latestTag?.name} iconOnly={true} />
+			<ActionButton
+				action={ACTION_DEFINITIONS.openGitHub}
+				onClick={() => window.open(`https://github.com/${org}/${name}`, '_blank')}
+			/>
+			<button
+				type="button"
+				onClick={() => onToggleFavorite(repo.fullName)}
+				className={`${isFavorite ? "text-warning" : "text-muted-foreground"} hover:text-warning/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-0.5`}
+				aria-label={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
+				title={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
+			>
+				<Star className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`} />
+			</button>
 		</div>
 	);
 }
@@ -214,202 +442,6 @@ function getDeployStatus(events: { state: string; id: string; subevents?: { id: 
 	return lastEvent.state;
 }
 
-function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
-	const [org, name] = repo.fullName.split("/");
-	const [isCommitsModalOpen, setIsCommitsModalOpen] = useState(false);
-
-	const { commits, latestCommit, isLoading: isLoadingCommits } = useGitCommits({
-		repo: repo.fullName,
-	});
-	const { latestTag, isLoading: isLoadingTags } = useGitTagsSimple({
-		repo: repo.fullName,
-	});
-
-	// Obtener estado del pipeline con extracción automática de endpoints para health monitor
-	const stagingPipeline = usePipelineWithHealth({
-		product: repo.fullName,
-		commit: latestCommit?.hash ?? "",
-		enabled: !!latestCommit?.hash,
-	});
-
-	const prodPipeline = usePipelineWithHealth({
-		product: repo.fullName,
-		commit: latestTag?.commit ?? "",
-		tag: latestTag?.name ?? "",
-		enabled: !!latestTag?.commit && !!latestTag?.name,
-	});
-
-	// Calculate pending commits (between production and staging)
-	const pendingCount = (() => {
-		if (!commits || !prodPipeline.data?.git?.commit) return 0;
-		const prodCommitIndex = commits.findIndex(c => c.hash === prodPipeline.data!.git!.commit);
-		if (prodCommitIndex === -1) return commits.length;
-		return prodCommitIndex;
-	})();
-
-	const commitShortHash = latestCommit?.shortHash;
-	const commitAuthor = latestCommit?.author;
-	const commitDate = latestCommit?.date;
-
-	// En el home solo usamos fecha del commit (tags simples no tienen fecha)
-	const latestDate = commitDate;
-
-	// Extraer información del pipeline para staging - usar el último evento (despliegue)
-	const stagingStatus = stagingPipeline.data ? {
-		status: getDeployStatus(stagingPipeline.data.events),
-		updatedAt: stagingPipeline.data.updated_at,
-		failedStage: stagingPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.label.es,
-		errorDetail: stagingPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.markdown,
-	} : { status: undefined };
-
-	// Extraer información del pipeline para production - usar el último evento (despliegue)
-	const productionStatus = prodPipeline.data ? {
-		status: getDeployStatus(prodPipeline.data.events),
-		updatedAt: prodPipeline.data.updated_at,
-		failedStage: prodPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.label.es,
-		errorDetail: prodPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.markdown,
-	} : { status: undefined };
-
-	const isLoading = isLoadingCommits || isLoadingTags;
-	const isStagingLoading = stagingPipeline.isLoading;
-	const isProdLoading = prodPipeline.isLoading;
-
-	if (isLoading) {
-		return (
-			<tr className="border-t animate-pulse">
-				<td className="px-4 py-3 w-auto">
-					<div className="flex items-center gap-2">
-						<div className="w-4 h-4 bg-muted rounded-full flex-shrink-0 flex items-center justify-center">
-							<Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
-						</div>
-						<div className="h-4 bg-muted rounded w-32" />
-					</div>
-				</td>
-				<td className="px-4 py-3 w-20">
-					<div className="h-4 bg-muted rounded w-16" />
-				</td>
-				<td className="px-4 py-3 w-20">
-					<div className="h-4 bg-muted rounded w-16" />
-				</td>
-				<td className="px-4 py-3 w-36">
-					<div className="h-4 bg-muted rounded w-24" />
-				</td>
-				<td className="px-4 py-3" style={{ width: '250px' }}>
-					<div className="h-4 bg-muted rounded w-40" />
-				</td>
-				<td className="px-4 py-3 text-center w-16">
-					<div className="flex items-center justify-center gap-2">
-						<div className="w-5 h-5 bg-muted rounded" />
-						<div className="w-5 h-5 bg-muted rounded" />
-					</div>
-				</td>
-			</tr>
-		);
-	}
-
-	return (
-		<>
-			<tr className="border-t hover:bg-muted/50 group">
-				<td className="px-4 py-3 w-auto">
-					<div className="flex items-center gap-2">
-						<Link
-							to="/github/$org/$repo"
-							params={{ org, repo: name }}
-							search={{ view: "commits" }}
-							className="font-medium hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md"
-						>
-							{name}
-						</Link>
-						{pendingCount > 0 && (
-						<Tooltip.Provider>
-							<Tooltip.Root>
-								<Tooltip.Trigger asChild>
-									<button
-										type="button"
-										onClick={() => setIsCommitsModalOpen(true)}
-											className="inline-flex items-center gap-1 text-[10px] bg-warning/10 text-warning px-2 py-0.5 rounded-full border border-warning/20 font-bold cursor-pointer hover:bg-warning/20 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-									>
-											<GitPullRequestCreateArrow className="w-2.5 h-2.5" />
-											<span>{pendingCount}</span>
-									</button>
-								</Tooltip.Trigger>
-								<Tooltip.Portal>
-									<Tooltip.Content
-										className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs z-50"
-										sideOffset={5}
-									>
-										{pendingCount} commit{pendingCount !== 1 ? 's' : ''} pendientes de promoción a producción
-									</Tooltip.Content>
-								</Tooltip.Portal>
-							</Tooltip.Root>
-						</Tooltip.Provider>
-						)}
-					</div>
-				</td>
-				<td className="px-4 py-3 w-20">
-					{latestTag?.name && (
-						<TagLink
-							tagName={latestTag.name}
-							org={org}
-							repo={name}
-							pipelineStatus={productionStatus}
-							isLoading={isProdLoading}
-						/>
-					)}
-				</td>
-				<td className="px-4 py-3 w-20">
-					{commitShortHash && (
-						<CommitLink
-							hash={commitShortHash}
-							org={org}
-							repo={name}
-							pipelineStatus={stagingStatus}
-							isLoading={isStagingLoading}
-						/>
-					)}
-				</td>
-				<td className="px-4 py-3 text-sm text-muted-foreground w-36">
-					<div className="flex items-center gap-1">
-						<DisplayInfo type="dates" value={latestDate} />
-					</div>
-				</td>
-				<td className="px-4 py-3 text-sm" style={{ width: '250px' }}>
-					<div className="truncate" title={commitAuthor || undefined}>
-						<DisplayInfo type="author" value={commitAuthor} hideTooltip={true} />
-					</div>
-				</td>
-				<td className="px-4 py-3 text-center w-16">
-					<div className="flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-						<FreezeDialog repo={repo.fullName} iconOnly={true} />
-						<ForceRedeployDialog repo={repo.fullName} iconOnly={true} />
-						<PromoteDialog repo={repo.fullName} latestTag={latestTag?.name} iconOnly={true} />
-						<ActionButton
-							action={ACTION_DEFINITIONS.openGitHub}
-							onClick={() => window.open(`https://github.com/${org}/${name}`, '_blank')}
-						/>
-						<button
-							type="button"
-							onClick={() => onToggleFavorite(repo.fullName)}
-							className={`${isFavorite ? "text-warning" : "text-muted-foreground"} hover:text-warning/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-0.5`}
-							aria-label={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
-							title={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
-						>
-							<Star className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`} />
-						</button>
-					</div>
-				</td>
-			</tr>
-			<CommitsModal
-				isOpen={isCommitsModalOpen}
-				onClose={() => setIsCommitsModalOpen(false)}
-				commits={commits || []}
-				prodCommitHash={prodPipeline.data?.git?.commit || ""}
-				prodTag={latestTag?.name}
-			/>
-		</>
-	);
-}
-
 type RepoInfo = {
 	fullName: string;
 	name: string;
@@ -421,10 +453,5 @@ type ReposTableProps = {
 	org: string;
 	repos: RepoInfo[];
 	favorites: string[];
-	onToggleFavorite: (product: string) => void;
-};
-type RepoRowProps = {
-	repo: RepoInfo;
-	isFavorite: boolean;
 	onToggleFavorite: (product: string) => void;
 };

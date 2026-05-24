@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VerificationPageRouteImport } from './routes/verification-page'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as NovedadesRouteImport } from './routes/novedades'
 import { Route as KubernetesRouteImport } from './routes/kubernetes'
@@ -19,11 +18,6 @@ import { Route as FetcherRouteImport } from './routes/fetcher'
 import { Route as DockerRouteImport } from './routes/docker'
 import { Route as GithubOrgRepoRouteImport } from './routes/github.$org.$repo'
 
-const VerificationPageRoute = VerificationPageRouteImport.update({
-  id: '/verification-page',
-  path: '/verification-page',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SetupRoute = SetupRouteImport.update({
   id: '/setup',
   path: '/setup',
@@ -73,7 +67,6 @@ export interface FileRoutesByFullPath {
   '/kubernetes': typeof KubernetesRoute
   '/novedades': typeof NovedadesRoute
   '/setup': typeof SetupRoute
-  '/verification-page': typeof VerificationPageRoute
   '/github/$org/$repo': typeof GithubOrgRepoRoute
 }
 export interface FileRoutesByTo {
@@ -84,7 +77,6 @@ export interface FileRoutesByTo {
   '/kubernetes': typeof KubernetesRoute
   '/novedades': typeof NovedadesRoute
   '/setup': typeof SetupRoute
-  '/verification-page': typeof VerificationPageRoute
   '/github/$org/$repo': typeof GithubOrgRepoRoute
 }
 export interface FileRoutesById {
@@ -96,7 +88,6 @@ export interface FileRoutesById {
   '/kubernetes': typeof KubernetesRoute
   '/novedades': typeof NovedadesRoute
   '/setup': typeof SetupRoute
-  '/verification-page': typeof VerificationPageRoute
   '/github/$org/$repo': typeof GithubOrgRepoRoute
 }
 export interface FileRouteTypes {
@@ -109,7 +100,6 @@ export interface FileRouteTypes {
     | '/kubernetes'
     | '/novedades'
     | '/setup'
-    | '/verification-page'
     | '/github/$org/$repo'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -120,7 +110,6 @@ export interface FileRouteTypes {
     | '/kubernetes'
     | '/novedades'
     | '/setup'
-    | '/verification-page'
     | '/github/$org/$repo'
   id:
     | '__root__'
@@ -131,7 +120,6 @@ export interface FileRouteTypes {
     | '/kubernetes'
     | '/novedades'
     | '/setup'
-    | '/verification-page'
     | '/github/$org/$repo'
   fileRoutesById: FileRoutesById
 }
@@ -143,18 +131,10 @@ export interface RootRouteChildren {
   KubernetesRoute: typeof KubernetesRoute
   NovedadesRoute: typeof NovedadesRoute
   SetupRoute: typeof SetupRoute
-  VerificationPageRoute: typeof VerificationPageRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/verification-page': {
-      id: '/verification-page'
-      path: '/verification-page'
-      fullPath: '/verification-page'
-      preLoaderRoute: typeof VerificationPageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/setup': {
       id: '/setup'
       path: '/setup'
@@ -233,7 +213,6 @@ const rootRouteChildren: RootRouteChildren = {
   KubernetesRoute: KubernetesRoute,
   NovedadesRoute: NovedadesRoute,
   SetupRoute: SetupRoute,
-  VerificationPageRoute: VerificationPageRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

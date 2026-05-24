@@ -55,15 +55,15 @@ const timelineStatusIcon = (state: string) => {
 const timelineStatusColor = (state: string) => {
 	switch (state) {
 		case "SUCCESS":
-			return "bg-[var(--primary)]";
+			return "bg-success";
 		case "FAILED":
-			return "bg-[var(--destructive)]";
+			return "bg-destructive";
 		case "WARN":
-			return "bg-[var(--warning)]";
+			return "bg-warning";
 		case "RUNNING":
 		case "PENDING":
 		case "STARTED":
-			return "bg-[var(--info)] animate-pulse-slow shadow-[0_0_8px_rgba(var(--color-info),0.4)]";
+			return "bg-info animate-pulse-slow shadow-[0_0_8px_rgba(var(--color-info),0.4)]";
 		default:
 			return "bg-muted";
 	}
@@ -230,7 +230,7 @@ export function MiniTimeline({ events, runningEventId }: MiniTimelineProps) {
 											setRunningTooltipClosed(true);
 										}
 									}}
-									className={`h-1.75 w-6.5 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-md focus-visible:scale-110 focus-visible:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${timelineStatusColor(
+									className={`h-2.5 w-8 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-md focus-visible:scale-110 focus-visible:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${timelineStatusColor(
 										event.state,
 									)}`}
 									aria-label={`Evento: ${event.label.es}, Estado: ${event.state}`}

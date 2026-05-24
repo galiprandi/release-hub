@@ -19,11 +19,12 @@ interface PromoteDialogProps {
 	repo: string
 	latestTag?: string
 	iconOnly?: boolean
+	showLabel?: boolean
 }
 
 type Step = 'config' | 'success'
 
-export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDialogProps) {
+export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = false }: PromoteDialogProps) {
 	const queryClient = useQueryClient()
 	const [open, setOpen] = useState(false)
 	const [step, setStep] = useState<Step>('config')
@@ -179,6 +180,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDial
 				<ActionButton
 					action={ACTION_DEFINITIONS.promoteToProd}
 					onClick={() => handleOpenChange(true)}
+					showLabel={showLabel}
 				/>
 			) : (
 				<Tooltip.Provider>

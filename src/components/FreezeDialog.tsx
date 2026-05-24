@@ -14,11 +14,12 @@ import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
 interface FreezeDialogProps {
 	repo: string
 	iconOnly?: boolean
+	showLabel?: boolean
 }
 
 type Step = 'config' | 'success'
 
-export function FreezeDialog({ repo, iconOnly = false }: FreezeDialogProps) {
+export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: FreezeDialogProps) {
 	const queryClient = useQueryClient()
 	const [open, setOpen] = useState(false)
 	const [step, setStep] = useState<Step>('config')
@@ -126,6 +127,7 @@ EOF`
 					action={isLocked ? ACTION_DEFINITIONS.unfreezeBranch : ACTION_DEFINITIONS.freezeBranch}
 					onClick={() => setOpen(true)}
 					disabled={!canManage}
+					showLabel={showLabel}
 				/>
 			) : (
 				<Tooltip.Provider>

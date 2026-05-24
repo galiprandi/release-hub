@@ -20,6 +20,7 @@ export interface ActionButtonProps {
 	size?: "sm" | "md"
 	tooltipSide?: "top" | "right" | "bottom" | "left"
 	className?: string
+	showLabel?: boolean
 }
 
 const colorClasses: Record<ActionColor, string> = {
@@ -44,6 +45,7 @@ export function ActionButton({
 	size = "md",
 	tooltipSide = "top",
 	className = "",
+	showLabel = false,
 }: ActionButtonProps) {
 	const colorClass = colorClasses[action.color || "default"]
 	const sizeClass = sizeClasses[size]
@@ -58,10 +60,11 @@ export function ActionButton({
 						type="button"
 						onClick={onClick}
 						disabled={isDisabled}
-						className={`${sizeClass} ${colorClass} rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${className}`}
+						className={`${sizeClass} ${colorClass} rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${showLabel ? 'inline-flex items-center gap-1.5 px-2.5 py-1.5' : ''} ${className}`}
 						aria-label={ariaLabel}
 					>
 						{loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <action.icon className="w-4 h-4" />}
+						{showLabel && <span className="text-xs font-medium">{action.label}</span>}
 					</button>
 				</Tooltip.Trigger>
 				<Tooltip.Portal>

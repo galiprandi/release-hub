@@ -55,15 +55,15 @@ const timelineStatusIcon = (state: string) => {
 const timelineStatusColor = (state: string) => {
 	switch (state) {
 		case "SUCCESS":
-			return "bg-success";
+			return "bg-[var(--primary)]";
 		case "FAILED":
-			return "bg-destructive";
+			return "bg-[var(--destructive)]";
 		case "WARN":
-			return "bg-warning";
+			return "bg-[var(--warning)]";
 		case "RUNNING":
 		case "PENDING":
 		case "STARTED":
-			return "bg-info animate-pulse-slow shadow-[0_0_8px_var(--color-info)]/40";
+			return "bg-[var(--info)] animate-pulse-slow shadow-[0_0_8px_rgba(var(--color-info),0.4)]";
 		default:
 			return "bg-muted";
 	}
@@ -230,7 +230,7 @@ export function MiniTimeline({ events, runningEventId }: MiniTimelineProps) {
 											setRunningTooltipClosed(true);
 										}
 									}}
-									className={`h-2.5 w-8 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-md focus-visible:scale-110 focus-visible:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${timelineStatusColor(
+									className={`h-1.75 w-6.5 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-md focus-visible:scale-110 focus-visible:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${timelineStatusColor(
 										event.state,
 									)}`}
 									aria-label={`Evento: ${event.label.es}, Estado: ${event.state}`}
@@ -244,7 +244,7 @@ export function MiniTimeline({ events, runningEventId }: MiniTimelineProps) {
 								<div className="p-4 space-y-4">
 									<div className="flex items-center justify-between gap-4">
 										<div className="flex items-center gap-2.5">
-											<div className={`p-1.5 rounded-lg ${timelineStatusColor(event.state)} bg-opacity-10`}>
+											<div className={`p-1.5 rounded-lg ${timelineStatusColor(event.state)}/10`}>
 												{timelineStatusIcon(event.state)}
 											</div>
 											<span
@@ -267,7 +267,7 @@ export function MiniTimeline({ events, runningEventId }: MiniTimelineProps) {
 											<div className="flex items-center gap-3 mb-3">
 												<div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
 													<div
-														className="h-full bg-success transition-all duration-500 shadow-[0_0_8px_var(--color-success)]/20"
+														className="h-full bg-success transition-all duration-500 shadow-[0_0_8px_rgba(var(--color-success),0.2)]"
 														style={{
 															width: `${(event.subevents.filter(s => ['SUCCESS', 'FAILED', 'WARN'].includes(s.state)).length / event.subevents.length) * 100}%`,
 														}}

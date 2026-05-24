@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import { Loader2, Star, Building2, FolderOpen, FolderPlus, Search, GitPullRequestCreateArrow } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -27,6 +27,8 @@ export const Route = createFileRoute("/github")({
 function Dashboard() {
 	const { favorites, projects, activeTab, setActiveTab, toggleFavorite } = useUserCollections();
 	const { isLoading: isLoadingRepos, data: summaryData } = useUserReposSummary();
+	const { location } = useRouterState();
+	const isIndexRoute = location.pathname === "/github";
 
 	const tabs = [
 		{ id: "favorites", label: "Favoritos", icon: Star, count: favorites.length, description: "" },
@@ -63,9 +65,13 @@ function Dashboard() {
 
 	const sortedOrgs = Object.keys(groupedRepos).sort();
 
+	if (!isIndexRoute) {
+		return <Outlet />;
+	}
+
 	return (
-		<PageLayout 
-			header={{ 
+		<PageLayout
+			header={{
 				title: "Repositorios",
 				searchComponent: <RepoSearch />
 			}}
@@ -74,7 +80,7 @@ function Dashboard() {
 				show: true,
 				icon: activeTab === "favorites" ? <Star className="w-10 h-10 mx-auto mb-4 opacity-20" /> : <FolderPlus className="w-10 h-10 mx-auto mb-4 opacity-20" />,
 				label: activeTab === "favorites" ? "Sin favoritos" : "Proyecto vacío",
-				caption: activeTab === "favorites" 
+				caption: activeTab === "favorites"
 					? "Agrega repositorios a tus favoritos para verlos aquí y monitorear sus despliegues."
 					: "Navega a un repositorio y agregalo a este proyecto desde la vista de detalle.",
 				action: activeTab === "favorites" ? (

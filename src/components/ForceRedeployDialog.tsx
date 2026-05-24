@@ -9,11 +9,12 @@ import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
 interface ForceRedeployDialogProps {
 	repo: string;
 	iconOnly?: boolean;
+	showLabel?: boolean;
 }
 
 type Step = "config" | "executing" | "success" | "error";
 
-export function ForceRedeployDialog({ repo, iconOnly = false }: ForceRedeployDialogProps) {
+export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false }: ForceRedeployDialogProps) {
 	const [open, setOpen] = useState(false);
 	const [step, setStep] = useState<Step>("config");
 	const [isExecuting, setIsExecuting] = useState(false);
@@ -121,6 +122,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false }: ForceRedeployDia
 				<ActionButton
 					action={ACTION_DEFINITIONS.forceRedeploy}
 					onClick={() => setOpen(true)}
+					showLabel={showLabel}
 				/>
 			) : (
 				<Tooltip.Provider>

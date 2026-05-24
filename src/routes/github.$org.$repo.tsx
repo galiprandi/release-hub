@@ -15,7 +15,6 @@ import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
 import { useOpenPullRequests } from "@/hooks/useOpenPullRequests";
 import { useGitHubActionsSummary } from "@/hooks/useGitHubActionsSummary";
 import { GitPullRequest, Play } from "lucide-react";
-import { K8sSection } from "@/components/K8sSection";
 import { PageLayout } from "@/layouts/PageLayout";
 
 dayjs.extend(relativeTime);
@@ -26,6 +25,7 @@ export const Route = createFileRoute("/github/$org/$repo")({
 	validateSearch: (search: Record<string, unknown>) => ({
 		view: search.view === "tags" ? "tags" : "commits",
 	}),
+	notFoundComponent: () => <div>Repository not found</div>,
 });
 
 function ProductIndex() {
@@ -79,6 +79,14 @@ function ProductIndex() {
 			header={{
 				title: fullProduct,
 			}}
+			actions={[
+				<FreezeDialog key="freeze" repo={fullProduct} iconOnly={true} showLabel={true} />,
+				isCommits ? (
+					<ForceRedeployDialog key="redeploy" repo={fullProduct} iconOnly={true} showLabel={true} />
+				) : (
+					<PromoteDialog key="promote" repo={fullProduct} latestTag={latestTag?.name} iconOnly={true} showLabel={true} />
+				),
+			]}
 			refreshFn={handleRefetchPipeline}
 			isLoading={isPipelineLoading || isPipelineFetching}
 		>
@@ -97,44 +105,39 @@ function ProductIndex() {
 				/>
 			</div>
 
-			<div className="space-y-2 mb-6">
-				<K8sSection namespace={repo} />
-			</div>
-
 			{/* Tabs de navegación */}
-			<div className="flex border-b border-border mb-3">
-				<button
-					type="button"
-					onClick={() => navigate({ search: { view: "commits" } })}
-					className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${
-						viewMode === "commits"
-							? "text-foreground"
-							: "text-muted-foreground hover:text-foreground"
-					}`}
-				>
-					Commits
-					{viewMode === "commits" && (
-						<span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
-					)}
-				</button>
-				<button
-					type="button"
-					onClick={() => navigate({ search: { view: "tags" } })}
-					className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${
-						viewMode === "tags"
-							? "text-foreground"
-							: "text-muted-foreground hover:text-foreground"
-					}`}
-				>
-					Tags
-					{viewMode === "tags" && (
-						<span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
-					)}
-				</button>
-			</div>
+			<div className="flex items-center justify-between border-b border-border mb-3">
+				<div className="flex items-center gap-1">
+					<button
+						type="button"
+						onClick={() => navigate({ search: { view: "commits" } })}
+						className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${
+							viewMode === "commits"
+								? "text-foreground"
+								: "text-muted-foreground hover:text-foreground"
+						}`}
+					>
+						Commits
+						{viewMode === "commits" && (
+							<span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+						)}
+					</button>
+					<button
+						type="button"
+						onClick={() => navigate({ search: { view: "tags" } })}
+						className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${
+							viewMode === "tags"
+								? "text-foreground"
+								: "text-muted-foreground hover:text-foreground"
+						}`}
+					>
+						Tags
+						{viewMode === "tags" && (
+							<span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+						)}
+					</button>
+				</div>
 
-			{/* Toolbar de acciones */}
-			<div className="flex items-center gap-2 mb-4 flex-wrap">
 				<div className="flex items-center gap-2">
 					{/* Metadata/Configuración */}
 					<ProjectSelector repo={fullProduct} />
@@ -180,19 +183,6 @@ function ProductIndex() {
 							</div>
 						)}
 					</a>
-				</div>
-
-				{/* Separador flexible que empuja todo a la derecha */}
-				<div className="flex-1 min-w-4" />
-
-				{/* Operaciones */}
-				<div className="flex items-center gap-2">
-					<FreezeDialog repo={fullProduct} iconOnly={false} />
-					{isCommits ? (
-						<ForceRedeployDialog repo={fullProduct} />
-					) : (
-						<PromoteDialog repo={fullProduct} latestTag={latestTag?.name} />
-					)}
 				</div>
 			</div>
 

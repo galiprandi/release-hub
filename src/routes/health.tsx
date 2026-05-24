@@ -165,8 +165,6 @@ function ProductSection({
 
 function EndpointsTable({
   endpoints,
-  expandedEndpoints,
-  setExpandedEndpoints,
   isChecking,
   onCheckEndpoint,
   onRemoveEndpoint,

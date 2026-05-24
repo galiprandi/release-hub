@@ -90,7 +90,7 @@ function ProductIndex() {
 			refreshFn={handleRefetchPipeline}
 			isLoading={isPipelineLoading || isPipelineFetching}
 		>
-			<div className="space-y-2 mb-6">
+			<div className="space-y-2 mb-3">
 				<PipelineMonitor
 					org={org}
 					repo={repo}
@@ -106,7 +106,7 @@ function ProductIndex() {
 			</div>
 
 			{/* Tabs de navegación */}
-			<div className="flex items-center justify-between border-b border-border mb-3">
+			<div className="flex items-center justify-between border-b border-border">
 				<div className="flex items-center gap-1">
 					<button
 						type="button"
@@ -137,13 +137,7 @@ function ProductIndex() {
 						)}
 					</button>
 				</div>
-
 				<div className="flex items-center gap-2">
-					{/* Metadata/Configuración */}
-					<ProjectSelector repo={fullProduct} />
-
-					<div className="w-px h-5 bg-border mx-1" />
-
 					{/* Links externos */}
 					<a
 						href={openPRs?.repoUrl}
@@ -183,6 +177,9 @@ function ProductIndex() {
 							</div>
 						)}
 					</a>
+					<div className="w-px h-5 bg-border mx-4" />
+					{/* Metadata/Configuración */}
+					<ProjectSelector repo={fullProduct} />
 				</div>
 			</div>
 

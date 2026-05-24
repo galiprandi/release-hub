@@ -1,12 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
-import { Send, Trash2, Copy } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
 import { FilterBar } from '@/components/shared/FilterBar';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { ImportQueryModal } from '@/components/ImportQueryModal';
 import { Table } from '@/components/ui/Table';
+import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 import type { ColumnDef } from '@tanstack/react-table';
 import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
@@ -32,33 +33,6 @@ function formatTimeAgo(dateString: string): string {
 	return date.toLocaleDateString();
 }
 
-// Method badge colors
-function getMethodBadgeColor(method: string): string {
-	switch (method.toUpperCase()) {
-		case 'GET':
-			return 'bg-green-100 text-green-700';
-		case 'POST':
-			return 'bg-blue-100 text-blue-700';
-		case 'PUT':
-		case 'PATCH':
-			return 'bg-yellow-100 text-yellow-700';
-		case 'DELETE':
-			return 'bg-red-100 text-red-700';
-		default:
-			return 'bg-gray-100 text-gray-700';
-	}
-}
-
-// Response time badge colors
-function getResponseTimeBadgeColor(responseTime: number): string {
-	if (responseTime < 200) {
-		return 'bg-success/20 text-success';
-	}
-	if (responseTime > 1000) {
-		return 'bg-destructive/20 text-destructive';
-	}
-	return 'bg-muted text-muted-foreground';
-}
 
 function FetcherPage() {
 	const { data: access, isLoading: checkingAccess } = useCurlAccess();
@@ -174,21 +148,23 @@ function FetcherPage() {
 	};
 
 	const headerActions = (
-		<form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); handleSendCurl(); }}>
-			<input
-				type="text"
-				value={curlInput}
-				onChange={(e) => setCurlInput(e.target.value)}
-				placeholder="Importar cURL"
-				className="w-64 px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
-			/>
-			<button
-				type="submit"
+		<form className="flex items-center gap-2" onSubmit={(e) => { e.preventDefault(); handleSendCurl(); }}>
+			<div className="relative">
+				<input
+					type="text"
+					value={curlInput}
+					onChange={(e) => setCurlInput(e.target.value)}
+					placeholder="Importar cURL... (curl -X GET...)"
+					className="w-80 px-3 py-1.5 text-sm border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono transition-shadow"
+				/>
+			</div>
+			<ActionButton
+				action={ACTION_DEFINITIONS.send}
+				onClick={handleSendCurl}
 				disabled={!isCurlValid}
-				className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm bg-success text-success-foreground rounded-md hover:bg-success/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
-			>
-				<Send className="w-3.5 h-3.5" />
-			</button>
+				size="md"
+				className="bg-primary text-primary-foreground hover:bg-primary/90"
+			/>
 		</form>
 	);
 
@@ -240,27 +216,27 @@ function FetcherPage() {
 
 						{/* Pagination */}
 						{totalPages > 1 && (
-							<div className="flex items-center justify-between px-4 py-3 border-t bg-muted/30">
-								<div className="text-sm text-muted-foreground">
-									Mostrando {page * pageSize + 1} - {Math.min((page + 1) * pageSize, filteredHistory.length)} de {filteredHistory.length}
+							<div className="flex items-center justify-between px-6 py-4 border-t border-border/60 bg-muted/40 rounded-b-xl">
+								<div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+									Mostrando <span className="text-foreground">{page * pageSize + 1} - {Math.min((page + 1) * pageSize, filteredHistory.length)}</span> de <span className="text-foreground">{filteredHistory.length}</span>
 								</div>
-								<div className="flex items-center gap-2">
+								<div className="flex items-center gap-3">
 									<button
 										type="button"
 										onClick={() => setPage(p => Math.max(0, p - 1))}
 										disabled={page === 0}
-										className="px-3 py-1 text-sm border border-input rounded-md hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+										className="px-4 py-1.5 text-xs font-bold uppercase tracking-tight border border-border/60 rounded-md bg-background hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 									>
 										Anterior
 									</button>
-									<span className="text-sm text-muted-foreground">
-										Página {page + 1} de {totalPages}
+									<span className="text-xs font-bold uppercase tracking-tighter text-muted-foreground">
+										Página <span className="text-foreground">{page + 1}</span> de <span className="text-foreground">{totalPages}</span>
 									</span>
 									<button
 										type="button"
 										onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
 										disabled={page === totalPages - 1}
-										className="px-3 py-1 text-sm border border-input rounded-md hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+										className="px-4 py-1.5 text-xs font-bold uppercase tracking-tight border border-border/60 rounded-md bg-background hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 									>
 										Siguiente
 									</button>
@@ -349,8 +325,18 @@ function MethodCell({ query }: { query: QueryRecord }) {
 	const parsed = parseCurlForDisplay(query.curl)
 	if (!parsed) return null
 
+	const methodStyles: Record<string, string> = {
+		GET: "bg-success/20 text-success",
+		POST: "bg-info/20 text-info",
+		PUT: "bg-warning/20 text-warning",
+		PATCH: "bg-warning/20 text-warning",
+		DELETE: "bg-destructive/20 text-destructive",
+	}
+
+	const style = methodStyles[parsed.method.toUpperCase()] || "bg-muted text-muted-foreground"
+
 	return (
-		<span className={`px-2 py-1 rounded text-xs font-semibold uppercase ${getMethodBadgeColor(parsed.method)}`}>
+		<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${style}`}>
 			{parsed.method}
 		</span>
 	)
@@ -384,13 +370,18 @@ function SentCell({ query }: { query: QueryRecord }) {
 
 function ResponseTimeCell({ query }: { query: QueryRecord }) {
 	if (query.response?.responseTime) {
+		const { responseTime } = query.response
+		let style = "bg-muted text-muted-foreground"
+		if (responseTime < 200) style = "bg-success/20 text-success"
+		else if (responseTime > 1000) style = "bg-destructive/20 text-destructive"
+
 		return (
-			<span className={`px-2 py-1 rounded text-xs font-medium ${getResponseTimeBadgeColor(query.response.responseTime)}`}>
-				{query.response.responseTime}ms
+			<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${style}`}>
+				{responseTime}ms
 			</span>
 		)
 	}
-	return <span className="text-muted-foreground">-</span>
+	return <span className="text-muted-foreground text-xs">-</span>
 }
 
 function ActionsCell({
@@ -407,34 +398,26 @@ function ActionsCell({
 	isDeleting: boolean
 }) {
 	return (
-		<div className="flex items-center justify-end gap-2">
-			<button
-				type="button"
-				className="p-1.5 bg-success text-success-foreground hover:bg-success/90 rounded transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
-				title="Enviar"
+		<div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+			<ActionButton
+				action={ACTION_DEFINITIONS.send}
 				onClick={() => onOpenModal(query)}
-			>
-				<Send className="w-4 h-4" />
-			</button>
+				size="sm"
+				className="text-success hover:bg-success/10"
+			/>
 			{query.response?.body && (
-				<button
-					type="button"
-					className="p-1.5 text-muted-foreground hover:text-primary hover:bg-accent rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-					title="Copiar respuesta"
+				<ActionButton
+					action={ACTION_DEFINITIONS.copy}
 					onClick={() => onCopyResponse(query)}
-				>
-					<Copy className="w-4 h-4" />
-				</button>
+					size="sm"
+				/>
 			)}
-			<button
-				type="button"
-				className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none focus-visible:ring-offset-1"
-				title="Eliminar"
+			<ActionButton
+				action={ACTION_DEFINITIONS.delete}
 				onClick={() => onDelete(query.id)}
 				disabled={isDeleting}
-			>
-				<Trash2 className="w-4 h-4" />
-			</button>
+				size="sm"
+			/>
 		</div>
 	)
 }

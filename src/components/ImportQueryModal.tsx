@@ -1,7 +1,8 @@
 import { useState, useEffect,  type Dispatch, type SetStateAction } from 'react';
-import { Send, AlertTriangle, SendHorizontal } from 'lucide-react';
+import { Send, AlertTriangle, SendHorizontal, Plus, X } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
 import { JsonEditor } from '@/components/JsonEditor';
+import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 import { parseCurlCommand, minifyJSON } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 import { executeCurlCommand } from '@/api/curl';
@@ -214,7 +215,7 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 										<select
 											value={parsed.method}
 											onChange={(e) => updateCurlInput({ method: e.target.value })}
-											className="w-full px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-2.5 py-1.5 text-sm border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
 										>
 											{['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
 												<option key={m} value={m}>{m}</option>
@@ -227,41 +228,30 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 											type="text"
 											value={parsed.url}
 											onChange={(e) => updateCurlInput({ url: e.target.value })}
-											className="w-full px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
+											className="w-full px-2.5 py-1.5 text-sm border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono transition-shadow"
 										/>
 									</div>
 									<div className="flex items-end">
-										<button
-											type="button"
+										<ActionButton
+											action={isExecuting ? ACTION_DEFINITIONS.loading : ACTION_DEFINITIONS.send}
 											onClick={handleExecute}
 											disabled={isExecuting}
-											className="flex items-center justify-center gap-2 px-4 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-										>
-											{isExecuting ? (
-												<>
-													<SendHorizontal className="w-3.5 h-3.5" />
-													Enviar
-												</>
-											) : (
-												<>
-													<Send className="w-3.5 h-3.5" />
-													Enviar
-												</>
-											)}
-										</button>
+											showLabel
+											className="bg-primary text-primary-foreground hover:bg-primary/90 h-[38px] font-bold uppercase tracking-tight"
+										/>
 									</div>
 								</div>
 
 								<div>
 									<div className="flex items-center justify-between mb-1.5">
-										<label className="text-xs font-medium">Headers</label>
-										<button
-											type="button"
+										<label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Headers</label>
+										<ActionButton
+											action={{ icon: Plus, label: "Agregar", color: "primary" }}
 											onClick={() => updateCurlInput({ headers: { ...parsed.headers, '': '' } })}
-											className="text-xs text-primary hover:underline"
-										>
-											+ Agregar
-										</button>
+											size="sm"
+											showLabel
+											className="text-[10px] font-bold uppercase tracking-wider hover:underline p-0 h-auto"
+										/>
 									</div>
 									<div className="space-y-2">
 										{Object.entries(parsed.headers)
@@ -278,7 +268,7 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 															updateCurlInput({ headers: newHeaders });
 														}}
 														placeholder="Header name"
-														className="w-full px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+														className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
 													/>
 													{key.toLowerCase() === 'authorization' ? (
 														<div className="relative">
@@ -289,14 +279,14 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 																	headers: { ...parsed.headers, [key]: e.target.value }
 																})}
 																placeholder="Value"
-																className={`w-full px-2 py-1 pr-8 text-xs border rounded-md focus:outline-none focus:ring-2 ${
+																className={`w-full px-2.5 py-1.5 pr-8 text-xs border bg-background rounded-md focus:outline-none focus-visible:ring-2 transition-shadow ${
 																	parsed.isTokenExpired && value.trim().length > 0
-																		? 'bg-warning/10 border-warning text-warning-foreground'
-																		: 'focus:ring-primary border'
+																		? 'bg-warning/10 border-warning text-warning-foreground focus-visible:ring-warning'
+																		: 'focus-visible:ring-primary border-input'
 																}`}
 															/>
 															{parsed.isTokenExpired && value.trim().length > 0 && (
-																<AlertTriangle className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-warning" />
+																<AlertTriangle className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-warning" />
 															)}
 														</div>
 													) : (
@@ -307,20 +297,18 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 																headers: { ...parsed.headers, [key]: e.target.value }
 															})}
 															placeholder="Value"
-															className="w-full px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+															className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
 														/>
 													)}
-													<button
-														type="button"
+													<ActionButton
+														action={ACTION_DEFINITIONS.delete}
 														onClick={() => {
 															const newHeaders = { ...parsed.headers };
 															delete newHeaders[key];
 															updateCurlInput({ headers: newHeaders });
 														}}
-														className="px-2 py-1 text-xs text-destructive hover:bg-destructive/10 rounded"
-													>
-														×
-													</button>
+														size="sm"
+													/>
 												</div>
 											))}
 										{Object.keys(parsed.headers).length > MAX_HEADERS_DISPLAY && (
@@ -352,15 +340,15 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 								<>
 				
 
-									{/* Tabs */}
-									<div className="flex gap-2 mb-3 items-center">
+									{/* Tabs - Using industrial resonance style from FilterBar */}
+									<div className="flex p-1 bg-muted/40 border border-border/60 rounded-lg gap-1 mb-3 items-center">
 										<button
 											type="button"
 											onClick={() => setActiveTab('headers')}
-											className={`px-3 py-1 text-xs rounded-md transition-colors ${
+											className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
 												activeTab === 'headers'
-													? 'bg-primary text-primary-foreground'
-													: 'bg-muted text-muted-foreground hover:bg-accent'
+													? 'bg-background shadow-sm text-foreground'
+													: 'text-muted-foreground hover:bg-accent'
 											}`}
 										>
 											Headers
@@ -368,10 +356,10 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 										<button
 											type="button"
 											onClick={() => setActiveTab('body')}
-											className={`px-3 py-1 text-xs rounded-md transition-colors ${
+											className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
 												activeTab === 'body'
-													? 'bg-primary text-primary-foreground'
-													: 'bg-muted text-muted-foreground hover:bg-accent'
+													? 'bg-background shadow-sm text-foreground'
+													: 'text-muted-foreground hover:bg-accent'
 											}`}
 										>
 											Body
@@ -402,18 +390,24 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 
 									{/* Response footer with timing info */}
 									
-									<div className="mt-3 text-xs text-muted-foreground flex items-center justify-between">
-										<span className={`px-2 py-1 rounded text-xs font-semibold ${
-												response.status >= 200 && response.status < 300
-													? 'bg-green-100 text-green-700'
-													: response.status >= 400
-														? 'bg-red-100 text-red-700'
-														: 'bg-yellow-100 text-yellow-700'
-											}`} title={query?.updatedAt ? formatTimeAgo(query.updatedAt) : new Date().toLocaleString()}>
-												{response.status} {response.statusText}
+									<div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between">
+										<div className="flex items-center gap-3">
+											<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+													response.status >= 200 && response.status < 300
+														? 'bg-success/20 text-success'
+														: response.status >= 400
+															? 'bg-destructive/20 text-destructive'
+															: 'bg-warning/20 text-warning'
+												}`} title={query?.updatedAt ? formatTimeAgo(query.updatedAt) : new Date().toLocaleString()}>
+													{response.status} {response.statusText}
 											</span>
-										<span>{response.responseTime}ms</span>
-										<span>{DayJS(query?.updatedAt || new Date()).fromNow()}</span>
+											<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 px-2 py-0.5 rounded">
+												{response.responseTime}ms
+											</span>
+										</div>
+										<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+											{DayJS(query?.updatedAt || new Date()).fromNow()}
+										</span>
 									</div>
 								</>
 							) : (

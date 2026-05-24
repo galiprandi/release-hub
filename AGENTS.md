@@ -54,6 +54,7 @@ Ubicar archivos `.test.ts[x]` junto al archivo que prueban. Evitar carpetas `__t
 - **Componentes compartidos**: Antes de crear uno nuevo, verificar si extiende `FilterBar`, `PageHeader`, `BaseDialog` o `DisplayInfo`. Todos los diálogos migrar a `BaseDialog`.
 - **Feedback**: Usar `StatusCard` para estados de carga, error y advertencia en monitores y Docker.
 - **Docker badges**: `bg-success/20 text-success` (Running), `bg-muted text-muted-foreground` (Stopped).
+- **Fetcher & HTTP Method Mapping**: Siempre usar opacidades semánticas (`/20`) para badges de métodos HTTP y tiempos de respuesta. GET -> success, POST -> info, PUT/PATCH -> warning, DELETE -> destructive.
 
 ## Mantenimiento de Skills
 

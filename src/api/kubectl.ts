@@ -98,15 +98,6 @@ export async function getContexts(): Promise<string[]> {
   }
 }
 
-export async function setContext(context: string): Promise<boolean> {
-  try {
-    const safeContext = sanitizeContext(context);
-    await runCommand(`kubectl config use-context ${safeContext}`);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 function parseDeployments(output: string, defaultNamespace?: string): DeploymentInfo[] {
   const lines = output.trim().split('\n');
@@ -243,15 +234,6 @@ export async function getDeployments(namespace?: string, context?: string): Prom
   }
 }
 
-export async function getPods(namespace?: string, context?: string): Promise<PodInfo[]> {
-  const nsFlag = namespace ? `-n ${sanitizeNamespace(namespace)}` : '--all-namespaces';
-  const ctxFlag = context ? `--context=${sanitizeContext(context)}` : '';
-  const result = await runCommand(`kubectl get pods ${nsFlag} ${ctxFlag}`.trim());
-  // kubectl outputs to stderr when no resources found, so check both
-  const output = result.stdout || result.stderr;
-  return parsePods(output);
-}
-
 export async function getPodsForDeployment(deploymentName: string, namespace?: string, context?: string): Promise<PodInfo[]> {
   const sanitizedDeploymentName = sanitizeK8sName(deploymentName);
   const nsFlag = namespace ? `-n ${sanitizeNamespace(namespace)}` : '';
@@ -303,15 +285,3 @@ function cleanLogs(logs: string): string {
     .replace(/\\\\/g, '\\'); // Fix double backslashes
 }
 
-/**
- * Generates SSE stream URL for Kubernetes logs
- */
-export function getK8sLogsStreamUrl(resourceType: 'deployment' | 'pod', name: string, namespace?: string, context?: string): string {
-  const params = new URLSearchParams({
-    resourceType,
-    name,
-  });
-  if (namespace) params.set('namespace', namespace);
-  if (context) params.set('context', context);
-  return `/local/k8s-logs-stream?${params.toString()}`;
-}

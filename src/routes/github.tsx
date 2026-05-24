@@ -130,7 +130,7 @@ function Dashboard() {
 			</div>
 
 			{/* Content */}
-			<div className="space-y-10">
+			<div className="space-y-12">
 				{sortedOrgs.map((org) => (
 					<section key={org} className="space-y-3">
 						<ReposTable

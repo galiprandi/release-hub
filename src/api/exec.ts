@@ -34,25 +34,3 @@ export const runCommand = async (command: string): Promise<ExecResponse> => {
   return data
 }
 
-/**
- * Execute command with AI error processing
- * @param command - Bash command to execute
- * @param processErrorFn - Optional function to process errors with AI
- * @returns Promise with stdout and stderr
- * @throws Error if command fails (processed by AI if processErrorFn provided)
- */
-export const runCommandWithAI = async (
-  command: string,
-  processErrorFn?: (error: Error | string) => Promise<string>
-): Promise<ExecResponse> => {
-  try {
-    return await runCommand(command)
-  } catch (err) {
-    if (processErrorFn) {
-      const errorObj = err instanceof Error ? err : new Error(String(err))
-      const friendlyError = await processErrorFn(errorObj)
-      throw new Error(friendlyError)
-    }
-    throw err
-  }
-}

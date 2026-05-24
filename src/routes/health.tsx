@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { Activity, RefreshCw, Trash2, ExternalLink, ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import { useHealthMonitor } from '@/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
+import { Table } from '@/components/ui/Table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { PageLayout } from '../layouts/PageLayout';
 
 export const Route = createFileRoute('/health')({
@@ -95,258 +97,252 @@ function ProductSection({
     return a.localeCompare(b);
   });
 
+  // Ordenar endpoints: production primero, luego staging
+  const sortedEndpoints = endpoints.sort((a, b) => {
+    if (a.environment !== b.environment) {
+      return a.environment === 'production' ? -1 : 1;
+    }
+    return a.url.localeCompare(b.url);
+  });
+
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
-      {/* Contenedor del producto con padding base */}
-      <div className="px-4">
-        {/* Header del producto */}
-        <div className="flex items-center justify-between py-3 bg-gray-50 border-b -mx-4 px-4">
-          <div className="flex items-center gap-2">
-            <Link
-              to="/github/$org/$repo"
-              params={{ org, repo: productName }}
-              className="font-semibold text-gray-800 hover:text-blue-600 transition-colors"
-            >
-              {productName}
-            </Link>
-            <span className="text-sm text-gray-500">({services.length} servicios)</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm">
-            {(() => {
-              const healthy = endpoints.filter((ep) => ep.isHealthy === true).length;
-              const unhealthy = endpoints.filter((ep) => ep.isHealthy === false).length;
-              const pending = endpoints.filter((ep) => ep.isHealthy === null).length;
-              return (
-                <>
-                  {healthy > 0 && (
-                    <span className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-green-500" />
-                      {healthy} OK
-                    </span>
-                  )}
-                  {pending > 0 && (
-                    <span className="flex items-center gap-1 text-gray-500">
-                      <div className="w-2 h-2 rounded-full bg-gray-400" />
-                      {pending} Pendientes
-                    </span>
-                  )}
-                  {unhealthy > 0 && (
-                    <span className="flex items-center gap-1 text-red-600 font-medium">
-                      <div className="w-2 h-2 rounded-full bg-red-500" />
-                      {unhealthy} Error
-                    </span>
-                  )}
-                </>
-              );
-            })()}
-          </div>
+      {/* Header del producto */}
+      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b">
+        <div className="flex items-center gap-2">
+          <Link
+            to="/github/$org/$repo"
+            params={{ org, repo: productName }}
+            className="font-semibold text-gray-800 hover:text-blue-600 transition-colors"
+          >
+            {productName}
+          </Link>
+          <span className="text-sm text-gray-500">({services.length} servicios)</span>
         </div>
-
-        {/* Servicios del producto */}
-        <div className="ml-4 space-y-3 py-3">
-          {services.map((service) => {
-          const serviceEndpoints = endpointsByService[service];
-          
-          // Ordenar: production primero, luego staging
-          const sortedEndpoints = serviceEndpoints.sort((a, b) => {
-            if (a.environment !== b.environment) {
-              return a.environment === 'production' ? -1 : 1;
-            }
-            return a.url.localeCompare(b.url);
-          });
-          
-          return (
-            <div key={service}>
-              {/* Servicio */}
-              <div className="font-medium text-gray-700 py-1">
-                {service === '/' ? '/' : `/${service}`}
-              </div>
-              
-              {/* Endpoints del servicio */}
-              <div className="ml-4 space-y-1">
-                {sortedEndpoints.map((endpoint) => (
-                  <div key={endpoint.id}>
-                    <div
-                      className="flex items-center gap-3 px-4 py-1 hover:bg-gray-50 rounded group cursor-pointer"
-                      onClick={() => {
-                        const newSet = new Set(expandedEndpoints);
-                        if (newSet.has(endpoint.id)) {
-                          newSet.delete(endpoint.id);
-                        } else {
-                          newSet.add(endpoint.id);
-                        }
-                        setExpandedEndpoints(newSet);
-                      }}
-                      role="button"
-                      tabIndex={0}
-                      aria-expanded={expandedEndpoints.has(endpoint.id)}
-                      aria-controls={`details-${endpoint.id}`}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          const newSet = new Set(expandedEndpoints);
-                          if (newSet.has(endpoint.id)) {
-                            newSet.delete(endpoint.id);
-                          } else {
-                            newSet.add(endpoint.id);
-                          }
-                          setExpandedEndpoints(newSet);
-                        }
-                      }}
-                    >
-                      {/* Status emoji */}
-                      <div className="flex-shrink-0">
-                        {endpoint.isHealthy === null && (
-                          <span className="text-gray-400">⚪</span>
-                        )}
-                        {endpoint.isHealthy === true && (
-                          <span className="text-green-500">🟢</span>
-                        )}
-                        {endpoint.isHealthy === false && (
-                          <span className="text-red-500">🔴</span>
-                        )}
-                      </div>
-
-                      {/* Ambiente badge */}
-                      <span
-                        className={`px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide ${
-                          endpoint.environment === 'production'
-                            ? 'bg-purple-100 text-purple-700'
-                            : 'bg-blue-100 text-blue-700'
-                        }`}
-                      >
-                        {endpoint.environment}
-                      </span>
-
-                      {/* Response time */}
-                      {endpoint.responseTime !== undefined && (
-                        <span className={`text-xs ${endpoint.isHealthy ? 'text-green-600' : 'text-red-600'}`}>
-                          {endpoint.responseTime}ms
-                        </span>
-                      )}
-
-                      {/* Error message */}
-                      {endpoint.error && (
-                        <span className="text-xs text-red-600 truncate max-w-[300px]" title={endpoint.error}>
-                          {(() => {
-                            if (endpoint.details) {
-                              try {
-                                const parsed = JSON.parse(endpoint.details);
-                                return parsed.data || parsed.statusText || endpoint.error;
-                              } catch {
-                                return endpoint.error;
-                              }
-                            }
-                            return endpoint.error;
-                          })()}
-                        </span>
-                      )}
-
-                      {/* Última verificación */}
-                      <span className="text-xs text-gray-400">
-                          {formatTimeAgo(endpoint.lastChecked)}
-                      </span>
-
-                      {/* URL */}
-                      <span className="flex-1 text-xs text-gray-500 truncate">
-                        {endpoint.url}
-                      </span>
-
-                      {/* Actions - solo visible al hover, detener propagación para no expandir */}
-                      <div
-                        className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <button
-                          onClick={() => onCheckEndpoint(endpoint.id)}
-                          disabled={isChecking}
-                          className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                          title="Verificar ahora"
-                          aria-label="Verificar estado del endpoint ahora"
-                        >
-                          <RefreshCw className={`w-3 h-3 ${isChecking ? 'animate-spin' : ''}`} />
-                        </button>
-                        <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(endpoint.url);
-                          }}
-                          className="p-1 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
-                          title="Copiar URL"
-                          aria-label="Copiar URL del endpoint"
-                        >
-                          <Copy className="w-3 h-3" />
-                        </button>
-                        <a
-                          href={endpoint.url.endsWith('/') ? `${endpoint.url}health` : `${endpoint.url}/health`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="p-1 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-                          title="Abrir /health"
-                          aria-label="Abrir endpoint /health en nueva pestaña"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                        <button
-                          onClick={() => onRemoveEndpoint(endpoint.id)}
-                          className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                          title="Eliminar del monitoreo"
-                          aria-label="Eliminar endpoint del monitoreo"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                      </div>
-
-                      {/* Chevron indicator */}
-                      <span className="text-gray-400">
-                        {expandedEndpoints.has(endpoint.id) ? (
-                          <ChevronUp className="w-3 h-3" />
-                        ) : (
-                          <ChevronDown className="w-3 h-3" />
-                        )}
-                      </span>
-                    </div>
-
-                    {/* Details expandible con animación */}
-                    <div
-                      id={`details-${endpoint.id}`}
-                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                        expandedEndpoints.has(endpoint.id) ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                      }`}
-                    >
-                      <div className="mt-1 p-2 bg-gray-50 rounded text-xs font-mono text-gray-700 overflow-x-auto">
-                        <pre className="whitespace-pre-wrap">
-                          {endpoint.details
-                            ? (() => {
-                                try {
-                                  const parsed = JSON.parse(endpoint.details);
-                                  // Si el campo data es un JSON stringificado, parsearlo también
-                                  if (parsed.data && typeof parsed.data === 'string') {
-                                    try {
-                                      parsed.data = JSON.parse(parsed.data);
-                                    } catch {
-                                      // Si no es JSON, dejarlo como está
-                                    }
-                                  }
-                                  return JSON.stringify(parsed, null, 2);
-                                } catch {
-                                  return endpoint.details;
-                                }
-                              })()
-                            : 'Sin información adicional'}
-                        </pre>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
+        <div className="flex items-center gap-3 text-sm">
+          {(() => {
+            const healthy = endpoints.filter((ep) => ep.isHealthy === true).length;
+            const unhealthy = endpoints.filter((ep) => ep.isHealthy === false).length;
+            const pending = endpoints.filter((ep) => ep.isHealthy === null).length;
+            return (
+              <>
+                {healthy > 0 && (
+                  <span className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-green-500" />
+                    {healthy} OK
+                  </span>
+                )}
+                {pending > 0 && (
+                  <span className="flex items-center gap-1 text-gray-500">
+                    <div className="w-2 h-2 rounded-full bg-gray-400" />
+                    {pending} Pendientes
+                  </span>
+                )}
+                {unhealthy > 0 && (
+                  <span className="flex items-center gap-1 text-red-600 font-medium">
+                    <div className="w-2 h-2 rounded-full bg-red-500" />
+                    {unhealthy} Error
+                  </span>
+                )}
+              </>
+            );
+          })()}
+        </div>
       </div>
-    </div>
+
+      {/* Tabla de endpoints */}
+      <EndpointsTable
+        endpoints={sortedEndpoints}
+        expandedEndpoints={expandedEndpoints}
+        setExpandedEndpoints={setExpandedEndpoints}
+        isChecking={isChecking}
+        onCheckEndpoint={onCheckEndpoint}
+        onRemoveEndpoint={onRemoveEndpoint}
+      />
     </div>
   );
+}
+
+function EndpointsTable({
+  endpoints,
+  expandedEndpoints,
+  setExpandedEndpoints,
+  isChecking,
+  onCheckEndpoint,
+  onRemoveEndpoint,
+}: {
+  endpoints: ReturnType<typeof useHealthMonitor>['endpoints']
+  expandedEndpoints: Set<string>
+  setExpandedEndpoints: React.Dispatch<React.SetStateAction<Set<string>>>
+  isChecking: boolean
+  onCheckEndpoint: (id: string) => void
+  onRemoveEndpoint: (id: string) => void
+}) {
+  const columns: ColumnDef<(typeof endpoints)[0]>[] = [
+    {
+      accessorKey: "status",
+      header: "",
+      cell: ({ row }) => <StatusCell endpoint={row.original} />,
+    },
+    {
+      accessorKey: "service",
+      header: "Ruta",
+      cell: ({ row }) => <span className="font-medium text-gray-700">{row.original.service || '/'}</span>,
+    },
+    {
+      accessorKey: "environment",
+      header: "Ambiente",
+      cell: ({ row }) => <EnvironmentCell endpoint={row.original} />,
+    },
+    {
+      accessorKey: "lastChecked",
+      header: "Verificado",
+      cell: ({ row }) => <LastCheckedCell endpoint={row.original} />,
+    },
+    {
+      accessorKey: "responseTime",
+      header: "Tiempo",
+      cell: ({ row }) => <ResponseTimeCell endpoint={row.original} />,
+    },
+    {
+      accessorKey: "url",
+      header: "URL",
+      cell: ({ row }) => <UrlCell endpoint={row.original} />,
+    },
+    {
+      accessorKey: "error",
+      header: "Error",
+      cell: ({ row }) => <ErrorCell endpoint={row.original} />,
+    },
+    {
+      id: "actions",
+      accessorKey: "actions",
+      header: "Acciones",
+      enableSorting: false,
+      cell: ({ row }) => (
+        <ActionsCell
+          endpoint={row.original}
+          isChecking={isChecking}
+          onCheckEndpoint={onCheckEndpoint}
+          onRemoveEndpoint={onRemoveEndpoint}
+        />
+      ),
+    },
+  ]
+
+  return <Table columns={columns} data={endpoints} />
+}
+
+function StatusCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
+  if (endpoint.isHealthy === null) return <span className="text-gray-400">⚪</span>
+  if (endpoint.isHealthy === true) return <span className="text-green-500">🟢</span>
+  return <span className="text-red-500">🔴</span>
+}
+
+function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
+  return (
+    <span
+      className={`px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide ${
+        endpoint.environment === 'production'
+          ? 'bg-purple-100 text-purple-700'
+          : 'bg-blue-100 text-blue-700'
+      }`}
+    >
+      {endpoint.environment}
+    </span>
+  )
+}
+
+function ResponseTimeCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
+  if (endpoint.responseTime !== undefined) {
+    return (
+      <span className={`text-xs ${endpoint.isHealthy ? 'text-green-600' : 'text-red-600'}`}>
+        {endpoint.responseTime}ms
+      </span>
+    )
+  }
+  return <span className="text-muted-foreground">-</span>
+}
+
+function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
+  if (!endpoint.error) return <span className="text-muted-foreground">-</span>
+
+  const errorMessage = (() => {
+    if (endpoint.details) {
+      try {
+        const parsed = JSON.parse(endpoint.details);
+        return parsed.data || parsed.statusText || endpoint.error;
+      } catch {
+        return endpoint.error;
+      }
+    }
+    return endpoint.error;
+  })()
+
+  const truncatedMessage = errorMessage.length > 50 ? `${errorMessage.slice(0, 50)}...` : errorMessage
+
+  return (
+    <span className="text-xs text-red-600" title={errorMessage}>
+      {truncatedMessage}
+    </span>
+  )
+}
+
+function LastCheckedCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
+  return <span className="text-xs text-gray-400">{formatTimeAgo(endpoint.lastChecked)}</span>
+}
+
+function UrlCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
+  const truncatedUrl = endpoint.url.length > 60 ? `${endpoint.url.slice(0, 60)}...` : endpoint.url
+  return <span className="flex-1 text-xs text-gray-500" title={endpoint.url}>{truncatedUrl}</span>
+}
+
+function ActionsCell({
+  endpoint,
+  isChecking,
+  onCheckEndpoint,
+  onRemoveEndpoint,
+}: {
+  endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0]
+  isChecking: boolean
+  onCheckEndpoint: (id: string) => void
+  onRemoveEndpoint: (id: string) => void
+}) {
+  return (
+    <div className="flex items-center gap-0.5">
+      <button
+        onClick={() => onCheckEndpoint(endpoint.id)}
+        disabled={isChecking}
+        className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+        title="Verificar ahora"
+      >
+        <RefreshCw className={`w-3 h-3 ${isChecking ? 'animate-spin' : ''}`} />
+      </button>
+      <button
+        onClick={() => navigator.clipboard.writeText(endpoint.url)}
+        className="p-1 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+        title="Copiar URL"
+      >
+        <Copy className="w-3 h-3" />
+      </button>
+      <a
+        href={endpoint.url.endsWith('/') ? `${endpoint.url}health` : `${endpoint.url}/health`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="p-1 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+        title="Abrir /health"
+      >
+        <ExternalLink className="w-3 h-3" />
+      </a>
+      <button
+        onClick={() => onRemoveEndpoint(endpoint.id)}
+        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+        title="Eliminar del monitoreo"
+      >
+        <Trash2 className="w-3 h-3" />
+      </button>
+    </div>
+  )
 }
 
 function HealthMonitorPage() {

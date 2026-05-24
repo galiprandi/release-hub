@@ -6,6 +6,8 @@ import { useCurlAccess } from '@/hooks/useCurlAccess';
 import { FilterBar } from '@/components/shared/FilterBar';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { ImportQueryModal } from '@/components/ImportQueryModal';
+import { Table } from '@/components/ui/Table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 import { PageLayout } from '../layouts/PageLayout';
@@ -226,80 +228,14 @@ function FetcherPage() {
 						</p>
 					</div>
 				) : (
-					<div className="bg-white rounded-lg border overflow-hidden">
-						<table className="w-full">
-							<thead>
-								<tr className="border-b bg-muted/50">
-									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Método</th>
-									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Path</th>
-									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Dominio</th>
-									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Enviado</th>
-									<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Tiempo</th>
-									<th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Acciones</th>
-								</tr>
-							</thead>
-							<tbody>
-								{paginatedHistory.map((query) => {
-									const parsed = parseCurlForDisplay(query.curl);
-									if (!parsed) return null;
-
-									return (
-										<tr key={query.id} className="border-b hover:bg-muted/30 transition-colors">
-											<td className="px-4 py-3">
-												<span className={`px-2 py-1 rounded text-xs font-semibold uppercase ${getMethodBadgeColor(parsed.method)}`}>
-													{parsed.method}
-												</span>
-											</td>
-											<td className="px-4 py-3 text-sm text-muted-foreground">
-												{parsed.path.length > 100 ? `${parsed.path.slice(0, 100)}...` : parsed.path}
-											</td>
-											<td className="px-4 py-3 text-sm text-muted-foreground">{parsed.domain}</td>
-											<td className="px-4 py-3 text-sm text-muted-foreground" title={query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}>{query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}</td>
-											<td className="px-4 py-3 text-sm">
-												{query.response?.responseTime ? (
-													<span className={`px-2 py-1 rounded text-xs font-medium ${getResponseTimeBadgeColor(query.response.responseTime)}`}>
-														{query.response.responseTime}ms
-													</span>
-												) : (
-													<span className="text-muted-foreground">-</span>
-												)}
-											</td>
-											<td className="px-4 py-3 text-right">
-												<div className="flex items-center justify-end gap-2">
-													<button
-														type="button"
-														className="p-1.5 bg-success text-success-foreground hover:bg-success/90 rounded transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
-														title="Enviar"
-														onClick={() => handleOpenModal(query)}
-													>
-														<Send className="w-4 h-4" />
-													</button>
-													{query.response?.body && (
-														<button
-															type="button"
-															className="p-1.5 text-muted-foreground hover:text-primary hover:bg-accent rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-															title="Copiar respuesta"
-															onClick={() => handleCopyResponse(query)}
-														>
-															<Copy className="w-4 h-4" />
-														</button>
-													)}
-													<button
-														type="button"
-														className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none focus-visible:ring-offset-1"
-														title="Eliminar"
-														onClick={() => handleDelete(query.id)}
-														disabled={isDeleting}
-													>
-														<Trash2 className="w-4 h-4" />
-													</button>
-												</div>
-											</td>
-										</tr>
-									);
-								})}
-							</tbody>
-						</table>
+					<>
+						<QueriesTable
+							queries={paginatedHistory}
+							onOpenModal={handleOpenModal}
+							onCopyResponse={handleCopyResponse}
+							onDelete={handleDelete}
+							isDeleting={isDeleting}
+						/>
 
 						{/* Pagination */}
 						{totalPages > 1 && (
@@ -330,7 +266,7 @@ function FetcherPage() {
 								</div>
 							</div>
 						)}
-					</div>
+					</>
 				)
 			) : (
 				<StatusCard
@@ -347,4 +283,157 @@ function FetcherPage() {
 		</div>
 		</PageLayout>
 	);
+}
+
+function QueriesTable({
+	queries,
+	onOpenModal,
+	onCopyResponse,
+	onDelete,
+	isDeleting,
+}: {
+	queries: QueryRecord[]
+	onOpenModal: (query: QueryRecord) => void
+	onCopyResponse: (query: QueryRecord) => void
+	onDelete: (id: string) => void
+	isDeleting: boolean
+}) {
+	const columns: ColumnDef<QueryRecord>[] = [
+		{
+			accessorKey: "method",
+			header: "Método",
+			cell: ({ row }) => <MethodCell query={row.original} />,
+		},
+		{
+			accessorKey: "path",
+			header: "Path",
+			cell: ({ row }) => <PathCell query={row.original} />,
+		},
+		{
+			accessorKey: "domain",
+			header: "Dominio",
+			cell: ({ row }) => <DomainCell query={row.original} />,
+		},
+		{
+			accessorKey: "updatedAt",
+			header: "Enviado",
+			cell: ({ row }) => <SentCell query={row.original} />,
+		},
+		{
+			accessorKey: "responseTime",
+			header: "Tiempo",
+			cell: ({ row }) => <ResponseTimeCell query={row.original} />,
+		},
+		{
+			id: "actions",
+			accessorKey: "actions",
+			header: "Acciones",
+			enableSorting: false,
+			cell: ({ row }) => (
+				<ActionsCell
+					query={row.original}
+					onOpenModal={onOpenModal}
+					onCopyResponse={onCopyResponse}
+					onDelete={onDelete}
+					isDeleting={isDeleting}
+				/>
+			),
+		},
+	]
+
+	return <Table columns={columns} data={queries} />
+}
+
+function MethodCell({ query }: { query: QueryRecord }) {
+	const parsed = parseCurlForDisplay(query.curl)
+	if (!parsed) return null
+
+	return (
+		<span className={`px-2 py-1 rounded text-xs font-semibold uppercase ${getMethodBadgeColor(parsed.method)}`}>
+			{parsed.method}
+		</span>
+	)
+}
+
+function PathCell({ query }: { query: QueryRecord }) {
+	const parsed = parseCurlForDisplay(query.curl)
+	if (!parsed) return null
+
+	return (
+		<span className="text-sm text-muted-foreground">
+			{parsed.path.length > 100 ? `${parsed.path.slice(0, 100)}...` : parsed.path}
+		</span>
+	)
+}
+
+function DomainCell({ query }: { query: QueryRecord }) {
+	const parsed = parseCurlForDisplay(query.curl)
+	if (!parsed) return null
+
+	return <span className="text-sm text-muted-foreground">{parsed.domain}</span>
+}
+
+function SentCell({ query }: { query: QueryRecord }) {
+	return (
+		<span className="text-sm text-muted-foreground" title={query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}>
+			{query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}
+		</span>
+	)
+}
+
+function ResponseTimeCell({ query }: { query: QueryRecord }) {
+	if (query.response?.responseTime) {
+		return (
+			<span className={`px-2 py-1 rounded text-xs font-medium ${getResponseTimeBadgeColor(query.response.responseTime)}`}>
+				{query.response.responseTime}ms
+			</span>
+		)
+	}
+	return <span className="text-muted-foreground">-</span>
+}
+
+function ActionsCell({
+	query,
+	onOpenModal,
+	onCopyResponse,
+	onDelete,
+	isDeleting,
+}: {
+	query: QueryRecord
+	onOpenModal: (query: QueryRecord) => void
+	onCopyResponse: (query: QueryRecord) => void
+	onDelete: (id: string) => void
+	isDeleting: boolean
+}) {
+	return (
+		<div className="flex items-center justify-end gap-2">
+			<button
+				type="button"
+				className="p-1.5 bg-success text-success-foreground hover:bg-success/90 rounded transition-colors focus-visible:ring-2 focus-visible:ring-success focus-visible:outline-none focus-visible:ring-offset-1"
+				title="Enviar"
+				onClick={() => onOpenModal(query)}
+			>
+				<Send className="w-4 h-4" />
+			</button>
+			{query.response?.body && (
+				<button
+					type="button"
+					className="p-1.5 text-muted-foreground hover:text-primary hover:bg-accent rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+					title="Copiar respuesta"
+					onClick={() => onCopyResponse(query)}
+				>
+					<Copy className="w-4 h-4" />
+				</button>
+			)}
+			<button
+				type="button"
+				className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none focus-visible:ring-offset-1"
+				title="Eliminar"
+				onClick={() => onDelete(query.id)}
+				disabled={isDeleting}
+			>
+				<Trash2 className="w-4 h-4" />
+			</button>
+		</div>
+	)
 }

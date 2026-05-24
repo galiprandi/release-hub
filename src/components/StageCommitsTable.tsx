@@ -4,6 +4,8 @@ import { type GitTag, useGitTags } from "@/hooks/useGitTags";
 import { DisplayInfo } from "./DisplayInfo";
 import { CommitLink } from "./CommitLink";
 import { TagLink } from "./TagLink";
+import { Table } from "@/components/ui/Table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Loader2 } from "lucide-react";
 
 
@@ -79,92 +81,111 @@ export function StageCommitsTable({
 
 	return (
 		<div>
-			<div className="overflow-hidden border rounded-lg">
-				<table className="w-full text-sm">
-					<thead className="bg-muted">
-						<tr>
-							<th className="px-4 py-2 text-left font-medium">
-								{isCommits ? "Hash" : "Tag"}
-							</th>
-							<th className="px-4 py-2 text-left font-medium">Fecha</th>
-							<th className="px-4 py-2 text-left font-medium">Autor</th>
-							{isCommits && (
-								<th className="px-4 py-2 text-left font-medium">Mensaje</th>
-							)}
-						</tr>
-					</thead>
-					<tbody>
-						{isLoading && (!commits?.length && !tags?.length) ? (
-							<tr>
-								<td
-									colSpan={4}
-									className="px-4 py-8 text-center text-muted-foreground"
-								>
-									<div className="flex items-center justify-center gap-2">
-										<Loader2 className="w-4 h-4 animate-spin" />
-										Cargando información...
-									</div>
-								</td>
-							</tr>
-						) : isCommits ? (
-							commits?.map((c: GitCommit) => (
-								<tr key={c.hash} className="border-t hover:bg-muted/30 transition-colors group">
-									<td className="px-4 py-3">
-										<CommitLink hash={c.hash} org={org} repo={product} showStatus={showStatus} />
-									</td>
-									<td className="px-4 py-3 text-muted-foreground">
-										<DisplayInfo value={c.date} type="dates" />
-									</td>
-									<td className="px-4 py-3">
-										<DisplayInfo value={c.author} type="author" maxChar={30} />
-									</td>
-									<td className="px-4 py-3 text-muted-foreground truncate max-w-[300px]">
-										<DisplayInfo
-											value={c.message}
-											type="message"
-											maxChar={50}
-										/>
-									</td>
-								</tr>
-							))
-						) : (
-							tags
-								?.map((t: GitTag) => (
-									<tr key={t.name} className="border-t hover:bg-muted/30 transition-colors group">
-										<td className="px-4 py-3">
-											<TagLink tagName={t.name} org={org} repo={product} showStatus={showStatus} />
-										</td>
-										<td className="px-4 py-3 text-muted-foreground">
-											<DisplayInfo value={t.date} type="dates" />
-										</td>
-										<td className="px-4 py-3">
-											<DisplayInfo
-												value={t.author.name}
-												type="author"
-												maxChar={50}
-											/>
-										</td>
-									</tr>
-								))
-						)}
-					</tbody>
-				</table>
-				
-				{/* Infinite scroll sensor */}
-				<div ref={loadMoreRef} className="flex items-center justify-center py-4 border-t text-xs text-muted-foreground">
-					{isFetchingNextPage ? (
-						<div className="flex items-center gap-2">
-							<Loader2 className="w-3 h-3 animate-spin" />
-							Cargando más...
+			{isLoading && (!commits?.length && !tags?.length) ? (
+				<div className="overflow-hidden border rounded-lg">
+					<div className="px-4 py-8 text-center text-muted-foreground">
+						<div className="flex items-center justify-center gap-2">
+							<Loader2 className="w-4 h-4 animate-spin" />
+							Cargando información...
 						</div>
-					) : hasNextPage ? (
-						"Desliza para cargar más"
-					) : (
-						commits?.length || tags?.length ? "Fin del historial" : ""
-					)}
+					</div>
 				</div>
-			</div>
+			) : (
+				<>
+					{isCommits ? (
+						<CommitsTable commits={commits || []} org={org} repo={product} showStatus={showStatus} />
+					) : (
+						<TagsTable tags={tags || []} org={org} repo={product} showStatus={showStatus} />
+					)}
+
+					{/* Infinite scroll sensor */}
+					<div ref={loadMoreRef} className="flex items-center justify-center py-4 border-t text-xs text-muted-foreground">
+						{isFetchingNextPage ? (
+							<div className="flex items-center gap-2">
+								<Loader2 className="w-3 h-3 animate-spin" />
+								Cargando más...
+							</div>
+						) : hasNextPage ? (
+							"Desliza para cargar más"
+						) : (
+							commits?.length || tags?.length ? "Fin del historial" : ""
+						)}
+					</div>
+				</>
+			)}
 		</div>
 	);
 }
 
+function CommitsTable({
+	commits,
+	org,
+	repo,
+	showStatus,
+}: {
+	commits: GitCommit[]
+	org: string
+	repo: string
+	showStatus?: boolean
+}) {
+	const columns: ColumnDef<GitCommit>[] = [
+		{
+			accessorKey: "hash",
+			header: "Hash",
+			cell: ({ row }) => <CommitLink hash={row.original.hash} org={org} repo={repo} showStatus={showStatus} />,
+		},
+		{
+			accessorKey: "date",
+			header: "Fecha",
+			cell: ({ row }) => <DisplayInfo value={row.original.date} type="dates" />,
+		},
+		{
+			accessorKey: "author",
+			header: "Autor",
+			cell: ({ row }) => <DisplayInfo value={row.original.author} type="author" maxChar={30} />,
+		},
+		{
+			accessorKey: "message",
+			header: "Mensaje",
+			cell: ({ row }) => (
+				<span className="text-muted-foreground truncate max-w-[300px]">
+					<DisplayInfo value={row.original.message} type="message" maxChar={50} />
+				</span>
+			),
+		},
+	]
+
+	return <Table columns={columns} data={commits} />
+}
+
+function TagsTable({
+	tags,
+	org,
+	repo,
+	showStatus,
+}: {
+	tags: GitTag[]
+	org: string
+	repo: string
+	showStatus?: boolean
+}) {
+	const columns: ColumnDef<GitTag>[] = [
+		{
+			accessorKey: "name",
+			header: "Tag",
+			cell: ({ row }) => <TagLink tagName={row.original.name} org={org} repo={repo} showStatus={showStatus} />,
+		},
+		{
+			accessorKey: "date",
+			header: "Fecha",
+			cell: ({ row }) => <DisplayInfo value={row.original.date} type="dates" />,
+		},
+		{
+			accessorKey: "author",
+			header: "Autor",
+			cell: ({ row }) => <DisplayInfo value={row.original.author.name} type="author" maxChar={50} />,
+		},
+	]
+
+	return <Table columns={columns} data={tags} />
+}

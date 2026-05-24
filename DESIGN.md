@@ -213,6 +213,28 @@ Usar negritas (`font-bold`, `font-semibold`) solo para elementos críticos:
 - Bordes sutiles: `border-border/60` (thead), `divide-border/40` (tbody)
 - Fondo de header: `bg-muted/40`
 
+### Headers de Tabla con Contexto
+
+Cuando se muestran múltiples tablas agrupadas por un contexto (ej: organizaciones en GitHub, contextos en Kubernetes), usar el contexto como header de la primera columna en lugar de un label genérico:
+
+```tsx
+{
+  accessorKey: "name",
+  header: () => (
+    <div className="flex items-center gap-2">
+      <Building2 className="w-5 h-5" />
+      <span>{org}</span>
+    </div>
+  ),
+  cell: ({ row }) => <RepoNameCell repo={row.original} />,
+}
+```
+
+Esto aplica cuando:
+- Hay múltiples tablas del mismo tipo agrupadas por un atributo (org, contexto, namespace, etc.)
+- El contexto ya se muestra visualmente como título de sección antes de la tabla
+- Se mantiene consistencia con el patrón usado en `/github` para organizaciones
+
 ### Componentes Compartidos
 
 Antes de crear componentes nuevos, verificar si extienden:

@@ -1,12 +1,12 @@
 import { useState, forwardRef, useImperativeHandle, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { Play, RefreshCw, Square, Terminal, ExternalLink } from "lucide-react"
-import * as Tooltip from "@radix-ui/react-tooltip"
+import { ExternalLink } from "lucide-react"
 import { getContainers, getContainerLogs, startContainer, restartContainer, stopContainer, type ContainerInfo } from "@/api/docker"
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys"
 import { LogsViewer } from "@/components/shared/LogsViewer"
 import { StatusCard } from "@/components/ui/StatusCard"
+import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
 
 export interface ContainerListRef {
 	refetch: () => void
@@ -279,91 +279,25 @@ function ContainerRow({
 			<td className="px-4 py-3 text-xs">{renderPorts()}</td>
 			<td className="px-4 py-3">
 				<div className="flex items-center justify-end gap-1.5">
-					<Tooltip.Provider>
-						<Tooltip.Root>
-							<Tooltip.Trigger asChild>
-								<button
-									type="button"
-									onClick={onViewLogs}
-									className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-									aria-label="Ver logs"
-								>
-									<Terminal className="w-4 h-4" />
-								</button>
-							</Tooltip.Trigger>
-							<Tooltip.Portal>
-								<Tooltip.Content
-									className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50"
-									sideOffset={5}
-								>
-									Ver logs
-								</Tooltip.Content>
-							</Tooltip.Portal>
-						</Tooltip.Root>
-						<Tooltip.Root>
-							<Tooltip.Trigger asChild>
-								<button
-									type="button"
-									onClick={onStart}
-									className="p-1.5 text-success hover:bg-success/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-									disabled={running}
-									aria-label="Iniciar contenedor"
-								>
-									<Play className="w-4 h-4" />
-								</button>
-							</Tooltip.Trigger>
-							<Tooltip.Portal>
-								<Tooltip.Content
-									className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50"
-									sideOffset={5}
-								>
-									Iniciar contenedor
-								</Tooltip.Content>
-							</Tooltip.Portal>
-						</Tooltip.Root>
-						<Tooltip.Root>
-							<Tooltip.Trigger asChild>
-								<button
-									type="button"
-									onClick={onRestart}
-									className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-									disabled={!running}
-									aria-label="Reiniciar contenedor"
-								>
-									<RefreshCw className="w-4 h-4" />
-								</button>
-							</Tooltip.Trigger>
-							<Tooltip.Portal>
-								<Tooltip.Content
-									className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50"
-									sideOffset={5}
-								>
-									Reiniciar contenedor
-								</Tooltip.Content>
-							</Tooltip.Portal>
-						</Tooltip.Root>
-						<Tooltip.Root>
-							<Tooltip.Trigger asChild>
-								<button
-									type="button"
-									onClick={onStop}
-									className="p-1.5 text-destructive hover:bg-destructive/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-									disabled={!running}
-									aria-label="Detener contenedor"
-								>
-									<Square className="w-4 h-4" />
-								</button>
-							</Tooltip.Trigger>
-							<Tooltip.Portal>
-								<Tooltip.Content
-									className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50"
-									sideOffset={5}
-								>
-									Detener contenedor
-								</Tooltip.Content>
-							</Tooltip.Portal>
-						</Tooltip.Root>
-					</Tooltip.Provider>
+					<ActionButton
+						action={ACTION_DEFINITIONS.viewLogs}
+						onClick={onViewLogs}
+					/>
+					<ActionButton
+						action={ACTION_DEFINITIONS.startContainer}
+						onClick={onStart}
+						disabled={running}
+					/>
+					<ActionButton
+						action={ACTION_DEFINITIONS.restartContainer}
+						onClick={onRestart}
+						disabled={!running}
+					/>
+					<ActionButton
+						action={ACTION_DEFINITIONS.stopContainer}
+						onClick={onStop}
+						disabled={!running}
+					/>
 				</div>
 			</td>
 		</tr>

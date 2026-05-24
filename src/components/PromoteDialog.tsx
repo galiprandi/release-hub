@@ -13,6 +13,7 @@ import { useCommitSummary } from "@/hooks/useCommitSummary"
 import { DiscordNotification } from "@/components/ui/DiscordNotification"
 import { CommitLink } from "@/components/CommitLink"
 import { BaseDialog } from "@/components/ui/BaseDialog"
+import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
 
 interface PromoteDialogProps {
 	repo: string
@@ -174,34 +175,41 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false }: PromoteDial
 
 	return (
 		<>
-			<Tooltip.Provider>
-				<Tooltip.Root>
-					<Tooltip.Trigger asChild>
-						<button
-							type="button"
-							onClick={() => handleOpenChange(true)}
-							aria-haspopup="dialog"
-							className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
-						>
-							<Rocket className="w-4 h-4" />
-							{!iconOnly && <span>Promocionar</span>}
-						</button>
-					</Tooltip.Trigger>
-					<Tooltip.Portal>
-						<Tooltip.Content
-							className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50"
-							sideOffset={5}
-						>
-							<div className="text-xs space-y-1">
-								<div className="font-medium">Crear tag para promocionar a producción</div>
-								<div className="text-muted-foreground">
-									Crear un nuevo tag en el commit más reciente de main
+			{iconOnly ? (
+				<ActionButton
+					action={ACTION_DEFINITIONS.promoteToProd}
+					onClick={() => handleOpenChange(true)}
+				/>
+			) : (
+				<Tooltip.Provider>
+					<Tooltip.Root>
+						<Tooltip.Trigger asChild>
+							<button
+								type="button"
+								onClick={() => handleOpenChange(true)}
+								aria-haspopup="dialog"
+								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+							>
+								<Rocket className="w-4 h-4" />
+								<span>Promocionar</span>
+							</button>
+						</Tooltip.Trigger>
+						<Tooltip.Portal>
+							<Tooltip.Content
+								className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50"
+								sideOffset={5}
+							>
+								<div className="text-xs space-y-1">
+									<div className="font-medium">Crear tag para promocionar a producción</div>
+									<div className="text-muted-foreground">
+										Crear un nuevo tag en el commit más reciente de main
+									</div>
 								</div>
-							</div>
-						</Tooltip.Content>
-					</Tooltip.Portal>
-				</Tooltip.Root>
-			</Tooltip.Provider>
+							</Tooltip.Content>
+						</Tooltip.Portal>
+					</Tooltip.Root>
+				</Tooltip.Provider>
+			)}
 			<BaseDialog
 				open={open}
 				onOpenChange={handleOpenChange}

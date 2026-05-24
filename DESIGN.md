@@ -220,6 +220,40 @@ Antes de crear componentes nuevos, verificar si extienden:
 - **PageHeader**: Para headers de página
 - **BaseDialog**: Para todos los diálogos modales
 - **DisplayInfo**: Para mostrar metadatos con iconos
+- **ActionButton**: Para botones de acción iconográficos con tooltip
+
+### ActionButton
+
+Componente reutilizable para botones de acción iconográficos con tooltip integrado. Estándar para todas las acciones de fila en tablas (Docker, K8s, repos, etc.).
+
+**Uso básico**:
+```tsx
+import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
+
+<ActionButton
+  action={ACTION_DEFINITIONS.viewLogs}
+  onClick={handleViewLogs}
+  disabled={!isEnabled}
+/>
+```
+
+**Props**:
+- `action`: Definición de acción (icono, label, color)
+- `onClick`: Handler del click
+- `disabled`: Estado deshabilitado
+- `size`: "sm" | "md" (default: "md")
+- `tooltipSide`: "top" | "right" | "bottom" | "left" (default: "top")
+- `className`: Clases adicionales
+
+**Colores disponibles**:
+- `default`: Gris/muted para acciones neutrales
+- `success`: Verde para acciones positivas (iniciar, confirmar)
+- `destructive`: Rojo para acciones críticas (eliminar, detener)
+- `primary`: Color de marca para acciones destacadas
+- `warning`: Amarillo para precauciones
+- `info`: Azul para información
+
+**Diccionario de acciones**: `ACTION_DEFINITIONS` incluye acciones predefinidas para Docker, GitHub, K8s, etc. Consultar `src/components/ui/actionDefinitions.ts` para el listado completo.
 
 ### Reglas de Negritas
 

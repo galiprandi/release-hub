@@ -9,6 +9,7 @@ import { useDiscordChannel } from "@/hooks/useDiscordChannel"
 import { useGitUser } from "@/hooks/useGitUser"
 import { DiscordNotification } from "@/components/ui/DiscordNotification"
 import { BaseDialog } from "@/components/ui/BaseDialog"
+import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
 
 interface FreezeDialogProps {
 	repo: string
@@ -120,45 +121,53 @@ EOF`
 
 	return (
 		<Dialog.Root open={open} onOpenChange={handleOpenChange}>
-			<Tooltip.Provider>
-				<Tooltip.Root>
-					<Tooltip.Trigger asChild>
-						<Dialog.Trigger asChild>
-							<button
-								type="button"
-								disabled={!canManage}
-								className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-									isLocked
-										? "bg-orange-600 text-white hover:bg-orange-700"
-										: "bg-slate-500 text-white hover:bg-slate-600"
-								} disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none`}
+			{iconOnly ? (
+				<ActionButton
+					action={isLocked ? ACTION_DEFINITIONS.unfreezeBranch : ACTION_DEFINITIONS.freezeBranch}
+					onClick={() => setOpen(true)}
+					disabled={!canManage}
+				/>
+			) : (
+				<Tooltip.Provider>
+					<Tooltip.Root>
+						<Tooltip.Trigger asChild>
+							<Dialog.Trigger asChild>
+								<button
+									type="button"
+									disabled={!canManage}
+									className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+										isLocked
+											? "bg-orange-600 text-white hover:bg-orange-700"
+											: "bg-slate-500 text-white hover:bg-slate-600"
+									} disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none`}
+								>
+									{isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+									<span>{isLocked ? "Desbloquear" : "Bloquear"}</span>
+								</button>
+							</Dialog.Trigger>
+						</Tooltip.Trigger>
+						<Tooltip.Portal>
+							<Tooltip.Content
+								className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50"
+								sideOffset={5}
 							>
-								{isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-								{!iconOnly && <span>{isLocked ? "Desbloquear" : "Bloquear"}</span>}
-							</button>
-						</Dialog.Trigger>
-					</Tooltip.Trigger>
-					<Tooltip.Portal>
-						<Tooltip.Content
-							className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50"
-							sideOffset={5}
-						>
-							<div className="text-xs space-y-1">
-								{canManage ? (
-									<>
-										<div className="font-medium">{isLocked ? "Desbloquear branch" : "Bloquear branch main"}</div>
-										<div className="text-muted-foreground">
-											{isLocked ? "Permitir merges y pushes a main" : "Bloquear merges y pushes a main"}
-										</div>
-									</>
-								) : (
-									<div className="text-muted-foreground">No tienes permisos para gestionar bloqueo</div>
-								)}
-							</div>
-						</Tooltip.Content>
-					</Tooltip.Portal>
-				</Tooltip.Root>
-			</Tooltip.Provider>
+								<div className="text-xs space-y-1">
+									{canManage ? (
+										<>
+											<div className="font-medium">{isLocked ? "Desbloquear branch" : "Bloquear branch main"}</div>
+											<div className="text-muted-foreground">
+												{isLocked ? "Permitir merges y pushes a main" : "Bloquear merges y pushes a main"}
+											</div>
+										</>
+									) : (
+										<div className="text-muted-foreground">No tienes permisos para gestionar bloqueo</div>
+									)}
+								</div>
+							</Tooltip.Content>
+						</Tooltip.Portal>
+					</Tooltip.Root>
+				</Tooltip.Provider>
+			)}
 			<BaseDialog
 				open={open}
 				onOpenChange={handleOpenChange}

@@ -4,6 +4,7 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import { RefreshCw, Loader2, CheckCircle2, ExternalLink, Circle, AlertCircle } from "lucide-react";
 import { usePrStatus } from "../hooks/usePrStatus";
 import { BaseDialog } from "@/components/ui/BaseDialog";
+import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
 
 interface ForceRedeployDialogProps {
 	repo: string;
@@ -116,34 +117,41 @@ export function ForceRedeployDialog({ repo, iconOnly = false }: ForceRedeployDia
 
 	return (
 		<Dialog.Root open={open} onOpenChange={handleOpenChange}>
-			<Tooltip.Provider>
-				<Tooltip.Root>
-					<Tooltip.Trigger asChild>
-						<Dialog.Trigger asChild>
-							<button
-								type="button"
-								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+			{iconOnly ? (
+				<ActionButton
+					action={ACTION_DEFINITIONS.forceRedeploy}
+					onClick={() => setOpen(true)}
+				/>
+			) : (
+				<Tooltip.Provider>
+					<Tooltip.Root>
+						<Tooltip.Trigger asChild>
+							<Dialog.Trigger asChild>
+								<button
+									type="button"
+									className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+								>
+									<RefreshCw className="w-4 h-4" />
+									<span>Re Deploy</span>
+								</button>
+							</Dialog.Trigger>
+						</Tooltip.Trigger>
+						<Tooltip.Portal>
+							<Tooltip.Content
+								className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50"
+								sideOffset={5}
 							>
-								<RefreshCw className="w-4 h-4" />
-								{!iconOnly && <span>Re Deploy</span>}
-							</button>
-						</Dialog.Trigger>
-					</Tooltip.Trigger>
-					<Tooltip.Portal>
-						<Tooltip.Content
-							className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50"
-							sideOffset={5}
-						>
-							<div className="text-xs space-y-1">
-								<div className="font-medium">Forzar redeploy a staging</div>
-								<div className="text-muted-foreground">
-									Crear PR para forzar que Nx reconstruya el grafo de dependencias
+								<div className="text-xs space-y-1">
+									<div className="font-medium">Forzar redeploy a staging</div>
+									<div className="text-muted-foreground">
+										Crear PR para forzar que Nx reconstruya el grafo de dependencias
+									</div>
 								</div>
-							</div>
-						</Tooltip.Content>
-					</Tooltip.Portal>
-				</Tooltip.Root>
-			</Tooltip.Provider>
+							</Tooltip.Content>
+						</Tooltip.Portal>
+					</Tooltip.Root>
+				</Tooltip.Provider>
+			)}
 			<BaseDialog
 				open={open}
 				onOpenChange={handleOpenChange}

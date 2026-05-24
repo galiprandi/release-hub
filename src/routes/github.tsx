@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Loader2, Star, Box, Building2, GitPullRequestCreateArrow, FolderOpen, FolderPlus, Search } from "lucide-react";
+import { Loader2, Star, Building2, FolderOpen, FolderPlus, Search, GitPullRequestCreateArrow } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { DisplayInfo } from "@/components/DisplayInfo";
 import { CommitLink } from "@/components/CommitLink";
@@ -11,6 +11,7 @@ import { FreezeDialog } from "@/components/FreezeDialog";
 import { CommitsModal } from "@/components/CommitsModal";
 import { PageLayout } from "@/layouts/PageLayout";
 import { RepoSearch } from "@/components/RepoSearch";
+import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
 import { useGitCommits } from "@/hooks/useGitCommits";
@@ -382,16 +383,10 @@ function RepoRow({ repo, isFavorite, onToggleFavorite }: RepoRowProps) {
 						<FreezeDialog repo={repo.fullName} iconOnly={true} />
 						<ForceRedeployDialog repo={repo.fullName} iconOnly={true} />
 						<PromoteDialog repo={repo.fullName} latestTag={latestTag?.name} iconOnly={true} />
-						<a
-							href={`https://github.com/${org}/${name}`}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-primary hover:text-primary/80 hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-1.5"
-							aria-label="Abrir en GitHub"
-							title="Abrir en GitHub"
-						>
-							<Box className="w-4 h-4" />
-						</a>
+						<ActionButton
+							action={ACTION_DEFINITIONS.openGitHub}
+							onClick={() => window.open(`https://github.com/${org}/${name}`, '_blank')}
+						/>
 						<button
 							type="button"
 							onClick={() => onToggleFavorite(repo.fullName)}

@@ -55,7 +55,11 @@ export const DeploymentList = ({ context, namespace, favorites }: DeploymentList
 			return deploymentsByContext.filter((item) => item.deployments.length > 0)
 		},
 		enabled: !!contexts && contexts.length > 0,
-		...applyCachePolicy("kubectl"),
+		placeholderData: (previousData) => previousData,
+		staleTime: favorites && favorites.length > 0 ? 30 * 1000 : 0, // 30s si hay favoritos, 0 si no
+		gcTime: 5 * 60 * 1000, // 5 minutos para permitir cache temporal
+		refetchOnWindowFocus: false,
+		retry: 0,
 	})
 
 	// Filter deployments by favorites if provided
@@ -105,11 +109,8 @@ export const DeploymentList = ({ context, namespace, favorites }: DeploymentList
 		setIsLogsModalOpen(true)
 	}
 
-	if (isLoading) {
-		return <StatusCard type="loading" message="Cargando deployments..." />
-	}
-
-	if (!filteredDeployments || filteredDeployments.length === 0) {
+	// Si no hay datos después de cargar
+	if (!isLoading && (!filteredDeployments || filteredDeployments.length === 0)) {
 		return (
 			<StatusCard
 				type="offline"
@@ -121,7 +122,7 @@ export const DeploymentList = ({ context, namespace, favorites }: DeploymentList
 	return (
 		<>
 			<div className="space-y-6">
-				{filteredDeployments.map(({ context: ctx, deployments }) => (
+				{filteredDeployments?.map(({ context: ctx, deployments }) => (
 					<div key={ctx} className="space-y-3">
 						<div className="flex items-center gap-2">
 							<h3 className="text-sm font-semibold text-foreground">
@@ -145,15 +146,44 @@ export const DeploymentList = ({ context, namespace, favorites }: DeploymentList
 									</tr>
 								</thead>
 								<tbody>
-									{deployments.map((deployment) => (
-										<DeploymentRow
-											key={`${ctx}/${deployment.namespace}/${deployment.name}`}
-											deployment={deployment}
-											context={ctx}
-											onViewLogs={() => handleViewLogs(deployment, ctx)}
-											onRemoveFavorite={() => toggleDeploymentFavorite(`${ctx}/${deployment.namespace}/${deployment.name}`)}
-										/>
-									))}
+									{isLoading ? (
+										// Skeleton rows while loading
+										Array.from({ length: 3 }).map((_, i) => (
+											<tr key={`skeleton-${i}`} className="border-b border-border/50 animate-pulse">
+												<td className="px-4 py-3">
+													<div className="h-4 bg-muted rounded w-32" />
+												</td>
+												<td className="px-4 py-3">
+													<div className="h-4 bg-muted rounded w-24" />
+												</td>
+												<td className="px-4 py-3">
+													<div className="h-6 bg-muted rounded w-16" />
+												</td>
+												<td className="px-4 py-3">
+													<div className="h-4 bg-muted rounded w-8" />
+												</td>
+												<td className="px-4 py-3">
+													<div className="h-4 bg-muted rounded w-8" />
+												</td>
+												<td className="px-4 py-3">
+													<div className="flex items-center justify-end gap-2">
+														<div className="w-8 h-8 bg-muted rounded" />
+														<div className="w-16 h-8 bg-muted rounded" />
+													</div>
+												</td>
+											</tr>
+										))
+									) : (
+										deployments.map((deployment) => (
+											<DeploymentRow
+												key={`${ctx}/${deployment.namespace}/${deployment.name}`}
+												deployment={deployment}
+												context={ctx}
+												onViewLogs={() => handleViewLogs(deployment, ctx)}
+												onRemoveFavorite={() => toggleDeploymentFavorite(`${ctx}/${deployment.namespace}/${deployment.name}`)}
+											/>
+										))
+									)}
 								</tbody>
 							</table>
 						</div>
@@ -181,7 +211,6 @@ export const DeploymentList = ({ context, namespace, favorites }: DeploymentList
 
 function DeploymentRow({
 	deployment,
-	context,
 	onViewLogs,
 	onRemoveFavorite,
 }: {

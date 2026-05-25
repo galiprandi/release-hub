@@ -5,7 +5,6 @@ import { DeploymentList } from "@/components/kubernetes/DeploymentList";
 import { DeploymentSearch } from "@/components/kubernetes/DeploymentSearch";
 import { checkKubectlInstalled } from "@/api/kubectl";
 import { applyCachePolicy } from "@/lib/queryKeys";
-import { StatusCard } from "@/components/ui/StatusCard";
 import { PageLayout } from "@/layouts/PageLayout";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useMemo, useCallback } from "react";
@@ -49,7 +48,7 @@ function KubernetesPage() {
 				title: "Kubernetes",
 				searchComponent: isInstalled ? <DeploymentSearch /> : undefined
 			}}
-			isLoading={isCheckingInstall}
+			isLoading={isCheckingInstall && safeDeploymentFavorites.length === 0}
 		>
 			{safeDeploymentFavorites.length === 0 ? (
 				<div className="flex items-center justify-center w-full min-h-[400px]">
@@ -72,11 +71,6 @@ function KubernetesPage() {
 						</button>
 					</div>
 				</div>
-			) : isInstalled === false ? (
-				<StatusCard
-					type="error"
-					message="kubectl no está instalado. Instálalo para gestionar deployments de Kubernetes."
-				/>
 			) : (
 				<DeploymentList
 					favorites={safeDeploymentFavorites}

@@ -2,15 +2,35 @@ import { useState, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery } from "@tanstack/react-query"
 import { Star } from "lucide-react"
-import { getDeployments, getResourceLogs, type DeploymentInfo } from "@/api/kubectl"
-import { getContexts } from "@/api/kubectl"
-import { queryKeys, applyCachePolicy } from "@/lib/queryKeys"
+import { getDeployment, getResourceLogs, type DeploymentInfo } from "@/api/kubectl"
 import { LogsViewer } from "@/components/shared/LogsViewer"
 import { StatusCard } from "@/components/ui/StatusCard"
 import { Table } from "@/components/ui/Table"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useUserCollections } from "@/hooks/useUserCollections"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
+
+const STORAGE_KEY = "kubernetes-deployments-metadata"
+
+function loadDeploymentsFromStorage(): Record<string, DeploymentInfo> {
+	try {
+		const stored = localStorage.getItem(STORAGE_KEY)
+		if (stored) {
+			return JSON.parse(stored)
+		}
+	} catch (error) {
+		console.error("[Kubernetes] Failed to load deployments from localStorage:", error)
+	}
+	return {}
+}
+
+function saveDeploymentsToStorage(deployments: Record<string, DeploymentInfo>): void {
+	try {
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(deployments))
+	} catch (error) {
+		console.error("[Kubernetes] Failed to save deployments to localStorage:", error)
+	}
+}
 
 interface DeploymentListProps {
 	favorites?: string[]
@@ -23,57 +43,74 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 	const [selectedDeployment, setSelectedDeployment] = useState<DeploymentInfo | null>(null)
 	const [selectedContext, setSelectedContext] = useState<string | null>(null)
 	const [isLogsModalOpen, setIsLogsModalOpen] = useState(false)
+	const [cachedDeployments, setCachedDeployments] = useState<Record<string, DeploymentInfo>>(loadDeploymentsFromStorage())
 	const { toggleDeploymentFavorite } = useUserCollections()
 
-	// Get all contexts - only if kubectl is installed
-	const { data: contexts } = useQuery({
-		queryKey: queryKeys.kubectl.contexts(),
-		queryFn: getContexts,
-		...applyCachePolicy("kubectl"),
-		enabled: isKubectlInstalled === true,
-	})
+	// Parse favorite IDs to get deployment info
+	const favoriteDeployments = useMemo(() => {
+		if (!favorites || favorites.length === 0) return []
+		return favorites.map(favId => {
+			const [context, namespace, name] = favId.split('/')
+			return { context, namespace, name }
+		})
+	}, [favorites])
 
-	// Get deployments for all contexts - only if kubectl is installed
-	const { data: allDeployments, isLoading } = useQuery({
-		queryKey: ["kubectl", "all-deployments"],
+	// Trigger fetch for all favorites in parallel and update localStorage
+	const { isLoading } = useQuery({
+		queryKey: ['kubectl', 'favorites-deployments', favorites],
 		queryFn: async () => {
-			if (!contexts || contexts.length === 0) return []
+			if (!favorites || favorites.length === 0 || isKubectlInstalled !== true) return []
 
-			const deploymentsByContext = await Promise.all(
-				contexts.map(async (ctx) => {
+			const updatedMetadata = { ...cachedDeployments }
+
+			await Promise.all(
+				favoriteDeployments.map(async ({ context, namespace, name }) => {
+					const deploymentId = `${context}/${namespace}/${name}`
 					try {
-						const deployments = await getDeployments(undefined, ctx)
-						return { context: ctx, deployments }
+						const deployment = await getDeployment(name, namespace, context)
+						if (deployment) {
+							updatedMetadata[deploymentId] = deployment
+						}
 					} catch {
-						return { context: ctx, deployments: [] }
+						// Silenciar errores de deployments que no existen
 					}
 				})
 			)
 
-			return deploymentsByContext.filter((item) => item.deployments.length > 0)
+			// Update localStorage with fresh data
+			saveDeploymentsToStorage(updatedMetadata)
+			setCachedDeployments(updatedMetadata)
+
+			return []
 		},
-		enabled: isKubectlInstalled === true && !!contexts && contexts.length > 0,
-		placeholderData: (previousData) => previousData,
-		staleTime: 30 * 1000,
-		gcTime: 5 * 60 * 1000, // 5 minutos para permitir cache temporal
+		enabled: isKubectlInstalled === true && favorites && favorites.length > 0,
 		refetchOnWindowFocus: false,
 		retry: 0,
 	})
 
-	// Filter deployments by favorites if provided
-	const filteredDeployments = useMemo(() => {
-		if (!favorites || favorites.length === 0) return allDeployments
-		if (!allDeployments) return []
+	// Get cached deployments from localStorage (instant display)
+	const displayDeployments = useMemo(() => {
+		if (!favorites || favorites.length === 0) return []
 
-		return allDeployments
-			.map(({ context: ctx, deployments }) => ({
-				context: ctx,
-				deployments: deployments.filter((d) =>
-					favorites.includes(`${ctx}/${d.namespace}/${d.name}`)
-				),
-			}))
-			.filter((item) => item.deployments.length > 0)
-	}, [allDeployments, favorites])
+		return favorites.map(favId => {
+			const cached = cachedDeployments[favId]
+			if (cached) {
+				const [context] = favId.split('/')
+				return { context, deployment: cached }
+			}
+			return null
+		}).filter(Boolean) as Array<{ context: string; deployment: DeploymentInfo }>
+	}, [favorites, cachedDeployments])
+
+	// Group by context for display
+	const groupedDeployments = useMemo(() => {
+		const groups: Record<string, DeploymentInfo[]> = {}
+		displayDeployments.forEach(({ context, deployment }) => {
+			if (!groups[context]) groups[context] = []
+			groups[context].push(deployment)
+		})
+		return Object.entries(groups).map(([context, deployments]) => ({ context, deployments }))
+	}, [displayDeployments])
 
 	// Fetch function for logs with cursor support
 	const fetchFn = (cursor?: number) => {
@@ -83,20 +120,24 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 
 	// Build resources list for LogsViewer select
 	const resources = useMemo(() => {
-		if (!allDeployments) return []
-		return allDeployments.flatMap(({ context: ctx, deployments }) =>
-			deployments.map(d => ({ id: `${ctx}/${d.namespace}/${d.name}`, name: d.name, type: 'deployment', context: ctx, namespace: d.namespace }))
-		)
-	}, [allDeployments])
+		if (!displayDeployments) return []
+		return displayDeployments.map(({ context, deployment }) => ({
+			id: `${context}/${deployment.namespace}/${deployment.name}`,
+			name: deployment.name,
+			type: 'deployment' as const,
+			context,
+			namespace: deployment.namespace,
+		}))
+	}, [displayDeployments])
 
 	const selectedResourceId = selectedDeployment ? `${selectedContext || ''}/${selectedDeployment.namespace}/${selectedDeployment.name}` : undefined
 
 	const handleResourceChange = (resourceId: string) => {
 		const resource = resources.find(r => r.id === resourceId)
 		if (resource) {
-			const deployment = allDeployments
-				?.find(item => item.context === resource.context)
-				?.deployments.find(d => d.name === resource.name)
+			const deployment = displayDeployments
+				?.find(d => d.context === resource.context && d.deployment.name === resource.name)
+				?.deployment
 			if (deployment) {
 				setSelectedDeployment(deployment)
 				setSelectedContext(resource.context)
@@ -116,8 +157,18 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 		return null
 	}
 
-	// Si no hay datos después de cargar y kubectl está instalado
-	if (isKubectlInstalled !== false && !isLoading && (!filteredDeployments || filteredDeployments.length === 0)) {
+	// Si kubectl no está instalado, mostrar error
+	if (isKubectlInstalled === false) {
+		return (
+			<StatusCard
+				type="error"
+				message="kubectl no está instalado. Instálalo para gestionar deployments de Kubernetes."
+			/>
+		)
+	}
+
+	// Si no hay datos cacheados ni live después de cargar
+	if (!isLoading && (!displayDeployments || displayDeployments.length === 0)) {
 		return (
 			<StatusCard
 				type="offline"
@@ -126,23 +177,26 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 		)
 	}
 
-	// Si kubectl no está instalado, no mostrar nada (dejar que el PageLayout maneje el empty state)
-	if (isKubectlInstalled === false) {
-		return null
-	}
-
 	return (
 		<>
-			{filteredDeployments && filteredDeployments.length > 0 && (
+			{groupedDeployments.length > 0 && (
 				<div className="space-y-12">
-					{filteredDeployments.map(({ context: ctx, deployments }) => (
+					{groupedDeployments.map(({ context: ctx, deployments }) => (
 						<div key={ctx} className="space-y-3">
 							<DeploymentsTable
 								deployments={deployments}
 								context={ctx}
 								isLoading={isLoading}
 								onViewLogs={handleViewLogs}
-								onRemoveFavorite={(deployment) => toggleDeploymentFavorite(`${ctx}/${deployment.namespace}/${deployment.name}`)}
+								onRemoveFavorite={(deployment) => {
+									const deploymentId = `${ctx}/${deployment.namespace}/${deployment.name}`
+									toggleDeploymentFavorite(deploymentId)
+									// Limpiar cache del deployment removido de localStorage
+									const updated = { ...cachedDeployments }
+									delete updated[deploymentId]
+									saveDeploymentsToStorage(updated)
+									setCachedDeployments(updated)
+								}}
 								activeFilter={activeFilter}
 								onFilterChange={onFilterChange}
 							/>

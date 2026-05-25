@@ -216,6 +216,33 @@ function parsePods(output: string): PodInfo[] {
   return pods;
 }
 
+export async function getDeployment(name: string, namespace: string, context?: string): Promise<DeploymentInfo | null> {
+  const nsFlag = `-n ${sanitizeNamespace(namespace)}`;
+  const ctxFlag = context ? `--context=${sanitizeContext(context)}` : '';
+  try {
+    const result = await runCommand(`kubectl get deployment ${sanitizeK8sName(name)} ${nsFlag} ${ctxFlag} -o json`.trim());
+    const json = JSON.parse(result.stdout);
+    const item: K8sDeploymentItem = json;
+    const ready = item.status.readyReplicas ?? 0;
+    const desired = item.spec.replicas ?? 0;
+    const updated = item.status.updatedReplicas ?? 0;
+    const available = item.status.availableReplicas ?? 0;
+
+    return {
+      namespace: item.metadata.namespace || namespace,
+      name: item.metadata.name,
+      ready: `${ready}/${desired}`,
+      upToDate: String(updated),
+      available: String(available),
+      age: formatAge(item.metadata.creationTimestamp),
+      images: item.spec.template.spec.containers.map(c => c.image),
+      status: deriveStatus(item.status.conditions),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function getDeployments(namespace?: string, context?: string): Promise<DeploymentInfo[]> {
   const nsFlag = namespace ? `-n ${sanitizeNamespace(namespace)}` : '--all-namespaces';
   const ctxFlag = context ? `--context=${sanitizeContext(context)}` : '';

@@ -1,7 +1,8 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Loader2, Star, Building2, FolderOpen, FolderPlus, Search, GitPullRequestCreateArrow } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import { FilterBar } from "@/components/shared/FilterBar";
 import { DisplayInfo } from "@/components/DisplayInfo";
 import { CommitLink } from "@/components/CommitLink";
 import { TagLink } from "@/components/TagLink";
@@ -30,10 +31,10 @@ function Dashboard() {
 	const { location } = useRouterState();
 	const isIndexRoute = location.pathname === "/github";
 
-	const tabs = [
-		{ id: "favorites", label: "Favoritos", icon: Star, count: favorites.length, description: "" },
-		...projects.map(p => ({ id: p.id, label: p.name, icon: FolderOpen, count: p.repos.length, description: p.description })),
-	];
+	const tabs = useMemo(() => [
+		{ value: "favorites", label: "Favoritos", icon: Star, count: favorites.length, description: "Tus repositorios marcados con estrella" },
+		...projects.map(p => ({ value: p.id, label: p.name, icon: FolderOpen, count: p.repos.length, description: p.description })),
+	], [favorites.length, projects]);
 
 	// Determine repos to show based on active tab
 	let displayRepos: RepoInfo[] = [];
@@ -105,35 +106,13 @@ function Dashboard() {
 				right: "ReleaseHub Open Source"
 			} : undefined}
 		>
-			<div className="space-y-6">
-			{/* Tabs */}
-			<div className="flex gap-1 bg-muted rounded-lg p-1 overflow-x-auto">
-				{tabs.map((tab) => {
-					const Icon = tab.icon;
-					const isActive = activeTab === tab.id;
-					return (
-						<button
-							key={tab.id}
-							type="button"
-							onClick={() => setActiveTab(tab.id)}
-								className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-all whitespace-nowrap focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
-								isActive
-									? "bg-background shadow-sm text-foreground font-medium"
-										: "text-muted-foreground hover:text-foreground hover:bg-background/50"
-							}`}
-							title={tab.description}
-						>
-							<Icon className={`w-4 h-4 ${isActive ? "text-primary" : ""}`} />
-							{tab.label}
-							{tab.count > 0 && (
-								<span className="text-xs bg-muted-foreground/20 px-1.5 py-0.5 rounded-full">
-									{tab.count}
-								</span>
-							)}
-						</button>
-					);
-				})}
-			</div>
+			<div className="space-y-8">
+			{/* Tabs via FilterBar */}
+			<FilterBar
+				filters={tabs}
+				activeFilter={activeTab}
+				onFilterChange={setActiveTab}
+			/>
 
 			{/* Content */}
 			<div className="space-y-12">

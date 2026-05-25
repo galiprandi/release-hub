@@ -14,8 +14,9 @@ import { usePipelineDetector } from "@/hooks/usePipelineDetector";
 import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
 import { useOpenPullRequests } from "@/hooks/useOpenPullRequests";
 import { useGitHubActionsSummary } from "@/hooks/useGitHubActionsSummary";
-import { GitPullRequest, Play } from "lucide-react";
+import { GitPullRequest, Play, History, Tag } from "lucide-react";
 import { PageLayout } from "@/layouts/PageLayout";
+import { FilterBar } from "@/components/shared/FilterBar";
 
 dayjs.extend(relativeTime);
 dayjs.locale("es");
@@ -74,6 +75,11 @@ function ProductIndex() {
 	// Usar fecha del commit/tag para consistencia con la tabla
 	const gitDate = isCommits ? latestCommit?.date : latestTag?.date;
 
+	const viewFilters = [
+		{ value: "commits", label: "Commits", icon: History },
+		{ value: "tags", label: "Tags", icon: Tag },
+	];
+
 	return (
 		<PageLayout
 			header={{
@@ -106,37 +112,12 @@ function ProductIndex() {
 			</div>
 
 			{/* Tabs de navegación */}
-			<div className="flex items-center justify-between border-b border-border">
-				<div className="flex items-center gap-1">
-					<button
-						type="button"
-						onClick={() => navigate({ search: { view: "commits" } })}
-						className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${
-							viewMode === "commits"
-								? "text-foreground"
-								: "text-muted-foreground hover:text-foreground"
-						}`}
-					>
-						Commits
-						{viewMode === "commits" && (
-							<span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
-						)}
-					</button>
-					<button
-						type="button"
-						onClick={() => navigate({ search: { view: "tags" } })}
-						className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${
-							viewMode === "tags"
-								? "text-foreground"
-								: "text-muted-foreground hover:text-foreground"
-						}`}
-					>
-						Tags
-						{viewMode === "tags" && (
-							<span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
-						)}
-					</button>
-				</div>
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-4">
+				<FilterBar
+					filters={viewFilters}
+					activeFilter={viewMode}
+					onFilterChange={(value) => navigate({ search: { view: value as "commits" | "tags" } })}
+				/>
 				<div className="flex items-center gap-2">
 					{/* Links externos */}
 					<a

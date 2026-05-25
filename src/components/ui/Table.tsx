@@ -40,9 +40,9 @@ export function Table<TData, TValue>({ columns, data, className }: TableProps<TD
 	})
 
 	return (
-		<div className={twMerge(clsx("w-full", className))}>
+		<div className={twMerge(clsx("w-full overflow-hidden rounded-xl border border-border/60 shadow-sm", className))}>
 			<table className="w-full table-auto">
-				<thead>
+				<thead className="bg-muted/40">
 					{table.getHeaderGroups().map((headerGroup) => (
 						<tr key={headerGroup.id}>
 							{headerGroup.headers.map((header, index) => {
@@ -56,11 +56,11 @@ export function Table<TData, TValue>({ columns, data, className }: TableProps<TD
 										key={header.id}
 										scope="col"
 										className={clsx(
-											"text-left px-4 py-3 font-bold tracking-wider text-foreground border-b border-border/40",
+											"text-left px-4 py-3.5 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b border-border/60",
 											isFirstColumn && "w-full",
 											!isFirstColumn && !columnWidth && "whitespace-nowrap",
 											columnWidth && "overflow-hidden text-ellipsis whitespace-nowrap",
-											canSort && "cursor-pointer hover:bg-muted/60 transition-colors select-none"
+											canSort && "cursor-pointer hover:bg-muted/80 transition-colors select-none"
 										)}
 										style={columnWidth ? { width: columnWidth, minWidth: columnWidth, maxWidth: columnWidth } : undefined}
 										onClick={header.column.getToggleSortingHandler()}

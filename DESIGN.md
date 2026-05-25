@@ -22,6 +22,12 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Feedback de Carga/Acceso**: Implementar `StatusCard` como componente estándar para todos los estados de carga, error y "offline".
 - **Tabla de Contenedores**: Bordes sutiles `border-border/60` y encabezados con `text-xs uppercase tracking-wider` para una estética profesional.
 
+### Tabla de Datos (Industrial Resonance)
+- **Contenedor**: `rounded-xl`, `border-border/60`, `overflow-hidden` y `shadow-sm`.
+- **Header**: `bg-muted/40` con bordes `border-b border-border/60`.
+- **Celdas Header**: `text-xs font-bold uppercase tracking-wider text-muted-foreground`.
+- **Filas**: `hover:bg-muted/20`, `transition-colors` y `border-b border-border/50`.
+
 ## Componentes de Feedback
 
 ### StatusCard
@@ -72,9 +78,12 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 - Icono con fondo sutil (`bg-primary/10`).
 - Título con `tracking-tight` para mayor elegancia.
 
-### FilterBar
-- Uso de `bg-muted` para botones inactivos y `bg-primary` para el activo.
-- Inputs con `border-input` y `bg-background`.
+### FilterBar (Industrial Resonance)
+- **Contenedor**: `bg-muted/40`, `border-border/60`, `rounded-lg` y `shadow-sm`.
+- **Botones**: `text-xs font-bold uppercase tracking-tight`.
+- **Estado Activo**: `bg-background shadow-sm text-foreground`.
+- **Iconos**: Soporte integrado para `LucideIcon` con `text-primary` en estado activo.
+- **Contadores**: Badges integrados para mostrar volumen de datos por filtro.
 
 ### DisplayInfo
 - Abstracción para mostrar metadatos (commits, tags, autores) con iconos y colores semánticos.

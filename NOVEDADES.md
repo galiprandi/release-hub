@@ -2,6 +2,10 @@
 
 ---
 
+### 🗓️ 25 de Mayo de 2026
+
+- 🎉 UI: Rediseño completo de la interfaz de usuario con mejor experiencia visual y consistencia en todo el sistema para dar soporte y ordenar nuevas características y utilidades.
+
 ### 🗓️ 21 de Mayo de 2026
 
 - 🎉 Queries: Nuevo sistema completo para importar, editar y ejecutar comandos curl con historial automático, detección de tokens expirados, búsqueda en tiempo real, visualización mejorada de headers y formateo automático de JSON.

@@ -1,7 +1,6 @@
 import { createFileRoute, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { checkKubectlInstalled } from "@/api/kubectl";
 import { applyCachePolicy } from "@/lib/queryKeys";
 
 export const Route = createFileRoute("/kubernetes")({
@@ -15,7 +14,10 @@ function KubernetesLayout() {
 
 	const { data: isInstalled } = useQuery({
 		queryKey: ["kubectl", "installed"],
-		queryFn: checkKubectlInstalled,
+		queryFn: async () => {
+			const { checkKubectlInstalled } = await import('@/api/kubectl')
+			return checkKubectlInstalled()
+		},
 		...applyCachePolicy("kubectl"),
 	});
 

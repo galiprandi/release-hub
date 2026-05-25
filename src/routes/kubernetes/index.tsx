@@ -3,7 +3,6 @@ import { Search, Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { DeploymentList } from "@/components/kubernetes/DeploymentList";
 import { DeploymentSearch } from "@/components/kubernetes/DeploymentSearch";
-import { checkKubectlInstalled } from "@/api/kubectl";
 import { applyCachePolicy } from "@/lib/queryKeys";
 import { PageLayout } from "@/layouts/PageLayout";
 import { useUserCollections } from "@/hooks/useUserCollections";
@@ -38,7 +37,10 @@ function KubernetesPage() {
 
 	const { data: isInstalled, isLoading: isCheckingInstall } = useQuery({
 		queryKey: ["kubectl", "installed"],
-		queryFn: checkKubectlInstalled,
+		queryFn: async () => {
+			const { checkKubectlInstalled } = await import('@/api/kubectl')
+			return checkKubectlInstalled()
+		},
 		...applyCachePolicy("kubectl"),
 	});
 

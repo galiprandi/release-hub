@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { Search, Star, Loader2, X, Terminal } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
-import { getDeployments } from '@/api/kubectl'
 import { applyCachePolicy } from '@/lib/queryKeys'
 import { useUserCollections } from '@/hooks/useUserCollections'
+import type { DeploymentInfo } from '@/api/kubectl'
 
 export function DeploymentSearch() {
   const [query, setQuery] = useState('')
@@ -18,7 +18,8 @@ export function DeploymentSearch() {
   const { data: allDeployments, isLoading, refetch } = useQuery({
     queryKey: ['kubectl', 'all-deployments-search'],
     queryFn: async () => {
-      const contexts = await (await import('@/api/kubectl')).getContexts()
+      const { getContexts, getDeployments } = await import('@/api/kubectl')
+      const contexts = await getContexts()
       if (!contexts || contexts.length === 0) return []
 
       const deploymentsByContext = await Promise.all(
@@ -33,7 +34,7 @@ export function DeploymentSearch() {
       )
 
       return deploymentsByContext.flatMap(({ context: ctx, deployments }) =>
-        deployments.map(d => ({ ...d, context: ctx }))
+        deployments.map((d: DeploymentInfo) => ({ ...d, context: ctx }))
       )
     },
     ...applyCachePolicy('kubectl'),

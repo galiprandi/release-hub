@@ -2,7 +2,7 @@ import { useState, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery } from "@tanstack/react-query"
 import { Star } from "lucide-react"
-import { getDeployment, getResourceLogs, type DeploymentInfo } from "@/api/kubectl"
+import type { DeploymentInfo } from "@/api/kubectl"
 import { LogsViewer } from "@/components/shared/LogsViewer"
 import { StatusCard } from "@/components/ui/StatusCard"
 import { Table } from "@/components/ui/Table"
@@ -61,6 +61,7 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 		queryFn: async () => {
 			if (!favorites || favorites.length === 0 || isKubectlInstalled !== true) return []
 
+			const { getDeployment } = await import('@/api/kubectl')
 			const updatedMetadata = { ...cachedDeployments }
 
 			await Promise.all(
@@ -113,8 +114,9 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 	}, [displayDeployments])
 
 	// Fetch function for logs with cursor support
-	const fetchFn = (cursor?: number) => {
-		if (!selectedDeployment) return Promise.resolve('')
+	const fetchFn = async (cursor?: number) => {
+		if (!selectedDeployment) return ''
+		const { getResourceLogs } = await import('@/api/kubectl')
 		return getResourceLogs('deployment', selectedDeployment.name, selectedDeployment.namespace, 100, selectedContext || undefined, cursor)
 	}
 

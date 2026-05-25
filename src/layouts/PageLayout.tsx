@@ -264,7 +264,7 @@ function NavIcon({ icon: Icon, label, active = false, to, pathname }: { icon: Re
 
   if (to) {
     return (
-      <Link to={to} className="block">
+      <Link to={to} preload="intent" className="block">
         {contentWithTooltip}
       </Link>
     );

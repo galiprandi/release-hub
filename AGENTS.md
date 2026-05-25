@@ -24,7 +24,8 @@ Antes de cualquier cambio:
 ### 2. Features Condicionales
 - **No placeholders**: Mientras se verifica disponibilidad, renderizar `null`. Nunca "Verificando...".
 - **Solo si disponible**: Mostrar UI de la feature solo si se confirma acceso/disponibilidad.
-- **Ocultar completamente**: Si no hay acceso, no mostrar nada (ni botones ni mensajes).
+- **Redirección a setup**: Si no hay acceso a un módulo (CLI no instalado), redirigir a `<module>/setup` con instrucciones de instalación. Ejemplo: `/docker/setup`, `/kubernetes/setup`, `/github/setup`, `/fetcher/setup`.
+- **Resiliencia**: Otros módulos deben seguir funcionando si uno no tiene sus dependencias instaladas.
 
 ### 3. Adapters CLI
 - **Priorizar JSON**: Usar `--format json` para datos estructurados.

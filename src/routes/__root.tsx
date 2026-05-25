@@ -1,11 +1,9 @@
 import { createRootRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useEffect, useState } from "react";
-import { useGhCliSetup } from "@/hooks/useGhCliSetup";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 function RootLayout() {
-	const { isInstalled, isAuthenticated, isLoading } = useGhCliSetup();
 	const navigate = useNavigate();
 	const routerState = useRouterState();
 	const [showSpinner, setShowSpinner] = useState(true);
@@ -18,13 +16,10 @@ function RootLayout() {
 	const pathname = routerState.location.pathname;
 
 	useEffect(() => {
-		if (!showSpinner && !isLoading && (!isInstalled || !isAuthenticated)) {
-			navigate({ to: "/setup" });
-		}
-		else if (pathname === '/') {
+		if (pathname === '/') {
 			navigate({ to: "/github", replace: true });
 		}
-	}, [isInstalled, isAuthenticated, isLoading, showSpinner, navigate, pathname]);
+	}, [navigate, pathname]);
 
 	if (showSpinner) {
 		return <LoadingSpinner />;

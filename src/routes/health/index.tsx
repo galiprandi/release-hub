@@ -1,14 +1,19 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Activity, RefreshCw, Trash2, ExternalLink, ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import { useHealthMonitor } from '@/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
 import { Table } from '@/components/ui/Table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PageLayout } from '../layouts/PageLayout';
+import { PageLayout } from '../../layouts/PageLayout';
 
-export const Route = createFileRoute('/health')({
+export const Route = createFileRoute('/health/')({
   component: HealthMonitorPage,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      environment: typeof search.environment === 'string' ? search.environment : undefined,
+    };
+  },
 });
 
 // Función para formatear tiempo relativo
@@ -68,15 +73,18 @@ function ProductSection({
   isChecking,
   onCheckEndpoint,
   onRemoveEndpoint,
+  activeFilter,
+  onFilterChange,
 }: {
   product: string;
   endpoints: ReturnType<typeof useHealthMonitor>['endpoints'];
   isChecking: boolean;
   onCheckEndpoint: (id: string) => void;
   onRemoveEndpoint: (id: string) => void;
+  activeFilter?: { id: string; value: string } | null
+  onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
   const [org, productName] = product.split('/');
-  const [expandedEndpoints, setExpandedEndpoints] = useState<Set<string>>(new Set());
 
   // Agrupar endpoints por servicio
   const endpointsByService = endpoints.reduce((acc, ep) => {
@@ -108,7 +116,7 @@ function ProductSection({
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
       {/* Header del producto */}
-      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b">
+      <div className="flex items-center justify-between bg-gray-50 border-b px-3">
         <div className="flex items-center gap-2">
           <Link
             to="/github/$org/$repo"
@@ -119,7 +127,7 @@ function ProductSection({
           </Link>
           <span className="text-sm text-gray-500">({services.length} servicios)</span>
         </div>
-        <div className="flex items-center gap-3 text-sm">
+        <div className="flex items-center gap-3 text-sm p-4">
           {(() => {
             const healthy = endpoints.filter((ep) => ep.isHealthy === true).length;
             const unhealthy = endpoints.filter((ep) => ep.isHealthy === false).length;
@@ -153,11 +161,11 @@ function ProductSection({
       {/* Tabla de endpoints */}
       <EndpointsTable
         endpoints={sortedEndpoints}
-        expandedEndpoints={expandedEndpoints}
-        setExpandedEndpoints={setExpandedEndpoints}
         isChecking={isChecking}
         onCheckEndpoint={onCheckEndpoint}
         onRemoveEndpoint={onRemoveEndpoint}
+        activeFilter={activeFilter}
+        onFilterChange={onFilterChange}
       />
     </div>
   );
@@ -168,19 +176,26 @@ function EndpointsTable({
   isChecking,
   onCheckEndpoint,
   onRemoveEndpoint,
+  activeFilter,
+  onFilterChange,
 }: {
   endpoints: ReturnType<typeof useHealthMonitor>['endpoints']
-  expandedEndpoints: Set<string>
-  setExpandedEndpoints: React.Dispatch<React.SetStateAction<Set<string>>>
   isChecking: boolean
   onCheckEndpoint: (id: string) => void
   onRemoveEndpoint: (id: string) => void
+  activeFilter?: { id: string; value: string } | null
+  onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
   const columns: ColumnDef<(typeof endpoints)[0]>[] = [
     {
-      accessorKey: "status",
+      id: "status",
+      accessorFn: (row) => row.isHealthy,
       header: "",
       cell: ({ row }) => <StatusCell endpoint={row.original} />,
+      filterFn: (row, columnId, filterValue) => {
+        const value = row.getValue(columnId);
+        return value === (filterValue === 'false' ? false : filterValue);
+      },
     },
     {
       accessorKey: "service",
@@ -188,9 +203,11 @@ function EndpointsTable({
       cell: ({ row }) => <span className="font-medium text-gray-700">{row.original.service || '/'}</span>,
     },
     {
-      accessorKey: "environment",
+      id: "environment",
+      accessorFn: (row) => row.environment,
       header: "Ambiente",
       cell: ({ row }) => <EnvironmentCell endpoint={row.original} />,
+      filterFn: 'equalsString',
     },
     {
       accessorKey: "lastChecked",
@@ -228,7 +245,29 @@ function EndpointsTable({
     },
   ]
 
-  return <Table columns={columns} data={endpoints} />
+  const filters = useMemo(() => {
+    const stagingCount = endpoints.filter(e => e.environment === 'staging').length;
+    const productionCount = endpoints.filter(e => e.environment === 'production').length;
+    const unhealthyCount = endpoints.filter(e => e.isHealthy === false).length;
+
+    return [
+      { label: 'Staging', columnId: 'environment', value: 'staging', count: stagingCount },
+      { label: 'Production', columnId: 'environment', value: 'production', count: productionCount },
+      { label: 'Con errores', columnId: 'status', value: 'false', count: unhealthyCount },
+    ];
+  }, [endpoints]);
+
+  return (
+    <div className='p-4'>
+    <Table
+      columns={columns}
+      data={endpoints}
+      filters={filters}
+      activeFilter={activeFilter}
+      onFilterChange={onFilterChange}
+      />
+      </div>
+  )
 }
 
 function StatusCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
@@ -355,27 +394,35 @@ function HealthMonitorPage() {
   } = useHealthMonitor();
 
   const { favorites } = useUserCollections();
+  const navigate = useNavigate();
+  const search = useSearch({ from: '/health/' });
 
-  // Estado para filtros
-  const [environmentFilter, setEnvironmentFilter] = useState<'all' | 'staging' | 'production' | 'unhealthy'>('all');
-  const [searchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'default' | 'errors' | 'recent'>('default');
 
-  // Filtrar endpoints según el filtro seleccionado y búsqueda
-  const filteredEndpoints = endpoints.filter((ep) => {
-    // Filtro por ambiente
-    if (environmentFilter === 'staging' && ep.environment !== 'staging') return false;
-    if (environmentFilter === 'production' && ep.environment !== 'production') return false;
-    if (environmentFilter === 'unhealthy' && ep.isHealthy !== false) return false;
-
-    // Filtro por búsqueda (servicio o URL)
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      const serviceMatch = ep.service?.toLowerCase().includes(query);
-      const urlMatch = ep.url.toLowerCase().includes(query);
-      if (!serviceMatch && !urlMatch) return false;
+  // Derivar filtro activo de query params
+  const activeFilter = useMemo(() => {
+    if (!search.environment) return null;
+    if (search.environment === 'staging' || search.environment === 'production') {
+      return { id: 'environment', value: search.environment };
     }
+    if (search.environment === 'unhealthy') {
+      return { id: 'status', value: 'false' };
+    }
+    return null;
+  }, [search.environment]);
 
+  const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
+    navigate({
+      to: '.',
+      search: filter ? { environment: filter.value === 'false' ? 'unhealthy' : filter.value } : {},
+    });
+  }, [navigate]);
+
+  // Filtrar endpoints según el filtro seleccionado
+  const filteredEndpoints = endpoints.filter((ep) => {
+    if (!activeFilter) return true;
+    if (activeFilter.id === 'environment' && ep.environment !== activeFilter.value) return false;
+    if (activeFilter.id === 'status' && ep.isHealthy !== (activeFilter.value === 'false' ? false : true)) return false;
     return true;
   });
 
@@ -451,14 +498,6 @@ function HealthMonitorPage() {
           {isChecking ? 'Verificando...' : `Verificar ${stats.unhealthy}`}
         </button>
       )}
-      <button
-        onClick={() => checkAllEndpoints()}
-        disabled={isChecking}
-        className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-gray-300 text-gray-600 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
-        {isChecking ? 'Verificando...' : 'Verificar todos'}
-      </button>
     </div>
   );
 
@@ -469,57 +508,18 @@ function HealthMonitorPage() {
       refreshFn={checkAllEndpoints}
     >
       <div className="space-y-6">
-      {/* Filtros por ambiente */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-600">Filtrar:</span>
-            {[
-              { value: 'all' as const, label: `Todos (${filteredEndpoints.length})` },
-              { value: 'staging' as const, label: `Staging (${filteredEndpoints.filter(e => e.environment === 'staging').length})` },
-              { value: 'production' as const, label: `Production (${filteredEndpoints.filter(e => e.environment === 'production').length})` },
-              { value: 'unhealthy' as const, label: `Con errores (${filteredEndpoints.filter(e => e.isHealthy === false).length})` },
-            ].map((filter) => (
-              <button
-                key={filter.value}
-                onClick={() => setEnvironmentFilter(filter.value)}
-                className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                  environmentFilter === filter.value
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Ordenamiento */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-600">Ordenar:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'default' | 'errors' | 'recent')}
-              className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="default">Por defecto</option>
-              <option value="errors">Con errores primero</option>
-              <option value="recent">Más recientes</option>
-            </select>
-          </div>
-        </div>
-
-        {/* CTAs */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => checkAllEndpoints()}
-            disabled={isChecking}
-            className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-gray-300 text-gray-600 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
-            {isChecking ? 'Verificando...' : 'Verificar todos'}
-          </button>
-        </div>
+      {/* Ordenamiento */}
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium text-gray-600">Ordenar:</span>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as 'default' | 'errors' | 'recent')}
+          className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="default">Por defecto</option>
+          <option value="errors">Con errores primero</option>
+          <option value="recent">Más recientes</option>
+        </select>
       </div>
 
       {/* Info banner - expandible */}
@@ -531,9 +531,9 @@ function HealthMonitorPage() {
           <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
           <p className="text-gray-500">No hay endpoints que coincidan con el filtro</p>
           <p className="text-sm text-gray-400 mt-1">
-            {environmentFilter === 'all' ? 'Navega a un producto favorito para detectar servicios automáticamente' : 'Intenta con otro filtro'}
+            {!activeFilter ? 'Navega a un producto favorito para detectar servicios automáticamente' : 'Intenta con otro filtro'}
           </p>
-          {environmentFilter === 'all' && (
+          {!activeFilter && (
             <Link
               to="/github"
               className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
@@ -552,6 +552,8 @@ function HealthMonitorPage() {
               isChecking={isChecking}
               onCheckEndpoint={checkEndpoint}
               onRemoveEndpoint={removeEndpoint}
+              activeFilter={activeFilter}
+              onFilterChange={handleFilterChange}
             />
           ))}
         </div>

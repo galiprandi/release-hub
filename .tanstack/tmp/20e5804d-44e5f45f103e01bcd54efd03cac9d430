@@ -3,7 +3,7 @@ import { Streamdown } from "streamdown";
 import { PageLayout } from "../layouts/PageLayout";
 import novedadesContent from "../../NOVEDADES.md?raw";
 
-export const Route = createFileRoute("/novedades")({
+export const Route = createFileRoute("/novedades/")({
 	component: NovedadesPage,
 });
 

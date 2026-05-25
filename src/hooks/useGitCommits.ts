@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { runCommand } from "@/api/exec";
+import { quote } from "@/utils/shell";
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
 
 export interface GitCommit {
@@ -26,7 +27,7 @@ export function useGitCommits({
 		queryFn: async ({ pageParam = 0 }) => {
 			const page = pageParam as number;
 			const perPage = 10;
-			const command = `gh api "repos/${repo}/commits?per_page=${perPage}&page=${page + 1}" --jq '.[] | {hash: .sha, author: .commit.author.name, date: .commit.committer.date, message: .commit.message}'`;
+			const command = `gh api ${quote(`repos/${repo}/commits?per_page=${perPage}&page=${page + 1}`)} --jq '.[] | {hash: .sha, author: .commit.author.name, date: .commit.committer.date, message: .commit.message}'`;
 			const response = await runCommand(command);
 
 			const lines = response.stdout

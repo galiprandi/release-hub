@@ -81,18 +81,18 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 		try {
 			const startTime = Date.now();
 
-			// Build curl command from parsed query
-			const headers = Object.entries(parsed.headers)
-				.map(([key, value]) => `-H "${key}: ${value}"`)
-				.join(' ');
+			// Build curl arguments array
+			const args: string[] = ['-X', parsed.method, parsed.url];
 
-			// Minify JSON body before sending
-			const bodyToSend = parsed.body ? minifyJSON(parsed.body) : '';
-			const data = bodyToSend ? `-d '${bodyToSend}'` : '';
-			// Use single quotes for URL to preserve special characters without escaping
-			const command = `-X ${parsed.method} '${parsed.url}' ${headers} ${data}`.trim();
+			Object.entries(parsed.headers).forEach(([key, value]) => {
+				args.push('-H', `${key}: ${value}`);
+			});
 
-			const result = await executeCurlCommand(command);
+			if (parsed.body) {
+				args.push('-d', minifyJSON(parsed.body));
+			}
+
+			const result = await executeCurlCommand(args);
 			const responseTime = Date.now() - startTime;
 
 			// Parse curl response (with -i flag, headers come first)

@@ -296,6 +296,11 @@ import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
 - Metadata secundaria
 - Contenido de cuerpo
 
+### Seguridad y Robustez
+
+- **Inyección de Comandos**: Se ha implementado un sistema de blindaje en `runCommand` mediante el uso de `quote()` para escapar argumentos de shell. Este patrón es mandatorio para cualquier nueva integración con CLIs.
+- **Validación de Entradas**: Las APIs de Docker y Kubectl implementan sanitización regex estricta además del escapado de shell para una defensa en profundidad.
+
 ### Debug de Sticky
 
 Si el header sticky no funciona:

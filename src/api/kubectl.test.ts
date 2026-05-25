@@ -17,6 +17,7 @@ describe('kubectl api', () => {
   });
 
   it('setCurrentContext handles invalid context names safely', async () => {
+    vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '', success: true });
     expect(await getCurrentContext()).toBe(null);
   });
 
@@ -30,7 +31,7 @@ describe('kubectl api', () => {
     const res = await getDeployments('default');
     expect(res).toHaveLength(1);
     expect(res[0].name).toBe('dep1');
-    expect(res[0].namespace).toBe('');
+    expect(res[0].namespace).toBe('default');
   });
 
   it('getDeployments parses output with namespace column', async () => {

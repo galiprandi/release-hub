@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { runCommand } from '@/api/exec'
+import { quote } from '@/utils/shell'
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys'
 
 // Type definitions at EOF
@@ -57,7 +58,7 @@ export function useUserRepos({
       if (org) {
         // If org specified, only list repos from that org
         commands.push(
-          `gh repo list ${org} --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission`
+          `gh repo list ${quote(org)} --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission`
         )
       } else {
         // Get organizations dynamically
@@ -67,7 +68,7 @@ export function useUserRepos({
         // Add commands for each org
         orgs.forEach((orgName) => {
           commands.push(
-            `gh repo list ${orgName} --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission`
+            `gh repo list ${quote(orgName)} --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission`
           )
         })
 
@@ -79,7 +80,7 @@ export function useUserRepos({
         // Add additional users
         ADDITIONAL_USERS.forEach((user) => {
           commands.push(
-            `gh repo list ${user} --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission`
+            `gh repo list ${quote(user)} --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission`
           )
         })
       }

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { runCommand } from '@/api/exec'
+import { quote } from '@/utils/shell'
 import { hasSekiToken } from '@/utils/sekiToken'
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys'
 
@@ -26,7 +27,7 @@ interface UsePipelineDetectorOptions {
 const hasNxBuildWorkflow = async (org: string, repo: string): Promise<boolean> => {
   try {
     const { stdout } = await runCommand(
-      `gh api repos/${org}/${repo}/actions/workflows --jq '.workflows[].name'`
+      `gh api ${quote(`repos/${org}/${repo}/actions/workflows`)} --jq '.workflows[].name'`
     )
     const workflows = stdout.trim().split('\n')
     return workflows.some((w) => w === 'Nx Build' || w === 'nx-build')

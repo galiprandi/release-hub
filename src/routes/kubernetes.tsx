@@ -52,16 +52,9 @@ function KubernetesPage() {
 			} : undefined}
 		>
 			<div className="space-y-6">
-				{checkingInstall ? (
-					<StatusCard type="loading" message="Verificando kubectl..." />
-				) : isInstalled ? (
+				{(!checkingInstall && isInstalled) ? (
 					<DeploymentList favorites={safeDeploymentFavorites} />
-				) : (
-					<StatusCard
-						type="error"
-						message="kubectl no está instalado. Instálalo para gestionar deployments de Kubernetes."
-					/>
-				)}
+				) : null}
 			</div>
 		</PageLayout>
 	);

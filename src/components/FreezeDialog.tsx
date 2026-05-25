@@ -4,6 +4,7 @@ import * as Dialog from "@radix-ui/react-dialog"
 import * as Tooltip from "@radix-ui/react-tooltip"
 import { Unlock, Lock, Loader2, CheckCircle2 } from "lucide-react"
 import { runCommand } from "@/api/exec"
+import { quote } from "@/utils/shell"
 import { useBranchProtection } from "@/hooks/useBranchProtection"
 import { useDiscordChannel } from "@/hooks/useDiscordChannel"
 import { useGitUser } from "@/hooks/useGitUser"
@@ -60,7 +61,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 			}
 
 			const result = await runCommand(
-				`gh api repos/${repo}/branches/main/protection --method PUT --input - << 'EOF'
+				`gh api ${quote(`repos/${repo}/branches/main/protection`)} --method PUT --input - << 'EOF'
 ${JSON.stringify(protectionConfig)}
 EOF`
 			)

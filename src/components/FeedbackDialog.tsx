@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useAISummarize } from "@galiprandi/react-tools"
 import { useAIErrorProcessor } from "@/hooks/useAIErrorProcessor"
 import { runCommand } from "@/api/exec"
+import { quote } from "@/utils/shell"
 import { BaseDialog } from "@/components/ui/BaseDialog"
 
 type Step = "describe" | "review" | "sending" | "success" | "error"
@@ -173,7 +174,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 		setError("")
 		
 		try {
-			const command = `gh issue create --repo "${REPO}" --title "${aiTitle}" --body "${aiBody}"`
+			const command = `gh issue create --repo ${quote(REPO)} --title ${quote(aiTitle)} --body ${quote(aiBody)}`
 			
 			const result = await runCommand(command)
 			

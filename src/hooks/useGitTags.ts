@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { runCommand } from "@/api/exec";
+import { quote } from "@/utils/shell";
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
 
 export interface GitTag {
@@ -38,7 +39,7 @@ export function useGitTags({
 			const page = pageParam as number;
 			const perPage = 10;
 			// First get the tags list with pagination
-			const tagsCommand = `gh api "repos/${repo}/tags?per_page=${perPage}&page=${page + 1}" --jq '.[] | {name: .name, commit: .commit.sha, zipball_url: .zipball_url, tarball_url: .tarball_url}'`;
+			const tagsCommand = `gh api ${quote(`repos/${repo}/tags?per_page=${perPage}&page=${page + 1}`)} --jq '.[] | {name: .name, commit: .commit.sha, zipball_url: .zipball_url, tarball_url: .tarball_url}'`;
 			const tagsResponse = await runCommand(tagsCommand);
 
 			const tagLines = tagsResponse.stdout
@@ -61,7 +62,7 @@ export function useGitTags({
 				tags.map(async (tag: GitTagFromAPI) => {
 					try {
 						// Get the tag reference to check if it's annotated
-						const refCommand = `gh api repos/${repo}/git/refs/tags/${tag.name} --jq '.object.type'`;
+						const refCommand = `gh api ${quote(`repos/${repo}/git/refs/tags/${tag.name}`)} --jq '.object.type'`;
 						const refResponse = await runCommand(refCommand);
 						const objectType = refResponse.stdout.trim();
 
@@ -69,17 +70,17 @@ export function useGitTags({
 
 						// If it's an annotated tag, get the tagger date
 						if (objectType === 'tag') {
-							const tagCommand = `gh api repos/${repo}/git/refs/tags/${tag.name} --jq '.object.sha'`;
+							const tagCommand = `gh api ${quote(`repos/${repo}/git/refs/tags/${tag.name}`)} --jq '.object.sha'`;
 							const tagShaResponse = await runCommand(tagCommand);
 							const tagSha = tagShaResponse.stdout.trim();
 
-							const taggerCommand = `gh api repos/${repo}/git/tags/${tagSha} --jq '.tagger.date'`;
+							const taggerCommand = `gh api ${quote(`repos/${repo}/git/tags/${tagSha}`)} --jq '.tagger.date'`;
 							const taggerResponse = await runCommand(taggerCommand);
 							tagDate = taggerResponse.stdout.trim();
 						}
 
 						// Get commit details for author info
-						const commitCommand = `gh api repos/${repo}/commits/${tag.commit} --jq '{message: .message, author: {name: .commit.author.name, email: .commit.author.email, date: .commit.author.date}}'`;
+						const commitCommand = `gh api ${quote(`repos/${repo}/commits/${tag.commit}`)} --jq '{message: .message, author: {name: .commit.author.name, email: .commit.author.email, date: .commit.author.date}}'`;
 						const commitResponse = await runCommand(commitCommand);
 						const commitDetails = JSON.parse(commitResponse.stdout.trim());
 
@@ -91,7 +92,7 @@ export function useGitTags({
 					} catch {
 						// Fallback if details fail, get commit date
 						try {
-							const commitCommand = `gh api repos/${repo}/commits/${tag.commit} --jq '{date: .commit.committer.date, message: .message, author: {name: .commit.author.name, email: .commit.author.email, date: .commit.author.date}}'`;
+							const commitCommand = `gh api ${quote(`repos/${repo}/commits/${tag.commit}`)} --jq '{date: .commit.committer.date, message: .message, author: {name: .commit.author.name, email: .commit.author.email, date: .commit.author.date}}'`;
 							const commitResponse = await runCommand(commitCommand);
 							const commitDetails = JSON.parse(commitResponse.stdout.trim());
 

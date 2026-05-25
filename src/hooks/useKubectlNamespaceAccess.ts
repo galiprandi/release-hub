@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { runCommand } from "@/api/exec";
+import { quote } from "@/utils/shell";
 import { checkKubectlInstalled, getContexts, getCurrentContext } from "@/api/kubectl";
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
 
@@ -12,13 +13,14 @@ export interface KubectlNamespaceAccess {
 }
 
 async function checkContextAccess(namespace: string, context: string): Promise<KubectlNamespaceAccess> {
-	const ctxFlag = `--context=${context}`;
+	const ctxFlag = `--context=${quote(context)}`;
+	const nsFlag = `-n ${quote(namespace)}`;
 
 	try {
 		const [podsResult, deploymentsResult, logsResult] = await Promise.allSettled([
-			runCommand(`kubectl auth can-i get pods -n ${namespace} ${ctxFlag}`.trim()),
-			runCommand(`kubectl auth can-i get deployments -n ${namespace} ${ctxFlag}`.trim()),
-			runCommand(`kubectl auth can-i get pods/logs -n ${namespace} ${ctxFlag}`.trim()),
+			runCommand(`kubectl auth can-i get pods ${nsFlag} ${ctxFlag}`.trim()),
+			runCommand(`kubectl auth can-i get deployments ${nsFlag} ${ctxFlag}`.trim()),
+			runCommand(`kubectl auth can-i get pods/logs ${nsFlag} ${ctxFlag}`.trim()),
 		]);
 
 		const canGetPods = podsResult.status === "fulfilled" && podsResult.value.stdout.trim() === "yes";

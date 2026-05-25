@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { runCommand } from "@/api/exec";
+import { quote } from "@/utils/shell";
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
 
 export interface GitTagSimple {
@@ -23,7 +24,7 @@ export function useGitTagsSimple({
 	const { data: tags, ...rest } = useQuery<GitTagSimple[]>({
 		queryKey: queryKeys.git.tags(repo, limit),
 		queryFn: async () => {
-			const command = `gh api repos/${repo}/tags --paginate --jq '.[] | {name: .name, commit: .commit.sha, zipball_url: .zipball_url, tarball_url: .tarball_url}'`;
+			const command = `gh api ${quote(`repos/${repo}/tags`)} --paginate --jq '.[] | {name: .name, commit: .commit.sha, zipball_url: .zipball_url, tarball_url: .tarball_url}'`;
 			const response = await runCommand(command);
 
 			const tagLines = response.stdout

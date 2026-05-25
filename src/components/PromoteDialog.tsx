@@ -4,6 +4,7 @@ import * as Tooltip from "@radix-ui/react-tooltip"
 import { Rocket, Loader2, CheckCircle2, ChevronRight, ChevronLeft, GitCommit, Sparkles } from "lucide-react"
 import axios from "axios"
 import { runCommand } from "@/api/exec"
+import { quote } from "@/utils/shell"
 import { useRepoPermission } from "../hooks/useRepoPermission"
 import { useDiscordChannel } from "@/hooks/useDiscordChannel"
 import { useGitUser } from "@/hooks/useGitUser"
@@ -102,7 +103,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 	const handleCreateTag = async () => {
 		if (!tagName.trim()) { setError("El nombre del Tag es requerido"); return }
 		// Obtener el commit más reciente de main
-		const latestCommitResult = await runCommand(`gh api repos/${repo}/commits/main --jq '.sha'`)
+		const latestCommitResult = await runCommand(`gh api ${quote(`repos/${repo}/commits/main`)} --jq '.sha'`)
 		const targetCommit = latestCommitResult.stdout.trim()
 		if (!targetCommit) throw new Error("No se pudo obtener el commit más reciente de main")
 

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { runCommand } from '@/api/exec'
+import { quote } from '@/utils/shell'
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys'
 
 interface OrgSummary {
@@ -58,7 +59,7 @@ export function useUserReposSummary(enabled = true) {
         }
       `
 
-      const command = `gh api graphql -f query='${query.replace(/\n/g, ' ')}'`
+      const command = `gh api graphql -f query=${quote(query.replace(/\n/g, ' '))}`
       const result = await runCommand(command)
       const data = JSON.parse(result.stdout) as GraphQLResponse
 

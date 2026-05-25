@@ -5,6 +5,7 @@
 
 import type { PipelineAdapter, PipelineData, PipelineEvent, ViewMode } from '../types'
 import { runCommand } from '@/api/exec'
+import { quote } from '@/utils/shell'
 
 interface WorkflowRun {
 	id: number
@@ -54,7 +55,7 @@ async function getWorkflowRuns(
 	try {
 		// Get workflow ID from workflow name first
 		const { stdout: workflowStdout } = await runCommand(
-			`gh api repos/${org}/${repo}/actions/workflows --jq '.workflows[] | select(.name == "${workflowName}") | .id'`
+			`gh api ${quote(`repos/${org}/${repo}/actions/workflows`)} --jq '.workflows[] | select(.name == ${quote(workflowName)}) | .id'`
 		)
 
 		const workflowId = workflowStdout.trim()
@@ -65,7 +66,7 @@ async function getWorkflowRuns(
 
 		// Get runs using workflow ID
 		const { stdout } = await runCommand(
-			`gh api "repos/${org}/${repo}/actions/workflows/${workflowId}/runs?per_page=${limit}" --jq '.workflow_runs[] | {id, name, head_sha, status, conclusion, created_at, updated_at, html_url}'`
+			`gh api ${quote(`repos/${org}/${repo}/actions/workflows/${workflowId}/runs?per_page=${limit}`)} --jq '.workflow_runs[] | {id, name, head_sha, status, conclusion, created_at, updated_at, html_url}'`
 		)
 
 		if (!stdout || stdout.trim() === '') {
@@ -91,7 +92,7 @@ async function getWorkflowJobs(
 ): Promise<WorkflowJob[]> {
 	try {
 		const { stdout } = await runCommand(
-			`gh api "repos/${org}/${repo}/actions/runs/${runId}/jobs" --jq '.jobs[] | {id, name, status, conclusion, started_at, completed_at}'`
+			`gh api ${quote(`repos/${org}/${repo}/actions/runs/${runId}/jobs`)} --jq '.jobs[] | {id, name, status, conclusion, started_at, completed_at}'`
 		)
 
 		if (!stdout || stdout.trim() === '') {
@@ -116,7 +117,7 @@ async function getCommitInfo(
 ): Promise<{ message?: string; author?: string }> {
 	try {
 		const { stdout } = await runCommand(
-			`gh api repos/${org}/${repo}/git/commits/${sha} --jq '{message: .message, author: .author.name}'`
+			`gh api ${quote(`repos/${org}/${repo}/git/commits/${sha}`)} --jq '{message: .message, author: .author.name}'`
 		)
 		return JSON.parse(stdout)
 	} catch (error) {
@@ -166,7 +167,7 @@ export const pulsarAdapter: PipelineAdapter = {
 		try {
 			 
 			const { stdout } = await runCommand(
-				`gh api repos/${org}/${repo}/actions/workflows --jq '.workflows[].name'`
+				`gh api ${quote(`repos/${org}/${repo}/actions/workflows`)} --jq '.workflows[].name'`
 			)
 			const workflows = stdout.trim().split('\n')
 			return workflows.some((w) => w === 'Nx Build' || w === 'nx-build')

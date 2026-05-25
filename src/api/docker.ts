@@ -1,4 +1,5 @@
 import { runCommand } from '@/api/exec';
+import { quote } from '@/utils/shell';
 
 export interface ContainerInfo {
 	id: string;
@@ -110,12 +111,12 @@ export async function getContainers(): Promise<ContainerInfo[]> {
  */
 export async function getContainerLogs(containerId: string, tail = 100, since?: number): Promise<string> {
 	try {
-		const sanitizedId = sanitizeContainerId(containerId);
-		let command = `docker logs --tail=${tail} ${sanitizedId}`;
+		const sanitizedId = quote(sanitizeContainerId(containerId));
+		let command = `docker logs --tail=${quote(String(tail))} ${sanitizedId}`;
 		if (since) {
 			// Convert Unix timestamp to ISO format for Docker --since
 			const sinceDate = new Date(since * 1000);
-			command = `docker logs --since="${sinceDate.toISOString()}" ${sanitizedId}`;
+			command = `docker logs --since=${quote(sinceDate.toISOString())} ${sanitizedId}`;
 		}
 		const result = await runCommand(command);
 		// Some containers use stdout, others use stderr
@@ -135,7 +136,7 @@ export async function getContainerLogs(containerId: string, tail = 100, since?: 
  */
 export async function startContainer(containerId: string): Promise<boolean> {
 	try {
-		const sanitizedId = sanitizeContainerId(containerId);
+		const sanitizedId = quote(sanitizeContainerId(containerId));
 		await runCommand(`docker start ${sanitizedId}`);
 		return true;
 	} catch (error) {
@@ -149,7 +150,7 @@ export async function startContainer(containerId: string): Promise<boolean> {
  */
 export async function restartContainer(containerId: string): Promise<boolean> {
 	try {
-		const sanitizedId = sanitizeContainerId(containerId);
+		const sanitizedId = quote(sanitizeContainerId(containerId));
 		await runCommand(`docker restart ${sanitizedId}`);
 		return true;
 	} catch (error) {
@@ -163,7 +164,7 @@ export async function restartContainer(containerId: string): Promise<boolean> {
  */
 export async function stopContainer(containerId: string): Promise<boolean> {
 	try {
-		const sanitizedId = sanitizeContainerId(containerId);
+		const sanitizedId = quote(sanitizeContainerId(containerId));
 		await runCommand(`docker stop ${sanitizedId}`);
 		return true;
 	} catch (error) {

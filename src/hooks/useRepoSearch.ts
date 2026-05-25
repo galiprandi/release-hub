@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { runCommand } from '@/api/exec'
+import { quote } from '@/utils/shell'
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys'
 import { useDebounce } from '@galiprandi/react-tools'
 
@@ -80,7 +81,7 @@ export function useRepoSearch({ searchTerm = '', enabled = true }: UseRepoSearch
         ? debouncedSearchTerm
         : `${debouncedSearchTerm} org:Cencosud-Cencommerce org:Cencosud-xlabs user:${username}`
 
-      const command = `gh api graphql -f query='${query.replace(/\n/g, ' ')}' -f searchTerm='${searchQuery}'`
+      const command = `gh api graphql -f query=${quote(query.replace(/\n/g, ' '))} -f searchTerm=${quote(searchQuery)}`
       const result = await runCommand(command)
       const data = JSON.parse(result.stdout) as GraphQLSearchResponse
 

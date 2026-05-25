@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { runCommand } from "../api/exec";
+import { quote } from "@/utils/shell";
 
 export interface GitHubActionsSummary {
 	total: number;
@@ -12,7 +13,7 @@ export function useGitHubActionsSummary(repo: string) {
 	return useQuery<GitHubActionsSummary>({
 		queryKey: ["github-actions", "summary", repo],
 		queryFn: async () => {
-			const command = `gh api 'repos/${repo}/actions/runs?per_page=5' --jq '.workflow_runs[] | {status, conclusion}'`;
+			const command = `gh api ${quote(`repos/${repo}/actions/runs?per_page=5`)} --jq '.workflow_runs[] | {status, conclusion}'`;
 			const { stdout } = await runCommand(command);
 			const lines = stdout
 				.trim()

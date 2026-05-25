@@ -22,6 +22,10 @@ import { SettingsDialog } from "@/components/SettingsDialog";
 import { GenericSearch } from "@/components/GenericSearch";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { EmptyState } from "@/components/EmptyState";
+import { useDockerAccess } from '@/hooks/useDockerAccess';
+import { useQuery } from '@tanstack/react-query';
+import { checkKubectlInstalled } from '@/api/kubectl';
+import { applyCachePolicy } from '@/lib/queryKeys';
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -71,6 +75,13 @@ export function PageLayout({
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
 
+  const { data: dockerAccess, isLoading: loadingDocker } = useDockerAccess();
+  const { data: k8sInstalled, isLoading: loadingK8s } = useQuery({
+    queryKey: ["kubectl", "installed"],
+    queryFn: checkKubectlInstalled,
+    ...applyCachePolicy("kubectl"),
+  });
+
   // Determine if any loading state is true
   const isAnyLoading = Array.isArray(isLoading) ? isLoading.some(Boolean) : isLoading;
 
@@ -97,12 +108,16 @@ export function PageLayout({
             <li>
               <NavIcon icon={BookMarked} label="Repositorios" to="/github" pathname={pathname} />
             </li>
-            <li>
-              <NavIcon icon={Boxes} label="Kubernetes" to="/kubernetes" pathname={pathname} />
-            </li>
-            <li>
-              <NavIcon icon={Blocks} label="Docker" to="/docker" pathname={pathname} />
-            </li>
+            {(!loadingK8s && k8sInstalled) && (
+              <li>
+                <NavIcon icon={Boxes} label="Kubernetes" to="/kubernetes" pathname={pathname} />
+              </li>
+            )}
+            {(!loadingDocker && dockerAccess?.isInstalled) && (
+              <li>
+                <NavIcon icon={Blocks} label="Docker" to="/docker" pathname={pathname} />
+              </li>
+            )}
             <li>
               <NavIcon icon={Send} label="Fetcher" to="/fetcher" pathname={pathname} />
             </li>

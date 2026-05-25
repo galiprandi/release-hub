@@ -89,17 +89,9 @@ function DockerManagerPage() {
       />
 
       {/* Contenido */}
-      {checkingAccess ? (
-        <StatusCard type="loading" message="Verificando acceso a Docker..." />
-      ) : access?.hasAccess ? (
+      {(!checkingAccess && access?.hasAccess) ? (
         <ContainerList ref={containerListRef} statusFilter={statusFilter} searchQuery={searchQuery} />
-      ) : (
-        <StatusCard
-          type="error"
-          message="No se tiene acceso a Docker. Asegúrate de que Docker esté instalado y en ejecución."
-          onRetry={handleRefresh}
-        />
-      )}
+      ) : null}
       </div>
     </PageLayout>
   );

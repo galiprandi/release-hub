@@ -40,7 +40,13 @@ Antes de cualquier cambio:
 - **GitHub API**: `gh auth token` dinámicamente. Nunca token Seki ni hardcodeados.
 - **Seki API**: `seki_api_token` desde localStorage. Nunca token de `gh`.
 
-### 6. Permisos GitHub
+### 6. Seguridad y Hardening
+- **Escapado de Shell**: Todos los comandos dinámicos deben usar `quote()` de `@/utils/shell` para prevenir inyecciones.
+- **Sanitización de K8s/Docker**: Mantener y usar validaciones estrictas de nombres de recursos antes de pasarlos a `runCommand`.
+- **Parsing de cURL**: El parser debe ser robusto contra ReDoS y no procesar sustituciones de comandos.
+- **Activación Condicional**: Aplicar estrictamente la Regla 2. Si un módulo (Docker/K8s) no está disponible, se debe ocultar su icono en `PageLayout` y su ruta debe renderizar `null` en lugar de mensajes de error o estados de carga.
+
+### 7. Permisos GitHub
 Verificar `permissions.push`, `.maintain`, `.admin` para crear tags. Fallback a `viewerPermission`.
 
 ### 7. React Query

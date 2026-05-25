@@ -1,4 +1,5 @@
 import { runCommand } from '@/api/exec';
+import { quote } from '@/utils/shell';
 
 function sanitizeContext(context: string): string {
   if (!context) {
@@ -186,8 +187,8 @@ function parsePods(output: string): PodInfo[] {
 }
 
 export async function getDeployments(namespace?: string, context?: string): Promise<DeploymentInfo[]> {
-  const nsFlag = namespace ? `-n ${sanitizeNamespace(namespace)}` : '--all-namespaces';
-  const ctxFlag = context ? `--context=${sanitizeContext(context)}` : '';
+  const nsFlag = namespace ? `-n ${quote(sanitizeNamespace(namespace))}` : '--all-namespaces';
+  const ctxFlag = context ? `--context=${quote(sanitizeContext(context))}` : '';
   try {
     const result = await runCommand(`kubectl get deployments ${nsFlag} ${ctxFlag}`.trim());
     // kubectl outputs to stderr when no resources found, so check both
@@ -203,7 +204,7 @@ export async function getDeployments(namespace?: string, context?: string): Prom
         const allDeployments: DeploymentInfo[] = [];
         for (const ns of namespaces) {
           try {
-            const result = await runCommand(`kubectl get deployments -n ${sanitizeNamespace(ns)} ${ctxFlag}`.trim());
+            const result = await runCommand(`kubectl get deployments -n ${quote(sanitizeNamespace(ns))} ${ctxFlag}`.trim());
             const output = result.stdout || result.stderr;
             allDeployments.push(...parseDeployments(output, ns));
           } catch {
@@ -218,7 +219,7 @@ export async function getDeployments(namespace?: string, context?: string): Prom
         const allDeployments: DeploymentInfo[] = [];
         for (const ns of knownNamespaces) {
           try {
-            const result = await runCommand(`kubectl get deployments -n ${sanitizeNamespace(ns)} ${ctxFlag}`.trim());
+            const result = await runCommand(`kubectl get deployments -n ${quote(sanitizeNamespace(ns))} ${ctxFlag}`.trim());
             const output = result.stdout || result.stderr;
             allDeployments.push(...parseDeployments(output, ns));
           } catch {
@@ -235,9 +236,9 @@ export async function getDeployments(namespace?: string, context?: string): Prom
 }
 
 export async function getPodsForDeployment(deploymentName: string, namespace?: string, context?: string): Promise<PodInfo[]> {
-  const sanitizedDeploymentName = sanitizeK8sName(deploymentName);
-  const nsFlag = namespace ? `-n ${sanitizeNamespace(namespace)}` : '';
-  const ctxFlag = context ? `--context=${sanitizeContext(context)}` : '';
+  const sanitizedDeploymentName = quote(sanitizeK8sName(deploymentName));
+  const nsFlag = namespace ? `-n ${quote(sanitizeNamespace(namespace))}` : '';
+  const ctxFlag = context ? `--context=${quote(sanitizeContext(context))}` : '';
   const selectorResult = await runCommand(`kubectl get deployment ${sanitizedDeploymentName} ${nsFlag} ${ctxFlag} -o jsonpath='{.spec.selector.matchLabels}'`.trim());
   const selector = selectorResult.stdout.trim();
   if (!selector) {
@@ -245,16 +246,16 @@ export async function getPodsForDeployment(deploymentName: string, namespace?: s
   }
   // Convertir selector JSON a formato -l key=value,key2=value2
   const labels = JSON.parse(selector);
-  const labelSelector = Object.entries(labels).map(([k, v]) => `${k}=${v}`).join(',');
+  const labelSelector = quote(Object.entries(labels).map(([k, v]) => `${k}=${v}`).join(','));
   const result = await runCommand(`kubectl get pods ${nsFlag} ${ctxFlag} -l ${labelSelector}`.trim());
   return parsePods(result.stdout);
 }
 
 export async function getResourceLogs(resourceType: 'deployment' | 'pod', name: string, namespace?: string, tail = 100, context?: string, since?: number): Promise<string> {
-  const sanitizedName = sanitizeK8sName(name);
-  const nsFlag = namespace ? `-n ${sanitizeNamespace(namespace)}` : '';
-  const ctxFlag = context ? `--context=${sanitizeContext(context)}` : '';
-  const sinceFlag = since ? `--since-time="${new Date(since * 1000).toISOString()}"` : '';
+  const sanitizedName = quote(sanitizeK8sName(name));
+  const nsFlag = namespace ? `-n ${quote(sanitizeNamespace(namespace))}` : '';
+  const ctxFlag = context ? `--context=${quote(sanitizeContext(context))}` : '';
+  const sinceFlag = since ? `--since-time=${quote(new Date(since * 1000).toISOString())}` : '';
   
   if (resourceType === 'deployment') {
     // Get deployment selector and use label selector for logs
@@ -265,7 +266,7 @@ export async function getResourceLogs(resourceType: 'deployment' | 'pod', name: 
     }
     // Convert selector JSON to format -l key=value,key2=value2
     const labels = JSON.parse(selector);
-    const labelSelector = Object.entries(labels).map(([k, v]) => `${k}=${v}`).join(',');
+    const labelSelector = quote(Object.entries(labels).map(([k, v]) => `${k}=${v}`).join(','));
     const result = await runCommand(`kubectl logs ${nsFlag} ${ctxFlag} -l ${labelSelector} --tail=${tail} ${sinceFlag} --ignore-errors`.trim());
     return cleanLogs(result.stdout);
   }

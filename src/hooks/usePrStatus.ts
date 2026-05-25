@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { runCommand } from "../api/exec";
+import { quote } from "@/utils/shell";
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
 
 interface PrStatus {
@@ -23,7 +24,7 @@ export function usePrStatus(
 	return useQuery({
 		queryKey: queryKeys.pr.status(repo, Number(prNumber)),
 		queryFn: async () => {
-			const command = `gh api repos/${repo}/pulls/${prNumber}`;
+			const command = `gh api ${quote(`repos/${repo}/pulls/${prNumber}`)}`;
 			const { stdout } = await runCommand(command);
 			const data = JSON.parse(stdout);
 

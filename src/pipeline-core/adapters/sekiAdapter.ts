@@ -130,7 +130,7 @@ export const sekiAdapter: PipelineAdapter = {
 			}
 			
 			// Transform the response to unified format
-			return transformSekiData(response.data, viewMode)
+			return transformSekiData(response, viewMode)
 		} catch (error) {
 			console.error('[SekiAdapter] Error fetching pipeline:', error)
 			return null

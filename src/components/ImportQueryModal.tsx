@@ -25,20 +25,6 @@ interface CurlResponse {
 
 const MAX_HEADERS_DISPLAY = 7;
 
-function formatTimeAgo(dateString: string): string {
-	const date = new Date(dateString);
-	const now = new Date();
-	const diffMs = now.getTime() - date.getTime();
-	const diffMins = Math.floor(diffMs / 60000);
-	const diffHours = Math.floor(diffMins / 60);
-	const diffDays = Math.floor(diffHours / 24);
-
-	if (diffMins < 1) return 'ahora mismo';
-	if (diffMins < 60) return `hace ${diffMins} min`;
-	if (diffHours < 24) return `hace ${diffHours} h`;
-	return `hace ${diffDays} días`;
-}
-
 export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalProps) {
 	const [curlInput, setCurlInput] = useState(query?.curl || '');
 	const [isExecuting, setIsExecuting] = useState(false);
@@ -211,8 +197,9 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 							<div className="space-y-4">
 								<div className="flex gap-2">
 									<div className="w-24">
-										<label className="text-xs font-medium block mb-1.5">Método</label>
+										<label htmlFor="method-select" className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-1.5">Método</label>
 										<select
+											id="method-select"
 											value={parsed.method}
 											onChange={(e) => updateCurlInput({ method: e.target.value })}
 											className="w-full px-2.5 py-1.5 text-sm border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
@@ -223,8 +210,9 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 										</select>
 									</div>
 									<div className="flex-1">
-										<label className="text-xs font-medium block mb-1.5">URL</label>
+										<label htmlFor="url-input" className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-1.5">URL</label>
 										<input
+											id="url-input"
 											type="text"
 											value={parsed.url}
 											onChange={(e) => updateCurlInput({ url: e.target.value })}
@@ -253,26 +241,32 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 											className="text-[10px] font-bold uppercase tracking-wider hover:underline p-0 h-auto"
 										/>
 									</div>
-									<div className="space-y-2">
+									<div className="space-y-3">
 										{Object.entries(parsed.headers)
 											.slice(0, headersExpanded ? undefined : MAX_HEADERS_DISPLAY)
-											.map(([key, value]) => (
-												<div key={key} className="grid grid-cols-[3fr_7fr_auto] gap-4 items-center">
-													<input
-														type="text"
-														value={key}
-														onChange={(e) => {
-															const newHeaders = { ...parsed.headers };
-															delete newHeaders[key];
-															newHeaders[e.target.value] = value;
-															updateCurlInput({ headers: newHeaders });
-														}}
-														placeholder="Header name"
-														className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
-													/>
+											.map(([key, value], idx) => (
+												<div key={key || idx} className="grid grid-cols-[3fr_7fr_auto] gap-3 items-center">
+													<div className="relative">
+														<label htmlFor={`header-key-${idx}`} className="sr-only">Nombre del Header</label>
+														<input
+															id={`header-key-${idx}`}
+															type="text"
+															value={key}
+															onChange={(e) => {
+																const newHeaders = { ...parsed.headers };
+																delete newHeaders[key];
+																newHeaders[e.target.value] = value;
+																updateCurlInput({ headers: newHeaders });
+															}}
+															placeholder="Header name"
+															className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
+														/>
+													</div>
 													{key.toLowerCase() === 'authorization' ? (
 														<div className="relative">
+															<label htmlFor={`header-value-${idx}`} className="sr-only">Valor del Header</label>
 															<input
+																id={`header-value-${idx}`}
 																type="text"
 																value={value}
 																onChange={(e) => updateCurlInput({
@@ -290,15 +284,19 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 															)}
 														</div>
 													) : (
-														<input
-															type="text"
-															value={value}
-															onChange={(e) => updateCurlInput({
-																headers: { ...parsed.headers, [key]: e.target.value }
-															})}
-															placeholder="Value"
-															className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
-														/>
+														<div className="relative">
+															<label htmlFor={`header-value-${idx}`} className="sr-only">Valor del Header</label>
+															<input
+																id={`header-value-${idx}`}
+																type="text"
+																value={value}
+																onChange={(e) => updateCurlInput({
+																	headers: { ...parsed.headers, [key]: e.target.value }
+																})}
+																placeholder="Value"
+																className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
+															/>
+														</div>
 													)}
 													<ActionButton
 														action={ACTION_DEFINITIONS.delete}
@@ -398,10 +396,14 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 														: response.status >= 400
 															? 'bg-destructive/20 text-destructive'
 															: 'bg-warning/20 text-warning'
-												}`} title={query?.updatedAt ? formatTimeAgo(query.updatedAt) : new Date().toLocaleString()}>
+												}`} title={query?.updatedAt ? DayJS(query.updatedAt).format('LLL') : DayJS().format('LLL')}>
 													{response.status} {response.statusText}
 											</span>
-											<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 px-2 py-0.5 rounded">
+											<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+												response.responseTime < 200 ? 'bg-success/20 text-success' :
+												response.responseTime > 1000 ? 'bg-destructive/20 text-destructive' :
+												'bg-muted text-muted-foreground'
+											}`}>
 												{response.responseTime}ms
 											</span>
 										</div>

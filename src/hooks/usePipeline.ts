@@ -45,8 +45,7 @@ export function usePipeline({
   return useQuery<PipelineStatusResponse>({
     queryKey: queryKeys.pipeline.staging(product, commit),
     queryFn: async () => {
-      const { data } = await fetchPipeline(product, commit)
-      return data
+      return fetchPipeline(product, commit)
     },
     enabled: enabled && !!product && !!commit,
     refetchInterval: (query) => {
@@ -84,8 +83,7 @@ export function usePipelineWithTag({
   return useQuery<PipelineStatusResponse>({
     queryKey: queryKeys.pipeline.production(product, tag),
     queryFn: async () => {
-      const { data } = await fetchPipelineWithTag(product, commit, tag)
-      return data
+      return fetchPipelineWithTag(product, commit, tag)
     },
     enabled: enabled && !!product && !!commit && !!tag,
     refetchInterval: (query) => {

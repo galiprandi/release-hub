@@ -7,7 +7,7 @@ vi.mock('@/api/seki', () => ({ fetchPipeline: vi.fn(), fetchPipelineWithTag: vi.
 describe('sekiAdapter', () => {
   it('should fetch and transform commit data', async () => {
     const mockData = { state: 'SUCCESS', created_at: '2025-01-01', git: { commit: 'abcdef123', commit_message: 'test', commit_author: 'Test', ref: 'v1' }, events: [] }
-    vi.mocked(sekiApi.fetchPipeline).mockResolvedValue({ data: mockData } as unknown as Awaited<ReturnType<typeof sekiApi.fetchPipeline>>)
+    vi.mocked(sekiApi.fetchPipeline).mockResolvedValue(mockData as any)
     const result = await sekiAdapter.fetch('o', 'r', 'commits', 'abcdef1')
     expect(result?.state).toBe('COMPLETED')
     expect(result?.ref).toBe('abcdef1')
@@ -15,7 +15,7 @@ describe('sekiAdapter', () => {
 
   it('should fetch and transform tag data', async () => {
     const mockData = { state: 'FAILED', created_at: '2025-01-01', git: { commit: 'abc', ref: 'v1.0.0', commit_message: 'msg', commit_author: 'auth' }, events: [] }
-    vi.mocked(sekiApi.fetchPipelineWithTag).mockResolvedValue({ data: mockData } as unknown as Awaited<ReturnType<typeof sekiApi.fetchPipelineWithTag>>)
+    vi.mocked(sekiApi.fetchPipelineWithTag).mockResolvedValue(mockData as any)
     const result = await sekiAdapter.fetch('o', 'r', 'tags', 'v1.0.0')
     expect(result?.state).toBe('FAILED')
     expect(result?.ref).toBe('v1.0.0')
@@ -26,7 +26,7 @@ describe('sekiAdapter', () => {
     const mockData = { state: 'RUNNING', created_at: '2025-01-01', git: { commit: 'abc', commit_message: 'm', commit_author: 'a' }, events: [
       { id: 'ev1', label: { es: 'Inicio', en: 'Start', br: '' }, state: 'SUCCESS', subevents: [{ id: 'sub1', label: 'Step 1', state: 'SUCCESS' }] }
     ] }
-    vi.mocked(sekiApi.fetchPipeline).mockResolvedValue({ data: mockData } as unknown as Awaited<ReturnType<typeof sekiApi.fetchPipeline>>)
+    vi.mocked(sekiApi.fetchPipeline).mockResolvedValue(mockData as any)
     const result = await sekiAdapter.fetch('o', 'r', 'commits', 'abcdef1')
     expect(result?.events).toHaveLength(2)
     expect(result?.events[0].name).toBe('Inicio')

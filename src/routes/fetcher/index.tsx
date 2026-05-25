@@ -4,6 +4,7 @@ import { Send } from 'lucide-react';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
 import { StatusCard } from '@/components/ui/StatusCard';
+import { EmptyState } from '@/components/EmptyState';
 import { ImportQueryModal } from '@/components/ImportQueryModal';
 import { Table } from '@/components/ui/Table';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
@@ -11,6 +12,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 import { PageLayout } from '@/layouts/PageLayout';
+import DayJS from '@/lib/dayjs';
 
 export const Route = createFileRoute('/fetcher/')({
 	component: FetcherPage,
@@ -20,22 +22,6 @@ export const Route = createFileRoute('/fetcher/')({
 		};
 	},
 });
-
-// Function to format relative time
-function formatTimeAgo(dateString: string): string {
-	const date = new Date(dateString);
-	const now = new Date();
-	const diffMs = now.getTime() - date.getTime();
-	const diffMins = Math.floor(diffMs / 60000);
-	const diffHours = Math.floor(diffMins / 60);
-	const diffDays = Math.floor(diffHours / 24);
-
-	if (diffMins < 1) return 'ahora mismo';
-	if (diffMins < 60) return `hace ${diffMins} min`;
-	if (diffHours < 24) return `hace ${diffHours} h`;
-	if (diffDays < 7) return `hace ${diffDays} días`;
-	return date.toLocaleDateString();
-}
 
 
 function FetcherPage() {
@@ -124,7 +110,9 @@ function FetcherPage() {
 	const headerActions = (
 		<form className="flex items-center gap-2" onSubmit={(e) => { e.preventDefault(); handleSendCurl(); }}>
 			<div className="relative">
+				<label htmlFor="curl-import" className="sr-only">Importar cURL</label>
 				<input
+					id="curl-import"
 					type="text"
 					value={curlInput}
 					onChange={(e) => setCurlInput(e.target.value)}
@@ -155,13 +143,11 @@ function FetcherPage() {
 				loadingHistory ? (
 					<StatusCard type="loading" message="Cargando historial..." />
 				) : history.length === 0 ? (
-					<div className="text-center py-12 bg-muted/50 rounded-lg border-2 border-dashed">
-						<Send className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-						<p className="text-muted-foreground">No hay queries en el historial</p>
-						<p className="text-sm text-muted-foreground mt-1">
-							Importa un comando cURL para comenzar
-						</p>
-					</div>
+					<EmptyState
+						icon={<Send className="w-12 h-12 text-muted-foreground mx-auto" />}
+						label="Historial vacío"
+						caption="Importa un comando cURL para comenzar a explorar tus APIs."
+					/>
 				) : (
 					<QueriesTable
 						queries={history}
@@ -241,7 +227,7 @@ function QueriesTable({
 		{
 			id: "actions",
 			accessorKey: "actions",
-			header: "Acciones",
+			header: "",
 			enableSorting: false,
 			cell: ({ row }) => (
 				<ActionsCell
@@ -256,19 +242,21 @@ function QueriesTable({
 	], [onOpenModal, onCopyResponse, onDelete, isDeleting])
 
 	return (
-		<Table
-			columns={columns}
-			data={queries}
-			pageSize={20}
-			filters={[
-				{ label: 'GET', columnId: 'method', value: 'GET' },
-				{ label: 'POST', columnId: 'method', value: 'POST' },
-				{ label: 'PATCH', columnId: 'method', value: 'PATCH' },
-				{ label: 'PUT', columnId: 'method', value: 'PUT' },
-			]}
-			activeFilter={activeFilter}
-			onFilterChange={onFilterChange}
-		/>
+		<div className="rounded-xl border border-border/60 shadow-sm overflow-hidden">
+			<Table
+				columns={columns}
+				data={queries}
+				pageSize={20}
+				filters={[
+					{ label: 'GET', columnId: 'method', value: 'GET' },
+					{ label: 'POST', columnId: 'method', value: 'POST' },
+					{ label: 'PATCH', columnId: 'method', value: 'PATCH' },
+					{ label: 'PUT', columnId: 'method', value: 'PUT' },
+				]}
+				activeFilter={activeFilter}
+				onFilterChange={onFilterChange}
+			/>
+		</div>
 	)
 }
 
@@ -313,8 +301,8 @@ function DomainCell({ query }: { query: QueryRecord }) {
 
 function SentCell({ query }: { query: QueryRecord }) {
 	return (
-		<span className="text-sm text-muted-foreground" title={query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}>
-			{query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}
+		<span className="text-sm text-muted-foreground" title={query.updatedAt ? DayJS(query.updatedAt).format('LLL') : 'Nunca'}>
+			{query.updatedAt ? DayJS(query.updatedAt).fromNow() : 'Nunca'}
 		</span>
 	)
 }

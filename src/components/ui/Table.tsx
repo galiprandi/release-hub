@@ -167,7 +167,7 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 					<table className="w-full table-auto">
 					<thead>
 						{table.getHeaderGroups().map((headerGroup) => (
-							<tr key={headerGroup.id}>
+							<tr key={headerGroup.id} className="bg-muted/40">
 								{headerGroup.headers.map((header, index) => {
 									const canSort = header.column.getCanSort()
 									const sortDirection = header.column.getIsSorted()
@@ -179,7 +179,7 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 											key={header.id}
 											scope="col"
 											className={clsx(
-												"text-left px-4 py-3 font-bold tracking-wider text-foreground border-b border-border/40",
+												"text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b border-border/60",
 												isFirstColumn && "w-full",
 												!isFirstColumn && !columnWidth && "whitespace-nowrap",
 												columnWidth && "overflow-hidden text-ellipsis whitespace-nowrap",

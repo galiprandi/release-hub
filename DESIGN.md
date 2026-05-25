@@ -90,6 +90,7 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 - **Campos de Entrada**: Inputs y selects deben usar `border-input`, `bg-background` y `focus-visible:ring-primary` con `focus-visible:ring-offset-1` para una consistencia táctil y visual.
 - **Badge de Método**: Mapeo semántico de métodos HTTP a opacidades (`bg-success/20 text-success` para GET, `bg-info/20 text-info` para POST, etc.) con fuente `text-[10px] font-bold uppercase tracking-wider`.
 - **Tabs Industriales**: Los selectores de pestañas en modales deben usar el estilo `bg-muted/40` con botones de estado `bg-background shadow-sm` para el elemento activo, similar a `FilterBar`.
+- **Historial y Tablas**: El historial de queries se presenta en un contenedor `rounded-xl border border-border/60 shadow-sm` para coherencia industrial. Los tiempos de respuesta también utilizan badges semánticos (`<200ms` success, `>1000ms` destructive).
 
 ## Layout V2 - Patrones y Guía de Uso
 

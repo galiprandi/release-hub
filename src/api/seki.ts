@@ -95,25 +95,27 @@ apiSeki.interceptors.request.use((config) => {
 /**
  * Fetch pipeline status for specific commit
  */
-export const fetchPipeline = (product: string, commit: string) => {
+export const fetchPipeline = async (product: string, commit: string) => {
   const [org, name] = product.split('/')
-  return apiSeki.get<PipelineStatusResponse>(
+  const response = await apiSeki.get<PipelineStatusResponse>(
     `/products/${org}/${name}/pipelines/${commit}`
   )
+  return response.data
 }
 
 /**
  * Fetch pipeline status for specific commit with optional tag
  * Used for production pipelines that have both commit and tag
  */
-export const fetchPipelineWithTag = (
+export const fetchPipelineWithTag = async (
   product: string, // organization/product
   commit: string,
   tag: string
 ) => {
   const [org, name] = product.split('/')
-  return apiSeki.get<PipelineStatusResponse>(
+  const response = await apiSeki.get<PipelineStatusResponse>(
     `/products/${org}/${name}/pipelines/${commit}/${tag}`
   )
+  return response.data
 }
 

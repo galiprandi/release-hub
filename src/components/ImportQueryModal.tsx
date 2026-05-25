@@ -1,5 +1,5 @@
-import { useState, useEffect,  type Dispatch, type SetStateAction } from 'react';
-import { Send, AlertTriangle, SendHorizontal, Plus, X } from 'lucide-react';
+import { useState, useRef, type Dispatch, type SetStateAction } from 'react';
+import { Send, AlertTriangle, Plus } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
 import { JsonEditor } from '@/components/JsonEditor';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
@@ -54,19 +54,19 @@ export function ImportQueryModal({ query, setQuery, onClose }: ImportQueryModalP
 	const [initialCurl, setInitialCurl] = useState(curl);
 	const parsed = curlInput ? parseCurlCommand(curlInput) : null;
 
-	// Sync curlInput when query changes externally (modal opened from outside)
-	useEffect(() => {
-		if (query?.curl && curlInput !== query.curl) {
-			setCurlInput(query.curl);
-		}
-	}, [query?.curl, curlInput]);
+	// Sync curlInput when query changes externally without useEffect
+	const prevQueryCurl = useRef(query?.curl);
+	if (query?.curl && prevQueryCurl.current !== query.curl && curlInput !== query.curl) {
+		prevQueryCurl.current = query.curl;
+		setCurlInput(query.curl);
+	}
 
-	// Sync initialCurl when curl changes externally (modal opened from outside)
-	useEffect(() => {
-		if (curl && initialCurl === null) {
-			setInitialCurl(curl);
-		}
-	}, [curl, initialCurl]);
+	// Sync initialCurl when curl changes externally without useEffect
+	const prevCurl = useRef(curl);
+	if (curl && prevCurl.current !== curl && initialCurl === null) {
+		prevCurl.current = curl;
+		setInitialCurl(curl);
+	}
 
 	// Derive response from initialQuery or execution result
 	const [executedResponse, setExecutedResponse] = useState<CurlResponse | null>(null);

@@ -1,9 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useState, useMemo } from 'react';
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
+import { useState, useMemo, useCallback } from 'react';
 import { Send } from 'lucide-react';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
-import { FilterBar } from '@/components/shared/FilterBar';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { ImportQueryModal } from '@/components/ImportQueryModal';
 import { Table } from '@/components/ui/Table';
@@ -15,6 +14,11 @@ import { PageLayout } from '@/layouts/PageLayout';
 
 export const Route = createFileRoute('/fetcher')({
 	component: FetcherPage,
+	validateSearch: (search: Record<string, unknown>) => {
+		return {
+			method: typeof search.method === 'string' ? search.method : undefined,
+		};
+	},
 });
 
 // Function to format relative time
@@ -37,9 +41,23 @@ function formatTimeAgo(dateString: string): string {
 function FetcherPage() {
 	const { data: access, isLoading: checkingAccess } = useCurlAccess();
 	const { history, isLoading: loadingHistory, deleteQueryRecord, isDeleting } = useFetcherHistory();
+	const navigate = useNavigate({ from: '/fetcher' });
+	const search = useSearch({ from: '/fetcher' });
 	const [activeQuery, setActiveQuery] = useState<QueryRecord | undefined>();
 	const [editingQuery, setEditingQuery] = useState<QueryRecord | undefined>();
 	const [curlInput, setCurlInput] = useState('');
+
+	// Derive active filter from query params - memoized to prevent re-renders
+	const activeFilter = useMemo(() => {
+		return search.method ? { id: 'method', value: search.method } : null;
+	}, [search.method]);
+
+	const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
+		navigate({
+			to: '.',
+			search: filter ? { method: filter.value } : {},
+		});
+	}, [navigate]);
 
 	// Validate curl in real-time
 	const isCurlValid = useMemo(() => {
@@ -52,56 +70,6 @@ function FetcherPage() {
 		}
 	}, [curlInput]);
 
-	// State for filters
-	const [methodFilter, setMethodFilter] = useState<'all' | 'GET' | 'POST' | 'PATCH' | 'PUT'>('all');
-	const [searchQuery] = useState('');
-	const [page, setPage] = useState(0);
-	const pageSize = 20;
-
-	// Calculate filter counts
-	const filterCounts = {
-		all: history.length,
-		GET: history.filter((q) => {
-			const parsed = parseCurlForDisplay(q.curl);
-			return parsed?.method === 'GET';
-		}).length,
-		POST: history.filter((q) => {
-			const parsed = parseCurlForDisplay(q.curl);
-			return parsed?.method === 'POST';
-		}).length,
-		PATCH: history.filter((q) => {
-			const parsed = parseCurlForDisplay(q.curl);
-			return parsed?.method === 'PATCH';
-		}).length,
-		PUT: history.filter((q) => {
-			const parsed = parseCurlForDisplay(q.curl);
-			return parsed?.method === 'PUT';
-		}).length,
-	};
-
-	// Filter history based on method and search
-	const filteredHistory = history.filter((query) => {
-		const parsed = parseCurlForDisplay(query.curl);
-		if (!parsed) return false;
-
-		// Method filter
-		if (methodFilter !== 'all' && parsed.method !== methodFilter) return false;
-
-		// Search filter (URL, domain, or path)
-		if (searchQuery) {
-			const queryLower = searchQuery.toLowerCase();
-			const urlMatch = parsed.url.toLowerCase().includes(queryLower);
-			const domainMatch = parsed.domain.toLowerCase().includes(queryLower);
-			const pathMatch = parsed.path.toLowerCase().includes(queryLower);
-			if (!urlMatch && !domainMatch && !pathMatch) return false;
-		}
-
-		return true;
-	});
-
-	// Pagination
-	const paginatedHistory = filteredHistory.slice(page * pageSize, (page + 1) * pageSize);
-	const totalPages = Math.ceil(filteredHistory.length / pageSize);
 
 	const handleDelete = (id: string) => {
 		if (confirm('¿Estás seguro de que quieres eliminar esta query del historial?')) {
@@ -174,76 +142,30 @@ function FetcherPage() {
 			actions={[headerActions]}
 		>
 			<div className="space-y-6">
-			{/* Filters */}
-			<FilterBar
-				filters={[
-					{ value: 'all', label: `Todos (${filterCounts.all})` },
-					{ value: 'GET', label: `GET (${filterCounts.GET})` },
-					{ value: 'POST', label: `POST (${filterCounts.POST})` },
-					{ value: 'PATCH', label: `PATCH (${filterCounts.PATCH})` },
-					{ value: 'PUT', label: `PUT (${filterCounts.PUT})` },
-				]}
-				activeFilter={methodFilter}
-				onFilterChange={(value) => {
-					setMethodFilter(value as typeof methodFilter);
-					setPage(0); // Reset to first page on filter change
-				}}
-			/>
-
 			{/* Content */}
 			{checkingAccess ? (
 				<StatusCard type="loading" message="Verificando acceso a curl..." />
 			) : access?.hasAccess ? (
 				loadingHistory ? (
 					<StatusCard type="loading" message="Cargando historial..." />
-				) : paginatedHistory.length === 0 ? (
+				) : history.length === 0 ? (
 					<div className="text-center py-12 bg-muted/50 rounded-lg border-2 border-dashed">
 						<Send className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
 						<p className="text-muted-foreground">No hay queries en el historial</p>
 						<p className="text-sm text-muted-foreground mt-1">
-							{searchQuery || methodFilter !== 'all' ? 'Intenta con otro filtro' : 'Importa un comando cURL para comenzar'}
+							Importa un comando cURL para comenzar
 						</p>
 					</div>
 				) : (
-					<>
-						<QueriesTable
-							queries={paginatedHistory}
-							onOpenModal={handleOpenModal}
-							onCopyResponse={handleCopyResponse}
-							onDelete={handleDelete}
-							isDeleting={isDeleting}
-						/>
-
-						{/* Pagination */}
-						{totalPages > 1 && (
-							<div className="flex items-center justify-between px-6 py-4 border-t border-border/60 bg-muted/40 rounded-b-xl">
-								<div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-									Mostrando <span className="text-foreground">{page * pageSize + 1} - {Math.min((page + 1) * pageSize, filteredHistory.length)}</span> de <span className="text-foreground">{filteredHistory.length}</span>
-								</div>
-								<div className="flex items-center gap-3">
-									<button
-										type="button"
-										onClick={() => setPage(p => Math.max(0, p - 1))}
-										disabled={page === 0}
-										className="px-4 py-1.5 text-xs font-bold uppercase tracking-tight border border-border/60 rounded-md bg-background hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-									>
-										Anterior
-									</button>
-									<span className="text-xs font-bold uppercase tracking-tighter text-muted-foreground">
-										Página <span className="text-foreground">{page + 1}</span> de <span className="text-foreground">{totalPages}</span>
-									</span>
-									<button
-										type="button"
-										onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-										disabled={page === totalPages - 1}
-										className="px-4 py-1.5 text-xs font-bold uppercase tracking-tight border border-border/60 rounded-md bg-background hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-									>
-										Siguiente
-									</button>
-								</div>
-							</div>
-						)}
-					</>
+					<QueriesTable
+						queries={history}
+						onOpenModal={handleOpenModal}
+						onCopyResponse={handleCopyResponse}
+						onDelete={handleDelete}
+						isDeleting={isDeleting}
+						activeFilter={activeFilter}
+						onFilterChange={handleFilterChange}
+					/>
 				)
 			) : (
 				<StatusCard
@@ -268,18 +190,27 @@ function QueriesTable({
 	onCopyResponse,
 	onDelete,
 	isDeleting,
+	activeFilter,
+	onFilterChange,
 }: {
 	queries: QueryRecord[]
 	onOpenModal: (query: QueryRecord) => void
 	onCopyResponse: (query: QueryRecord) => void
 	onDelete: (id: string) => void
 	isDeleting: boolean
+	activeFilter?: { id: string; value: string } | null
+	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
-	const columns: ColumnDef<QueryRecord>[] = [
+	const columns: ColumnDef<QueryRecord>[] = useMemo(() => [
 		{
-			accessorKey: "method",
+			id: "method",
+			accessorFn: (row) => {
+				const parsed = parseCurlForDisplay(row.curl);
+				return parsed?.method || '';
+			},
 			header: "Método",
 			cell: ({ row }) => <MethodCell query={row.original} />,
+			filterFn: 'equalsString',
 		},
 		{
 			accessorKey: "path",
@@ -316,9 +247,23 @@ function QueriesTable({
 				/>
 			),
 		},
-	]
+	], [onOpenModal, onCopyResponse, onDelete, isDeleting])
 
-	return <Table columns={columns} data={queries} />
+	return (
+		<Table
+			columns={columns}
+			data={queries}
+			pageSize={20}
+			filters={[
+				{ label: 'GET', columnId: 'method', value: 'GET' },
+				{ label: 'POST', columnId: 'method', value: 'POST' },
+				{ label: 'PATCH', columnId: 'method', value: 'PATCH' },
+				{ label: 'PUT', columnId: 'method', value: 'PUT' },
+			]}
+			activeFilter={activeFilter}
+			onFilterChange={onFilterChange}
+		/>
+	)
 }
 
 function MethodCell({ query }: { query: QueryRecord }) {

@@ -56,6 +56,100 @@ Ubicar archivos `.test.ts[x]` junto al archivo que prueban. Evitar carpetas `__t
 - **Docker badges**: `bg-success/20 text-success` (Running), `bg-muted text-muted-foreground` (Stopped).
 - **Fetcher & HTTP Method Mapping**: Siempre usar opacidades semánticas (`/20`) para badges de métodos HTTP y tiempos de respuesta. GET -> success, POST -> info, PUT/PATCH -> warning, DELETE -> destructive.
 
+### 10. Componente Table con Filtros Integrados
+
+El componente `Table` (`src/components/ui/Table.tsx`) incluye filtrado opcional integrado usando TanStack Table's column filtering API.
+
+#### Uso Básico (Modo No Controlado)
+
+```tsx
+<Table
+  columns={columns}
+  data={data}
+  filters={[
+    { label: 'GET', columnId: 'method', value: 'GET' },
+    { label: 'POST', columnId: 'method', value: 'POST' },
+  ]}
+/>
+```
+
+#### Uso con TanStack Router (Modo Controlado)
+
+Para persistir el estado del filtro en query params:
+
+```tsx
+// En la definición de la ruta
+export const Route = createFileRoute('/fetcher')({
+  component: FetcherPage,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      method: typeof search.method === 'string' ? search.method : undefined,
+    };
+  },
+});
+
+// En el componente
+function FetcherPage() {
+  const navigate = useNavigate({ from: '/fetcher' });
+  const search = useSearch({ from: '/fetcher' });
+
+  const activeFilter = useMemo(() => {
+    return search.method ? { id: 'method', value: search.method } : null;
+  }, [search.method]);
+
+  const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
+    navigate({
+      to: '.',
+      search: filter ? { method: filter.value } : {},
+    });
+  }, [navigate]);
+
+  return (
+    <Table
+      columns={columns}
+      data={data}
+      filters={[...]}
+      activeFilter={activeFilter}
+      onFilterChange={handleFilterChange}
+    />
+  );
+}
+```
+
+#### Configuración de Columnas para Filtrado
+
+Las columnas deben usar `accessorFn` o `accessorKey` correctamente:
+
+```tsx
+const columns: ColumnDef<QueryRecord>[] = [
+  {
+    id: "method",
+    accessorFn: (row) => {
+      const parsed = parseCurlForDisplay(row.curl);
+      return parsed?.method || '';
+    },
+    header: "Método",
+    cell: ({ row }) => <MethodCell query={row.original} />,
+    filterFn: 'equalsString', // Para coincidencia exacta
+  },
+  // ...
+]
+```
+
+#### Consideraciones de Rendimiento
+
+- **Memoizar columnas**: Usar `useMemo` para el array de columnas para evitar recreación
+- **Memoizar callbacks**: Usar `useCallback` para `onFilterChange` y `handleFilterChange`
+- **Memoizar activeFilter**: Derivar el filtro activo de query params con `useMemo`
+- El componente Table internamente memoiza `effectiveColumnFilters` y `tableOptions` para prevenir re-renders
+
+#### Estilos de Filtros
+
+- **Activo**: `bg-info/20 text-info shadow-sm` (azul semántico)
+- **Inactivo**: `bg-muted text-foreground hover:bg-muted/80`
+- **Botón "Todos"**: Mismo comportamiento que filtros individuales
+- **Tamaño**: `px-2.5 py-1 text-xs` (compacto)
+
 ## Mantenimiento de Skills
 
 Mantener `.windsurf/skills/` con flujos comunes, referencias de elementos y patrones nuevos para evitar snapshots repetitivos.

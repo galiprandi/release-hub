@@ -1,8 +1,7 @@
 import { useState, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery } from "@tanstack/react-query"
-import { Terminal, Star } from "lucide-react"
-import * as Tooltip from "@radix-ui/react-tooltip"
+import { Star } from "lucide-react"
 import { getDeployments, getResourceLogs, type DeploymentInfo } from "@/api/kubectl"
 import { getContexts, getCurrentContext } from "@/api/kubectl"
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys"
@@ -11,6 +10,7 @@ import { StatusCard } from "@/components/ui/StatusCard"
 import { Table } from "@/components/ui/Table"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useUserCollections } from "@/hooks/useUserCollections"
+import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
 
 interface DeploymentListProps {
 	context?: string
@@ -205,24 +205,24 @@ function DeploymentsTable({
 		{
 			id: "namespace",
 			accessorKey: "namespace",
-			header: "Namespace",
+			header: "Espacio de nombres",
 			cell: ({ row }) => row.original.namespace,
 			filterFn: 'equalsString',
 		},
 		{
-			accessorKey: "ready",
-			header: "Ready",
-			cell: ({ row }) => <ReadyCell deployment={row.original} isLoading={isLoading} />,
+			accessorKey: "status",
+			header: "Estado",
+			cell: ({ row }) => <StatusCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
-			accessorKey: "upToDate",
-			header: "Up-to-date",
-			cell: ({ row }) => row.original.upToDate,
+			accessorKey: "age",
+			header: "Antigüedad",
+			cell: ({ row }) => <AgeCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
-			accessorKey: "available",
-			header: "Available",
-			cell: ({ row }) => row.original.available,
+			accessorKey: "images",
+			header: "Imágenes",
+			cell: ({ row }) => <ImagesCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			id: "actions",
@@ -265,24 +265,51 @@ function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentI
 	return <span className="font-medium text-foreground text-sm">{deployment.name}</span>
 }
 
-function ReadyCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
+function StatusCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
 	if (isLoading) {
 		return <div className="h-6 bg-muted rounded w-16" />
 	}
 
-	const isReady = deployment.ready === deployment.upToDate && deployment.ready === deployment.available
-
-	if (isReady) {
-		return (
-			<span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-success/20 text-success">
-				Ready
-			</span>
-		)
+	const variants: Record<string, string> = {
+		healthy: 'bg-success/20 text-success',
+		progressing: 'bg-info/20 text-info',
+		degraded: 'bg-destructive/20 text-destructive',
+		unknown: 'bg-muted text-muted-foreground',
 	}
+
 	return (
-		<span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-warning/20 text-warning">
-			Not Ready
+		<span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase ${variants[deployment.status] || variants.unknown}`}>
+			{deployment.status}
 		</span>
+	)
+}
+
+function AgeCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
+	if (isLoading) {
+		return <div className="h-4 bg-muted rounded w-10" />
+	}
+	return <span className="text-sm text-muted-foreground">{deployment.age}</span>
+}
+
+function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
+	if (isLoading) {
+		return <div className="h-4 bg-muted rounded w-24" />
+	}
+
+	const shortImages = deployment.images.map(img => {
+		const parts = img.split('/')
+		const lastPart = parts[parts.length - 1] || img
+		return lastPart
+	})
+
+	return (
+		<div className="flex flex-col gap-0.5">
+			{shortImages.map((img, i) => (
+				<span key={i} className="text-xs text-muted-foreground font-mono truncate max-w-[180px]" title={deployment.images[i]}>
+					{img}
+				</span>
+			))}
+		</div>
 	)
 }
 
@@ -299,36 +326,17 @@ function ActionsCell({
 }) {
 	return (
 		<div className="flex items-center justify-end gap-1.5">
-			<Tooltip.Provider>
-				<Tooltip.Root>
-					<Tooltip.Trigger asChild>
-						<button
-							type="button"
-							onClick={() => onRemoveFavorite(deployment)}
-							className="p-1.5 text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-							aria-label="Eliminar de favoritos"
-						>
-							<Star className="w-4 h-4 fill-current" />
-						</button>
-					</Tooltip.Trigger>
-					<Tooltip.Portal>
-						<Tooltip.Content
-							className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50"
-							sideOffset={5}
-						>
-							Eliminar de favoritos
-						</Tooltip.Content>
-					</Tooltip.Portal>
-				</Tooltip.Root>
-			</Tooltip.Provider>
+			<ActionButton
+				action={ACTION_DEFINITIONS.viewLogs}
+				onClick={() => onViewLogs(deployment, context)}
+			/>
 			<button
 				type="button"
-				onClick={() => onViewLogs(deployment, context)}
-				className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 shadow-sm"
-				aria-label="Ver logs"
+				onClick={() => onRemoveFavorite(deployment)}
+				className="p-1.5 text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+				aria-label="Eliminar de favoritos"
 			>
-				<Terminal className="w-4 h-4" />
-				<span>logs</span>
+				<Star className="w-4 h-4 fill-current" />
 			</button>
 		</div>
 	)

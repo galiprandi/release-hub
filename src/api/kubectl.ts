@@ -21,6 +21,7 @@ export interface DeploymentInfo {
   available: string;
   age: string;
   images: string[];
+  status: 'healthy' | 'progressing' | 'degraded' | 'unknown';
 }
 
 export interface PodInfo {
@@ -99,47 +100,77 @@ export async function getContexts(): Promise<string[]> {
 }
 
 
-function parseDeployments(output: string, defaultNamespace?: string): DeploymentInfo[] {
-  const lines = output.trim().split('\n');
-  const deployments: DeploymentInfo[] = [];
-  
-  // Detect if it has NAMESPACE column (all-namespaces) or only NAME
-  const hasNamespace = lines[0]?.includes('NAMESPACE');
-  
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('NAME')) continue;
-    const parts = trimmed.split(/\s+/);
-    
-    if (hasNamespace) {
-      // Format: NAMESPACE NAME READY UP-TO-DATE AVAILABLE AGE
-      if (parts.length >= 6) {
-        deployments.push({
-          namespace: parts[0],
-          name: parts[1],
-          ready: parts[2],
-          upToDate: parts[3],
-          available: parts[4],
-          age: parts[5] || '',
-          images: [],
-        });
-      }
-    } else {
-      // Format: NAME READY UP-TO-DATE AVAILABLE AGE
-      if (parts.length >= 5) {
-        deployments.push({
-          namespace: defaultNamespace || '',
-          name: parts[0],
-          ready: parts[1],
-          upToDate: parts[2],
-          available: parts[3],
-          age: parts[4] || '',
-          images: [],
-        });
-      }
-    }
+function formatAge(timestamp: string): string {
+  const diff = Date.now() - new Date(timestamp).getTime();
+  const seconds = Math.floor(diff / 1000);
+  if (seconds < 60) return `${seconds}s`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h`;
+  const days = Math.floor(hours / 24);
+  if (days < 365) return `${days}d`;
+  const years = Math.floor(days / 365);
+  return `${years}y`;
+}
+
+function deriveStatus(conditions?: { type: string; status: string }[]): DeploymentInfo['status'] {
+  const available = conditions?.find(c => c.type === 'Available');
+  const progressing = conditions?.find(c => c.type === 'Progressing');
+
+  if (available?.status === 'True') return 'healthy';
+  if (progressing?.status === 'True') return 'progressing';
+  if (available?.status === 'False') return 'degraded';
+  return 'unknown';
+}
+
+interface K8sDeploymentItem {
+  metadata: {
+    name: string;
+    namespace: string;
+    creationTimestamp: string;
+  };
+  spec: {
+    replicas?: number;
+    template: {
+      spec: {
+        containers: { image: string }[];
+      };
+    };
+  };
+  status: {
+    readyReplicas?: number;
+    updatedReplicas?: number;
+    availableReplicas?: number;
+    conditions?: { type: string; status: string }[];
+  };
+}
+
+function parseDeploymentsJson(output: string, defaultNamespace?: string): DeploymentInfo[] {
+  try {
+    const json = JSON.parse(output);
+    const items: K8sDeploymentItem[] = json.items || [];
+
+    return items.map((item) => {
+      const ready = item.status.readyReplicas ?? 0;
+      const desired = item.spec.replicas ?? 0;
+      const updated = item.status.updatedReplicas ?? 0;
+      const available = item.status.availableReplicas ?? 0;
+
+      return {
+        namespace: item.metadata.namespace || defaultNamespace || '',
+        name: item.metadata.name,
+        ready: `${ready}/${desired}`,
+        upToDate: String(updated),
+        available: String(available),
+        age: formatAge(item.metadata.creationTimestamp),
+        images: item.spec.template.spec.containers.map(c => c.image),
+        status: deriveStatus(item.status.conditions),
+      };
+    });
+  } catch {
+    return [];
   }
-  return deployments;
 }
 
 function parsePods(output: string): PodInfo[] {
@@ -189,23 +220,20 @@ export async function getDeployments(namespace?: string, context?: string): Prom
   const nsFlag = namespace ? `-n ${sanitizeNamespace(namespace)}` : '--all-namespaces';
   const ctxFlag = context ? `--context=${sanitizeContext(context)}` : '';
   try {
-    const result = await runCommand(`kubectl get deployments ${nsFlag} ${ctxFlag}`.trim());
-    // kubectl outputs to stderr when no resources found, so check both
-    const output = result.stdout || result.stderr;
-    return parseDeployments(output, namespace);
+    const result = await runCommand(`kubectl get deployments ${nsFlag} ${ctxFlag} -o json`.trim());
+    return parseDeploymentsJson(result.stdout, namespace);
   } catch {
     // If using --all-namespaces and getting Forbidden errors, try namespace by namespace
     if (!namespace) {
       try {
         const namespacesResult = await runCommand(`kubectl get namespaces -o jsonpath='{.items[*].metadata.name}' ${ctxFlag}`.trim());
         const namespaces = namespacesResult.stdout.trim().split(' ').filter(Boolean);
-        
+
         const allDeployments: DeploymentInfo[] = [];
         for (const ns of namespaces) {
           try {
-            const result = await runCommand(`kubectl get deployments -n ${sanitizeNamespace(ns)} ${ctxFlag}`.trim());
-            const output = result.stdout || result.stderr;
-            allDeployments.push(...parseDeployments(output, ns));
+            const result = await runCommand(`kubectl get deployments -n ${sanitizeNamespace(ns)} ${ctxFlag} -o json`.trim());
+            allDeployments.push(...parseDeploymentsJson(result.stdout, ns));
           } catch {
             // Skip namespaces where we don't have permission
             continue;
@@ -218,9 +246,8 @@ export async function getDeployments(namespace?: string, context?: string): Prom
         const allDeployments: DeploymentInfo[] = [];
         for (const ns of knownNamespaces) {
           try {
-            const result = await runCommand(`kubectl get deployments -n ${sanitizeNamespace(ns)} ${ctxFlag}`.trim());
-            const output = result.stdout || result.stderr;
-            allDeployments.push(...parseDeployments(output, ns));
+            const result = await runCommand(`kubectl get deployments -n ${sanitizeNamespace(ns)} ${ctxFlag} -o json`.trim());
+            allDeployments.push(...parseDeploymentsJson(result.stdout, ns));
           } catch {
             // Skip namespaces where we don't have permission
             continue;

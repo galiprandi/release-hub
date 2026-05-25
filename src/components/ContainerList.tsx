@@ -194,9 +194,9 @@ function ContainersTable({
 	const filters = useMemo(() => {
 		if (!filterCounts) return []
 		return [
-			{ label: 'Running', columnId: 'status' as const, value: 'running', count: filterCounts.running },
-			{ label: 'Stopped', columnId: 'status' as const, value: 'stopped', count: filterCounts.stopped },
-			{ label: 'Exited', columnId: 'status' as const, value: 'exited', count: filterCounts.exited },
+			{ label: 'Ejecutando', columnId: 'status' as const, value: 'running', count: filterCounts.running },
+			{ label: 'Detenido', columnId: 'status' as const, value: 'stopped', count: filterCounts.stopped },
+			{ label: 'Finalizado', columnId: 'status' as const, value: 'exited', count: filterCounts.exited },
 		]
 	}, [filterCounts])
 
@@ -226,7 +226,7 @@ function StatusCell({ container }: { container: ContainerInfo }) {
 					: 'bg-muted text-muted-foreground'
 			}`}
 		>
-			{running ? 'Running' : 'Stopped'}
+			{running ? 'Ejecutando' : 'Detenido'}
 		</span>
 	)
 }

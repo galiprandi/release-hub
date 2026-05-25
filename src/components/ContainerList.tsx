@@ -15,11 +15,13 @@ export interface ContainerListRef {
 }
 
 interface ContainerListProps {
-	statusFilter?: 'all' | 'running' | 'stopped' | 'exited'
 	searchQuery?: string
+	filterCounts?: { all: number; running: number; stopped: number; exited: number }
+	activeFilter?: { id: string; value: string } | null
+	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }
 
-export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({ statusFilter = 'all', searchQuery = '' }, ref) => {
+export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({ searchQuery = '', filterCounts, activeFilter, onFilterChange }, ref) => {
 	const queryClient = useQueryClient()
 	const [selectedContainer, setSelectedContainer] = useState<ContainerInfo | null>(null)
 	const [isLogsModalOpen, setIsLogsModalOpen] = useState(false)
@@ -49,38 +51,11 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 		if (container) setSelectedContainer(container)
 	}
 
-	// Filtrar y ordenar contenedores
-	const filteredContainers = useMemo(() => {
+	// Ordenar contenedores por nombre
+	const sortedContainers = useMemo(() => {
 		if (!containers) return []
-
-		return containers
-			.filter((container) => {
-				// Filtro por status
-				if (statusFilter !== 'all') {
-					const normalizedStatus = container.status.toLowerCase()
-					if (statusFilter === 'running' && !normalizedStatus.startsWith('up')) {
-						return false
-					}
-					if (statusFilter === 'stopped' && normalizedStatus.startsWith('up')) {
-						return false
-					}
-					if (statusFilter === 'exited' && !normalizedStatus.startsWith('exited')) {
-						return false
-					}
-				}
-				// Filtro por búsqueda
-				if (searchQuery) {
-					const query = searchQuery.toLowerCase()
-					return (
-						container.id.toLowerCase().includes(query) ||
-						container.name.toLowerCase().includes(query) ||
-						container.status.toLowerCase().includes(query)
-					)
-				}
-				return true
-			})
-			.sort((a, b) => a.name.localeCompare(b.name))
-	}, [containers, statusFilter, searchQuery])
+		return containers.sort((a, b) => a.name.localeCompare(b.name))
+	}, [containers])
 
 	// Expose refetch to parent
 	useImperativeHandle(ref, () => ({
@@ -112,7 +87,7 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 		return <StatusCard type="loading" message="Cargando contenedores..." />
 	}
 
-	if (!Array.isArray(filteredContainers) || filteredContainers.length === 0) {
+	if (!Array.isArray(sortedContainers) || sortedContainers.length === 0) {
 		return (
 			<StatusCard
 				type="offline"
@@ -124,11 +99,14 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 	return (
 		<>
 			<ContainersTable
-				containers={filteredContainers}
+				containers={sortedContainers}
 				onStart={handleStart}
 				onRestart={handleRestart}
 				onStop={handleStop}
 				onViewLogs={handleViewLogs}
+				filterCounts={filterCounts}
+				activeFilter={activeFilter}
+				onFilterChange={onFilterChange}
 			/>
 
 			{isLogsModalOpen && selectedContainer &&
@@ -155,23 +133,36 @@ function ContainersTable({
 	onRestart,
 	onStop,
 	onViewLogs,
+	filterCounts,
+	activeFilter,
+	onFilterChange,
 }: {
 	containers: ContainerInfo[]
 	onStart: (containerId: string) => void
 	onRestart: (containerId: string) => void
 	onStop: (containerId: string) => void
 	onViewLogs: (container: ContainerInfo) => void
+	filterCounts?: { all: number; running: number; stopped: number; exited: number }
+	activeFilter?: { id: string; value: string } | null
+	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
-	const columns: ColumnDef<ContainerInfo>[] = [
+	const columns: ColumnDef<ContainerInfo>[] = useMemo(() => [
 		{
 			accessorKey: "name",
 			header: "Contenedor",
 			cell: ({ row }) => <ContainerNameCell container={row.original} />,
 		},
 		{
-			accessorKey: "status",
+			id: "status",
+			accessorFn: (row) => {
+				const normalizedStatus = row.status.toLowerCase()
+				if (normalizedStatus.startsWith('up')) return 'running'
+				if (normalizedStatus.includes('exited')) return 'exited'
+				return 'stopped'
+			},
 			header: "Estado",
 			cell: ({ row }) => <StatusCell container={row.original} />,
+			filterFn: 'equalsString',
 		},
 		{
 			accessorKey: "runningFor",
@@ -198,9 +189,26 @@ function ContainersTable({
 				/>
 			),
 		},
-	]
+	], [onStart, onRestart, onStop, onViewLogs])
 
-	return <Table columns={columns} data={containers} />
+	const filters = useMemo(() => {
+		if (!filterCounts) return []
+		return [
+			{ label: 'Running', columnId: 'status' as const, value: 'running', count: filterCounts.running },
+			{ label: 'Stopped', columnId: 'status' as const, value: 'stopped', count: filterCounts.stopped },
+			{ label: 'Exited', columnId: 'status' as const, value: 'exited', count: filterCounts.exited },
+		]
+	}, [filterCounts])
+
+	return (
+		<Table
+			columns={columns}
+			data={containers}
+			filters={filters}
+			activeFilter={activeFilter}
+			onFilterChange={onFilterChange}
+		/>
+	)
 }
 
 function ContainerNameCell({ container }: { container: ContainerInfo }) {

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { Search, Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { DeploymentList } from "@/components/DeploymentList";
@@ -8,14 +8,34 @@ import { applyCachePolicy } from "@/lib/queryKeys";
 import { StatusCard } from "@/components/ui/StatusCard";
 import { PageLayout } from "../layouts/PageLayout";
 import { useUserCollections } from "@/hooks/useUserCollections";
+import { useMemo, useCallback } from "react";
 
 export const Route = createFileRoute("/kubernetes")({
 	component: KubernetesPage,
+	validateSearch: (search: Record<string, unknown>) => {
+		return {
+			namespace: typeof search.namespace === 'string' ? search.namespace : undefined,
+		};
+	},
 });
 
 function KubernetesPage() {
 	const { deploymentFavorites = [] } = useUserCollections();
 	const safeDeploymentFavorites = deploymentFavorites || [];
+	const navigate = useNavigate({ from: '/kubernetes' });
+	const search = useSearch({ from: '/kubernetes' });
+
+	// Derive active filter from query params - memoized to prevent re-renders
+	const activeFilter = useMemo(() => {
+		return search.namespace ? { id: 'namespace', value: search.namespace } : null;
+	}, [search.namespace]);
+
+	const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
+		navigate({
+			to: '.',
+			search: filter ? { namespace: filter.value } : {},
+		});
+	}, [navigate]);
 
 	const { data: isInstalled, isLoading: checkingInstall } = useQuery({
 		queryKey: ["kubectl", "installed"],
@@ -25,7 +45,7 @@ function KubernetesPage() {
 
 	return (
 		<PageLayout
-			header={{ 
+			header={{
 				title: "Kubernetes",
 				searchComponent: <DeploymentSearch />
 			}}
@@ -55,7 +75,11 @@ function KubernetesPage() {
 				{checkingInstall ? (
 					<StatusCard type="loading" message="Verificando kubectl..." />
 				) : isInstalled ? (
-					<DeploymentList favorites={safeDeploymentFavorites} />
+					<DeploymentList
+						favorites={safeDeploymentFavorites}
+						activeFilter={activeFilter}
+						onFilterChange={handleFilterChange}
+					/>
 				) : (
 					<StatusCard
 						type="error"

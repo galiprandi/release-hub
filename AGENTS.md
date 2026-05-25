@@ -116,6 +116,29 @@ function FetcherPage() {
 }
 ```
 
+#### Contadores Opcionales en Filtros
+
+Los filtros pueden incluir contadores dinámicos opcionales:
+
+```tsx
+const filters = useMemo(() => {
+  return [
+    { label: 'Running', columnId: 'status', value: 'running', count: filterCounts.running },
+    { label: 'Stopped', columnId: 'status', value: 'stopped', count: filterCounts.stopped },
+  ];
+}, [filterCounts]);
+
+<Table
+  columns={columns}
+  data={data}
+  filters={filters}
+  activeFilter={activeFilter}
+  onFilterChange={handleFilterChange}
+/>
+```
+
+El botón "Todos" también muestra el total cuando los filtros tienen contadores.
+
 #### Configuración de Columnas para Filtrado
 
 Las columnas deben usar `accessorFn` o `accessorKey` correctamente:
@@ -141,6 +164,7 @@ const columns: ColumnDef<QueryRecord>[] = [
 - **Memoizar columnas**: Usar `useMemo` para el array de columnas para evitar recreación
 - **Memoizar callbacks**: Usar `useCallback` para `onFilterChange` y `handleFilterChange`
 - **Memoizar activeFilter**: Derivar el filtro activo de query params con `useMemo`
+- **Memoizar filters con contadores**: Usar `useMemo` para el array de filtros cuando incluye contadores dinámicos
 - El componente Table internamente memoiza `effectiveColumnFilters` y `tableOptions` para prevenir re-renders
 
 #### Estilos de Filtros

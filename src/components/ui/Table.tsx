@@ -27,6 +27,7 @@ export interface TableFilter<TData> {
 	label: string
 	columnId: keyof TData | string
 	value: string
+	count?: number
 }
 
 export interface TableProps<TData, TValue> {
@@ -108,6 +109,9 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 	const showPagination = pageSize && filteredRowCount > pageSize
 	const pageCount = pageSize ? Math.ceil(filteredRowCount / pageSize) : 1
 
+	// Calculate total count from filters if counts are provided
+	const totalCount = filters?.reduce((sum, filter) => sum + (filter.count || 0), 0) || 0
+
 	return (
 		<div className={twMerge(clsx("w-full", className))}>
 			{/* Filter Bar */}
@@ -127,7 +131,7 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 										: "bg-muted text-foreground hover:bg-muted/80"
 								)}
 							>
-								Todos
+								Todos{totalCount > 0 ? ` (${totalCount})` : ''}
 							</button>
 							{filters.map((filter) => {
 								const isActive = currentActiveFilter?.id === filter.columnId && currentActiveFilter?.value === filter.value
@@ -144,7 +148,7 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 												: "bg-muted text-foreground hover:bg-muted/80"
 										)}
 									>
-										{filter.label}
+										{filter.label}{filter.count !== undefined ? ` (${filter.count})` : ''}
 									</button>
 								)
 							})}

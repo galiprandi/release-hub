@@ -16,9 +16,11 @@ interface DeploymentListProps {
 	context?: string
 	namespace?: string
 	favorites?: string[]
+	activeFilter?: { id: string; value: string } | null
+	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }
 
-export const DeploymentList = ({ context, namespace, favorites }: DeploymentListProps) => {
+export const DeploymentList = ({ context, namespace, favorites, activeFilter, onFilterChange }: DeploymentListProps) => {
 	const [selectedDeployment, setSelectedDeployment] = useState<DeploymentInfo | null>(null)
 	const [isLogsModalOpen, setIsLogsModalOpen] = useState(false)
 	const { toggleDeploymentFavorite } = useUserCollections()
@@ -132,6 +134,8 @@ export const DeploymentList = ({ context, namespace, favorites }: DeploymentList
 							isLoading={isLoading}
 							onViewLogs={handleViewLogs}
 							onRemoveFavorite={(deployment) => toggleDeploymentFavorite(`${ctx}/${deployment.namespace}/${deployment.name}`)}
+							activeFilter={activeFilter}
+							onFilterChange={onFilterChange}
 						/>
 					</div>
 				))}
@@ -161,16 +165,34 @@ function DeploymentsTable({
 	isLoading,
 	onViewLogs,
 	onRemoveFavorite,
+	activeFilter,
+	onFilterChange,
 }: {
 	deployments: DeploymentInfo[]
 	context: string
 	isLoading: boolean
 	onViewLogs: (deployment: DeploymentInfo, context: string) => void
 	onRemoveFavorite: (deployment: DeploymentInfo) => void
+	activeFilter?: { id: string; value: string } | null
+	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
 	const sortedDeployments = [...deployments].sort((a, b) => a.name.localeCompare(b.name))
 
-	const columns: ColumnDef<DeploymentInfo & { context: string }>[] = [
+	// Get unique namespaces for filters
+	const namespaces = useMemo(() => {
+		const uniqueNamespaces = Array.from(new Set(deployments.map(d => d.namespace))).sort()
+		return uniqueNamespaces
+	}, [deployments])
+
+	const filters = useMemo(() => {
+		return namespaces.map(ns => ({
+			label: ns,
+			columnId: 'namespace' as const,
+			value: ns,
+		}))
+	}, [namespaces])
+
+	const columns: ColumnDef<DeploymentInfo & { context: string }>[] = useMemo(() => [
 		{
 			accessorKey: "name",
 			header: () => (
@@ -181,9 +203,11 @@ function DeploymentsTable({
 			cell: ({ row }) => <DeploymentNameCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
+			id: "namespace",
 			accessorKey: "namespace",
 			header: "Namespace",
 			cell: ({ row }) => row.original.namespace,
+			filterFn: 'equalsString',
 		},
 		{
 			accessorKey: "ready",
@@ -214,11 +238,19 @@ function DeploymentsTable({
 				/>
 			),
 		},
-	]
+	], [context, isLoading, onViewLogs, onRemoveFavorite])
 
 	const dataWithContext = sortedDeployments.map(d => ({ ...d, context }))
 
-	return <Table columns={columns} data={dataWithContext} />
+	return (
+		<Table
+			columns={columns}
+			data={dataWithContext}
+			filters={filters}
+			activeFilter={activeFilter}
+			onFilterChange={onFilterChange}
+		/>
+	)
 }
 
 function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentInfo & { context: string }; isLoading: boolean }) {

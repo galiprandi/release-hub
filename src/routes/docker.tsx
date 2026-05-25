@@ -1,10 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useRef, useState, useEffect } from 'react';
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
+import { useRef, useState, useMemo, useCallback } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { useDockerAccess } from '@/hooks/useDockerAccess';
 import { useQuery } from '@tanstack/react-query';
 import { ContainerList, type ContainerListRef } from '@/components/ContainerList';
-import { FilterBar } from '@/components/shared/FilterBar';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { getContainers } from '@/api/docker';
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys';
@@ -12,14 +11,31 @@ import { PageLayout } from '../layouts/PageLayout';
 
 export const Route = createFileRoute('/docker')({
   component: DockerManagerPage,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      status: typeof search.status === 'string' ? search.status : undefined,
+    };
+  },
 });
 
 function DockerManagerPage() {
   const containerListRef = useRef<ContainerListRef>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
   const { data: access, isLoading: checkingAccess } = useDockerAccess();
-  const [statusFilter, setStatusFilter] = useState<'all' | 'running' | 'stopped' | 'exited'>('running');
+  const navigate = useNavigate({ from: '/docker' });
+  const search = useSearch({ from: '/docker' });
   const [searchQuery] = useState('');
+
+  // Derive active filter from query params - memoized to prevent re-renders
+  const activeFilter = useMemo(() => {
+    return search.status ? { id: 'status', value: search.status } : null;
+  }, [search.status]);
+
+  const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
+    navigate({
+      to: '.',
+      search: filter ? { status: filter.value } : {},
+    });
+  }, [navigate]);
 
   // Obtener contenedores para calcular contadores
   const { data: containers } = useQuery({
@@ -28,39 +44,18 @@ function DockerManagerPage() {
     ...applyCachePolicy('docker'),
   });
 
-  // Calcular contadores para los filtros
-  const filterCounts = {
-    all: containers?.length || 0,
-    running: containers?.filter(c => c.status.toLowerCase().startsWith('up')).length || 0,
-    stopped: containers?.filter(c => !c.status.toLowerCase().startsWith('up')).length || 0,
-    exited: containers?.filter(c => c.status.toLowerCase().includes('exited')).length || 0,
-  };
+  // Calcular contadores para los filtros - memoized
+  const filterCounts = useMemo(() => {
+    return {
+      all: containers?.length || 0,
+      running: containers?.filter(c => c.status.toLowerCase().startsWith('up')).length || 0,
+      stopped: containers?.filter(c => !c.status.toLowerCase().startsWith('up')).length || 0,
+      exited: containers?.filter(c => c.status.toLowerCase().includes('exited')).length || 0,
+    };
+  }, [containers]);
 
   const handleRefresh = () => {
     containerListRef.current?.refetch();
-  };
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-        e.preventDefault();
-        searchInputRef.current?.focus();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const filters = [
-    { value: 'all' as const, label: `Todos (${filterCounts.all})` },
-    { value: 'running' as const, label: `Running (${filterCounts.running})` },
-    { value: 'stopped' as const, label: `Stopped (${filterCounts.stopped})` },
-    { value: 'exited' as const, label: `Exited (${filterCounts.exited})` },
-  ];
-
-  const handleFilterChange = (value: string) => {
-    setStatusFilter(value as 'all' | 'running' | 'stopped' | 'exited');
   };
 
   const headerActions = (
@@ -75,24 +70,23 @@ function DockerManagerPage() {
   );
 
   return (
-    <PageLayout 
+    <PageLayout
       header={{ title: "Docker" }}
       actions={[headerActions]}
       refreshFn={handleRefresh}
     >
       <div className="space-y-6">
-      {/* Filtros */}
-      <FilterBar
-        filters={filters}
-        activeFilter={statusFilter}
-        onFilterChange={handleFilterChange}
-      />
-
       {/* Contenido */}
       {checkingAccess ? (
         <StatusCard type="loading" message="Verificando acceso a Docker..." />
       ) : access?.hasAccess ? (
-        <ContainerList ref={containerListRef} statusFilter={statusFilter} searchQuery={searchQuery} />
+        <ContainerList
+          ref={containerListRef}
+          searchQuery={searchQuery}
+          filterCounts={filterCounts}
+          activeFilter={activeFilter}
+          onFilterChange={handleFilterChange}
+        />
       ) : (
         <StatusCard
           type="error"

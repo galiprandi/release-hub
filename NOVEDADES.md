@@ -94,6 +94,12 @@
 - ✨ Logs: Ahora puedes filtrar por nivel de log (ERROR, WARN, INFO) y alternar la actualización automática.
 - ✨ Kubernetes: Nuevo selector de contexto para cambiar rápidamente entre pods y mejoras en el visor de logs.
 
+### 🗓️ 1 de Mayo de 2026
+
+- 🎉 **Pipeline Unificado**: Migración completa a la arquitectura `UnifiedPipelineMonitor`. Ahora todos los monitores de despliegue comparten la misma lógica y diseño, reduciendo la fragmentación técnica y visual.
+- 🎨 **Estándar Industrial**: Estandarización de estados de feedback mediante `StatusCard` y uso estricto de tokens semánticos en timelines para una resonancia industrial superior.
+- 🧹 **Higiene Técnica**: Eliminación de componentes de monitoreo obsoletos y centralización de utilidades en el core del sistema.
+
 ### 🗓️ 30 de Abril de 2026
 
 - 🎉 Kubernetes: Nuevo sistema de monitoreo con navegación desde deployment hasta pods individuales para ver logs detallados.

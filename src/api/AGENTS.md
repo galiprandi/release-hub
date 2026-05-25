@@ -235,17 +235,15 @@ Test files:
 - `src/pipeline-core/__tests__/PipelineCard.test.tsx`
 - `src/pipeline-core/__tests__/SimpleTimeline.test.tsx`
 
-### Migration from Old System
+### Migration from Old System (Completed)
 
-Old components (kept for backward compatibility):
-- `PipelineMonitor` - Routes to appropriate monitor
-- `SekiMonitor` - Seki-specific implementation
-- `PulsarMonitor` - GitHub Actions implementation
+Legacy monitor components (PipelineMonitor, SekiMonitor, PulsarMonitor) have been removed.
 
-New unified approach:
-- Use `UnifiedPipelineMonitor` for new code
-- Adapters handle provider-specific logic
-- Single hook `useUnifiedPipeline` replaces multiple hooks
+Current approach:
+- `UnifiedPipelineMonitor` is the single component for all pipeline monitoring.
+- Adapters in `src/pipeline-core/adapters/` handle provider-specific logic.
+- `useUnifiedPipeline` hook manages data fetching and smart polling.
+- Shared utilities reside in `src/pipeline-core/utils.ts`.
 
 ## Workflow Preferences
 

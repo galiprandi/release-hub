@@ -15,7 +15,7 @@ export function DeploymentSearch() {
   const searchWidth = 'w-[35dvw]'
 
   // Search deployments on-demand with debounce
-  const { data: allDeployments, isLoading } = useQuery({
+  const { data: allDeployments, isLoading, refetch } = useQuery({
     queryKey: ['kubectl', 'all-deployments-search'],
     queryFn: async () => {
       const contexts = await (await import('@/api/kubectl')).getContexts()
@@ -37,6 +37,7 @@ export function DeploymentSearch() {
       )
     },
     ...applyCachePolicy('kubectl'),
+    enabled: false,
   })
 
   // Filter deployments based on query
@@ -146,6 +147,7 @@ export function DeploymentSearch() {
           }}
           onFocus={() => {
             setIsEditable(true);
+            if (!allDeployments) refetch();
             if (query.length >= 2) setIsOpen(true);
           }}
           onBlur={() => setIsEditable(false)}

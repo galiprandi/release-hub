@@ -3,7 +3,7 @@ import { createPortal } from "react-dom"
 import { useQuery } from "@tanstack/react-query"
 import { Star } from "lucide-react"
 import { getDeployments, getResourceLogs, type DeploymentInfo } from "@/api/kubectl"
-import { getContexts, getCurrentContext } from "@/api/kubectl"
+import { getContexts } from "@/api/kubectl"
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys"
 import { LogsViewer } from "@/components/shared/LogsViewer"
 import { StatusCard } from "@/components/ui/StatusCard"
@@ -13,42 +13,36 @@ import { useUserCollections } from "@/hooks/useUserCollections"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
 
 interface DeploymentListProps {
-	context?: string
-	namespace?: string
 	favorites?: string[]
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
+	isKubectlInstalled?: boolean
 }
 
-export const DeploymentList = ({ context, namespace, favorites, activeFilter, onFilterChange }: DeploymentListProps) => {
+export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKubectlInstalled }: DeploymentListProps) => {
 	const [selectedDeployment, setSelectedDeployment] = useState<DeploymentInfo | null>(null)
+	const [selectedContext, setSelectedContext] = useState<string | null>(null)
 	const [isLogsModalOpen, setIsLogsModalOpen] = useState(false)
 	const { toggleDeploymentFavorite } = useUserCollections()
 
-	// Get all contexts
+	// Get all contexts - only if kubectl is installed
 	const { data: contexts } = useQuery({
 		queryKey: queryKeys.kubectl.contexts(),
 		queryFn: getContexts,
 		...applyCachePolicy("kubectl"),
+		enabled: isKubectlInstalled === true,
 	})
 
-	// Get current context
-	const { data: currentContext } = useQuery({
-		queryKey: ["kubectl", "current-context"],
-		queryFn: getCurrentContext,
-		...applyCachePolicy("kubectl"),
-	})
-
-	// Get deployments for all contexts
+	// Get deployments for all contexts - only if kubectl is installed
 	const { data: allDeployments, isLoading } = useQuery({
-		queryKey: ["kubectl", "all-deployments", namespace],
+		queryKey: ["kubectl", "all-deployments"],
 		queryFn: async () => {
 			if (!contexts || contexts.length === 0) return []
 
 			const deploymentsByContext = await Promise.all(
 				contexts.map(async (ctx) => {
 					try {
-						const deployments = await getDeployments(namespace, ctx)
+						const deployments = await getDeployments(undefined, ctx)
 						return { context: ctx, deployments }
 					} catch {
 						return { context: ctx, deployments: [] }
@@ -58,9 +52,9 @@ export const DeploymentList = ({ context, namespace, favorites, activeFilter, on
 
 			return deploymentsByContext.filter((item) => item.deployments.length > 0)
 		},
-		enabled: !!contexts && contexts.length > 0,
+		enabled: isKubectlInstalled === true && !!contexts && contexts.length > 0,
 		placeholderData: (previousData) => previousData,
-		staleTime: favorites && favorites.length > 0 ? 30 * 1000 : 0, // 30s si hay favoritos, 0 si no
+		staleTime: 30 * 1000,
 		gcTime: 5 * 60 * 1000, // 5 minutos para permitir cache temporal
 		refetchOnWindowFocus: false,
 		retry: 0,
@@ -84,7 +78,7 @@ export const DeploymentList = ({ context, namespace, favorites, activeFilter, on
 	// Fetch function for logs with cursor support
 	const fetchFn = (cursor?: number) => {
 		if (!selectedDeployment) return Promise.resolve('')
-		return getResourceLogs('deployment', selectedDeployment.name, selectedDeployment.namespace, 100, context, cursor)
+		return getResourceLogs('deployment', selectedDeployment.name, selectedDeployment.namespace, 100, selectedContext || undefined, cursor)
 	}
 
 	// Build resources list for LogsViewer select
@@ -95,7 +89,7 @@ export const DeploymentList = ({ context, namespace, favorites, activeFilter, on
 		)
 	}, [allDeployments])
 
-	const selectedResourceId = selectedDeployment ? `${context || currentContext || ''}/${selectedDeployment.namespace}/${selectedDeployment.name}` : undefined
+	const selectedResourceId = selectedDeployment ? `${selectedContext || ''}/${selectedDeployment.namespace}/${selectedDeployment.name}` : undefined
 
 	const handleResourceChange = (resourceId: string) => {
 		const resource = resources.find(r => r.id === resourceId)
@@ -103,43 +97,59 @@ export const DeploymentList = ({ context, namespace, favorites, activeFilter, on
 			const deployment = allDeployments
 				?.find(item => item.context === resource.context)
 				?.deployments.find(d => d.name === resource.name)
-			if (deployment) setSelectedDeployment(deployment)
+			if (deployment) {
+				setSelectedDeployment(deployment)
+				setSelectedContext(resource.context)
+			}
 		}
 	}
 
 	const handleViewLogs = (deployment: DeploymentInfo, deploymentContext: string) => {
 		console.log('[DeploymentList] Opening logs for deployment:', deployment.name, 'context:', deploymentContext)
 		setSelectedDeployment(deployment)
+		setSelectedContext(deploymentContext)
 		setIsLogsModalOpen(true)
 	}
 
-	// Si no hay datos después de cargar
-	if (!isLoading && (!filteredDeployments || filteredDeployments.length === 0)) {
+	// Si no hay favoritos, no renderizar nada (el padre maneja el empty state)
+	if (!favorites || favorites.length === 0) {
+		return null
+	}
+
+	// Si no hay datos después de cargar y kubectl está instalado
+	if (isKubectlInstalled !== false && !isLoading && (!filteredDeployments || filteredDeployments.length === 0)) {
 		return (
 			<StatusCard
 				type="offline"
-				message={favorites && favorites.length > 0 ? "No hay deployments favoritos disponibles." : "No hay deployments disponibles en ningún contexto."}
+				message="No hay deployments favoritos disponibles."
 			/>
 		)
 	}
 
+	// Si kubectl no está instalado, no mostrar nada (dejar que el PageLayout maneje el empty state)
+	if (isKubectlInstalled === false) {
+		return null
+	}
+
 	return (
 		<>
-			<div className="space-y-12">
-				{filteredDeployments?.map(({ context: ctx, deployments }) => (
-					<div key={ctx} className="space-y-3">
-						<DeploymentsTable
-							deployments={deployments}
-							context={ctx}
-							isLoading={isLoading}
-							onViewLogs={handleViewLogs}
-							onRemoveFavorite={(deployment) => toggleDeploymentFavorite(`${ctx}/${deployment.namespace}/${deployment.name}`)}
-							activeFilter={activeFilter}
-							onFilterChange={onFilterChange}
-						/>
-					</div>
-				))}
-			</div>
+			{filteredDeployments && filteredDeployments.length > 0 && (
+				<div className="space-y-12">
+					{filteredDeployments.map(({ context: ctx, deployments }) => (
+						<div key={ctx} className="space-y-3">
+							<DeploymentsTable
+								deployments={deployments}
+								context={ctx}
+								isLoading={isLoading}
+								onViewLogs={handleViewLogs}
+								onRemoveFavorite={(deployment) => toggleDeploymentFavorite(`${ctx}/${deployment.namespace}/${deployment.name}`)}
+								activeFilter={activeFilter}
+								onFilterChange={onFilterChange}
+							/>
+						</div>
+					))}
+				</div>
+			)}
 
 			{isLogsModalOpen && selectedDeployment &&
 				createPortal(
@@ -176,7 +186,9 @@ function DeploymentsTable({
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
-	const sortedDeployments = [...deployments].sort((a, b) => a.name.localeCompare(b.name))
+	const sortedDeployments = useMemo(() => {
+		return [...deployments].sort((a, b) => a.name.localeCompare(b.name))
+	}, [deployments])
 
 	// Get unique namespaces for filters
 	const namespaces = useMemo(() => {
@@ -240,7 +252,7 @@ function DeploymentsTable({
 		},
 	], [context, isLoading, onViewLogs, onRemoveFavorite])
 
-	const dataWithContext = sortedDeployments.map(d => ({ ...d, context }))
+	const dataWithContext = useMemo(() => sortedDeployments.map(d => ({ ...d, context })), [sortedDeployments, context])
 
 	return (
 		<Table
@@ -292,15 +304,17 @@ function AgeCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoad
 }
 
 function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
+	const shortImages = useMemo(() => {
+		return deployment.images.map(img => {
+			const parts = img.split('/')
+			const lastPart = parts[parts.length - 1] || img
+			return lastPart
+		})
+	}, [deployment.images])
+
 	if (isLoading) {
 		return <div className="h-4 bg-muted rounded w-24" />
 	}
-
-	const shortImages = deployment.images.map(img => {
-		const parts = img.split('/')
-		const lastPart = parts[parts.length - 1] || img
-		return lastPart
-	})
 
 	return (
 		<div className="flex flex-col gap-0.5">

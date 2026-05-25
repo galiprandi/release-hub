@@ -55,6 +55,7 @@ interface PageLayoutProps {
     caption?: ReactNode;
     action?: ReactNode;
   };
+  showEmptyState?: boolean;
 }
 
 export function PageLayout({
@@ -65,7 +66,8 @@ export function PageLayout({
   themeSwitch = true,
   isLoading,
   footer,
-  emptyState
+  emptyState,
+  showEmptyState
 }: PageLayoutProps) {
   const [isDark, setIsDark] = useState(false);
   const routerState = useRouterState();
@@ -199,23 +201,23 @@ export function PageLayout({
         <div className="flex flex-col gap-6 px-8 grow">
           {isAnyLoading ? (
             <LoadingSpinner />
-          ) : emptyState?.show ? (
+          ) : showEmptyState ? (
             <EmptyState
-              icon={emptyState.icon}
-              label={emptyState.label}
-              caption={emptyState.caption}
-              action={emptyState.action}
+              icon={emptyState?.icon}
+              label={emptyState?.label}
+              caption={emptyState?.caption}
+              action={emptyState?.action}
             />
           ) : (
             children
           )}
         </div>
         {/* Footer */}
-        {footer?.show !== false && (
+        {footer?.show && (
           <footer className="mt-auto border-t border-border/40 py-4 px-8 bg-muted/30">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>{footer?.left || "6570 repos accesibles (2 orgs + 16 personales)"}</span>
-              <span>{footer?.right || "ReleaseHub Open Source"}</span>
+              <span>{footer?.left}</span>
+              <span>{footer?.right}</span>
             </div>
           </footer>
         )}

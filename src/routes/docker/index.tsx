@@ -3,7 +3,7 @@ import { useRef, useState, useMemo, useCallback, useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { useDockerAccess } from '@/hooks/useDockerAccess';
 import { useQuery } from '@tanstack/react-query';
-import { ContainerList, type ContainerListRef } from '@/components/ContainerList';
+import { ContainerList, type ContainerListRef } from '@/docker/componentes/ContainerList';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { getContainers } from '@/api/docker';
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys';

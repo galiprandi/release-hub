@@ -229,31 +229,36 @@ export async function getDeployments(namespace?: string, context?: string): Prom
         const namespacesResult = await runCommand(`kubectl get namespaces -o jsonpath='{.items[*].metadata.name}' ${ctxFlag}`.trim());
         const namespaces = namespacesResult.stdout.trim().split(' ').filter(Boolean);
 
-        const allDeployments: DeploymentInfo[] = [];
-        for (const ns of namespaces) {
+        // Execute all namespace queries in parallel for better performance
+        const deploymentPromises = namespaces.map(async (ns) => {
           try {
             const result = await runCommand(`kubectl get deployments -n ${sanitizeNamespace(ns)} ${ctxFlag} -o json`.trim());
-            allDeployments.push(...parseDeploymentsJson(result.stdout, ns));
+            return parseDeploymentsJson(result.stdout, ns);
           } catch {
             // Skip namespaces where we don't have permission
-            continue;
+            return [];
           }
-        }
-        return allDeployments;
+        });
+
+        const allResults = await Promise.all(deploymentPromises);
+        return allResults.flat();
       } catch {
         // If we can't even list namespaces, try known namespaces
         const knownNamespaces = ['argentina-arcus', 'colombia-arcus', 'jc-test', 'seki-runners', 'default'];
-        const allDeployments: DeploymentInfo[] = [];
-        for (const ns of knownNamespaces) {
+        
+        // Execute all known namespace queries in parallel
+        const deploymentPromises = knownNamespaces.map(async (ns) => {
           try {
             const result = await runCommand(`kubectl get deployments -n ${sanitizeNamespace(ns)} ${ctxFlag} -o json`.trim());
-            allDeployments.push(...parseDeploymentsJson(result.stdout, ns));
+            return parseDeploymentsJson(result.stdout, ns);
           } catch {
             // Skip namespaces where we don't have permission
-            continue;
+            return [];
           }
-        }
-        return allDeployments;
+        });
+
+        const allResults = await Promise.all(deploymentPromises);
+        return allResults.flat();
       }
     }
     // If specific namespace was requested and failed, return empty

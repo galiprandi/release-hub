@@ -1,14 +1,14 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { Search, Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { DeploymentList } from "@/components/DeploymentList";
-import { DeploymentSearch } from "@/components/DeploymentSearch";
+import { DeploymentList } from "@/components/kubernetes/DeploymentList";
+import { DeploymentSearch } from "@/components/kubernetes/DeploymentSearch";
 import { checkKubectlInstalled } from "@/api/kubectl";
 import { applyCachePolicy } from "@/lib/queryKeys";
 import { StatusCard } from "@/components/ui/StatusCard";
-import { PageLayout } from "../../layouts/PageLayout";
+import { PageLayout } from "@/layouts/PageLayout";
 import { useUserCollections } from "@/hooks/useUserCollections";
-import { useMemo, useCallback, useEffect } from "react";
+import { useMemo, useCallback } from "react";
 
 export const Route = createFileRoute("/kubernetes/")({
 	component: KubernetesPage,
@@ -37,62 +37,54 @@ function KubernetesPage() {
 		});
 	}, [navigate]);
 
-	const { data: isInstalled, isLoading: checkingInstall } = useQuery({
+	const { data: isInstalled, isLoading: isCheckingInstall } = useQuery({
 		queryKey: ["kubectl", "installed"],
 		queryFn: checkKubectlInstalled,
 		...applyCachePolicy("kubectl"),
 	});
 
-	useEffect(() => {
-		if (isInstalled === false) {
-			navigate({ to: '/kubernetes/setup' });
-		}
-	}, [isInstalled, navigate]);
-
 	return (
 		<PageLayout
 			header={{
 				title: "Kubernetes",
-				searchComponent: <DeploymentSearch />
+				searchComponent: isInstalled ? <DeploymentSearch /> : undefined
 			}}
-			emptyState={safeDeploymentFavorites.length === 0 ? {
-				show: true,
-				icon: <Star className="w-10 h-10 mx-auto mb-4 opacity-20" />,
-				label: "Sin favoritos",
-				caption: "Agrega deployments a tus favoritos para verlos aquí y monitorear sus logs.",
-				action: (
-					<button
-						type="button"
-						onClick={() => {
-							const input = document.querySelector('input[placeholder*="Búsqueda de deployments"]') as HTMLInputElement;
-							if (input) {
-								input.focus();
-							}
-						}}
-						className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-					>
-						<Search className="w-4 h-4" />
-						Buscar Deployments
-					</button>
-				)
-			} : undefined}
+			isLoading={isCheckingInstall}
 		>
-			<div className="space-y-6">
-				{checkingInstall ? (
-					<StatusCard type="loading" message="Verificando kubectl..." />
-				) : isInstalled ? (
-					<DeploymentList
-						favorites={safeDeploymentFavorites}
-						activeFilter={activeFilter}
-						onFilterChange={handleFilterChange}
-					/>
-				) : (
-					<StatusCard
-						type="error"
-						message="kubectl no está instalado. Instálalo para gestionar deployments de Kubernetes."
-					/>
-				)}
-			</div>
+			{safeDeploymentFavorites.length === 0 ? (
+				<div className="flex items-center justify-center w-full min-h-[400px]">
+					<div className="w-full border rounded-xl p-12 text-center text-muted-foreground bg-muted/20 border-dashed">
+						<Star className="w-10 h-10 mx-auto mb-4 opacity-20" />
+						<h3 className="text-lg font-medium text-foreground mb-1">Sin favoritos</h3>
+						<p className="text-sm max-w-xs mx-auto mb-6">Agrega deployments a tus favoritos para verlos aquí y monitorear sus logs.</p>
+						<button
+							type="button"
+							onClick={() => {
+								const input = document.querySelector('input[placeholder*="Búsqueda de deployments"]') as HTMLInputElement;
+								if (input) {
+									input.focus();
+								}
+							}}
+							className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						>
+							<Search className="w-4 h-4" />
+							Buscar Deployments
+						</button>
+					</div>
+				</div>
+			) : isInstalled === false ? (
+				<StatusCard
+					type="error"
+					message="kubectl no está instalado. Instálalo para gestionar deployments de Kubernetes."
+				/>
+			) : (
+				<DeploymentList
+					favorites={safeDeploymentFavorites}
+					activeFilter={activeFilter}
+					onFilterChange={handleFilterChange}
+					isKubectlInstalled={isInstalled}
+				/>
+			)}
 		</PageLayout>
 	);
 }

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
@@ -46,6 +46,31 @@ function FetcherPage() {
 	const [activeQuery, setActiveQuery] = useState<QueryRecord | undefined>();
 	const [editingQuery, setEditingQuery] = useState<QueryRecord | undefined>();
 	const [curlInput, setCurlInput] = useState('');
+
+	// Clipboard magic: detect curl command in clipboard on mount
+	useEffect(() => {
+		const checkClipboard = async () => {
+			try {
+				const text = await navigator.clipboard.readText();
+				if (text.trim().toLowerCase().startsWith('curl')) {
+					try {
+						// Validate it's a valid curl
+						parseCurlCommand(text);
+						const now = new Date().toISOString();
+						setActiveQuery({ id: '', curl: text, createdAt: now, updatedAt: now });
+					} catch (e) {
+						// Not a valid curl, ignore
+					}
+				}
+			} catch (err) {
+				// Clipboard access might be denied, ignore silently
+			}
+		};
+
+		// Small delay to ensure the page is focused and ready
+		const timer = setTimeout(checkClipboard, 500);
+		return () => clearTimeout(timer);
+	}, []);
 
 	// Derive active filter from query params - memoized to prevent re-renders
 	const activeFilter = useMemo(() => {

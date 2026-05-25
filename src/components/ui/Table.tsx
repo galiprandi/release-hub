@@ -125,13 +125,23 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 								onClick={handleResetFilters}
 								aria-pressed={currentActiveFilter === null}
 								className={clsx(
-									"px-2.5 py-1 text-xs rounded-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 font-medium",
+									"px-3 py-1.5 text-xs rounded-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 font-bold uppercase tracking-tight",
 									currentActiveFilter === null
 										? "bg-info/20 text-info shadow-sm"
-										: "bg-muted text-foreground hover:bg-muted/80"
+										: "bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
 								)}
 							>
-								Todos{totalCount > 0 ? ` (${totalCount})` : ''}
+								<div className="flex items-center gap-1.5">
+									<span>Todos</span>
+									{totalCount > 0 && (
+										<span className={clsx(
+											"px-1.5 py-0.5 rounded-full text-[10px] font-bold",
+											currentActiveFilter === null ? "bg-info-foreground/20" : "bg-muted-foreground/20"
+										)}>
+											{totalCount}
+										</span>
+									)}
+								</div>
 							</button>
 							{filters.map((filter) => {
 								const isActive = currentActiveFilter?.id === filter.columnId && currentActiveFilter?.value === filter.value
@@ -142,13 +152,23 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 										onClick={() => handleFilterClick(filter)}
 										aria-pressed={isActive}
 										className={clsx(
-											"px-2.5 py-1 text-xs rounded-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 font-medium",
+											"px-3 py-1.5 text-xs rounded-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 font-bold uppercase tracking-tight",
 											isActive
 												? "bg-info/20 text-info shadow-sm"
-												: "bg-muted text-foreground hover:bg-muted/80"
+												: "bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
 										)}
 									>
-										{filter.label}{filter.count !== undefined ? ` (${filter.count})` : ''}
+										<div className="flex items-center gap-1.5">
+											<span>{filter.label}</span>
+											{filter.count !== undefined && (
+												<span className={clsx(
+													"px-1.5 py-0.5 rounded-full text-[10px] font-bold",
+													isActive ? "bg-info-foreground/20" : "bg-muted-foreground/20"
+												)}>
+													{filter.count}
+												</span>
+											)}
+										</div>
 									</button>
 								)
 							})}

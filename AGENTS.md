@@ -170,9 +170,13 @@ const columns: ColumnDef<QueryRecord>[] = [
 #### Estilos de Filtros
 
 - **Activo**: `bg-info/20 text-info shadow-sm` (azul semántico)
-- **Inactivo**: `bg-muted text-foreground hover:bg-muted/80`
+- **Inactivo**: `bg-muted text-foreground hover:bg-accent hover:text-accent-foreground`
 - **Botón "Todos"**: Mismo comportamiento que filtros individuales
-- **Tamaño**: `px-2.5 py-1 text-xs` (compacto)
+- **Tamaño**: `px-3 py-1.5 text-xs font-bold uppercase tracking-tight` (Industrial Resonance)
+
+### 11. Clipboard Magic en Fetcher
+- **Detección Automática**: El módulo Fetcher detecta comandos `curl` en el portapapeles al montarse y los importa automáticamente.
+- **Seguridad**: El acceso al portapapeles es silencioso y se maneja mediante `try-catch` para evitar errores si los permisos son denegados.
 
 ## Mantenimiento de Skills
 

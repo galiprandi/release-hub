@@ -4,7 +4,7 @@ import { Send } from 'lucide-react';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
 import { StatusCard } from '@/components/ui/StatusCard';
-import { ImportQueryModal } from '@/components/ImportQueryModal';
+import { QueryModal } from '@/components/QueryModal';
 import { Table } from '@/components/ui/Table';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -180,7 +180,7 @@ function FetcherPage() {
 				/>
 			)}
 
-			<ImportQueryModal
+			<QueryModal
 				setQuery={setActiveQuery}
 				query={activeQuery || editingQuery}
 				onClose={handleCloseModal}
@@ -209,6 +209,16 @@ function QueriesTable({
 }) {
 	const columns: ColumnDef<QueryRecord>[] = useMemo(() => [
 		{
+			accessorKey: "domain",
+			header: "Dominio",
+			cell: ({ row }) => <DomainCell query={row.original} />,
+		},
+		{
+			accessorKey: "path",
+			header: "Path",
+			cell: ({ row }) => <PathCell query={row.original} />,
+		},
+		{
 			id: "method",
 			accessorFn: (row) => {
 				const parsed = parseCurlForDisplay(row.curl);
@@ -217,16 +227,6 @@ function QueriesTable({
 			header: "Método",
 			cell: ({ row }) => <MethodCell query={row.original} />,
 			filterFn: 'equalsString',
-		},
-		{
-			accessorKey: "path",
-			header: "Path",
-			cell: ({ row }) => <PathCell query={row.original} />,
-		},
-		{
-			accessorKey: "domain",
-			header: "Dominio",
-			cell: ({ row }) => <DomainCell query={row.original} />,
 		},
 		{
 			accessorKey: "updatedAt",

@@ -239,6 +239,12 @@ function QueriesTable({
 			cell: ({ row }) => <ResponseTimeCell query={row.original} />,
 		},
 		{
+			id: "status",
+			accessorFn: (row) => row.response?.status || null,
+			header: "Status",
+			cell: ({ row }) => <StatusCell query={row.original} />,
+		},
+		{
 			id: "actions",
 			accessorKey: "actions",
 			header: "Acciones",
@@ -317,6 +323,23 @@ function SentCell({ query }: { query: QueryRecord }) {
 			{query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}
 		</span>
 	)
+}
+
+function StatusCell({ query }: { query: QueryRecord }) {
+	if (query.response?.status) {
+		const { status } = query.response
+		let style = "bg-muted text-muted-foreground"
+		if (status >= 200 && status < 300) style = "bg-success/20 text-success"
+		else if (status >= 400 && status < 500) style = "bg-warning/20 text-warning"
+		else if (status >= 500) style = "bg-destructive/20 text-destructive"
+
+		return (
+			<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${style}`}>
+				{status}
+			</span>
+		)
+	}
+	return <span className="text-muted-foreground text-xs">-</span>
 }
 
 function ResponseTimeCell({ query }: { query: QueryRecord }) {

@@ -1,6 +1,8 @@
 import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
+import { queryKeys } from "@/lib/queryKeys";
+
+const STORAGE_KEY = "releasehub_user_collections";
 
 export interface Project {
 	id: string;
@@ -20,6 +22,26 @@ function getInitialCollections(): UserCollections {
 	return { favorites: [], deploymentFavorites: [], projects: [], activeTab: "favorites" };
 }
 
+function loadCollectionsFromStorage(): UserCollections {
+	try {
+		const stored = localStorage.getItem(STORAGE_KEY);
+		if (stored) {
+			return JSON.parse(stored);
+		}
+	} catch (error) {
+		console.error("[UserCollections] Failed to load from localStorage:", error);
+	}
+	return getInitialCollections();
+}
+
+function saveCollectionsToStorage(collections: UserCollections): void {
+	try {
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(collections));
+	} catch (error) {
+		console.error("[UserCollections] Failed to save to localStorage:", error);
+	}
+}
+
 export function useUserCollections() {
 	const queryClient = useQueryClient();
 
@@ -27,9 +49,11 @@ export function useUserCollections() {
 		queryKey: queryKeys.user.collections(),
 		queryFn: () => {
 			const cached = queryClient.getQueryData<UserCollections>(queryKeys.user.collections());
-			return cached || getInitialCollections();
+			if (cached) return cached;
+			return loadCollectionsFromStorage();
 		},
-		...applyCachePolicy("user"),
+		staleTime: Infinity,
+		gcTime: Infinity,
 	});
 
 	const mutate = useMutation({
@@ -38,11 +62,13 @@ export function useUserCollections() {
 			await queryClient.cancelQueries({ queryKey: queryKeys.user.collections() });
 			const previous = queryClient.getQueryData<UserCollections>(queryKeys.user.collections());
 			queryClient.setQueryData(queryKeys.user.collections(), next);
+			saveCollectionsToStorage(next);
 			return { previous };
 		},
 		onError: (_err, _vars, context) => {
 			if (context?.previous) {
 				queryClient.setQueryData(queryKeys.user.collections(), context.previous);
+				saveCollectionsToStorage(context.previous);
 			}
 		},
 	});

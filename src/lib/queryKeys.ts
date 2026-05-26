@@ -491,11 +491,11 @@ export const cachePolicies: Record<QueryKeyDomain, CachePolicy> = {
 		retry: 2,
 	},
 
-	// USER: Cachear infinito, PERSISTIR en LS
+	// USER: Cachear infinito, NO persistir en LS (manejo manual en useUserCollections)
 	user: {
 		staleTime: Infinity, // Nunca stale
 		gcTime: Infinity, // Nunca garbage collect
-		persistInLocalStorage: true, // PERSISTIR (user preferences)
+		persistInLocalStorage: false, // NO persistir (manejo manual con localStorage directo)
 		refetchOnWindowFocus: false,
 		refetchInterval: false,
 		retry: 0,

@@ -2,6 +2,14 @@
 
 ---
 
+### 🗓️ 27 de Mayo de 2026
+
+- 🎉 **Resonancia Industrial**: Refinamiento global del sistema de diseño para una estética de alta densidad y profesionalismo técnico.
+- ✨ **FilterBar Pro**: Nueva variante `tabs` estandarizada para navegación interna en dashboards y modales, reduciendo la carga cognitiva.
+- ✨ **Tablas de Alto Contraste**: Rediseño del componente `Table` con bordes sutiles `border-border/60`, encabezados `bg-muted/40` y tipografía `uppercase` para una legibilidad superior.
+- ✨ **GitHub Dashboard**: Navegación de colecciones (Favoritos/Proyectos) unificada mediante el nuevo sistema de pestañas industriales.
+- ✨ **Acciones Estandarizadas**: Uso sistemático de `ActionButton` en las tablas de repositorios para una interacción táctil y visual consistente.
+
 ### 🗓️ 26 de Mayo de 2026
 
 - 🎉 **Diff Engine**: Lanzamiento del nuevo Comparador Universal. Una herramienta suiza para comparar payloads JSON, tokens JWT, comandos cURL y logs/texto plano 100% en el cliente.

@@ -73,8 +73,15 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 - Título con `tracking-tight` para mayor elegancia.
 
 ### FilterBar
-- Uso de `bg-muted` para botones inactivos y `bg-primary` para el activo.
+- **Variante Default**: Uso de `bg-muted` para botones inactivos y `bg-primary` para el activo.
+- **Variante Tabs**: Estética industrial de alta densidad. Contenedor `bg-muted` con padding `p-1`. Botones activos con `bg-background shadow-sm text-foreground` e inactivos con `text-muted-foreground hover:text-foreground`.
 - Inputs con `border-input` y `bg-background`.
+
+### Table (Resonancia Industrial)
+- **Contenedor**: `rounded-xl`, `border-border/60`, `shadow-sm`, `overflow-hidden`.
+- **Encabezados**: `bg-muted/40` con celdas `text-xs font-bold uppercase tracking-wider text-muted-foreground border-b border-border/60`.
+- **Filas**: `hover:bg-muted/20`, `transition-colors`, `divide-y` en el `tbody`.
+- **Filtros Integrados**: Botones ultra-compactos `text-[10px] font-bold uppercase tracking-wider`.
 
 ### DisplayInfo
 - Abstracción para mostrar metadatos (commits, tags, autores) con iconos y colores semánticos.

@@ -9,7 +9,7 @@ describe('api/seki', () => {
     const spy = vi.spyOn(apiSeki, 'get').mockResolvedValue({ data: mockP })
 
     const res = await fetchPipeline('o/r', 'commit')
-    expect(res).toBe(mockP)
-    expect(spy).toHaveBeenCalledWith('/products/o/r/pipelines/commit', expect.any(Object))
+    expect(res.data).toBe(mockP)
+    expect(spy).toHaveBeenCalledWith('/products/o/r/pipelines/commit')
   })
 })

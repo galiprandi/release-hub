@@ -11,6 +11,7 @@ import { FreezeDialog } from "@/components/FreezeDialog";
 import { CommitsModal } from "@/components/CommitsModal";
 import { PageLayout } from "@/layouts/PageLayout";
 import { RepoSearch } from "@/components/RepoSearch";
+import { FilterBar } from "@/components/shared/FilterBar";
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
 import { Table } from "@/components/ui/Table";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -31,8 +32,8 @@ function Dashboard() {
 	const isIndexRoute = location.pathname === "/github";
 
 	const tabs = [
-		{ id: "favorites", label: "Favoritos", icon: Star, count: favorites.length, description: "" },
-		...projects.map(p => ({ id: p.id, label: p.name, icon: FolderOpen, count: p.repos.length, description: p.description })),
+		{ value: "favorites", label: "Favoritos", icon: Star, count: favorites.length, description: "" },
+		...projects.map(p => ({ value: p.id, label: p.name, icon: FolderOpen, count: p.repos.length, description: p.description })),
 	];
 
 	// Determine repos to show based on active tab
@@ -64,6 +65,7 @@ function Dashboard() {
 	}, {} as Record<string, RepoInfo[]>);
 
 	const sortedOrgs = Object.keys(groupedRepos).sort();
+	const isEmpty = displayRepos.length === 0;
 
 	if (!isIndexRoute) {
 		return <Outlet />;
@@ -76,8 +78,8 @@ function Dashboard() {
 				searchComponent: <RepoSearch />
 			}}
 			isLoading={isLoadingRepos}
-			emptyState={displayRepos.length === 0 ? {
-				show: true,
+			showEmptyState={isEmpty}
+			emptyState={isEmpty ? {
 				icon: activeTab === "favorites" ? <Star className="w-10 h-10 mx-auto mb-4 opacity-20" /> : <FolderPlus className="w-10 h-10 mx-auto mb-4 opacity-20" />,
 				label: activeTab === "favorites" ? "Sin favoritos" : "Proyecto vacío",
 				caption: activeTab === "favorites"
@@ -107,33 +109,13 @@ function Dashboard() {
 		>
 			<div className="space-y-6">
 			{/* Tabs */}
-			<div className="flex gap-1 bg-muted rounded-lg p-1 overflow-x-auto">
-				{tabs.map((tab) => {
-					const Icon = tab.icon;
-					const isActive = activeTab === tab.id;
-					return (
-						<button
-							key={tab.id}
-							type="button"
-							onClick={() => setActiveTab(tab.id)}
-								className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-all whitespace-nowrap focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
-								isActive
-									? "bg-background shadow-sm text-foreground font-medium"
-										: "text-muted-foreground hover:text-foreground hover:bg-background/50"
-							}`}
-							title={tab.description}
-						>
-							<Icon className={`w-4 h-4 ${isActive ? "text-primary" : ""}`} />
-							{tab.label}
-							{tab.count > 0 && (
-								<span className="text-xs bg-muted-foreground/20 px-1.5 py-0.5 rounded-full">
-									{tab.count}
-								</span>
-							)}
-						</button>
-					);
-				})}
-			</div>
+			<FilterBar
+				filters={tabs}
+				activeFilter={activeTab}
+				onFilterChange={(value) => setActiveTab(value)}
+				variant="tabs"
+				label="Colecciones:"
+			/>
 
 			{/* Content */}
 			<div className="space-y-12">
@@ -161,8 +143,8 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 			accessorKey: "name",
 			header: () => (
 				<div className="flex items-center gap-2">
-					<Building2 className="w-5 h-5" />
-					<span>{org}</span>
+					<Building2 className="w-4 h-4 text-primary" />
+					<span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{org}</span>
 				</div>
 			),
 			cell: ({ row }) => <RepoNameCell repo={row.original} />,
@@ -398,23 +380,20 @@ function ActionsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; i
 	});
 
 	return (
-		<div className="flex items-center justify-end gap-1.5">
+		<div className="flex items-center justify-end gap-1">
 			<FreezeDialog repo={repo.fullName} iconOnly={true} />
 			<ForceRedeployDialog repo={repo.fullName} iconOnly={true} />
 			<PromoteDialog repo={repo.fullName} latestTag={latestTag?.name} iconOnly={true} />
 			<ActionButton
 				action={ACTION_DEFINITIONS.openGitHub}
 				onClick={() => window.open(`https://github.com/${org}/${name}`, '_blank')}
+				size="sm"
 			/>
-			<button
-				type="button"
+			<ActionButton
+				action={isFavorite ? ACTION_DEFINITIONS.removeFavorite : ACTION_DEFINITIONS.addFavorite}
 				onClick={() => onToggleFavorite(repo.fullName)}
-				className={`${isFavorite ? "text-warning" : "text-muted-foreground"} hover:text-warning/80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md transition-all p-0.5`}
-				aria-label={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
-				title={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
-			>
-				<Star className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`} />
-			</button>
+				size="sm"
+			/>
 		</div>
 	);
 }

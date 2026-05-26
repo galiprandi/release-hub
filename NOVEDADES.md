@@ -2,6 +2,13 @@
 
 ---
 
+### 🗓️ 26 de Mayo de 2026
+
+- 🎉 **Diff Engine**: Lanzamiento del nuevo Comparador Universal. Una herramienta suiza para comparar payloads JSON, tokens JWT, comandos cURL y logs/texto plano 100% en el cliente.
+- ✨ Normalización inteligente: Los payloads JSON se ordenan alfabéticamente de forma recursiva antes de comparar para evitar falsos positivos por desalineación de llaves.
+- ✨ JWT & cURL: Decodificación transparente de tokens y descomposición de comandos cURL para identificar discrepancias exactas en headers o parámetros.
+- ✨ UX Industrial: Sincronización de scroll entre paneles, scroll horizontal para líneas largas y resaltado semántico de cambios (rojo/verde).
+
 ### 🗓️ 25 de Mayo de 2026
 
 - 🎉 UI: Rediseño completo de la interfaz de usuario con mejor experiencia visual y consistencia en todo el sistema para dar soporte y ordenar nuevas características y utilidades.

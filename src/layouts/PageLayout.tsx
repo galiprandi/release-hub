@@ -13,7 +13,8 @@ import {
   MessageSquare,
   Settings,
   RefreshCw,
-  Activity
+  Activity,
+  GitCompare
 } from 'lucide-react';
 import { useEffect } from 'react';
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -110,6 +111,9 @@ export function PageLayout({
             </li>
             <li>
               <NavIcon icon={Activity} label="Health Monitor" to="/health" pathname={pathname} />
+            </li>
+            <li>
+              <NavIcon icon={GitCompare} label="Diff Engine" to="/diff" pathname={pathname} />
             </li>
           </ul>
 

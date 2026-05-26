@@ -13,6 +13,7 @@ import { Route as KubernetesRouteImport } from './routes/kubernetes'
 import { Route as GithubRouteImport } from './routes/github'
 import { Route as FetcherRouteImport } from './routes/fetcher'
 import { Route as DockerRouteImport } from './routes/docker'
+import { Route as DiffRouteImport } from './routes/diff'
 import { Route as NovedadesIndexRouteImport } from './routes/novedades/index'
 import { Route as KubernetesIndexRouteImport } from './routes/kubernetes/index'
 import { Route as HealthIndexRouteImport } from './routes/health/index'
@@ -43,6 +44,11 @@ const FetcherRoute = FetcherRouteImport.update({
 const DockerRoute = DockerRouteImport.update({
   id: '/docker',
   path: '/docker',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiffRoute = DiffRouteImport.update({
+  id: '/diff',
+  path: '/diff',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NovedadesIndexRoute = NovedadesIndexRouteImport.update({
@@ -102,6 +108,7 @@ const GithubOrgRepoRoute = GithubOrgRepoRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/diff': typeof DiffRoute
   '/docker': typeof DockerRouteWithChildren
   '/fetcher': typeof FetcherRouteWithChildren
   '/github': typeof GithubRouteWithChildren
@@ -119,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/github/$org/$repo': typeof GithubOrgRepoRoute
 }
 export interface FileRoutesByTo {
+  '/diff': typeof DiffRoute
   '/docker/setup': typeof DockerSetupRoute
   '/fetcher/setup': typeof FetcherSetupRoute
   '/github/setup': typeof GithubSetupRoute
@@ -133,6 +141,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/diff': typeof DiffRoute
   '/docker': typeof DockerRouteWithChildren
   '/fetcher': typeof FetcherRouteWithChildren
   '/github': typeof GithubRouteWithChildren
@@ -152,6 +161,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/diff'
     | '/docker'
     | '/fetcher'
     | '/github'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/github/$org/$repo'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/diff'
     | '/docker/setup'
     | '/fetcher/setup'
     | '/github/setup'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/github/$org/$repo'
   id:
     | '__root__'
+    | '/diff'
     | '/docker'
     | '/fetcher'
     | '/github'
@@ -200,6 +212,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  DiffRoute: typeof DiffRoute
   DockerRoute: typeof DockerRouteWithChildren
   FetcherRoute: typeof FetcherRouteWithChildren
   GithubRoute: typeof GithubRouteWithChildren
@@ -236,6 +249,13 @@ declare module '@tanstack/react-router' {
       path: '/docker'
       fullPath: '/docker'
       preLoaderRoute: typeof DockerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diff': {
+      id: '/diff'
+      path: '/diff'
+      fullPath: '/diff'
+      preLoaderRoute: typeof DiffRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/novedades/': {
@@ -374,6 +394,7 @@ const KubernetesRouteWithChildren = KubernetesRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  DiffRoute: DiffRoute,
   DockerRoute: DockerRouteWithChildren,
   FetcherRoute: FetcherRouteWithChildren,
   GithubRoute: GithubRouteWithChildren,

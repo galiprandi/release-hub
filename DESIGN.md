@@ -261,6 +261,11 @@ Antes de crear componentes nuevos, verificar si extienden:
 
 Componente reutilizable para botones de acción iconográficos con tooltip integrado. Estándar para todas las acciones de fila en tablas (Docker, K8s, repos, etc.).
 
+## Security Validation Standard
+
+- **Shell Injection Protection**: Todos los comandos externos se ejecutan utilizando un sistema de escape POSIX-compatible.
+- **Verification**: Refactorizaciones de endurecimiento de shell deben ser verificadas por `src/api/security.test.ts`.
+
 **Uso básico**:
 ```tsx
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"

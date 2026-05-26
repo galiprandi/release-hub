@@ -36,10 +36,10 @@ function ProductIndex() {
 	const fullProduct = `${org}/${repo}`;
 	const isCommits = viewMode === "commits";
 
-	const { latestCommit } = useGitCommits({ repo: fullProduct });
-	const { latestTag } = useGitTags({ repo: fullProduct });
-	const { data: openPRs } = useOpenPullRequests(fullProduct);
-	const { data: actionsSummary } = useGitHubActionsSummary(fullProduct);
+	const { latestCommit, refetch: refreshCommits } = useGitCommits({ repo: fullProduct });
+	const { latestTag, refetch: refreshTags } = useGitTags({ repo: fullProduct });
+	const { data: openPRs, refetch: refreshOpenPRs } = useOpenPullRequests(fullProduct);
+	const { data: actionsSummary, refetch: refreshActionsSummary } = useGitHubActionsSummary(fullProduct);
 
 	// Detect pipeline type
 	const { plugin: detectedPlugin } = usePipelineDetector({
@@ -65,10 +65,14 @@ function ProductIndex() {
 	const pipeline = isCommits ? commitsPipeline.data : tagsPipeline.data;
 	const isPipelineLoading = isCommits ? commitsPipeline.isLoading : tagsPipeline.isLoading;
 	const isPipelineFetching = isCommits ? commitsPipeline.isFetching : tagsPipeline.isFetching;
-	const currentPipeline = isCommits ? commitsPipeline : tagsPipeline;
 
 	const handleRefetchPipeline = () => {
-		currentPipeline.refetch();
+		Promise.all([
+			refreshCommits(),
+			refreshTags(),
+			refreshOpenPRs(),
+			refreshActionsSummary(),
+		]);
 	};
 
 	// Usar fecha del commit/tag para consistencia con la tabla

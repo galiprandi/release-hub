@@ -5,6 +5,7 @@ import { BaseDialog } from '@/components/ui/BaseDialog';
 import { JsonEditor } from '@/components/JsonEditor';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 import { parseCurlCommand, minifyJSON } from '@/utils/curlParser';
+import { joinArgs } from '@/utils/shell';
 import type { QueryRecord } from '@/types/queries';
 import { executeCurlCommand } from '@/api/curl';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
@@ -76,17 +77,20 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 			const startTime = Date.now();
 
 			// Build curl command from parsed query
-			const headers = Object.entries(parsed.headers)
-				.map(([key, value]) => `-H "${key}: ${value}"`)
-				.join(' ');
+			const args: string[] = ['-X', parsed.method];
+
+			Object.entries(parsed.headers).forEach(([key, value]) => {
+				args.push('-H', `${key}: ${value}`);
+			});
 
 			// Minify JSON body before sending
-			const bodyToSend = parsed.body ? minifyJSON(parsed.body) : '';
-			const data = bodyToSend ? `-d '${bodyToSend}'` : '';
-			// Use single quotes for URL to preserve special characters without escaping
-			const command = `-X ${parsed.method} '${parsed.url}' ${headers} ${data}`.trim();
+			if (parsed.body) {
+				args.push('-d', minifyJSON(parsed.body));
+			}
 
-			const result = await executeCurlCommand(command);
+			args.push(parsed.url);
+
+			const result = await executeCurlCommand(args);
 			const responseTime = Date.now() - startTime;
 
 			// Parse curl response (with -i flag, headers come first)
@@ -171,25 +175,36 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 
 	// Helper to update curlInput when form fields change
 	const updateCurlInput = (updates: Partial<typeof parsed>, shouldMinify = true) => {
-			if (!parsed) return;
+		if (!parsed) return;
 		const updated = { ...parsed, ...updates };
-		const headers = Object.entries(updated.headers)
-			.map(([key, value]) => `-H "${key}: ${value}"`)
-			.join(' ');
-		const bodyToSend = updated.body ? (shouldMinify ? minifyJSON(updated.body) : updated.body) : '';
-		const data = bodyToSend ? `-d '${bodyToSend}'` : '';
-		
+
 		// Rebuild URL with query params
-		const urlObj = new URL(updated.url);
-		urlObj.search = ''; // Clear existing params
-		Object.entries(updated.queryParams).forEach(([key, value]) => {
-			if (key) { // Solo requerimos key, value puede estar vacío
-				urlObj.searchParams.set(key, value);
-			}
+		let finalUrl = updated.url;
+		try {
+			const urlObj = new URL(updated.url);
+			urlObj.search = ''; // Clear existing params
+			Object.entries(updated.queryParams).forEach(([key, value]) => {
+				if (key) {
+					urlObj.searchParams.set(key, value);
+				}
+			});
+			finalUrl = urlObj.toString();
+		} catch (e) {
+			// If URL is invalid while typing, keep it as is
+		}
+
+		const args: string[] = ['curl', '-X', updated.method];
+		Object.entries(updated.headers).forEach(([key, value]) => {
+			args.push('-H', `${key}: ${value}`);
 		});
-		const finalUrl = urlObj.toString();
-		
-		const newCurl = `curl -X ${updated.method} '${finalUrl}' ${headers} ${data}`.trim();
+
+		if (updated.body) {
+			args.push('-d', shouldMinify ? minifyJSON(updated.body) : updated.body);
+		}
+
+		args.push(finalUrl);
+
+		const newCurl = joinArgs(args);
 		setCurlInput(newCurl);
 		setQuery(prev => prev ? { ...prev, curl: newCurl } : { id: '', curl: newCurl, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
 	};

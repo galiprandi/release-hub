@@ -3,6 +3,48 @@ import { decodeJWT } from '@/hooks/useToken';
 
 export type DiffMode = 'json' | 'jwt' | 'curl' | 'text';
 
+/**
+ * Detects the content type from a string.
+ * Priority: JWT > cURL > JSON > text
+ */
+export function detectContentType(text: string): DiffMode {
+	if (!text || text.trim().length === 0) return 'text';
+
+	const trimmed = text.trim();
+
+	// Check for JWT (3 parts separated by dots, base64-like)
+	const jwtParts = trimmed.split('.');
+	if (jwtParts.length === 3) {
+		try {
+			// Try to decode the header to verify it's a valid JWT
+			const header = JSON.parse(atob(jwtParts[0].replace(/-/g, '+').replace(/_/g, '/')));
+			if (header && (header.alg || header.typ)) {
+				return 'jwt';
+			}
+		} catch {
+			// Not a valid JWT, continue checking
+		}
+	}
+
+	// Check for cURL command
+	if (trimmed.toLowerCase().startsWith('curl ')) {
+		return 'curl';
+	}
+
+	// Check for JSON
+	if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+		try {
+			JSON.parse(trimmed);
+			return 'json';
+		} catch {
+			// Not valid JSON, fallback to text
+		}
+	}
+
+	// Default to text
+	return 'text';
+}
+
 export interface DiffResult {
 	type: 'added' | 'removed' | 'changed' | 'equal';
 	value: string;
@@ -46,6 +88,33 @@ function sortObjectKeys(obj: any): any {
 }
 
 /**
+ * Formats a timestamp as a human-readable expiration message.
+ */
+export function formatExpiration(exp: number): string {
+	const now = Math.floor(Date.now() / 1000);
+	const diff = exp - now;
+
+	if (diff <= 0) {
+		return 'Expirado';
+	}
+
+	const hours = Math.floor(diff / 3600);
+	const minutes = Math.floor((diff % 3600) / 60);
+
+	if (hours > 24) {
+		const days = Math.floor(hours / 24);
+		const remainingHours = hours % 24;
+		return `Expira en ${days}d ${remainingHours}h`;
+	}
+
+	if (hours > 0) {
+		return `Expira en ${hours}h ${minutes}m`;
+	}
+
+	return `Expira en ${minutes}m`;
+}
+
+/**
  * Decodes a JWT and returns a normalized JSON string of its parts.
  */
 export function decodeAndNormalizeJwt(token: string): string {
@@ -59,7 +128,7 @@ export function decodeAndNormalizeJwt(token: string): string {
 
 		return JSON.stringify({
 			header: sortObjectKeys(header),
-			payload: sortObjectKeys(payload)
+			payload: sortObjectKeys(payload || {})
 		}, null, 2);
 	} catch {
 		return token;

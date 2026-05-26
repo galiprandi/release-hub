@@ -7,7 +7,6 @@ import {
   Send,
   Moon,
   Sun,
-  MoreHorizontal,
   BookMarked,
   Newspaper,
   MessageSquare,
@@ -170,6 +169,9 @@ export function PageLayout({
                   onSelectResult={header.search.onSelectResult}
                 />
               )}
+              {actions && actions.map((action, index) => (
+                <React.Fragment key={index}>{action}</React.Fragment>
+              ))}
               {refreshFn && (
                 <button
                   onClick={refreshFn}
@@ -179,10 +181,7 @@ export function PageLayout({
                   <RefreshCw className="w-4 h-4" aria-hidden="true" />
                 </button>
               )}
-              {actions && actions.map((action, index) => (
-                <React.Fragment key={index}>{action}</React.Fragment>
-              ))}
-              {themeSwitch && (
+               {themeSwitch && (
                 <button
                   onClick={() => setIsDark(!isDark)}
                   className="p-2 text-muted-foreground hover:text-foreground transition-colors"
@@ -191,9 +190,6 @@ export function PageLayout({
                   {isDark ? <Sun className="w-4 h-4" aria-hidden="true" /> : <Moon className="w-4 h-4" aria-hidden="true" />}
                 </button>
               )}
-              <button className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Más opciones">
-                <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
-              </button>
             </div>
           </header>
           {/* Gradient separator for sticky header */}

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es";
-import { PipelineMonitor } from "@/components/PipelineMonitor/PipelineMonitor";
+import { UnifiedPipelineMonitor } from "@/pipeline-core/components/UnifiedPipelineMonitor";
 import { StageCommitsTable } from "@/components/StageCommitsTable";
 import { PromoteDialog } from "@/components/PromoteDialog";
 import { ForceRedeployDialog } from "@/components/ForceRedeployDialog";
@@ -16,6 +16,7 @@ import { useOpenPullRequests } from "@/hooks/useOpenPullRequests";
 import { useGitHubActionsSummary } from "@/hooks/useGitHubActionsSummary";
 import { GitPullRequest, Play } from "lucide-react";
 import { PageLayout } from "@/layouts/PageLayout";
+import { FilterBar } from "@/components/shared/FilterBar";
 
 dayjs.extend(relativeTime);
 dayjs.locale("es");
@@ -91,54 +92,26 @@ function ProductIndex() {
 			isLoading={isPipelineLoading || isPipelineFetching}
 		>
 			<div className="space-y-2 mb-3">
-				<PipelineMonitor
+				<UnifiedPipelineMonitor
 					org={org}
 					repo={repo}
-					sekiData={{
-						pipeline,
-						viewMode,
-						gitDate,
-						isLoading: isPipelineLoading || isPipelineFetching,
-						refetch: handleRefetchPipeline,
-						tagName: latestTag?.name,
-					}}
+					viewMode={viewMode}
+					ref={viewMode === "commits" ? (latestCommit?.hash ?? "") : (latestTag?.name ?? "")}
 				/>
 			</div>
 
 			{/* Tabs de navegación */}
-			<div className="flex items-center justify-between border-b border-border">
-				<div className="flex items-center gap-1">
-					<button
-						type="button"
-						onClick={() => navigate({ search: { view: "commits" } })}
-						className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${
-							viewMode === "commits"
-								? "text-foreground"
-								: "text-muted-foreground hover:text-foreground"
-						}`}
-					>
-						Commits
-						{viewMode === "commits" && (
-							<span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
-						)}
-					</button>
-					<button
-						type="button"
-						onClick={() => navigate({ search: { view: "tags" } })}
-						className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${
-							viewMode === "tags"
-								? "text-foreground"
-								: "text-muted-foreground hover:text-foreground"
-						}`}
-					>
-						Tags
-						{viewMode === "tags" && (
-							<span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
-						)}
-					</button>
-				</div>
-				<div className="flex items-center gap-2">
-					{/* Links externos */}
+			<div className="border-b border-border pb-1">
+				<FilterBar
+					filters={[
+						{ value: "commits", label: "Commits" },
+						{ value: "tags", label: "Tags" },
+					]}
+					activeFilter={viewMode}
+					onFilterChange={(value) => navigate({ search: { view: value as "commits" | "tags" } })}
+					rightContent={
+						<div className="flex items-center gap-2">
+							{/* Links externos */}
 					<a
 						href={openPRs?.repoUrl}
 						target="_blank"
@@ -177,10 +150,12 @@ function ProductIndex() {
 							</div>
 						)}
 					</a>
-					<div className="w-px h-5 bg-border mx-4" />
-					{/* Metadata/Configuración */}
-					<ProjectSelector repo={fullProduct} />
-				</div>
+							<div className="w-px h-5 bg-border mx-4" />
+							{/* Metadata/Configuración */}
+							<ProjectSelector repo={fullProduct} />
+						</div>
+					}
+				/>
 			</div>
 
 			<StageCommitsTable

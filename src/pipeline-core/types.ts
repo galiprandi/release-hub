@@ -14,6 +14,8 @@ export interface PipelineEvent {
 	startedAt?: string
 	completedAt?: string
 	duration?: number
+	markdown?: string
+	subevents?: PipelineEvent[]
 }
 
 export interface PipelineData {

@@ -35,34 +35,23 @@ function mapSubEvent(sub: SubEvent): PipelineEvent {
 		state: mapSekiState(sub.state),
 		startedAt: sub.created_at,
 		completedAt: sub.updated_at,
+		markdown: sub.markdown,
 	}
 }
 
 /**
- * Flatten Seki events with their subevents
+ * Convert Seki events to unified PipelineEvents (with nested subevents)
  */
-function flattenSekiEvents(events: SekiEvent[]): PipelineEvent[] {
-	const result: PipelineEvent[] = []
-	
-	for (const event of events) {
-		// Add parent event
-		result.push({
-			id: event.id || `event-${event.label?.en || 'unknown'}`,
-			name: event.label?.es || event.label?.en || event.id,
-			state: mapSekiState(event.state),
-			startedAt: event.created_at,
-			completedAt: event.updated_at,
-		})
-		
-		// Add subevents if present
-		if (event.subevents?.length) {
-			for (const sub of event.subevents) {
-				result.push(mapSubEvent(sub))
-			}
-		}
-	}
-	
-	return result
+function mapSekiEvents(events: SekiEvent[]): PipelineEvent[] {
+	return events.map(event => ({
+		id: event.id || `event-${event.label?.en || 'unknown'}`,
+		name: event.label?.es || event.label?.en || event.id,
+		state: mapSekiState(event.state),
+		startedAt: event.created_at,
+		completedAt: event.updated_at,
+		markdown: event.markdown,
+		subevents: event.subevents?.map(mapSubEvent)
+	}))
 }
 
 /**
@@ -80,7 +69,7 @@ function transformSekiData(data: PipelineStatusResponse, viewMode: ViewMode): Pi
 		state: mapSekiState(data.state),
 		startedAt: data.created_at,
 		completedAt: undefined,
-		events: flattenSekiEvents(data.events),
+		events: mapSekiEvents(data.events),
 		externalUrl: undefined, // Seki doesn't provide external URL yet
 		commit: {
 			message: data.git.commit_message,

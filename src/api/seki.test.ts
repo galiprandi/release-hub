@@ -10,6 +10,6 @@ describe('api/seki', () => {
 
     const res = await fetchPipeline('o/r', 'commit')
     expect(res).toBe(mockP)
-    expect(spy).toHaveBeenCalledWith('/products/o/r/pipelines/commit', expect.any(Object))
+    expect(spy).toHaveBeenCalledWith('/products/o/r/pipelines/commit')
   })
 })

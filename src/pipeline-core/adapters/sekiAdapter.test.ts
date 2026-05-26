@@ -28,9 +28,10 @@ describe('sekiAdapter', () => {
     ] }
     vi.mocked(sekiApi.fetchPipeline).mockResolvedValue({ data: mockData } as unknown as Awaited<ReturnType<typeof sekiApi.fetchPipeline>>)
     const result = await sekiAdapter.fetch('o', 'r', 'commits', 'abcdef1')
-    expect(result?.events).toHaveLength(2)
+    expect(result?.events).toHaveLength(1)
     expect(result?.events[0].name).toBe('Inicio')
-    expect(result?.events[1].name).toBe('Step 1')
+    expect(result?.events[0].subevents).toHaveLength(1)
+    expect(result?.events[0].subevents?.[0].name).toBe('Step 1')
   })
 
   it('should return null for short refs or API errors', async () => {

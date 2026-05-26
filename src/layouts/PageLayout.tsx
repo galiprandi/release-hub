@@ -110,10 +110,10 @@ export function PageLayout({
               <NavIcon icon={Send} label="Fetcher" to="/fetcher" pathname={pathname} />
             </li>
             <li>
-              <NavIcon icon={Activity} label="Health Monitor" to="/health" pathname={pathname} />
+              <NavIcon icon={GitCompare} label="Diff Engine" to="/diff" pathname={pathname} />
             </li>
             <li>
-              <NavIcon icon={GitCompare} label="Diff Engine" to="/diff" pathname={pathname} />
+              <NavIcon icon={Activity} label="Health Monitor" to="/health" pathname={pathname} />
             </li>
           </ul>
 

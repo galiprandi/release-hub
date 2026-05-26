@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { joinArgs } from '@/utils/shell'
 
 export const apiExec = axios.create({
   baseURL: '/local',
@@ -13,14 +14,16 @@ interface ExecResponse {
 
 /**
  * Execute any bash command via Vite dev server
- * @param command - Bash command to execute (e.g., 'ls -la', 'gh api repos/...')
+ * @param command - Bash command to execute (as string or array of args)
  * @returns Promise with stdout and stderr
  * @throws Error if command fails (success: false)
  */
-export const runCommand = async (command: string): Promise<ExecResponse> => {
+export const runCommand = async (command: string | string[]): Promise<ExecResponse> => {
+  const finalCommand = Array.isArray(command) ? joinArgs(command) : command
+
   const response = await apiExec.post<ExecResponse>(
     '/exec',
-    { command },
+    { command: finalCommand },
     {
       headers: {
         'Content-Type': 'application/json',
@@ -33,4 +36,3 @@ export const runCommand = async (command: string): Promise<ExecResponse> => {
   }
   return data
 }
-

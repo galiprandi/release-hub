@@ -1,4 +1,5 @@
 import { runCommand } from '@/api/exec';
+import { quote } from '@/utils/shell';
 
 export interface ContainerInfo {
 	id: string;
@@ -31,7 +32,7 @@ function sanitizeContainerId(containerId: string): string {
  */
 export async function checkDockerInstalled(): Promise<boolean> {
 	try {
-		const result = await runCommand('docker --version');
+		const result = await runCommand(['docker', '--version']);
 		return result.stdout.includes('Docker version');
 	} catch {
 		return false;
@@ -43,7 +44,7 @@ export async function checkDockerInstalled(): Promise<boolean> {
  */
 export async function checkDockerAccess(): Promise<boolean> {
 	try {
-		await runCommand('docker ps');
+		await runCommand(['docker', 'ps']);
 		return true;
 	} catch {
 		return false;
@@ -96,7 +97,7 @@ function parseContainers(output: string): ContainerInfo[] {
  */
 export async function getContainers(): Promise<ContainerInfo[]> {
 	try {
-		const result = await runCommand('docker ps -a --format json');
+		const result = await runCommand(['docker', 'ps', '-a', '--format', 'json']);
 		return parseContainers(result.stdout);
 	} catch (error) {
 		console.error('[Docker] Error getting containers:', error);
@@ -111,13 +112,13 @@ export async function getContainers(): Promise<ContainerInfo[]> {
 export async function getContainerLogs(containerId: string, tail = 100, since?: number): Promise<string> {
 	try {
 		const sanitizedId = sanitizeContainerId(containerId);
-		let command = `docker logs --tail=${tail} ${sanitizedId}`;
+		let args: string[] = ['docker', 'logs', `--tail=${tail}`, sanitizedId];
 		if (since) {
 			// Convert Unix timestamp to ISO format for Docker --since
 			const sinceDate = new Date(since * 1000);
-			command = `docker logs --since="${sinceDate.toISOString()}" ${sanitizedId}`;
+			args = ['docker', 'logs', `--since=${sinceDate.toISOString()}`, sanitizedId];
 		}
-		const result = await runCommand(command);
+		const result = await runCommand(args);
 		// Some containers use stdout, others use stderr
 		// Use stderr if it has content, otherwise use stdout
 		const logs = (result.stderr || '').trim() || (result.stdout || '').trim();
@@ -136,7 +137,7 @@ export async function getContainerLogs(containerId: string, tail = 100, since?: 
 export async function startContainer(containerId: string): Promise<boolean> {
 	try {
 		const sanitizedId = sanitizeContainerId(containerId);
-		await runCommand(`docker start ${sanitizedId}`);
+		await runCommand(['docker', 'start', sanitizedId]);
 		return true;
 	} catch (error) {
 		console.error('[Docker] Error starting container:', error);
@@ -150,7 +151,7 @@ export async function startContainer(containerId: string): Promise<boolean> {
 export async function restartContainer(containerId: string): Promise<boolean> {
 	try {
 		const sanitizedId = sanitizeContainerId(containerId);
-		await runCommand(`docker restart ${sanitizedId}`);
+		await runCommand(['docker', 'restart', sanitizedId]);
 		return true;
 	} catch (error) {
 		console.error('[Docker] Error restarting container:', error);
@@ -164,11 +165,10 @@ export async function restartContainer(containerId: string): Promise<boolean> {
 export async function stopContainer(containerId: string): Promise<boolean> {
 	try {
 		const sanitizedId = sanitizeContainerId(containerId);
-		await runCommand(`docker stop ${sanitizedId}`);
+		await runCommand(['docker', 'stop', sanitizedId]);
 		return true;
 	} catch (error) {
 		console.error('[Docker] Error stopping container:', error);
 		return false;
 	}
 }
-

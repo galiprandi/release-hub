@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import type { DiffMode, DiffLine } from '@/utils/diffEngine';
 import { computeDiff, normalizeJson, decodeAndNormalizeJwt, normalizeCurl, formatExpiration, detectContentType } from '@/utils/diffEngine';
 import { decodeJWT } from '@/hooks/useToken';
@@ -39,11 +39,7 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
 	const diffScrollRef = useRef<HTMLDivElement>(null);
 
 	// Synchronize scrolling
-	const handleScroll = (source: 'left' | 'right' | 'diff') => (e: React.UIEvent<HTMLDivElement | HTMLTextAreaElement>) => {
-		const target = e.currentTarget;
-		const scrollTop = target.scrollTop;
-		const scrollLeft = target.scrollLeft;
-
+	const syncScroll = useCallback((source: 'left' | 'right' | 'diff', scrollTop: number, scrollLeft: number) => {
 		if (source !== 'left' && leftScrollRef.current) {
 			leftScrollRef.current.scrollTop = scrollTop;
 			leftScrollRef.current.scrollLeft = scrollLeft;
@@ -56,7 +52,19 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
 			diffScrollRef.current.scrollTop = scrollTop;
 			diffScrollRef.current.scrollLeft = scrollLeft;
 		}
-	};
+	}, []);
+
+	const handleLeftScroll = useCallback((e: React.UIEvent<HTMLDivElement | HTMLTextAreaElement>) => {
+		syncScroll('left', e.currentTarget.scrollTop, e.currentTarget.scrollLeft);
+	}, [syncScroll]);
+
+	const handleRightScroll = useCallback((e: React.UIEvent<HTMLDivElement | HTMLTextAreaElement>) => {
+		syncScroll('right', e.currentTarget.scrollTop, e.currentTarget.scrollLeft);
+	}, [syncScroll]);
+
+	const handleDiffScroll = useCallback((e: React.UIEvent<HTMLDivElement | HTMLTextAreaElement>) => {
+		syncScroll('diff', e.currentTarget.scrollTop, e.currentTarget.scrollLeft);
+	}, [syncScroll]);
 
 	const diff = useMemo(() => {
 		let processedA = textA;
@@ -108,7 +116,7 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
 					onChange={setTextA}
 					placeholder={`Pega aquí el contenido ${mode.toUpperCase()}...`}
 					scrollRef={leftScrollRef}
-					onScroll={handleScroll('left')}
+					onScroll={handleLeftScroll}
 				/>
 				<DiffPanel
 					title="Destino (Panel B)"
@@ -116,7 +124,7 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
 					onChange={setTextB}
 					placeholder={`Pega aquí el contenido ${mode.toUpperCase()} a comparar...`}
 					scrollRef={rightScrollRef}
-					onScroll={handleScroll('right')}
+					onScroll={handleRightScroll}
 				/>
 			</div>
 
@@ -166,7 +174,7 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
 				</div>
 				<div
 					ref={diffScrollRef}
-					onScroll={handleScroll('diff')}
+					onScroll={handleDiffScroll}
 					className="flex-1 overflow-auto p-4 font-mono text-xs scrollbar-hide"
 				>
 					{!textA && !textB ? (

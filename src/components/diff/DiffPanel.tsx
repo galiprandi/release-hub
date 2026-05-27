@@ -1,6 +1,15 @@
 import React from 'react';
 import { Copy, Check } from 'lucide-react';
 
+interface DiffPanelProps {
+	title: string;
+	value: string;
+	onChange: (value: string) => void;
+	placeholder: string;
+	onScroll: (e: React.UIEvent<HTMLTextAreaElement>) => void;
+	scrollRef: React.RefObject<HTMLDivElement | null>;
+}
+
 export function DiffPanel({
 	title,
 	value,
@@ -8,7 +17,7 @@ export function DiffPanel({
 	placeholder,
 	onScroll,
 	scrollRef
-}: any) {
+}: DiffPanelProps) {
 	const [copied, setCopied] = React.useState(false);
 
 	const handleCopy = async () => {
@@ -37,7 +46,7 @@ export function DiffPanel({
 			</div>
 			<div className="relative flex-1">
 				<textarea
-					ref={scrollRef as any}
+					ref={scrollRef as unknown as React.RefObject<HTMLTextAreaElement>}
 					onScroll={onScroll}
 					value={value}
 					onChange={(e) => onChange(e.target.value)}

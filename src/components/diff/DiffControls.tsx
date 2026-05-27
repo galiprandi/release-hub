@@ -8,7 +8,7 @@ interface DiffControlsProps {
 }
 
 export function DiffControls({ mode, onModeChange }: DiffControlsProps) {
-	const modes: { id: DiffMode; label: string; icon: any }[] = [
+	const modes: { id: DiffMode; label: string; icon: React.ElementType }[] = [
 		{ id: 'json', label: 'JSON Mode', icon: LayoutGrid },
 		{ id: 'jwt', label: 'JWT Mode', icon: Fingerprint },
 		{ id: 'curl', label: 'cURL Mode', icon: Terminal },

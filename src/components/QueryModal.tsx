@@ -1,5 +1,5 @@
  
-import { useState, useEffect, type Dispatch, type SetStateAction } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Send, AlertTriangle, Plus } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
 import { JsonEditor } from '@/components/JsonEditor';
@@ -27,20 +27,6 @@ interface CurlResponse {
 
 const MAX_HEADERS_DISPLAY = 7;
 
-function formatTimeAgo(dateString: string): string {
-	const date = new Date(dateString);
-	const now = new Date();
-	const diffMs = now.getTime() - date.getTime();
-	const diffMins = Math.floor(diffMs / 60000);
-	const diffHours = Math.floor(diffMins / 60);
-	const diffDays = Math.floor(diffHours / 24);
-
-	if (diffMins < 1) return 'ahora mismo';
-	if (diffMins < 60) return `hace ${diffMins} min`;
-	if (diffHours < 24) return `hace ${diffHours} h`;
-	return `hace ${diffDays} días`;
-}
-
 export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 	const [curlInput, setCurlInput] = useState(query?.curl || '');
 	const [isExecuting, setIsExecuting] = useState(false);
@@ -54,14 +40,17 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 	const [requestBodySearchQuery, setRequestBodySearchQuery] = useState('');
 
 	const { addQueryRecord } = useFetcherHistory();
-	const parsed = curlInput ? parseCurlCommand(curlInput) : null;
 
-	// Sync curlInput when query changes externally
-	useEffect(() => {
-		if (query?.curl && curlInput !== query.curl) {
-			setCurlInput(query.curl);
-		}
-	}, [query?.curl, curlInput]);
+	// Use query.curl as the source of truth if provided, otherwise local state
+	const effectiveCurl = query?.curl ?? curlInput;
+	const parsed = effectiveCurl ? parseCurlCommand(effectiveCurl) : null;
+
+	// Update local state when query.curl changes to keep them in sync for editing
+	const [lastQueryCurl, setLastQueryCurl] = useState(query?.curl);
+	if (query?.curl !== lastQueryCurl) {
+		setLastQueryCurl(query?.curl);
+		setCurlInput(query?.curl || '');
+	}
 
 	// Derive response from initialQuery or execution result
 	const [executedResponse, setExecutedResponse] = useState<CurlResponse | null>(null);
@@ -189,7 +178,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 				}
 			});
 			finalUrl = urlObj.toString();
-		} catch (e) {
+		} catch {
 			// If URL is invalid while typing, keep it as is
 		}
 
@@ -538,7 +527,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 													: response.status >= 400
 														? 'bg-destructive/20 text-destructive'
 														: 'bg-warning/20 text-warning'
-											}`} title={query?.updatedAt ? formatTimeAgo(query.updatedAt) : new Date().toLocaleString()}>
+											}`} title={query?.updatedAt ? DayJS(query.updatedAt).format('LLL') : new Date().toLocaleString()}>
 											{response.status} {response.statusText}
 										</span>
 										<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 px-2 py-0.5 rounded">

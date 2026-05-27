@@ -106,7 +106,7 @@ describe('docker api', () => {
         it('fetches logs with default tail', async () => {
             vi.mocked(runCommand).mockResolvedValueOnce({ stdout: 'line1\nline2', stderr: '', success: true });
             const logs = await getContainerLogs('abc123');
-            expect(runCommand).toHaveBeenCalledWith('docker logs --tail=100 abc123');
+            expect(runCommand).toHaveBeenCalledWith(['docker', 'logs', '--tail=100', 'abc123']);
             expect(logs).toBe('line1\nline2');
         });
 
@@ -144,7 +144,7 @@ describe('docker api', () => {
         it('startContainer returns true on success', async () => {
             vi.mocked(runCommand).mockResolvedValueOnce({ stdout: 'abc', stderr: '', success: true });
             expect(await startContainer('abc')).toBe(true);
-            expect(runCommand).toHaveBeenCalledWith('docker start abc');
+            expect(runCommand).toHaveBeenCalledWith(['docker', 'start', 'abc']);
         });
 
         it('startContainer returns false on failure', async () => {
@@ -155,13 +155,13 @@ describe('docker api', () => {
         it('restartContainer returns true on success', async () => {
             vi.mocked(runCommand).mockResolvedValueOnce({ stdout: 'abc', stderr: '', success: true });
             expect(await restartContainer('abc')).toBe(true);
-            expect(runCommand).toHaveBeenCalledWith('docker restart abc');
+            expect(runCommand).toHaveBeenCalledWith(['docker', 'restart', 'abc']);
         });
 
         it('stopContainer returns true on success', async () => {
             vi.mocked(runCommand).mockResolvedValueOnce({ stdout: 'abc', stderr: '', success: true });
             expect(await stopContainer('abc')).toBe(true);
-            expect(runCommand).toHaveBeenCalledWith('docker stop abc');
+            expect(runCommand).toHaveBeenCalledWith(['docker', 'stop', 'abc']);
         });
     });
 });

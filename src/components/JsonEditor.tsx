@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Copy, Check, AlertCircle, Code, Minimize2, Search, X } from 'lucide-react';
 import { formatJSON, minifyJSON } from '../utils/curlParser';
 
@@ -26,10 +26,12 @@ export function JsonEditor({
 	const [displayMode, setDisplayMode] = useState<'formatted' | 'minified'>('formatted');
 	const [formatFeedback, setFormatFeedback] = useState(false);
 
-	// Reset display mode when value changes
-	useEffect(() => {
+	// Sync display mode when value changes using a ref-based previous value check to avoid useEffect cascading renders
+	const [lastValue, setLastValue] = useState(value);
+	if (value !== lastValue) {
+		setLastValue(value);
 		setDisplayMode('formatted');
-	}, [value]);
+	}
 
 	const isValidJson = useMemo(() => {
 		if (!value) return true;

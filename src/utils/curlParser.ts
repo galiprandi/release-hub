@@ -86,20 +86,13 @@ export function parseCurlCommand(curlString: string): ParsedCurl {
 				}
 				
 				if (char === quoteChar) {
-					// Check if this quote is followed by a space and a flag (starts with -)
-					// or if it's at the end of the string
+					// Check if this quote is followed by a space or end of string
+					// This means the string is closed (the next token is a flag, URL, or EOF)
 					const nextChar = cleaned[i + 1];
 					if (nextChar === undefined || nextChar === ' ' || nextChar === '\n' || nextChar === '\t') {
-						// Look ahead to see if there's a flag after the space
-						let j = i + 1;
-						while (j < cleaned.length && (cleaned[j] === ' ' || cleaned[j] === '\n' || cleaned[j] === '\t')) {
-							j++;
-						}
-						if (j >= cleaned.length || cleaned[j] === '-') {
-							endIndex = i;
-							inString = false;
-							break;
-						}
+						endIndex = i;
+						inString = false;
+						break;
 					}
 				}
 			}

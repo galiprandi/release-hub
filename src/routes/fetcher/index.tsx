@@ -181,6 +181,7 @@ function FetcherPage() {
 			)}
 
 			<QueryModal
+				key={activeQuery?.curl || editingQuery?.curl || 'empty'}
 				setQuery={setActiveQuery}
 				query={activeQuery || editingQuery}
 				onClose={handleCloseModal}

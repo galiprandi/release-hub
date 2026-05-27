@@ -1,10 +1,10 @@
-import { useState, useMemo, useEffect } from 'react';
-import { Copy, Check, AlertCircle, Code, Minimize2, Search, X } from 'lucide-react';
-import { formatJSON, minifyJSON } from '../utils/curlParser';
+import { useState, useMemo } from 'react';
+import { Copy, Check, Code, Search, X } from 'lucide-react';
+import { formatJSON } from '../utils/curlParser';
 
 interface JsonEditorProps {
 	value: string;
-	onChange: (value: string, shouldMinify?: boolean) => void;
+	onChange: (value: string) => void;
 	placeholder?: string;
 	readOnly?: boolean;
 	height?: string;
@@ -23,23 +23,7 @@ export function JsonEditor({
 }: JsonEditorProps) {
 	const [copied, setCopied] = useState(false);
 	const [searchExpanded, setSearchExpanded] = useState(false);
-	const [displayMode, setDisplayMode] = useState<'formatted' | 'minified'>('formatted');
 	const [formatFeedback, setFormatFeedback] = useState(false);
-
-	// Reset display mode when value changes
-	useEffect(() => {
-		setDisplayMode('formatted');
-	}, [value]);
-
-	const isValidJson = useMemo(() => {
-		if (!value) return true;
-		try {
-			JSON.parse(value);
-			return true;
-		} catch {
-			return false;
-		}
-	}, [value]);
 
 	const stats = useMemo(() => {
 		if (!value) return { lines: 0, chars: 0 };
@@ -53,21 +37,15 @@ export function JsonEditor({
 		setFormatFeedback(true);
 		setTimeout(() => setFormatFeedback(false), 1000);
 		
-		if (readOnly) {
-			// Toggle between formatted and minified
-			setDisplayMode(displayMode === 'formatted' ? 'minified' : 'formatted');
-		} else {
-			// In edit mode, toggle between formatted and minified
-			const formatted = formatJSON(value);
-			const minified = minifyJSON(value);
-			
-			if (value === formatted) {
-				// Currently formatted, go to minified
-				onChange(minified, true);
-			} else {
-				// Currently minified or original, go to formatted
-				onChange(formatted, false);
-			}
+		if (readOnly) return;
+		
+		// Only try to format if it looks like JSON
+		const trimmed = value.trim();
+		if (!trimmed || (!trimmed.startsWith('{') && !trimmed.startsWith('['))) return;
+		
+		const formatted = formatJSON(value);
+		if (formatted !== value) {
+			onChange(formatted);
 		}
 	};
 
@@ -86,15 +64,11 @@ export function JsonEditor({
 		
 		let displayValue = value;
 		
-		// Apply display mode transformations for readOnly
+		// For readOnly, always format if it looks like JSON
 		if (readOnly) {
-			// Always minify first to get a clean base, then format if needed
-			const minified = minifyJSON(value);
-			
-			if (displayMode === 'formatted') {
-				displayValue = formatJSON(minified);
-			} else {
-				displayValue = minified;
+			const trimmed = value.trim();
+			if (trimmed && (trimmed.startsWith('{') || trimmed.startsWith('['))) {
+				displayValue = formatJSON(value);
 			}
 		}
 		
@@ -115,12 +89,6 @@ export function JsonEditor({
 			<div className="flex items-center justify-between bg-g pb-1 px-4">
 				<div className="flex items-center gap-2">
 					<label className="text-xs font-medium">JSON</label>
-					{!isValidJson && !readOnly && (
-						<span className="text-xs text-warning flex items-center gap-1">
-							<AlertCircle className="w-3 h-3" />
-							Inválido
-						</span>
-					)}
 				</div>
 				<div className="flex items-center gap-2">
 					{onSearchChange && (
@@ -163,9 +131,9 @@ export function JsonEditor({
 						type="button"
 						onClick={handleFormatToggle}
 						className="text-primary hover:text-primary/80"
-						title={formatFeedback ? (displayMode === 'formatted' ? 'Formateado' : 'Minificado') : (displayMode === 'formatted' ? 'Minificar' : 'Formatear')}
+						title={formatFeedback ? 'Formateado' : 'Formatear'}
 					>
-						{formatFeedback ? <Check className="w-4 h-4" /> : (displayMode === 'formatted' ? <Minimize2 className="w-4 h-4" /> : <Code className="w-4 h-4" />)}
+						{formatFeedback ? <Check className="w-4 h-4" /> : <Code className="w-4 h-4" />}
 					</button>
 					<button
 						type="button"
@@ -195,7 +163,7 @@ export function JsonEditor({
 						onChange={(e) => onChange(e.target.value)}
 						placeholder={placeholder}
 						readOnly={readOnly}
-						className={`w-full ${height} px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono ${!isValidJson ? 'border-warning/50 focus:ring-warning' : ''}`}
+						className={`w-full ${height} px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono`}
 					/>
 					{value && (
 						<div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-background/80 px-1.5 py-0.5 rounded">

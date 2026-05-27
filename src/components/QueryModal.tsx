@@ -27,20 +27,6 @@ interface CurlResponse {
 
 const MAX_HEADERS_DISPLAY = 7;
 
-function formatTimeAgo(dateString: string): string {
-	const date = new Date(dateString);
-	const now = new Date();
-	const diffMs = now.getTime() - date.getTime();
-	const diffMins = Math.floor(diffMs / 60000);
-	const diffHours = Math.floor(diffMins / 60);
-	const diffDays = Math.floor(diffHours / 24);
-
-	if (diffMins < 1) return 'ahora mismo';
-	if (diffMins < 60) return `hace ${diffMins} min`;
-	if (diffHours < 24) return `hace ${diffHours} h`;
-	return `hace ${diffDays} días`;
-}
-
 export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 	const [curlInput, setCurlInput] = useState(query?.curl || '');
 	const [isExecuting, setIsExecuting] = useState(false);
@@ -278,39 +264,20 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 									<div className="space-y-4 flex-1 flex flex-col">
 										{/* Request tabs */}
 										<div className="flex p-1 bg-muted/40 border border-border/60 rounded-lg gap-1 items-center flex-shrink-0">
-											<button
-												type="button"
-												onClick={() => setRequestTab('params')}
-												className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-													requestTab === 'params'
-														? 'bg-background shadow-sm text-foreground'
-														: 'text-muted-foreground hover:bg-accent'
-												}`}
-											>
-												Params
-											</button>
-											<button
-												type="button"
-												onClick={() => setRequestTab('headers')}
-												className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-													requestTab === 'headers'
-														? 'bg-background shadow-sm text-foreground'
-														: 'text-muted-foreground hover:bg-accent'
-												}`}
-											>
-												Headers
-											</button>
-											<button
-												type="button"
-												onClick={() => setRequestTab('body')}
-												className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-													requestTab === 'body'
-														? 'bg-background shadow-sm text-foreground'
-														: 'text-muted-foreground hover:bg-accent'
-												}`}
-											>
-												Body
-											</button>
+											{(['params', 'headers', 'body'] as const).map((tab) => (
+												<button
+													key={tab}
+													type="button"
+													onClick={() => setRequestTab(tab)}
+													className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
+														requestTab === tab
+															? 'bg-background shadow-sm text-foreground'
+															: 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+													}`}
+												>
+													{tab === 'params' ? 'Params' : tab === 'headers' ? 'Headers' : 'Body'}
+												</button>
+											))}
 										</div>
 
 										{/* Request content */}
@@ -474,28 +441,20 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 										<>
 											{/* Tabs - Using industrial resonance style from FilterBar */}
 											<div className="flex p-1 bg-muted/40 border border-border/60 rounded-lg gap-1 mb-3 items-center flex-shrink-0">
-												<button
-													type="button"
-													onClick={() => setActiveTab('headers')}
-													className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-														activeTab === 'headers'
-															? 'bg-background shadow-sm text-foreground'
-															: 'text-muted-foreground hover:bg-accent'
-													}`}
-												>
-													Headers
-												</button>
-												<button
-													type="button"
-													onClick={() => setActiveTab('body')}
-													className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-														activeTab === 'body'
-															? 'bg-background shadow-sm text-foreground'
-															: 'text-muted-foreground hover:bg-accent'
-													}`}
-												>
-													Body
-												</button>
+												{(['headers', 'body'] as const).map((tab) => (
+													<button
+														key={tab}
+														type="button"
+														onClick={() => setActiveTab(tab)}
+														className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
+															activeTab === tab
+																? 'bg-background shadow-sm text-foreground'
+																: 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+														}`}
+													>
+														{tab === 'headers' ? 'Headers' : 'Body'}
+													</button>
+												))}
 											</div>
 
 											{/* Response content */}
@@ -538,7 +497,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 													: response.status >= 400
 														? 'bg-destructive/20 text-destructive'
 														: 'bg-warning/20 text-warning'
-											}`} title={query?.updatedAt ? formatTimeAgo(query.updatedAt) : new Date().toLocaleString()}>
+											}`} title={query?.updatedAt ? DayJS(query.updatedAt).format('LLL') : DayJS().format('LLL')}>
 											{response.status} {response.statusText}
 										</span>
 										<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 px-2 py-0.5 rounded">

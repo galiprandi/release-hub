@@ -261,6 +261,10 @@ Antes de crear componentes nuevos, verificar si extienden:
 
 Componente reutilizable para botones de acción iconográficos con tooltip integrado. Estándar para todas las acciones de fila en tablas (Docker, K8s, repos, etc.).
 
+### ConfirmDialog
+
+Componente modal para confirmaciones críticas. Extiende `BaseDialog` y utiliza `AlertTriangle` para resonancia visual. Soporta variantes `default` y `destructive`. Debe usarse en lugar de `confirm()` nativo.
+
 ## Security Validation Standard
 
 - **Shell Injection Protection**: Todos los comandos externos se ejecutan utilizando un sistema de escape POSIX-compatible.

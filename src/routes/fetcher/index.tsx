@@ -1,16 +1,18 @@
 import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Send } from 'lucide-react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { Send, Plus } from 'lucide-react';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { QueryModal } from '@/components/QueryModal';
 import { Table } from '@/components/ui/Table';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import type { ColumnDef } from '@tanstack/react-table';
 import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 import { PageLayout } from '@/layouts/PageLayout';
+import DayJS from '@/lib/dayjs';
 
 export const Route = createFileRoute('/fetcher/')({
 	component: FetcherPage,
@@ -21,22 +23,6 @@ export const Route = createFileRoute('/fetcher/')({
 	},
 });
 
-// Function to format relative time
-function formatTimeAgo(dateString: string): string {
-	const date = new Date(dateString);
-	const now = new Date();
-	const diffMs = now.getTime() - date.getTime();
-	const diffMins = Math.floor(diffMs / 60000);
-	const diffHours = Math.floor(diffMins / 60);
-	const diffDays = Math.floor(diffHours / 24);
-
-	if (diffMins < 1) return 'ahora mismo';
-	if (diffMins < 60) return `hace ${diffMins} min`;
-	if (diffHours < 24) return `hace ${diffHours} h`;
-	if (diffDays < 7) return `hace ${diffDays} días`;
-	return date.toLocaleDateString();
-}
-
 
 function FetcherPage() {
 	const { data: access, isLoading: checkingAccess } = useCurlAccess();
@@ -46,6 +32,8 @@ function FetcherPage() {
 	const [activeQuery, setActiveQuery] = useState<QueryRecord | undefined>();
 	const [editingQuery, setEditingQuery] = useState<QueryRecord | undefined>();
 	const [curlInput, setCurlInput] = useState('');
+	const [deleteId, setDeleteId] = useState<string | null>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (access && !access.isInstalled) {
@@ -78,8 +66,13 @@ function FetcherPage() {
 
 
 	const handleDelete = (id: string) => {
-		if (confirm('¿Estás seguro de que quieres eliminar esta query del historial?')) {
-			deleteQueryRecord(id);
+		setDeleteId(id);
+	};
+
+	const confirmDelete = () => {
+		if (deleteId) {
+			deleteQueryRecord(deleteId);
+			setDeleteId(null);
 		}
 	};
 
@@ -125,6 +118,7 @@ function FetcherPage() {
 		<form className="flex items-center gap-2" onSubmit={(e) => { e.preventDefault(); handleSendCurl(); }}>
 			<div className="relative">
 				<input
+					ref={inputRef}
 					type="text"
 					value={curlInput}
 					onChange={(e) => setCurlInput(e.target.value)}
@@ -155,12 +149,22 @@ function FetcherPage() {
 				loadingHistory ? (
 					<StatusCard type="loading" message="Cargando historial..." />
 				) : history.length === 0 ? (
-					<div className="text-center py-12 bg-muted/50 rounded-lg border-2 border-dashed">
-						<Send className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-						<p className="text-muted-foreground">No hay queries en el historial</p>
-						<p className="text-sm text-muted-foreground mt-1">
-							Importa un comando cURL para comenzar
-						</p>
+					<div className="text-center py-16 bg-muted/20 rounded-xl border border-dashed border-border/60 flex flex-col items-center justify-center gap-4">
+						<div className="w-16 h-16 rounded-full bg-muted/40 flex items-center justify-center">
+							<Send className="w-8 h-8 text-muted-foreground" />
+						</div>
+						<div className="space-y-1">
+							<p className="font-bold text-lg tracking-tight">Historial vacío</p>
+							<p className="text-sm text-muted-foreground max-w-[280px]">
+								No hay registros de queries enviadas. Comienza importando un comando cURL.
+							</p>
+						</div>
+						<ActionButton
+							action={{ icon: Plus, label: "Importar cURL", color: "primary" }}
+							onClick={() => inputRef.current?.focus()}
+							showLabel
+							className="font-bold uppercase tracking-tight mt-2"
+						/>
 					</div>
 				) : (
 					<QueriesTable
@@ -184,6 +188,16 @@ function FetcherPage() {
 				setQuery={setActiveQuery}
 				query={activeQuery || editingQuery}
 				onClose={handleCloseModal}
+			/>
+
+			<ConfirmDialog
+				open={!!deleteId}
+				onOpenChange={(open) => !open && setDeleteId(null)}
+				title="Eliminar Query"
+				description="¿Estás seguro de que quieres eliminar esta query del historial? Esta acción no se puede deshacer."
+				onConfirm={confirmDelete}
+				variant="destructive"
+				confirmLabel="Eliminar"
 			/>
 		</div>
 		</PageLayout>
@@ -319,8 +333,8 @@ function DomainCell({ query }: { query: QueryRecord }) {
 
 function SentCell({ query }: { query: QueryRecord }) {
 	return (
-		<span className="text-sm text-muted-foreground" title={query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}>
-			{query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}
+		<span className="text-sm text-muted-foreground" title={query.updatedAt ? DayJS(query.updatedAt).format('LLL') : 'Nunca'}>
+			{query.updatedAt ? DayJS(query.updatedAt).fromNow() : 'Nunca'}
 		</span>
 	)
 }

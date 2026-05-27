@@ -4,7 +4,10 @@
 
 ### 🗓️ 27 de Mayo de 2026
 
-- 🎉 **Resonancia Industrial**: Refinamiento global del sistema de diseño para una estética de alta densidad y profesionalismo técnico.
+- 🎉 **Fetcher Pro**: Estandarización y resonancia industrial en el módulo de queries.
+- ✨ **ConfirmDialog**: Nuevo componente de confirmación modal que reemplaza los diálogos nativos del navegador para una experiencia integrada.
+- ✨ **Empty States Accionables**: Mejora del "Time to Value" mediante CTAs directos en estados vacíos (ej: "Importar cURL").
+- ✨ **Resonancia Industrial**: Refinamiento global del sistema de diseño para una estética de alta densidad y profesionalismo técnico.
 - ✨ **FilterBar Pro**: Nueva variante `tabs` estandarizada para navegación interna en dashboards y modales, reduciendo la carga cognitiva.
 - ✨ **Tablas de Alto Contraste**: Rediseño del componente `Table` con bordes sutiles `border-border/60`, encabezados `bg-muted/40` y tipografía `uppercase` para una legibilidad superior.
 - ✨ **GitHub Dashboard**: Navegación de colecciones (Favoritos/Proyectos) unificada mediante el nuevo sistema de pestañas industriales.

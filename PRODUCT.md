@@ -14,4 +14,6 @@ ReleaseHub es una aplicación web **stateless** para visualizar pipelines CI/CD 
 
 - El color principal de la marca de ReleaseHub será el amarillo #F59E0B, utilizado tanto en el favicon como en todo el diseño de la aplicación. Esto ayudará a diferenciarnos claramente de otras aplicaciones GitHub en la barra de navegación del navegador de Github.
 
+- **Fetcher Pro**: Estandarización del módulo de obtención de datos con un flujo de trabajo optimizado que reduce la fricción mediante estados vacíos accionables y una interfaz de ejecución de queries de alta densidad.
+
 - **Monitoreo Unificado**: Adopción de una arquitectura de monitoreo único para todos los proveedores de CI/CD. El sistema debe ser capaz de detectar automáticamente el proveedor y mostrar el estado del pipeline de forma consistente e interactiva, maximizando el valor para el desarrollador al centralizar el feedback de despliegue.

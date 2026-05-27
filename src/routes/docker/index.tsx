@@ -72,7 +72,7 @@ function DockerManagerPage() {
     <button
       type="button"
       onClick={handleRefresh}
-      className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-input text-muted-foreground rounded-md hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+      className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider border border-border/60 text-muted-foreground rounded-lg bg-background hover:bg-accent hover:text-accent-foreground transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
     >
       <RefreshCw className="w-3.5 h-3.5" />
       Recargar

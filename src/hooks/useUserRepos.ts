@@ -52,50 +52,49 @@ export function useUserRepos({
   return useQuery<Repo[]>({
     queryKey: queryKeys.user.repos(org || 'all'),
     queryFn: async () => {
-      const commands: string[] = []
+      const repoListArgs = [
+        '--limit',
+        '1000',
+        '--json',
+        'name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission',
+      ]
 
       if (org) {
         // If org specified, only list repos from that org
-        commands.push(
-          `gh repo list ${org} --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission`
-        )
+        const result = await runCommand(['gh', 'repo', 'list', org, ...repoListArgs])
+        const repos = JSON.parse(result.stdout) as CmdResponseDTO[]
+        return repos.map((repo) => ({
+          fullName: repo.fullName || repo.nameWithOwner || '',
+          name: repo.name,
+          description: repo.description || '',
+          updatedAt: repo.pushedAt || repo.updatedAt || '',
+          viewerPermission: repo.viewerPermission,
+        }))
       } else {
         // Get organizations dynamically
-        const orgsResult = await runCommand('gh api /user/memberships/orgs --jq \'.[].organization.login\'')
+        const orgsResult = await runCommand(['gh', 'api', '/user/memberships/orgs', '--jq', '.[].organization.login'])
         const orgs = orgsResult.stdout.trim().split('\n').filter(Boolean)
 
-        // Add commands for each org
-        orgs.forEach((orgName) => {
-          commands.push(
-            `gh repo list ${orgName} --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission`
-          )
-        })
+        const allPromises = [
+          // User's personal repos
+          runCommand(['gh', 'repo', 'list', ...repoListArgs]),
+          // Additional users
+          ...ADDITIONAL_USERS.map((user) => runCommand(['gh', 'repo', 'list', user, ...repoListArgs])),
+          // Organizations
+          ...orgs.map((orgName) => runCommand(['gh', 'repo', 'list', orgName, ...repoListArgs])),
+        ]
 
-        // Add user's personal repos
-        commands.push(
-          'gh repo list --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission'
-        )
+        const results = await Promise.all(allPromises)
+        const allRepos = results.flatMap((res) => JSON.parse(res.stdout || '[]') as CmdResponseDTO[])
 
-        // Add additional users
-        ADDITIONAL_USERS.forEach((user) => {
-          commands.push(
-            `gh repo list ${user} --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission`
-          )
-        })
+        return allRepos.map((repo) => ({
+          fullName: repo.fullName || repo.nameWithOwner || '',
+          name: repo.name,
+          description: repo.description || '',
+          updatedAt: repo.pushedAt || repo.updatedAt || '',
+          viewerPermission: repo.viewerPermission,
+        }))
       }
-
-      // Execute all commands and combine results with jq
-      const combinedCommand = `(${commands.join(' && ')}) | jq -s 'add'`
-      const result = await runCommand(combinedCommand)
-      const repos = JSON.parse(result.stdout) as CmdResponseDTO[]
-
-      return (repos || []).map((repo) => ({
-        fullName: repo.fullName || repo.nameWithOwner || '',
-        name: repo.name,
-        description: repo.description || '',
-        updatedAt: repo.pushedAt || repo.updatedAt || '',
-        viewerPermission: repo.viewerPermission,
-      }))
     },
     select: (data) => {
       // Handle both old format {results: []} and new format []

@@ -23,8 +23,7 @@ export function usePrStatus(
 	return useQuery({
 		queryKey: queryKeys.pr.status(repo, Number(prNumber)),
 		queryFn: async () => {
-			const command = `gh api repos/${repo}/pulls/${prNumber}`;
-			const { stdout } = await runCommand(command);
+			const { stdout } = await runCommand(['gh', 'api', `repos/${repo}/pulls/${prNumber}`]);
 			const data = JSON.parse(stdout);
 
 			return {

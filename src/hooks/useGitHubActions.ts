@@ -55,9 +55,13 @@ interface GitHubActionsResult {
  */
 const getCommitInfo = async (org: string, repo: string, sha: string): Promise<CommitInfo> => {
   try {
-    const { stdout } = await runCommand(
-      `gh api repos/${org}/${repo}/commits/${sha} --jq '{author: .commit.author.name, message: .commit.message, sha: .sha}'`
-    )
+    const { stdout } = await runCommand([
+      'gh',
+      'api',
+      `repos/${org}/${repo}/commits/${sha}`,
+      '--jq',
+      '{author: .commit.author.name, message: .commit.message, sha: .sha}',
+    ])
     const data = JSON.parse(stdout)
     return {
       author: data.author || 'Unknown',
@@ -138,9 +142,13 @@ const getWorkflowJobsAsEvents = async (
   limit: number = 3
 ): Promise<Event[]> => {
   try {
-    const { stdout } = await runCommand(
-      `gh api repos/${org}/${repo}/actions/runs/${runId}/jobs --jq '.jobs[:${limit}] | map({id, name, status, conclusion, started_at, completed_at, steps})'`
-    )
+    const { stdout } = await runCommand([
+      'gh',
+      'api',
+      `repos/${org}/${repo}/actions/runs/${runId}/jobs`,
+      '--jq',
+      `.jobs[:${limit}] | map({id, name, status, conclusion, started_at, completed_at, steps})`,
+    ])
     if (!stdout || stdout.trim() === '' || stdout === 'null') {
       return []
     }
@@ -165,9 +173,13 @@ const getWorkflowRuns = async (
     console.log(`[GitHub Actions] Looking for workflow: ${workflowName} in ${org}/${repo}`)
 
     // Get workflow ID from workflow name first
-    const { stdout: workflowStdout } = await runCommand(
-      `gh api repos/${org}/${repo}/actions/workflows --jq '.workflows[] | select(.name == "${workflowName}") | {id, name}'`
-    )
+    const { stdout: workflowStdout } = await runCommand([
+      'gh',
+      'api',
+      `repos/${org}/${repo}/actions/workflows`,
+      '--jq',
+      `.workflows[] | select(.name == "${workflowName}") | {id, name}`,
+    ])
     console.log(`[GitHub Actions] Workflow lookup stdout:`, workflowStdout)
 
     const workflowData = JSON.parse(workflowStdout)
@@ -180,9 +192,13 @@ const getWorkflowRuns = async (
 
     // Get runs using workflow ID
     console.log(`[GitHub Actions] Fetching runs for workflow ID: ${workflowData.id}`)
-    const { stdout } = await runCommand(
-      `gh api "repos/${org}/${repo}/actions/workflows/${workflowData.id}/runs?per_page=${limit}" --jq '{workflow_runs: [.workflow_runs[] | {id, name, head_sha, status, conclusion, created_at, updated_at, html_url}]}'`
-    )
+    const { stdout } = await runCommand([
+      'gh',
+      'api',
+      `repos/${org}/${repo}/actions/workflows/${workflowData.id}/runs?per_page=${limit}`,
+      '--jq',
+      '{workflow_runs: [.workflow_runs[] | {id, name, head_sha, status, conclusion, created_at, updated_at, html_url}]}',
+    ])
     console.log(`[GitHub Actions] Runs stdout (raw):`, stdout)
     console.log(`[GitHub Actions] Runs stdout length:`, stdout.length)
 

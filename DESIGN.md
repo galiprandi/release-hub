@@ -265,6 +265,8 @@ Componente reutilizable para botones de acción iconográficos con tooltip integ
 
 - **Shell Injection Protection**: Todos los comandos externos se ejecutan utilizando un sistema de escape POSIX-compatible.
 - **Verification**: Refactorizaciones de endurecimiento de shell deben ser verificadas por `src/api/security.test.ts`.
+- **Shell Hardening**: Ejecución obligatoria de comandos basada en arrays a través de `runCommand`. Neutraliza la inyección de shell por diseño.
+- **Secure Data Pipe**: Uso de `stdin` para pasar payloads complejos (JSON/configuraciones) a herramientas CLI, evitando redirecciones de shell.
 
 **Uso básico**:
 ```tsx

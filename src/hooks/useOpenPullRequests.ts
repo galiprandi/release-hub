@@ -11,8 +11,7 @@ export function useOpenPullRequests(repo: string) {
 	return useQuery<OpenPullRequestsResult>({
 		queryKey: queryKeys.pr.list(repo),
 		queryFn: async () => {
-			const command = `gh pr list --repo ${repo} --state open --json number`;
-			const { stdout } = await runCommand(command);
+			const { stdout } = await runCommand(['gh', 'pr', 'list', '--repo', repo, '--state', 'open', '--json', 'number']);
 			const prs = JSON.parse(stdout);
 			const count = Array.isArray(prs) ? prs.length : 0;
 			const [org, name] = repo.split("/");

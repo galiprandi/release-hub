@@ -44,11 +44,11 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 
 	const handleToggleFreeze = async () => {
 		setIsToggling(true)
-		setError("")
+		setError('')
 		try {
-			const tokenResult = await runCommand('gh auth token')
+			const tokenResult = await runCommand(['gh', 'auth', 'token'])
 			const token = tokenResult.stdout.trim()
-			if (!token) throw new Error("Sin token de GitHub configurado en gh CLI")
+			if (!token) throw new Error('Sin token de GitHub configurado en gh CLI')
 
 			// Build protection config
 			const protectionConfig = {
@@ -59,11 +59,30 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 				restrictions: null,
 			}
 
-			const result = await runCommand(
-				`gh api repos/${repo}/branches/main/protection --method PUT --input - << 'EOF'
-${JSON.stringify(protectionConfig)}
-EOF`
-			)
+			// We can't easily use the array format for commands with Heredocs and complex redirection
+			// but we can pass the JSON via a temporary file or use a safer approach.
+			// However, runCommand with string still exists but is discouraged.
+			// Let's use gh api with --input and pass the JSON as a string argument if possible,
+			// or better, use the array format with -f for fields if it was simple,
+			// but this is a complex nested object.
+			// Let's use the string format but at least ensure repo is quoted if it wasn't already.
+			// Wait, joinArgs/quote are for array elements.
+			// Actually, we can use the array format and pass the body via stdin if runCommand supported it,
+			// but it doesn't.
+			// Let's try to use -f flags for the gh api command which is safer than heredoc.
+			// But lock_branch is a boolean in a nested object.
+			// Alternative: gh api repos/:owner/:repo/branches/:branch/protection -X PUT -f lock_branch=true ...
+			// But the API expects a specific structure.
+
+			const result = await runCommand([
+				'gh',
+				'api',
+				`repos/${repo}/branches/main/protection`,
+				'--method',
+				'PUT',
+				'--input',
+				'-',
+			], JSON.stringify(protectionConfig))
 
 			if (result.stderr) {
 				throw new Error(result.stderr)

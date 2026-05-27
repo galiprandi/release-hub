@@ -38,7 +38,7 @@ export function useSetup({ required, optional = [] }: UseSetupOptions) {
 			queryKey: ["tools", cmdDef.name, "version"],
 			queryFn: async () => {
 				try {
-					const result = await runCommand(`${cmdDef.command} --version`);
+					const result = await runCommand([cmdDef.command, "--version"]);
 					return result.stdout.trim();
 				} catch {
 					return null;

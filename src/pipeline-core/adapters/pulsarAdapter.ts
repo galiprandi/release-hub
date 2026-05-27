@@ -53,9 +53,13 @@ async function getWorkflowRuns(
 ): Promise<WorkflowRun[]> {
 	try {
 		// Get workflow ID from workflow name first
-		const { stdout: workflowStdout } = await runCommand(
-			`gh api repos/${org}/${repo}/actions/workflows --jq '.workflows[] | select(.name == "${workflowName}") | .id'`
-		)
+		const { stdout: workflowStdout } = await runCommand([
+			'gh',
+			'api',
+			`repos/${org}/${repo}/actions/workflows`,
+			'--jq',
+			`.workflows[] | select(.name == "${workflowName}") | .id`,
+		])
 
 		const workflowId = workflowStdout.trim()
 		if (!workflowId) {
@@ -64,9 +68,13 @@ async function getWorkflowRuns(
 		}
 
 		// Get runs using workflow ID
-		const { stdout } = await runCommand(
-			`gh api "repos/${org}/${repo}/actions/workflows/${workflowId}/runs?per_page=${limit}" --jq '.workflow_runs[] | {id, name, head_sha, status, conclusion, created_at, updated_at, html_url}'`
-		)
+		const { stdout } = await runCommand([
+			'gh',
+			'api',
+			`repos/${org}/${repo}/actions/workflows/${workflowId}/runs?per_page=${limit}`,
+			'--jq',
+			'.workflow_runs[] | {id, name, head_sha, status, conclusion, created_at, updated_at, html_url}',
+		])
 
 		if (!stdout || stdout.trim() === '') {
 			return []
@@ -84,15 +92,15 @@ async function getWorkflowRuns(
 /**
  * Get jobs for a workflow run
  */
-async function getWorkflowJobs(
-	org: string,
-	repo: string,
-	runId: number
-): Promise<WorkflowJob[]> {
+async function getWorkflowJobs(org: string, repo: string, runId: number): Promise<WorkflowJob[]> {
 	try {
-		const { stdout } = await runCommand(
-			`gh api "repos/${org}/${repo}/actions/runs/${runId}/jobs" --jq '.jobs[] | {id, name, status, conclusion, started_at, completed_at}'`
-		)
+		const { stdout } = await runCommand([
+			'gh',
+			'api',
+			`repos/${org}/${repo}/actions/runs/${runId}/jobs`,
+			'--jq',
+			'.jobs[] | {id, name, status, conclusion, started_at, completed_at}',
+		])
 
 		if (!stdout || stdout.trim() === '') {
 			return []
@@ -115,9 +123,13 @@ async function getCommitInfo(
 	sha: string
 ): Promise<{ message?: string; author?: string }> {
 	try {
-		const { stdout } = await runCommand(
-			`gh api repos/${org}/${repo}/git/commits/${sha} --jq '{message: .message, author: .author.name}'`
-		)
+		const { stdout } = await runCommand([
+			'gh',
+			'api',
+			`repos/${org}/${repo}/git/commits/${sha}`,
+			'--jq',
+			'{message: .message, author: .author.name}',
+		])
 		return JSON.parse(stdout)
 	} catch (error) {
 		console.error('[PulsarAdapter] Error fetching commit info:', error)
@@ -164,10 +176,13 @@ export const pulsarAdapter: PipelineAdapter = {
 
 	async supports(org: string, repo: string): Promise<boolean> {
 		try {
-			 
-			const { stdout } = await runCommand(
-				`gh api repos/${org}/${repo}/actions/workflows --jq '.workflows[].name'`
-			)
+			const { stdout } = await runCommand([
+				'gh',
+				'api',
+				`repos/${org}/${repo}/actions/workflows`,
+				'--jq',
+				'.workflows[].name',
+			])
 			const workflows = stdout.trim().split('\n')
 			return workflows.some((w) => w === 'Nx Build' || w === 'nx-build')
 		} catch (error) {

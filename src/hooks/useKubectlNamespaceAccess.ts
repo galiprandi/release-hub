@@ -16,9 +16,9 @@ async function checkContextAccess(namespace: string, context: string): Promise<K
 
 	try {
 		const [podsResult, deploymentsResult, logsResult] = await Promise.allSettled([
-			runCommand(`kubectl auth can-i get pods -n ${namespace} ${ctxFlag}`.trim()),
-			runCommand(`kubectl auth can-i get deployments -n ${namespace} ${ctxFlag}`.trim()),
-			runCommand(`kubectl auth can-i get pods/logs -n ${namespace} ${ctxFlag}`.trim()),
+			runCommand(['kubectl', 'auth', 'can-i', 'get', 'pods', '-n', namespace, ctxFlag]),
+			runCommand(['kubectl', 'auth', 'can-i', 'get', 'deployments', '-n', namespace, ctxFlag]),
+			runCommand(['kubectl', 'auth', 'can-i', 'get', 'pods/logs', '-n', namespace, ctxFlag]),
 		]);
 
 		const canGetPods = podsResult.status === "fulfilled" && podsResult.value.stdout.trim() === "yes";

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { runCommand, apiExec } from './exec'
-import { startContainer, stopContainer, getContainerLogs } from './docker'
-import { getDeployment, getResourceLogs } from './kubectl'
+import { apiExec } from './exec'
+import { startContainer } from './docker'
+import { getDeployment } from './kubectl'
 import { executeCurlCommand } from './curl'
 
 describe('Security Hardening', () => {
@@ -19,14 +19,14 @@ describe('Security Hardening', () => {
       // We expect the sanitizer to catch it first if it's still there
       try {
         await startContainer(maliciousId)
-      } catch (e) {
+      } catch {
         // Sanitizer caught it, which is also good security
       }
 
       // If it passed the sanitizer, it should be quoted by joinArgs/quote
       const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
       if (lastCall) {
-        const command = lastCall[1].command
+        const command = (lastCall[1] as { command: string }).command
         expect(command).toContain("'abc; rm -rf /'")
         expect(command).not.toMatch(/docker start abc; rm -rf \//)
       }
@@ -40,13 +40,13 @@ describe('Security Hardening', () => {
       const maliciousName = 'web-`id`'
       try {
         await getDeployment(maliciousName, 'default')
-      } catch (e) {
+      } catch {
         // Sanitizer might catch it
       }
 
       const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
       if (lastCall) {
-        const command = lastCall[1].command
+        const command = (lastCall[1] as { command: string }).command
         expect(command).toContain("'web-`id`'")
       }
     })
@@ -60,11 +60,11 @@ describe('Security Hardening', () => {
       await executeCurlCommand([maliciousUrl])
 
       const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
-      const command = lastCall[1].command
+      const command = (lastCall[1] as { command: string }).command
       expect(command).toContain("'https://example.com$(whoami)'")
       // The whole command string will contain it, but it should be inside single quotes
       // and NOT appear as a bare word
-      expect(command).not.toMatch(/[^\']https:\/\/example\.com\$\(whoami\)/)
+      expect(command).not.toMatch(/[^']https:\/\/example\.com\$\(whoami\)/)
     })
 
     it('should handle single quotes within arguments correctly', async () => {
@@ -76,7 +76,7 @@ describe('Security Hardening', () => {
       await executeCurlCommand([argWithQuote])
 
       const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
-      const command = lastCall[1].command
+      const command = (lastCall[1] as { command: string }).command
       // POSIX quote for O'Reilly is 'O'\''Reilly'
       expect(command).toContain("'O'\\''Reilly'")
     })

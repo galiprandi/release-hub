@@ -1,5 +1,4 @@
 import { runCommand } from '@/api/exec';
-import { quote } from '@/utils/shell';
 
 function sanitizeContext(context: string): string {
   if (!context) {

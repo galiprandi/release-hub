@@ -1,5 +1,4 @@
 import { runCommand } from '@/api/exec';
-import { joinArgs } from '@/utils/shell';
 
 /**
  * Verifies that curl is installed and accessible.

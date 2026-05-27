@@ -1,5 +1,4 @@
 import { runCommand } from '@/api/exec';
-import { quote } from '@/utils/shell';
 
 export interface ContainerInfo {
 	id: string;

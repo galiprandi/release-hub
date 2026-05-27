@@ -177,6 +177,11 @@ const columns: ColumnDef<QueryRecord>[] = [
 - **Botón "Todos"**: Mismo comportamiento que filtros individuales
 - **Tamaño**: `px-2.5 py-1 text-xs` (compacto)
 
+### 11. Validación de Build Antes de Commits y PRs
+- **Obligatorio antes de commit a main**: Ejecutar `node --run build` y verificar que no existan errores de compilación.
+- **Obligatorio antes de crear PR**: Ejecutar `node --run build` y verificar que no existan errores de compilación.
+- No proceder con commit o PR si el build falla.
+
 ## Mantenimiento de Skills
 
 Mantener `.windsurf/skills/` con flujos comunes, referencias de elementos y patrones nuevos para evitar snapshots repetitivos.

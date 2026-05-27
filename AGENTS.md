@@ -57,6 +57,7 @@ Ubicar archivos `.test.ts[x]` junto al archivo que prueban. Evitar carpetas `__t
 - **Docker badges**: `bg-success/20 text-success` (Running), `bg-muted text-muted-foreground` (Stopped).
 - **Fetcher & HTTP Method Mapping**: Siempre usar opacidades semánticas (`/20`) para badges de métodos HTTP y tiempos de respuesta. GET -> success, POST -> info, PUT/PATCH -> warning, DELETE -> destructive.
 - **FilterBar**: Utilizar `variant="tabs"` para navegación de colecciones en dashboards. El contenedor debe ser `bg-muted` con padding `p-1`.
+- **Industrial Resonance V2**: Uso de `tracking-tight` para nombres de elementos, `rounded-xl` para contenedores principales y `rounded-lg` para botones de acción.
 - **Shell Hardening**: Todo comando CLI (gh, docker, kubectl, curl) debe usar `runCommand` con un array de argumentos. Parámetros dinámicos deben pasar por `quote()` o ser parte del array de `runCommand` (que internamente usa `joinArgs`). Prohibido concatenar strings sin escape para comandos.
 
 ### 10. Componente Table con Filtros Integrados

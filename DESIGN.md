@@ -15,9 +15,15 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Info**: `text-info`. Utilizado para información neutral o estados en progreso.
 - **Destructive**: `text-destructive`. Utilizado para acciones críticas o errores.
 
+## Industrial Resonance V2 - Refinamientos de Elite
+
+- **Tipografía Técnica**: Uso sistemático de `tracking-tight` para nombres de elementos y `tracking-wider` para labels en mayúsculas.
+- **Jerarquía de Color**: Aplicación estricta de opacidades semánticas (10-20%) para fondos de contenedores de estado (ej: `bg-success/10 border-success/20`).
+- **Geometría**: Evolución de `rounded-md` a `rounded-xl` para contenedores principales y `rounded-lg` para elementos de acción, suavizando la estética industrial sin perder su carácter técnico.
+
 ## Docker UI Pattern (Resonancia Industrial)
 
-- **Badges de Estado**: Usar `bg-success/20 text-success` para estados activos y `bg-muted text-muted-foreground` para estados inactivos o detenidos. Aplicar `font-bold uppercase tracking-wider text-[10px]` para mayor legibilidad.
+- **Badges de Estado**: Usar `bg-success/20 text-success` para estados activos y `bg-muted text-muted-foreground` para estados inactivos o detenidos. Aplicar `font-bold uppercase tracking-wider text-[10px] rounded-md` para mayor legibilidad y consistencia.
 - **Acciones de Fila**: Botones iconográficos con `hover:bg-accent` y colores semánticos. Deben implementar el anillo de foco estándar del sistema.
 - **Feedback de Carga/Acceso**: Implementar `StatusCard` como componente estándar para todos los estados de carga, error y "offline".
 - **Tabla de Contenedores**: Bordes sutiles `border-border/60` y encabezados con `text-xs uppercase tracking-wider` para una estética profesional.
@@ -82,6 +88,7 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 - **Encabezados**: `bg-muted/40` con celdas `text-xs font-bold uppercase tracking-wider text-muted-foreground border-b border-border/60`.
 - **Filas**: `hover:bg-muted/20`, `transition-colors`, `divide-y` en el `tbody`.
 - **Filtros Integrados**: Botones ultra-compactos `text-[10px] font-bold uppercase tracking-wider`.
+- **Celdas de Datos**: Nombres de elementos con `font-medium tracking-tight`, metadatos con `text-muted-foreground`.
 
 ### DisplayInfo
 - Abstracción para mostrar metadatos (commits, tags, autores) con iconos y colores semánticos.

@@ -7,6 +7,7 @@ import { TagLink } from "./TagLink";
 import { Table } from "@/components/ui/Table";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Loader2 } from "lucide-react";
+import { StatusCard } from "@/components/ui/StatusCard";
 
 
 interface StageCommitsTableProps {
@@ -80,16 +81,9 @@ export function StageCommitsTable({
 	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 	return (
-		<div>
+		<div className="space-y-4">
 			{isLoading && (!commits?.length && !tags?.length) ? (
-				<div className="overflow-hidden border rounded-lg">
-					<div className="px-4 py-8 text-center text-muted-foreground">
-						<div className="flex items-center justify-center gap-2">
-							<Loader2 className="w-4 h-4 animate-spin" />
-							Cargando información...
-						</div>
-					</div>
-				</div>
+				<StatusCard type="loading" message="Cargando historial..." />
 			) : (
 				<>
 					{isCommits ? (
@@ -99,16 +93,16 @@ export function StageCommitsTable({
 					)}
 
 					{/* Infinite scroll sensor */}
-					<div ref={loadMoreRef} className="flex items-center justify-center py-4 border-t text-xs text-muted-foreground">
+					<div ref={loadMoreRef} className="flex items-center justify-center py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground/60 border-t border-border/20">
 						{isFetchingNextPage ? (
 							<div className="flex items-center gap-2">
-								<Loader2 className="w-3 h-3 animate-spin" />
-								Cargando más...
+								<Loader2 className="w-3 h-3 animate-spin text-primary" />
+								<span>Cargando más resultados</span>
 							</div>
 						) : hasNextPage ? (
-							"Desliza para cargar más"
+							<span className="animate-pulse">Desliza para cargar más</span>
 						) : (
-							commits?.length || tags?.length ? "Fin del historial" : ""
+							(commits?.length || tags?.length) ? "Fin del historial de desarrollo" : ""
 						)}
 					</div>
 				</>
@@ -137,19 +131,19 @@ function CommitsTable({
 		{
 			accessorKey: "date",
 			header: "Fecha",
-			cell: ({ row }) => <DisplayInfo value={row.original.date} type="dates" />,
+			cell: ({ row }) => <DisplayInfo value={row.original.date} type="dates" className="font-mono text-[13px]" />,
 		},
 		{
 			accessorKey: "author",
 			header: "Autor",
-			cell: ({ row }) => <DisplayInfo value={row.original.author} type="author" maxChar={30} />,
+			cell: ({ row }) => <DisplayInfo value={row.original.author} type="author" maxChar={30} className="font-medium" />,
 		},
 		{
 			accessorKey: "message",
 			header: "Mensaje",
 			cell: ({ row }) => (
-				<span className="text-muted-foreground truncate max-w-[300px]">
-					<DisplayInfo value={row.original.message} type="message" maxChar={50} />
+				<span className="text-muted-foreground">
+					<DisplayInfo value={row.original.message} type="message" maxChar={60} hideIcon />
 				</span>
 			),
 		},
@@ -178,12 +172,12 @@ function TagsTable({
 		{
 			accessorKey: "date",
 			header: "Fecha",
-			cell: ({ row }) => <DisplayInfo value={row.original.date} type="dates" />,
+			cell: ({ row }) => <DisplayInfo value={row.original.date} type="dates" className="font-mono text-[13px]" />,
 		},
 		{
 			accessorKey: "author",
 			header: "Autor",
-			cell: ({ row }) => <DisplayInfo value={row.original.author.name} type="author" maxChar={50} />,
+			cell: ({ row }) => <DisplayInfo value={row.original.author.name} type="author" maxChar={50} className="font-medium" />,
 		},
 	]
 

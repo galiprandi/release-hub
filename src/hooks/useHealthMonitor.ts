@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
-import { extractRoutes } from '@/components/SekiMonitor/helpers';
+import { extractRoutes } from '@/pipeline-core/utils';
 import type { Event } from '@/api/seki.type';
 
 const HEALTH_STORAGE_KEY = 'seki:health:endpoints:v1';

@@ -322,7 +322,3 @@ Si el header sticky no funciona:
 2. Verificar que el elemento con `sticky` tenga un ancestro con scroll
 3. Usar `sticky top-0` (no `top-4` u otro valor a menos que sea intencional)
 4. Verificar `z-index` (debe ser mayor que elementos detrás)
-### GitHub Repository Detail Standard
-- **Pipeline Monitor**: Uso obligatorio de `UnifiedPipelineMonitor`.
-- **Navegación**: Utilizar `FilterBar` con `variant="tabs"` para alternar entre vistas (Commits/Tags).
-- **Acciones**: Links externos (PRs, Actions) estandarizados con estilo `rounded-lg`, `bg-muted/40` y `text-xs font-bold uppercase`.

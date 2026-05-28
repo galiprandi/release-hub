@@ -9,6 +9,7 @@
 - ✨ **Tablas de Alto Contraste**: Rediseño del componente `Table` con bordes sutiles `border-border/60`, encabezados `bg-muted/40` y tipografía `uppercase` para una legibilidad superior.
 - ✨ **GitHub Dashboard**: Navegación de colecciones (Favoritos/Proyectos) unificada mediante el nuevo sistema de pestañas industriales.
 - ✨ **Acciones Estandarizadas**: Uso sistemático de `ActionButton` en las tablas de repositorios para una interacción táctil y visual consistente.
+- ♻️ **Queries**: Simplificación del editor JSON y mejoras de rendimiento en el modal de peticiones.
 
 ### 🗓️ 26 de Mayo de 2026
 

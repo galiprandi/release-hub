@@ -13,7 +13,7 @@ Antes de cualquier cambio:
 
 ### 0. Higiene y Refactorización
 - **Código muerto**: Eliminar inmediatamente (no comentar) cualquier componente/ruta/utilidad sin referencias activas.
-- **Hooks hygiene**: Prohibido usar `useEffect` para sincronizar estados derivados o mutar el DOM. Usar `useRef` o event handlers.
+- **Hooks hygiene**: Prohibido usar `useEffect` para sincronizar estados derivados o mutar el DOM. Usar `useRef` o event handlers. Prohibido acceder a `.current` de un Ref durante la fase de renderizado; encapsular lógica dependiente de Refs en `useCallback` o efectos para evitar inconsistencias en el renderizado de React.
 - **Tokens semánticos**: En componentes de estado/feedback, usar exclusivamente los tokens de `DESIGN.md`. Nunca colores hardcodeados como `text-zinc-500` o `bg-red-500`.
 
 ### 1. Operaciones por Repositorio
@@ -59,6 +59,7 @@ Ubicar archivos `.test.ts[x]` junto al archivo que prueban. Evitar carpetas `__t
 - **FilterBar**: Utilizar `variant="tabs"` para navegación de colecciones en dashboards. El contenedor debe ser `bg-muted` con padding `p-1`.
 - **Industrial Resonance V2**: Uso de `tracking-tight` para nombres de elementos, `rounded-xl` para contenedores principales y `rounded-lg` para botones de acción.
 - **Shell Hardening**: Todo comando CLI (gh, docker, kubectl, curl) debe usar `runCommand` con un array de argumentos. Parámetros dinámicos deben pasar por `quote()` o ser parte del array de `runCommand` (que internamente usa `joinArgs`). Prohibido concatenar strings sin escape para comandos.
+- **Type Hygiene**: Prohibido el uso de `any`. Usar interfaces explícitas o `unknown` con validación de tipos/aserciones seguras. Las funciones de utilidad deben estar estrictamente tipadas.
 
 ### 10. Componente Table con Filtros Integrados
 

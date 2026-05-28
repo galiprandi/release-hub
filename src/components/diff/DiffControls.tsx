@@ -1,5 +1,5 @@
 import type { DiffMode } from '@/utils/diffEngine';
-import { LayoutGrid, Fingerprint, Terminal, FileText } from 'lucide-react';
+import { LayoutGrid, Fingerprint, Terminal, FileText, type LucideIcon } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface DiffControlsProps {
@@ -8,7 +8,7 @@ interface DiffControlsProps {
 }
 
 export function DiffControls({ mode, onModeChange }: DiffControlsProps) {
-	const modes: { id: DiffMode; label: string; icon: any }[] = [
+	const modes: { id: DiffMode; label: string; icon: LucideIcon }[] = [
 		{ id: 'json', label: 'JSON Mode', icon: LayoutGrid },
 		{ id: 'jwt', label: 'JWT Mode', icon: Fingerprint },
 		{ id: 'curl', label: 'cURL Mode', icon: Terminal },

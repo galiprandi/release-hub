@@ -102,8 +102,9 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 ### Fetcher & ImportQueryModal
 - **Interacciones**: Uso obligatorio de `ActionButton` para acciones de fila y controles de modal.
 - **Campos de Entrada**: Inputs y selects deben usar `border-input`, `bg-background` y `focus-visible:ring-primary` con `focus-visible:ring-offset-1` para una consistencia táctil y visual.
-- **Badge de Método**: Mapeo semántico de métodos HTTP a opacidades (`bg-success/20 text-success` para GET, `bg-info/20 text-info` para POST, etc.) con fuente `text-[10px] font-bold uppercase tracking-wider`.
+- **Badge de Método**: Mapeo semántico de métodos HTTP a opacidades (`bg-success/20 text-success` para GET, `bg-info/20 text-info` para POST, etc.) con fuente `text-[10px] font-bold uppercase tracking-wider`. Deben incluir `rounded-md` y `border` con opacidad (ej: `border-success/20`).
 - **Tabs Industriales**: Los selectores de pestañas en modales deben usar el estilo `bg-muted/40` con botones de estado `bg-background shadow-sm` para el elemento activo, similar a `FilterBar`.
+- **Magic Clipboard**: Detección automática de cURL en portapapeles para abrir `QueryModal` instantáneamente, maximizando el "Time to Value".
 
 ## Layout V2 - Patrones y Guía de Uso
 

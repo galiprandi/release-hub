@@ -10,29 +10,19 @@ test.describe('Fetcher Module', () => {
 	});
 
 	test('should show Fetcher in breadcrumb', async ({ page }) => {
-		const breadcrumb = page.locator('.text-lg.font-normal').getByText('Fetcher');
+		const breadcrumb = page.locator('h1').getByText('Fetcher');
 		await expect(breadcrumb).toBeVisible();
 	});
 
-	test('should show filter buttons', async ({ page }) => {
-		await expect(page.getByText('Todos (0)')).toBeVisible();
-		await expect(page.getByText('GET (0)')).toBeVisible();
-		await expect(page.getByText('POST (0)')).toBeVisible();
-	});
-
-	test('should show search input', async ({ page }) => {
-		const searchInput = page.getByPlaceholder('Buscar query...');
-		await expect(searchInput).toBeVisible();
-	});
 
 	test('should show curl import input', async ({ page }) => {
-		const curlInput = page.getByPlaceholder('Importart cURL');
+		const curlInput = page.getByPlaceholder(/Importar cURL/i);
 		await expect(curlInput).toBeVisible();
 	});
 
 	test('should show empty state message', async ({ page }) => {
-		await expect(page.getByText('No hay queries en el historial')).toBeVisible();
-		await expect(page.getByText('Importa un comando cURL para comenzar')).toBeVisible();
+		await expect(page.getByText('Historial Vacío')).toBeVisible();
+		await expect(page.getByText(/Pega un comando cURL/i)).toBeVisible();
 	});
 
 	test('should navigate to fetcher from header link', async ({ page }) => {

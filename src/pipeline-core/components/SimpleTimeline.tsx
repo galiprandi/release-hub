@@ -7,6 +7,7 @@
 import {
 	AlertTriangle,
 	CheckCircle2,
+	Circle,
 	Loader2,
 	XCircle,
 } from "lucide-react"
@@ -51,6 +52,8 @@ const timelineStatusIcon = (state: PipelineState) => {
 		case "RUNNING":
 		case "STARTED":
 			return <Loader2 className={`${baseClass} animate-spin`} />
+		case "IDLE":
+			return <Circle className={baseClass} />
 		default:
 			return null
 	}
@@ -144,6 +147,34 @@ export function SimpleTimeline({ events }: SimpleTimelineProps) {
 								{event.startedAt && (
 									<div className="text-xs text-muted-foreground">
 										{DayJS(event.startedAt).fromNow()}
+									</div>
+								)}
+								{event.subevents && event.subevents.length > 0 && (
+									<div className="pt-2 border-t border-border/50">
+										<div className="text-xs font-medium text-muted-foreground mb-1.5">
+											Subestados ({event.subevents.length})
+										</div>
+										<div className="space-y-1">
+											{event.subevents.map((sub) => {
+												const subDuration = formatDuration(sub.startedAt, sub.completedAt)
+												return (
+													<div
+														key={sub.id}
+														className="flex items-center justify-between gap-2 text-xs"
+													>
+														<div className="flex items-center gap-2">
+															{timelineStatusIcon(sub.state)}
+															<span className="text-foreground">{sub.name}</span>
+														</div>
+														{subDuration && (
+															<span className="text-muted-foreground text-[10px]">
+																{subDuration}
+															</span>
+														)}
+													</div>
+												)
+											})}
+										</div>
 									</div>
 								)}
 							</div>

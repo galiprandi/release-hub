@@ -14,12 +14,14 @@ import { Route as GithubRouteImport } from './routes/github'
 import { Route as FetcherRouteImport } from './routes/fetcher'
 import { Route as DockerRouteImport } from './routes/docker'
 import { Route as DiffRouteImport } from './routes/diff'
+import { Route as UiIndexRouteImport } from './routes/ui/index'
 import { Route as NovedadesIndexRouteImport } from './routes/novedades/index'
 import { Route as KubernetesIndexRouteImport } from './routes/kubernetes/index'
 import { Route as HealthIndexRouteImport } from './routes/health/index'
 import { Route as GithubIndexRouteImport } from './routes/github/index'
 import { Route as FetcherIndexRouteImport } from './routes/fetcher/index'
 import { Route as DockerIndexRouteImport } from './routes/docker/index'
+import { Route as UiSekiMonitorRouteImport } from './routes/ui/seki-monitor'
 import { Route as KubernetesSetupRouteImport } from './routes/kubernetes/setup'
 import { Route as GithubSetupRouteImport } from './routes/github/setup'
 import { Route as FetcherSetupRouteImport } from './routes/fetcher/setup'
@@ -51,6 +53,11 @@ const DiffRoute = DiffRouteImport.update({
   path: '/diff',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UiIndexRoute = UiIndexRouteImport.update({
+  id: '/ui/',
+  path: '/ui/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NovedadesIndexRoute = NovedadesIndexRouteImport.update({
   id: '/novedades/',
   path: '/novedades/',
@@ -80,6 +87,11 @@ const DockerIndexRoute = DockerIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DockerRoute,
+} as any)
+const UiSekiMonitorRoute = UiSekiMonitorRouteImport.update({
+  id: '/ui/seki-monitor',
+  path: '/ui/seki-monitor',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const KubernetesSetupRoute = KubernetesSetupRouteImport.update({
   id: '/setup',
@@ -117,12 +129,14 @@ export interface FileRoutesByFullPath {
   '/fetcher/setup': typeof FetcherSetupRoute
   '/github/setup': typeof GithubSetupRoute
   '/kubernetes/setup': typeof KubernetesSetupRoute
+  '/ui/seki-monitor': typeof UiSekiMonitorRoute
   '/docker/': typeof DockerIndexRoute
   '/fetcher/': typeof FetcherIndexRoute
   '/github/': typeof GithubIndexRoute
   '/health/': typeof HealthIndexRoute
   '/kubernetes/': typeof KubernetesIndexRoute
   '/novedades/': typeof NovedadesIndexRoute
+  '/ui/': typeof UiIndexRoute
   '/github/$org/$repo': typeof GithubOrgRepoRoute
 }
 export interface FileRoutesByTo {
@@ -131,12 +145,14 @@ export interface FileRoutesByTo {
   '/fetcher/setup': typeof FetcherSetupRoute
   '/github/setup': typeof GithubSetupRoute
   '/kubernetes/setup': typeof KubernetesSetupRoute
+  '/ui/seki-monitor': typeof UiSekiMonitorRoute
   '/docker': typeof DockerIndexRoute
   '/fetcher': typeof FetcherIndexRoute
   '/github': typeof GithubIndexRoute
   '/health': typeof HealthIndexRoute
   '/kubernetes': typeof KubernetesIndexRoute
   '/novedades': typeof NovedadesIndexRoute
+  '/ui': typeof UiIndexRoute
   '/github/$org/$repo': typeof GithubOrgRepoRoute
 }
 export interface FileRoutesById {
@@ -150,12 +166,14 @@ export interface FileRoutesById {
   '/fetcher/setup': typeof FetcherSetupRoute
   '/github/setup': typeof GithubSetupRoute
   '/kubernetes/setup': typeof KubernetesSetupRoute
+  '/ui/seki-monitor': typeof UiSekiMonitorRoute
   '/docker/': typeof DockerIndexRoute
   '/fetcher/': typeof FetcherIndexRoute
   '/github/': typeof GithubIndexRoute
   '/health/': typeof HealthIndexRoute
   '/kubernetes/': typeof KubernetesIndexRoute
   '/novedades/': typeof NovedadesIndexRoute
+  '/ui/': typeof UiIndexRoute
   '/github/$org/$repo': typeof GithubOrgRepoRoute
 }
 export interface FileRouteTypes {
@@ -170,12 +188,14 @@ export interface FileRouteTypes {
     | '/fetcher/setup'
     | '/github/setup'
     | '/kubernetes/setup'
+    | '/ui/seki-monitor'
     | '/docker/'
     | '/fetcher/'
     | '/github/'
     | '/health/'
     | '/kubernetes/'
     | '/novedades/'
+    | '/ui/'
     | '/github/$org/$repo'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -184,12 +204,14 @@ export interface FileRouteTypes {
     | '/fetcher/setup'
     | '/github/setup'
     | '/kubernetes/setup'
+    | '/ui/seki-monitor'
     | '/docker'
     | '/fetcher'
     | '/github'
     | '/health'
     | '/kubernetes'
     | '/novedades'
+    | '/ui'
     | '/github/$org/$repo'
   id:
     | '__root__'
@@ -202,12 +224,14 @@ export interface FileRouteTypes {
     | '/fetcher/setup'
     | '/github/setup'
     | '/kubernetes/setup'
+    | '/ui/seki-monitor'
     | '/docker/'
     | '/fetcher/'
     | '/github/'
     | '/health/'
     | '/kubernetes/'
     | '/novedades/'
+    | '/ui/'
     | '/github/$org/$repo'
   fileRoutesById: FileRoutesById
 }
@@ -217,8 +241,10 @@ export interface RootRouteChildren {
   FetcherRoute: typeof FetcherRouteWithChildren
   GithubRoute: typeof GithubRouteWithChildren
   KubernetesRoute: typeof KubernetesRouteWithChildren
+  UiSekiMonitorRoute: typeof UiSekiMonitorRoute
   HealthIndexRoute: typeof HealthIndexRoute
   NovedadesIndexRoute: typeof NovedadesIndexRoute
+  UiIndexRoute: typeof UiIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -256,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/diff'
       fullPath: '/diff'
       preLoaderRoute: typeof DiffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ui/': {
+      id: '/ui/'
+      path: '/ui'
+      fullPath: '/ui/'
+      preLoaderRoute: typeof UiIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/novedades/': {
@@ -299,6 +332,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/docker/'
       preLoaderRoute: typeof DockerIndexRouteImport
       parentRoute: typeof DockerRoute
+    }
+    '/ui/seki-monitor': {
+      id: '/ui/seki-monitor'
+      path: '/ui/seki-monitor'
+      fullPath: '/ui/seki-monitor'
+      preLoaderRoute: typeof UiSekiMonitorRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/kubernetes/setup': {
       id: '/kubernetes/setup'
@@ -399,8 +439,10 @@ const rootRouteChildren: RootRouteChildren = {
   FetcherRoute: FetcherRouteWithChildren,
   GithubRoute: GithubRouteWithChildren,
   KubernetesRoute: KubernetesRouteWithChildren,
+  UiSekiMonitorRoute: UiSekiMonitorRoute,
   HealthIndexRoute: HealthIndexRoute,
   NovedadesIndexRoute: NovedadesIndexRoute,
+  UiIndexRoute: UiIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

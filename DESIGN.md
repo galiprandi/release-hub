@@ -291,3 +291,9 @@ Si el header sticky no funciona:
 - **Pipeline Monitor**: Uso obligatorio de `UnifiedPipelineMonitor`.
 - **Navegación**: Utilizar `FilterBar` con `variant="tabs"` para alternar entre vistas (Commits/Tags).
 - **Acciones**: Links externos (PRs, Actions) estandarizados con estilo `rounded-lg`, `bg-muted/40` y `text-xs font-bold uppercase`.
+
+### Health Monitor Standard
+- **Iconografía**: Uso de `CheckCircle2` (success), `XCircle` (destructive) y `Circle` (muted-foreground/40) para estados de salud.
+- **Fechas**: Uso obligatorio de `DayJS` para tiempo relativo (`.fromNow()`).
+- **Acciones**: Uso de `ActionButton` (size="sm") para todas las operaciones de fila.
+- **Empty State**: Implementar patrón de alta jerarquía con icono `Activity` (muted/20) y CTA claro para navegación.

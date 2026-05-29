@@ -47,12 +47,47 @@ export function parseCurlCommand(curlString: string): ParsedCurl {
 	}
 
 	// Extract URL - support both direct URL and --url flag
-	// Handle URLs in quotes after curl command or --url flag
-	const urlMatch = cleaned.match(/--url\s+['"]?([^'"\s]+)['"]?|curl\s+(?:-X\s+\w+\s+)?['"]?(https?:\/\/[^'"\s]+)['"]?/);
-	if (!urlMatch) {
-		throw new Error('Could not extract URL from cURL command');
+	let url: string;
+	const urlFlagMatch = cleaned.match(/--url\s+['"]?([^'"\s]+)['"]?/);
+	if (urlFlagMatch) {
+		url = urlFlagMatch[1];
+	} else {
+		// Tokenize while respecting quotes to find the URL token robustly
+		const tokens: string[] = [];
+		let current = '';
+		let inQuote: string | null = null;
+
+		for (let i = 0; i < cleaned.length; i++) {
+			const char = cleaned[i];
+
+			if (inQuote) {
+				if (char === '\\' && i + 1 < cleaned.length) {
+					current += char + cleaned[i + 1];
+					i++;
+				} else if (char === inQuote) {
+					inQuote = null;
+				} else {
+					current += char;
+				}
+			} else if (char === '"' || char === "'") {
+				inQuote = char;
+			} else if (char === ' ') {
+				if (current) {
+					tokens.push(current);
+					current = '';
+				}
+			} else {
+				current += char;
+			}
+		}
+		if (current) tokens.push(current);
+
+		const urlToken = tokens.find(t => t.startsWith('http://') || t.startsWith('https://'));
+		if (!urlToken) {
+			throw new Error('Could not extract URL from cURL command');
+		}
+		url = urlToken;
 	}
-	let url = urlMatch[1] || urlMatch[2];
 
 	// Remove backslash escapes from brackets
 	url = url.replace(/\\\[/g, '[').replace(/\\\]/g, ']');

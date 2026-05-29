@@ -71,11 +71,11 @@ function FetcherPage() {
 						// Valid curl found, open modal automatically
 						const now = new Date().toISOString();
 						setActiveQuery({ id: '', curl: text, createdAt: now, updatedAt: now });
-					} catch (e) {
+					} catch {
 						// Not a valid curl, ignore
 					}
 				}
-			} catch (err) {
+			} catch {
 				// Clipboard access denied or other error, ignore
 			}
 		};
@@ -244,14 +244,9 @@ function QueriesTable({
 }) {
 	const columns: ColumnDef<QueryRecord>[] = useMemo(() => [
 		{
-			accessorKey: "domain",
-			header: "Dominio",
-			cell: ({ row }) => <DomainCell query={row.original} />,
-		},
-		{
-			accessorKey: "path",
-			header: "Path",
-			cell: ({ row }) => <PathCell query={row.original} />,
+			accessorKey: "url",
+			header: "URL",
+			cell: ({ row }) => <UrlCell query={row.original} />,
 		},
 		{
 			id: "method",
@@ -334,22 +329,16 @@ function MethodCell({ query }: { query: QueryRecord }) {
 	)
 }
 
-function PathCell({ query }: { query: QueryRecord }) {
+function UrlCell({ query }: { query: QueryRecord }) {
 	const parsed = parseCurlForDisplay(query.curl)
 	if (!parsed) return null
 
+	const fullPath = parsed.path.length > 80 ? `${parsed.path.slice(0, 80)}...` : parsed.path
 	return (
 		<span className="text-sm text-muted-foreground">
-			{parsed.path.length > 100 ? `${parsed.path.slice(0, 100)}...` : parsed.path}
+			{parsed.domain}{fullPath}
 		</span>
 	)
-}
-
-function DomainCell({ query }: { query: QueryRecord }) {
-	const parsed = parseCurlForDisplay(query.curl)
-	if (!parsed) return null
-
-	return <span className="text-sm text-muted-foreground">{parsed.domain}</span>
 }
 
 function SentCell({ query }: { query: QueryRecord }) {

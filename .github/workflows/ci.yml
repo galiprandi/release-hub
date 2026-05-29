@@ -1,20 +1,48 @@
 name: CI
+
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
+
 jobs:
   test:
     runs-on: ubuntu-latest
     permissions:
+      contents: write
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+
       - run: npm install
-      - name: Run tests and comment coverage
-        if: always()
+
+      - name: Prepare context directory
+        run: mkdir -p .context
+
+      # Run tests — if this fails, the entire workflow fails and the commit is marked ❌
+      - name: Run tests and generate JSON report
+        run: npx vitest run --reporter=json --outputFile=.context/test-results.json
+
+      # Generate BEHAVIOR.md from passing tests
+      - name: Generate BEHAVIOR.md
+        run: node .agents/skills/context-organizer/scripts/compile-behavior.mjs
+
+      # Auto-commit BEHAVIOR.md on main pushes (skips CI to avoid loops)
+      - name: Commit BEHAVIOR.md
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update BEHAVIOR.md [skip ci]"
+          file_pattern: BEHAVIOR.md
+
+      # Coverage report on PRs (runs even if tests failed, for visibility)
+      - name: Coverage report
+        if: github.event_name == 'pull_request' && always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

@@ -1,0 +1,3 @@
+npx vitest run --reporter=json --outputFile=.context/test-results.json || exit 1
+node .agents/skills/context-organizer/scripts/compile-behavior.mjs
+git add BEHAVIOR.md

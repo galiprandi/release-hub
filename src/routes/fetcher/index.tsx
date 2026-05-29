@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Send } from 'lucide-react';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
@@ -46,12 +46,45 @@ function FetcherPage() {
 	const [activeQuery, setActiveQuery] = useState<QueryRecord | undefined>();
 	const [editingQuery, setEditingQuery] = useState<QueryRecord | undefined>();
 	const [curlInput, setCurlInput] = useState('');
+	const lastClipboardContent = useRef<string | null>(null);
 
 	useEffect(() => {
 		if (access && !access.isInstalled) {
 			navigate({ to: '/fetcher/setup' });
 		}
 	}, [access, navigate]);
+
+	// Magic Clipboard: Auto-detect cURL in clipboard on focus
+	useEffect(() => {
+		const checkClipboard = async () => {
+			if (typeof navigator === 'undefined' || !navigator.clipboard || !navigator.clipboard.readText) return;
+
+			try {
+				const text = await navigator.clipboard.readText();
+				if (!text || text === lastClipboardContent.current) return;
+
+				lastClipboardContent.current = text;
+
+				if (text.trim().toLowerCase().startsWith('curl')) {
+					try {
+						parseCurlCommand(text);
+						// Valid curl found, open modal automatically
+						const now = new Date().toISOString();
+						setActiveQuery({ id: '', curl: text, createdAt: now, updatedAt: now });
+					} catch (e) {
+						// Not a valid curl, ignore
+					}
+				}
+			} catch (err) {
+				// Clipboard access denied or other error, ignore
+			}
+		};
+
+		// Check on mount and window focus to catch external copies
+		checkClipboard();
+		window.addEventListener('focus', checkClipboard);
+		return () => window.removeEventListener('focus', checkClipboard);
+	}, []);
 
 	// Derive active filter from query params - memoized to prevent re-renders
 	const activeFilter = useMemo(() => {
@@ -77,11 +110,11 @@ function FetcherPage() {
 	}, [curlInput]);
 
 
-	const handleDelete = (id: string) => {
+	const handleDelete = useCallback((id: string) => {
 		if (confirm('¿Estás seguro de que quieres eliminar esta query del historial?')) {
 			deleteQueryRecord(id);
 		}
-	};
+	}, [deleteQueryRecord]);
 
 	const handleOpenModal = (query?: QueryRecord) => {
 		setEditingQuery(query);
@@ -110,16 +143,15 @@ function FetcherPage() {
 		setEditingQuery(undefined);
 	};
 
-	const handleCopyResponse = async (query: QueryRecord) => {
+	const handleCopyResponse = useCallback(async (query: QueryRecord) => {
 		if (query.response?.body) {
 			try {
 				await navigator.clipboard.writeText(query.response.body);
-				// Optionally show a toast notification
 			} catch (error) {
 				console.error('Failed to copy to clipboard:', error);
 			}
 		}
-	};
+	}, []);
 
 	const headerActions = (
 		<form className="flex items-center gap-2" onSubmit={(e) => { e.preventDefault(); handleSendCurl(); }}>
@@ -155,11 +187,13 @@ function FetcherPage() {
 				loadingHistory ? (
 					<StatusCard type="loading" message="Cargando historial..." />
 				) : history.length === 0 ? (
-					<div className="text-center py-12 bg-muted/50 rounded-lg border-2 border-dashed">
-						<Send className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-						<p className="text-muted-foreground">No hay queries en el historial</p>
-						<p className="text-sm text-muted-foreground mt-1">
-							Importa un comando cURL para comenzar
+					<div className="text-center py-20 bg-muted/10 rounded-xl border border-border/40 flex flex-col items-center justify-center">
+						<div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mb-4">
+							<Send className="w-8 h-8 text-muted-foreground" />
+						</div>
+						<h3 className="text-lg font-bold tracking-tight text-foreground">Historial Vacío</h3>
+						<p className="text-muted-foreground max-w-xs mx-auto mt-1">
+							Pega un comando cURL en la barra superior o copia uno al portapapeles para comenzar.
 						</p>
 					</div>
 				) : (
@@ -284,17 +318,17 @@ function MethodCell({ query }: { query: QueryRecord }) {
 	if (!parsed) return null
 
 	const methodStyles: Record<string, string> = {
-		GET: "bg-success/20 text-success",
-		POST: "bg-info/20 text-info",
-		PUT: "bg-warning/20 text-warning",
-		PATCH: "bg-warning/20 text-warning",
-		DELETE: "bg-destructive/20 text-destructive",
+		GET: "bg-success/20 text-success border-success/20",
+		POST: "bg-info/20 text-info border-info/20",
+		PUT: "bg-warning/20 text-warning border-warning/20",
+		PATCH: "bg-warning/20 text-warning border-warning/20",
+		DELETE: "bg-destructive/20 text-destructive border-destructive/20",
 	}
 
-	const style = methodStyles[parsed.method.toUpperCase()] || "bg-muted text-muted-foreground"
+	const style = methodStyles[parsed.method.toUpperCase()] || "bg-muted text-muted-foreground border-border/60"
 
 	return (
-		<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${style}`}>
+		<span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${style}`}>
 			{parsed.method}
 		</span>
 	)
@@ -329,13 +363,13 @@ function SentCell({ query }: { query: QueryRecord }) {
 function StatusCell({ query }: { query: QueryRecord }) {
 	if (query.response?.status) {
 		const { status } = query.response
-		let style = "bg-muted text-muted-foreground"
-		if (status >= 200 && status < 300) style = "bg-success/20 text-success"
-		else if (status >= 400 && status < 500) style = "bg-warning/20 text-warning"
-		else if (status >= 500) style = "bg-destructive/20 text-destructive"
+		let style = "bg-muted text-muted-foreground border-border/60"
+		if (status >= 200 && status < 300) style = "bg-success/20 text-success border-success/20"
+		else if (status >= 400 && status < 500) style = "bg-warning/20 text-warning border-warning/20"
+		else if (status >= 500) style = "bg-destructive/20 text-destructive border-destructive/20"
 
 		return (
-			<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${style}`}>
+			<span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${style}`}>
 				{status}
 			</span>
 		)
@@ -346,12 +380,12 @@ function StatusCell({ query }: { query: QueryRecord }) {
 function ResponseTimeCell({ query }: { query: QueryRecord }) {
 	if (query.response?.responseTime) {
 		const { responseTime } = query.response
-		let style = "bg-muted text-muted-foreground"
-		if (responseTime < 200) style = "bg-success/20 text-success"
-		else if (responseTime > 1000) style = "bg-destructive/20 text-destructive"
+		let style = "bg-muted text-muted-foreground border-border/60"
+		if (responseTime < 200) style = "bg-success/20 text-success border-success/20"
+		else if (responseTime > 1000) style = "bg-destructive/20 text-destructive border-destructive/20"
 
 		return (
-			<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${style}`}>
+			<span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${style}`}>
 				{responseTime}ms
 			</span>
 		)

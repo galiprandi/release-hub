@@ -579,16 +579,16 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 					{response && (
 						<div className="px-4 py-3 border-t border-border/40 flex items-center justify-between flex-shrink-0">
 							<div className="flex items-center gap-3">
-								<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+						<span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${
 										response.status >= 200 && response.status < 300
-											? 'bg-success/20 text-success'
+									? 'bg-success/20 text-success border-success/20'
 											: response.status >= 400
-												? 'bg-destructive/20 text-destructive'
-												: 'bg-warning/20 text-warning'
+										? 'bg-destructive/20 text-destructive border-destructive/20'
+										: 'bg-warning/20 text-warning border-warning/20'
 									}`} title={query?.updatedAt ? formatTimeAgo(query.updatedAt) : new Date().toLocaleString()}>
 									{response.status} {response.statusText}
 								</span>
-								<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 px-2 py-0.5 rounded">
+						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 border border-border/60 px-2 py-0.5 rounded-md">
 									{response.responseTime}ms
 								</span>
 							</div>

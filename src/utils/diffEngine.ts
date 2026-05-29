@@ -70,7 +70,7 @@ export function normalizeJson(jsonStr: string): string {
 	}
 }
 
-function sortObjectKeys(obj: any): any {
+function sortObjectKeys(obj: unknown): unknown {
 	if (obj === null || typeof obj !== 'object') {
 		return obj;
 	}
@@ -79,10 +79,11 @@ function sortObjectKeys(obj: any): any {
 		return obj.map(sortObjectKeys);
 	}
 
-	const sortedKeys = Object.keys(obj).sort();
-	const result: any = {};
+	const object = obj as Record<string, unknown>;
+	const sortedKeys = Object.keys(object).sort();
+	const result: Record<string, unknown> = {};
 	for (const key of sortedKeys) {
-		result[key] = sortObjectKeys(obj[key]);
+		result[key] = sortObjectKeys(object[key]);
 	}
 	return result;
 }

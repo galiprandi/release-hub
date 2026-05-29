@@ -2,6 +2,10 @@
 
 ---
 
+### 🗓️ 29 de Mayo de 2026
+
+- 🎉 **Kubernetes: Port-Forward Integrado** 🌐: Ahora puedes abrir túneles locales a tus deployments directamente desde la lista, con detección automática de puertos libres, control de conexión en un clic y acceso instantáneo al health check local.
+
 ### 🗓️ 28 de Mayo de 2026
 
 - 🎉 **Fetcher: Magic Clipboard Resonance** 🪄: El módulo Fetcher ahora detecta automáticamente comandos cURL en tu portapapeles al enfocar la ventana y abre el modal de ejecución al instante, maximizando el "Time to Value".

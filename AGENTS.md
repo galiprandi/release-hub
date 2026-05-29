@@ -12,9 +12,9 @@ Antes de cualquier cambio:
 ## Reglas Críticas
 
 ### 0. Higiene y Refactorización
-- **Código muerto**: Eliminar inmediatamente (no comentar) cualquier componente/ruta/utilidad sin referencias activas.
+- **Código muerto**: Eliminar inmediatamente (no comentar) cualquier componente/ruta/utilidad sin referencias activas. La eliminación de rutas debe verificarse mediante la regeneración de `src/routeTree.gen.ts`.
 - **Hooks hygiene**: Prohibido usar `useEffect` para sincronizar estados derivados o mutar el DOM. Usar `useRef` o event handlers. Prohibido acceder a `.current` de un Ref durante la fase de renderizado; encapsular lógica dependiente de Refs en `useCallback` o efectos para evitar inconsistencias en el renderizado de React.
-- **Tokens semánticos**: En componentes de estado/feedback, usar exclusivamente los tokens de `DESIGN.md`. Nunca colores hardcodeados como `text-zinc-500` o `bg-red-500`.
+- **Tokens semánticos**: En componentes de estado/feedback, usar exclusivamente los tokens de `DESIGN.md` (success, destructive, info, warning, ai, commit, tag). Nunca colores hardcodeados de Tailwind como `text-green-500` o `bg-red-600`.
 
 ### 1. Operaciones por Repositorio
 - **Solo remotas**: Todas las operaciones GitHub deben usar la API o `gh`. Nunca `git` local que requiera estar en el directorio del repo.

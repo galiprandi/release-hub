@@ -36,28 +36,28 @@ function InfoBanner() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg overflow-hidden">
+    <div className="bg-info/5 border border-info/20 rounded-lg overflow-hidden">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-blue-100/50 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-info/10 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <Activity className="w-5 h-5 text-blue-600" />
-          <span className="font-medium text-blue-800">Cómo funciona</span>
+          <Activity className="w-5 h-5 text-info" />
+          <span className="font-medium text-info">Cómo funciona</span>
         </div>
         {isExpanded ? (
-          <ChevronUp className="w-5 h-5 text-blue-600" />
+          <ChevronUp className="w-5 h-5 text-info" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-blue-600" />
+          <ChevronDown className="w-5 h-5 text-info" />
         )}
       </button>
 
       {isExpanded && (
         <div className="px-4 pb-4">
-          <div className="text-sm text-blue-800 pt-2 border-t border-blue-200">
+          <div className="text-sm text-info pt-2 border-t border-info/20">
             <ul className="space-y-1 list-disc list-inside">
               <li>Los endpoints se detectan automáticamente desde los pipelines de deploy</li>
-              <li>Se verifica el endpoint <code className="bg-blue-100 px-1 rounded">/health</code> en cada URL</li>
+              <li>Se verifica el endpoint <code className="bg-info/10 px-1 rounded">/health</code> en cada URL</li>
               <li>Los servicios se eliminan automáticamente cuando quitas un repo de favoritos</li>
             </ul>
           </div>
@@ -121,7 +121,7 @@ function ProductSection({
           <Link
             to="/github/$org/$repo"
             params={{ org, repo: productName }}
-            className="font-semibold text-gray-800 hover:text-blue-600 transition-colors"
+            className="font-semibold text-foreground hover:text-info transition-colors"
           >
             {productName}
           </Link>
@@ -136,19 +136,19 @@ function ProductSection({
               <>
                 {healthy > 0 && (
                   <span className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full bg-green-500" />
+                    <div className="w-2 h-2 rounded-full bg-success" />
                     {healthy} OK
                   </span>
                 )}
                 {pending > 0 && (
-                  <span className="flex items-center gap-1 text-gray-500">
-                    <div className="w-2 h-2 rounded-full bg-gray-400" />
+                  <span className="flex items-center gap-1 text-muted-foreground">
+                    <div className="w-2 h-2 rounded-full bg-muted-foreground/40" />
                     {pending} Pendientes
                   </span>
                 )}
                 {unhealthy > 0 && (
-                  <span className="flex items-center gap-1 text-red-600 font-medium">
-                    <div className="w-2 h-2 rounded-full bg-red-500" />
+                  <span className="flex items-center gap-1 text-destructive font-medium">
+                    <div className="w-2 h-2 rounded-full bg-destructive" />
                     {unhealthy} Error
                   </span>
                 )}
@@ -271,9 +271,9 @@ function EndpointsTable({
 }
 
 function StatusCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
-  if (endpoint.isHealthy === null) return <span className="text-gray-400">⚪</span>
-  if (endpoint.isHealthy === true) return <span className="text-green-500">🟢</span>
-  return <span className="text-red-500">🔴</span>
+  if (endpoint.isHealthy === null) return <span className="text-muted-foreground/40">⚪</span>
+  if (endpoint.isHealthy === true) return <span className="text-success">🟢</span>
+  return <span className="text-destructive">🔴</span>
 }
 
 function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
@@ -281,8 +281,8 @@ function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMo
     <span
       className={`px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide ${
         endpoint.environment === 'production'
-          ? 'bg-purple-100 text-purple-700'
-          : 'bg-blue-100 text-blue-700'
+          ? 'bg-tag/10 text-tag'
+          : 'bg-info/10 text-info'
       }`}
     >
       {endpoint.environment}
@@ -293,7 +293,7 @@ function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMo
 function ResponseTimeCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
   if (endpoint.responseTime !== undefined) {
     return (
-      <span className={`text-xs ${endpoint.isHealthy ? 'text-green-600' : 'text-red-600'}`}>
+      <span className={`text-xs ${endpoint.isHealthy ? 'text-success' : 'text-destructive'}`}>
         {endpoint.responseTime}ms
       </span>
     )
@@ -319,7 +319,7 @@ function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>
   const truncatedMessage = errorMessage.length > 50 ? `${errorMessage.slice(0, 50)}...` : errorMessage
 
   return (
-    <span className="text-xs text-red-600" title={errorMessage}>
+    <span className="text-xs text-destructive" title={errorMessage}>
       {truncatedMessage}
     </span>
   )
@@ -350,14 +350,14 @@ function ActionsCell({
       <button
         onClick={() => onCheckEndpoint(endpoint.id)}
         disabled={isChecking}
-        className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+        className="p-1 text-muted-foreground hover:text-info hover:bg-info/10 rounded transition-colors"
         title="Verificar ahora"
       >
         <RefreshCw className={`w-3 h-3 ${isChecking ? 'animate-spin' : ''}`} />
       </button>
       <button
         onClick={() => navigator.clipboard.writeText(endpoint.url)}
-        className="p-1 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+        className="p-1 text-muted-foreground hover:text-tag hover:bg-tag/10 rounded transition-colors"
         title="Copiar URL"
       >
         <Copy className="w-3 h-3" />
@@ -366,14 +366,14 @@ function ActionsCell({
         href={endpoint.url.endsWith('/') ? `${endpoint.url}health` : `${endpoint.url}/health`}
         target="_blank"
         rel="noopener noreferrer"
-        className="p-1 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+        className="p-1 text-muted-foreground hover:text-success hover:bg-success/10 rounded transition-colors"
         title="Abrir /health"
       >
         <ExternalLink className="w-3 h-3" />
       </a>
       <button
         onClick={() => onRemoveEndpoint(endpoint.id)}
-        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+        className="p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors"
         title="Eliminar del monitoreo"
       >
         <Trash2 className="w-3 h-3" />
@@ -492,7 +492,7 @@ function HealthMonitorPage() {
             unhealthy.forEach((ep) => checkEndpoint(ep.id));
           }}
           disabled={isChecking}
-          className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded-md hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-destructive/30 text-destructive rounded-md hover:bg-destructive/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
           {isChecking ? 'Verificando...' : `Verificar ${stats.unhealthy}`}
@@ -527,16 +527,16 @@ function HealthMonitorPage() {
 
       {/* Endpoints by product */}
       {filteredEndpoints.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed">
-          <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">No hay endpoints que coincidan con el filtro</p>
-          <p className="text-sm text-gray-400 mt-1">
+        <div className="text-center py-12 bg-muted/20 rounded-lg border-2 border-dashed">
+          <Activity className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+          <p className="text-muted-foreground">No hay endpoints que coincidan con el filtro</p>
+          <p className="text-sm text-muted-foreground/60 mt-1">
             {!activeFilter ? 'Navega a un producto favorito para detectar servicios automáticamente' : 'Intenta con otro filtro'}
           </p>
           {!activeFilter && (
             <Link
               to="/github"
-              className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="inline-block mt-4 px-4 py-2 bg-info text-info-foreground rounded-md hover:opacity-90 transition-colors"
             >
               Ir al inicio
             </Link>

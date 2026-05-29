@@ -139,8 +139,8 @@ EOF`
 									disabled={!canManage}
 									className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
 										isLocked
-											? "bg-orange-600 text-white hover:bg-orange-700"
-											: "bg-slate-500 text-white hover:bg-slate-600"
+											? "bg-warning text-warning-foreground hover:opacity-90"
+											: "bg-muted text-muted-foreground hover:bg-muted/80"
 									} disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none`}
 								>
 									{isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
@@ -173,7 +173,7 @@ EOF`
 			<BaseDialog
 				open={open}
 				onOpenChange={handleOpenChange}
-				title={step === 'config' ? <>{isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />} {isLocked ? "Desbloquear Branch" : "Bloquear Branch"}</> : <><CheckCircle2 className="w-4 h-4 text-green-600" /> {isLocked ? "Branch Desbloqueado" : "Branch Bloqueado"}</>}
+				title={step === 'config' ? <>{isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />} {isLocked ? "Desbloquear Branch" : "Bloquear Branch"}</> : <><CheckCircle2 className="w-4 h-4 text-success" /> {isLocked ? "Branch Desbloqueado" : "Branch Bloqueado"}</>}
 				description="Gestión de bloqueo"
 				maxWidth={dialogWidth}
 			>
@@ -196,7 +196,7 @@ EOF`
 								readonly
 							/>
 
-							{error && <p className="text-sm text-red-600">{error}</p>}
+							{error && <p className="text-sm text-destructive">{error}</p>}
 						</div>
 
 						<div className="mt-4 pt-4 border-t flex justify-end flex-shrink-0">
@@ -204,7 +204,7 @@ EOF`
 								onClick={handleToggleFreeze}
 								disabled={isToggling}
 								className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none ${
-									isLocked ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-600 hover:bg-gray-700"
+									isLocked ? "bg-info hover:opacity-90" : "bg-muted text-muted-foreground hover:bg-muted/80"
 								}`}
 							>
 								{isToggling ? <><Loader2 className="w-4 h-4 animate-spin" /> Procesando...</> : <>{isLocked ? <><Lock className="w-4 h-4" /> Desbloquear</> : <><Lock className="w-4 h-4" /> Bloquear</>}</>}
@@ -216,7 +216,7 @@ EOF`
 				{/* Step 2: Success */}
 				{step === 'success' && (
 					<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
-						<CheckCircle2 className="w-12 h-12 text-green-600" />
+						<CheckCircle2 className="w-12 h-12 text-success" />
 						<div>
 							<p className="text-lg font-semibold">{isLocked ? "Branch Desbloqueado" : "Branch Bloqueado"}</p>
 							<p className="text-sm text-muted-foreground mt-1">

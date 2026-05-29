@@ -153,6 +153,14 @@ function FetcherPage() {
 		}
 	}, []);
 
+	const handleCopyCurl = useCallback(async (query: QueryRecord) => {
+		try {
+			await navigator.clipboard.writeText(query.curl);
+		} catch (error) {
+			console.error('Failed to copy cURL to clipboard:', error);
+		}
+	}, []);
+
 	const headerActions = (
 		<form className="flex items-center gap-2" onSubmit={(e) => { e.preventDefault(); handleSendCurl(); }}>
 			<div className="relative">
@@ -201,6 +209,7 @@ function FetcherPage() {
 						queries={history}
 						onOpenModal={handleOpenModal}
 						onCopyResponse={handleCopyResponse}
+						onCopyCurl={handleCopyCurl}
 						onDelete={handleDelete}
 						isDeleting={isDeleting}
 						activeFilter={activeFilter}
@@ -229,6 +238,7 @@ function QueriesTable({
 	queries,
 	onOpenModal,
 	onCopyResponse,
+	onCopyCurl,
 	onDelete,
 	isDeleting,
 	activeFilter,
@@ -237,6 +247,7 @@ function QueriesTable({
 	queries: QueryRecord[]
 	onOpenModal: (query: QueryRecord) => void
 	onCopyResponse: (query: QueryRecord) => void
+	onCopyCurl: (query: QueryRecord) => void
 	onDelete: (id: string) => void
 	isDeleting: boolean
 	activeFilter?: { id: string; value: string } | null
@@ -284,12 +295,13 @@ function QueriesTable({
 					query={row.original}
 					onOpenModal={onOpenModal}
 					onCopyResponse={onCopyResponse}
+					onCopyCurl={onCopyCurl}
 					onDelete={onDelete}
 					isDeleting={isDeleting}
 				/>
 			),
 		},
-	], [onOpenModal, onCopyResponse, onDelete, isDeleting])
+	], [onOpenModal, onCopyResponse, onCopyCurl, onDelete, isDeleting])
 
 	return (
 		<Table
@@ -386,12 +398,14 @@ function ActionsCell({
 	query,
 	onOpenModal,
 	onCopyResponse,
+	onCopyCurl,
 	onDelete,
 	isDeleting,
 }: {
 	query: QueryRecord
 	onOpenModal: (query: QueryRecord) => void
 	onCopyResponse: (query: QueryRecord) => void
+	onCopyCurl: (query: QueryRecord) => void
 	onDelete: (id: string) => void
 	isDeleting: boolean
 }) {
@@ -402,6 +416,11 @@ function ActionsCell({
 				onClick={() => onOpenModal(query)}
 				size="sm"
 				className="text-success hover:bg-success/10"
+			/>
+			<ActionButton
+				action={ACTION_DEFINITIONS.copyCurl}
+				onClick={() => onCopyCurl(query)}
+				size="sm"
 			/>
 			{query.response?.body && (
 				<ActionButton

@@ -61,6 +61,7 @@ export const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
 	// General actions
 	copy: { icon: Copy, label: "Copiar", color: "default" },
 	clipboardCopy: { icon: ClipboardCopy, label: "Copiar", color: "default" },
+	copyCurl: { icon: ClipboardCopy, label: "Copiar cURL", color: "default" },
 	delete: { icon: Trash2, label: "Eliminar", color: "destructive" },
 	settings: { icon: Settings, label: "Configuración", color: "default" },
 	search: { icon: Search, label: "Buscar", color: "default" },

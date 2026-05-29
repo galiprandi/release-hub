@@ -12,13 +12,11 @@ export interface KubectlNamespaceAccess {
 }
 
 async function checkContextAccess(namespace: string, context: string): Promise<KubectlNamespaceAccess> {
-	const ctxFlag = `--context=${context}`;
-
 	try {
 		const [podsResult, deploymentsResult, logsResult] = await Promise.allSettled([
-			runCommand(`kubectl auth can-i get pods -n ${namespace} ${ctxFlag}`.trim()),
-			runCommand(`kubectl auth can-i get deployments -n ${namespace} ${ctxFlag}`.trim()),
-			runCommand(`kubectl auth can-i get pods/logs -n ${namespace} ${ctxFlag}`.trim()),
+			runCommand(['kubectl', 'auth', 'can-i', 'get', 'pods', '-n', namespace, '--context', context]),
+			runCommand(['kubectl', 'auth', 'can-i', 'get', 'deployments', '-n', namespace, '--context', context]),
+			runCommand(['kubectl', 'auth', 'can-i', 'get', 'pods/logs', '-n', namespace, '--context', context]),
 		]);
 
 		const canGetPods = podsResult.status === "fulfilled" && podsResult.value.stdout.trim() === "yes";

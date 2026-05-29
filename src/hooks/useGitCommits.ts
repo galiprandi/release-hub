@@ -26,8 +26,17 @@ export function useGitCommits({
 		queryFn: async ({ pageParam = 0 }) => {
 			const page = pageParam as number;
 			const perPage = 10;
-			const command = `gh api "repos/${repo}/commits?per_page=${perPage}&page=${page + 1}" --jq '.[] | {hash: .sha, author: .commit.author.name, date: .commit.committer.date, message: .commit.message}'`;
-			const response = await runCommand(command);
+			const response = await runCommand([
+				'gh',
+				'api',
+				`repos/${repo}/commits`,
+				'-F',
+				`per_page=${perPage}`,
+				'-F',
+				`page=${page + 1}`,
+				'--jq',
+				'.[] | {hash: .sha, author: .commit.author.name, date: .commit.committer.date, message: .commit.message}'
+			]);
 
 			const lines = response.stdout
 				.trim()

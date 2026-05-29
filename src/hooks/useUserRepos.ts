@@ -52,42 +52,41 @@ export function useUserRepos({
   return useQuery<Repo[]>({
     queryKey: queryKeys.user.repos(org || 'all'),
     queryFn: async () => {
-      const commands: string[] = []
-
-      if (org) {
-        // If org specified, only list repos from that org
-        commands.push(
-          `gh repo list ${org} --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission`
-        )
-      } else {
-        // Get organizations dynamically
-        const orgsResult = await runCommand('gh api /user/memberships/orgs --jq \'.[].organization.login\'')
-        const orgs = orgsResult.stdout.trim().split('\n').filter(Boolean)
-
-        // Add commands for each org
-        orgs.forEach((orgName) => {
-          commands.push(
-            `gh repo list ${orgName} --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission`
-          )
-        })
-
-        // Add user's personal repos
-        commands.push(
-          'gh repo list --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission'
-        )
-
-        // Add additional users
-        ADDITIONAL_USERS.forEach((user) => {
-          commands.push(
-            `gh repo list ${user} --limit 1000 --json name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission`
-          )
-        })
+      const getRepos = async (target?: string) => {
+        const args = ['gh', 'repo', 'list']
+        if (target) args.push(target)
+        args.push('--limit', '1000', '--json', 'name,nameWithOwner,description,pushedAt,isPrivate,viewerPermission')
+        const res = await runCommand(args)
+        return JSON.parse(res.stdout || '[]') as CmdResponseDTO[]
       }
 
-      // Execute all commands and combine results with jq
-      const combinedCommand = `(${commands.join(' && ')}) | jq -s 'add'`
-      const result = await runCommand(combinedCommand)
-      const repos = JSON.parse(result.stdout) as CmdResponseDTO[]
+      let repos: CmdResponseDTO[] = []
+
+      if (org) {
+        repos = await getRepos(org)
+      } else {
+        // Get organizations dynamically
+        const orgsResult = await runCommand(['gh', 'api', '/user/memberships/orgs', '--jq', '.[].organization.login'])
+        const orgs = orgsResult.stdout.trim().split('\n').filter(Boolean)
+
+        const results = await Promise.all([
+          // User's personal repos
+          getRepos(),
+          // Each org's repos
+          ...orgs.map(orgName => getRepos(orgName)),
+          // Additional users
+          ...ADDITIONAL_USERS.map(user => getRepos(user))
+        ])
+
+        // Flatten results and remove duplicates by nameWithOwner
+        const seen = new Set<string>()
+        repos = results.flat().filter(repo => {
+          const id = repo.nameWithOwner || repo.fullName
+          if (!id || seen.has(id)) return false
+          seen.add(id)
+          return true
+        })
+      }
 
       return (repos || []).map((repo) => ({
         fullName: repo.fullName || repo.nameWithOwner || '',

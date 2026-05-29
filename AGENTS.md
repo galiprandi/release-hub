@@ -58,7 +58,7 @@ Ubicar archivos `.test.ts[x]` junto al archivo que prueban. Evitar carpetas `__t
 - **Fetcher & HTTP Method Mapping**: Siempre usar opacidades semánticas (`/20`) para badges de métodos HTTP y tiempos de respuesta. GET -> success, POST -> info, PUT/PATCH -> warning, DELETE -> destructive.
 - **FilterBar**: Utilizar `variant="tabs"` para navegación de colecciones en dashboards. El contenedor debe ser `bg-muted` con padding `p-1`.
 - **Industrial Resonance V2**: Uso de `tracking-tight` para nombres de elementos, `rounded-xl` para contenedores principales y `rounded-lg` para botones de acción.
-- **Shell Hardening**: Todo comando CLI (gh, docker, kubectl, curl) debe usar `runCommand` con un array de argumentos. Parámetros dinámicos deben pasar por `quote()` o ser parte del array de `runCommand` (que internamente usa `joinArgs`). Prohibido concatenar strings sin escape para comandos.
+- **Shell Hardening**: Todo comando CLI (gh, docker, kubectl, curl) debe usar `runCommand` obligatoriamente con un array de argumentos (`string[]`). Los parámetros dinámicos deben ser elementos individuales del array para asegurar el escape automático POSIX. Prohibido concatenar strings o usar interpolación de variables dentro de un string para comandos.
 
 ### 10. Componente Table con Filtros Integrados
 

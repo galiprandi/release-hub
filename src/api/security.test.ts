@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { apiExec } from './exec'
+import { apiExec, runCommand } from './exec'
 import { startContainer } from './docker'
 import { getDeployment } from './kubectl'
 import { executeCurlCommand } from './curl'
@@ -79,6 +79,44 @@ describe('Security Hardening', () => {
       const command = (lastCall[1] as { command: string }).command
       // POSIX quote for O'Reilly is 'O'\''Reilly'
       expect(command).toContain("'O'\\''Reilly'")
+    })
+
+    it('should neutralize pipe injection in repo search', async () => {
+      const spy = vi.spyOn(apiExec, 'post').mockResolvedValue({
+        data: { success: true, stdout: '{"data":{"search":{"nodes":[],"repositoryCount":0}}}', stderr: '' }
+      })
+
+      const maliciousSearch = 'repo | rm -rf /'
+      // This would normally be called by useRepoSearch
+      await runCommand([
+        'gh',
+        'api',
+        'graphql',
+        '-f',
+        `query=query { viewer { login } }`,
+        '-f',
+        `searchTerm=${maliciousSearch}`
+      ])
+
+      const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
+      const command = (lastCall[1] as { command: string }).command
+      expect(command).toContain("'searchTerm=repo | rm -rf /'")
+      // The pipe should only exist inside the single quotes
+      expect(command).not.toMatch(/[^\']searchTerm=repo \| rm -rf \//)
+    })
+
+    it('should handle redirection injection attempts', async () => {
+      const spy = vi.spyOn(apiExec, 'post').mockResolvedValue({
+        data: { success: true, stdout: '[]', stderr: '' }
+      })
+
+      const maliciousRepo = 'org/repo > /etc/passwd'
+      await runCommand(['gh', 'pr', 'list', '--repo', maliciousRepo])
+
+      const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
+      const command = (lastCall[1] as { command: string }).command
+      expect(command).toContain("'org/repo > /etc/passwd'")
+      expect(command).not.toContain('repo org/repo > /etc/passwd')
     })
   })
 })

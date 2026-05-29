@@ -50,7 +50,7 @@ export function useRepoSearch({ searchTerm = '', enabled = true }: UseRepoSearch
     queryKey: queryKeys.user.repoSearch(debouncedSearchTerm),
     queryFn: async () => {
       // Get username for search query
-      const userResult = await runCommand('gh api /user --jq \'.login\'')
+      const userResult = await runCommand(['gh', 'api', '/user', '--jq', '.login'])
       const username = userResult.stdout.trim()
 
       // Build search query with all orgs and user
@@ -80,8 +80,15 @@ export function useRepoSearch({ searchTerm = '', enabled = true }: UseRepoSearch
         ? debouncedSearchTerm
         : `${debouncedSearchTerm} org:Cencosud-Cencommerce org:Cencosud-xlabs user:${username}`
 
-      const command = `gh api graphql -f query='${query.replace(/\n/g, ' ')}' -f searchTerm='${searchQuery}'`
-      const result = await runCommand(command)
+      const result = await runCommand([
+        'gh',
+        'api',
+        'graphql',
+        '-f',
+        `query=${query.replace(/\n/g, ' ')}`,
+        '-f',
+        `searchTerm=${searchQuery}`
+      ])
       const data = JSON.parse(result.stdout) as GraphQLSearchResponse
 
       return {

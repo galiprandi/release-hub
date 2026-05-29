@@ -26,6 +26,8 @@ export async function executeCurlCommand(args: string | string[]): Promise<strin
 		if (Array.isArray(args)) {
 			command = ['curl', '-i', ...args];
 		} else {
+			// DEPRECATED: Concatenating strings for shell commands is insecure.
+			// This remains only for legacy support but should be avoided.
 			command = `curl -i ${args}`;
 		}
 

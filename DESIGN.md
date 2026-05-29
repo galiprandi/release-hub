@@ -270,8 +270,8 @@ Componente reutilizable para botones de acción iconográficos con tooltip integ
 
 ## Security Validation Standard
 
-- **Shell Injection Protection**: Todos los comandos externos se ejecutan utilizando un sistema de escape POSIX-compatible.
-- **Verification**: Refactorizaciones de endurecimiento de shell deben ser verificadas por `src/api/security.test.ts`.
+- **Shell Injection Protection**: Todos los comandos externos se ejecutan utilizando un sistema de escape POSIX-compatible mediante el uso mandatorio de arrays de argumentos en `runCommand`.
+- **Verification**: Refactorizaciones de endurecimiento de shell y nuevos vectores de ataque deben ser validados por `src/api/security.test.ts`.
 
 **Uso básico**:
 ```tsx

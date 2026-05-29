@@ -102,14 +102,20 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 	const handleCreateTag = async () => {
 		if (!tagName.trim()) { setError("El nombre del Tag es requerido"); return }
 		// Obtener el commit más reciente de main
-		const latestCommitResult = await runCommand(`gh api repos/${repo}/commits/main --jq '.sha'`)
+		const latestCommitResult = await runCommand([
+			'gh',
+			'api',
+			`repos/${repo}/commits/main`,
+			'--jq',
+			'.sha'
+		])
 		const targetCommit = latestCommitResult.stdout.trim()
 		if (!targetCommit) throw new Error("No se pudo obtener el commit más reciente de main")
 
 		setIsCreating(true)
 		setError("")
 		try {
-			const tokenResult = await runCommand('gh auth token')
+			const tokenResult = await runCommand(['gh', 'auth', 'token'])
 			const token = tokenResult.stdout.trim()
 			if (!token) throw new Error("Sin token de GitHub configurado en gh CLI")
 			const tagResponse = await axios.post(

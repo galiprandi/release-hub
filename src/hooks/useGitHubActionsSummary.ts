@@ -12,8 +12,15 @@ export function useGitHubActionsSummary(repo: string) {
 	return useQuery<GitHubActionsSummary>({
 		queryKey: ["github-actions", "summary", repo],
 		queryFn: async () => {
-			const command = `gh api 'repos/${repo}/actions/runs?per_page=5' --jq '.workflow_runs[] | {status, conclusion}'`;
-			const { stdout } = await runCommand(command);
+			const { stdout } = await runCommand([
+				'gh',
+				'api',
+				`repos/${repo}/actions/runs`,
+				'-F',
+				'per_page=5',
+				'--jq',
+				'.workflow_runs[] | {status, conclusion}'
+			]);
 			const lines = stdout
 				.trim()
 				.split("\n")

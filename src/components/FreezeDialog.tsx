@@ -46,7 +46,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 		setIsToggling(true)
 		setError("")
 		try {
-			const tokenResult = await runCommand('gh auth token')
+			const tokenResult = await runCommand(['gh', 'auth', 'token'])
 			const token = tokenResult.stdout.trim()
 			if (!token) throw new Error("Sin token de GitHub configurado en gh CLI")
 
@@ -59,11 +59,15 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 				restrictions: null,
 			}
 
-			const result = await runCommand(
-				`gh api repos/${repo}/branches/main/protection --method PUT --input - << 'EOF'
-${JSON.stringify(protectionConfig)}
-EOF`
-			)
+			const result = await runCommand([
+				'gh',
+				'api',
+				`repos/${repo}/branches/main/protection`,
+				'--method',
+				'PUT',
+				'--input',
+				'-'
+			], JSON.stringify(protectionConfig))
 
 			if (result.stderr) {
 				throw new Error(result.stderr)

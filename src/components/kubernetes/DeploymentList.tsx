@@ -9,6 +9,10 @@ import { Table } from "@/components/ui/Table"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useUserCollections } from "@/hooks/useUserCollections"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
+import { PortForwardControl } from "@/components/ui/PortForwardControl"
+import { usePortForward } from "@/hooks/usePortForward"
+import { usePortFree } from "@/hooks/usePortFree"
+import { DEFAULT_START_PORT } from "@/config/portForward"
 
 const STORAGE_KEY = "kubernetes-deployments-metadata"
 
@@ -293,6 +297,17 @@ function DeploymentsTable({
 			cell: ({ row }) => <ImagesCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
+			id: "portForward",
+			header: "Port Forward",
+			enableSorting: false,
+			cell: ({ row }) => (
+				<PortForwardCell
+					deployment={row.original}
+					context={context}
+				/>
+			),
+		},
+		{
 			id: "actions",
 			accessorKey: "actions",
 			header: "Acciones",
@@ -409,5 +424,36 @@ function ActionsCell({
 				<Star className="w-4 h-4 fill-current" />
 			</button>
 		</div>
+	)
+}
+
+function PortForwardCell({ deployment, context }: { deployment: DeploymentInfo & { context: string }; context: string }) {
+	const { connect, disconnect, status, error, isActive, localPort } = usePortForward({
+		deployment: deployment.name,
+		namespace: deployment.namespace,
+		context,
+	})
+
+	const { data: freePort } = usePortFree()
+	const [userPort, setUserPort] = useState("")
+
+	const suggestedPort = isActive && localPort != null
+		? String(localPort)
+		: (userPort || (freePort != null ? String(freePort) : ""))
+
+	const handleConnect = async (port: number) => {
+		await connect(port, 8080)
+	}
+
+	return (
+		<PortForwardControl
+			value={suggestedPort}
+			placeholder={String(DEFAULT_START_PORT)}
+			onChange={setUserPort}
+			onConnect={handleConnect}
+			onDisconnect={disconnect}
+			status={status}
+			error={error}
+		/>
 	)
 }

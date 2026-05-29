@@ -1,13 +1,17 @@
 import { exec, spawn } from "node:child_process";
 import { promisify } from "node:util";
+import http from "node:http";
 import https from "node:https";
 import type { Connect } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import { DEFAULT_START_PORT, DEFAULT_MAX_PORTS } from "./src/config/portForward";
 
 const execAsync = promisify(exec);
+
+const activePortForwards = new Map<string, ReturnType<typeof spawn>>();
 
 // Handler for /local/exec endpoint - works in both dev and preview
 const execHandler: Connect.NextHandleFunction = async (req, res) => {
@@ -98,9 +102,11 @@ const healthProxyHandler: Connect.NextHandleFunction = async (req, res) => {
 	try {
 		const targetUrlObj = new URL(healthUrl);
 
+		const isHttps = targetUrlObj.protocol === 'https:';
+		const port = targetUrlObj.port || (isHttps ? 443 : 80);
 		const options = {
 			hostname: targetUrlObj.hostname,
-			port: targetUrlObj.port || 443,
+			port,
 			path: targetUrlObj.pathname + targetUrlObj.search,
 			method: 'GET',
 			rejectUnauthorized: false, // Ignore SSL certificate errors
@@ -110,7 +116,7 @@ const healthProxyHandler: Connect.NextHandleFunction = async (req, res) => {
 			},
 		};
 
-		const proxyReq = https.request(options, (proxyRes) => {
+		const proxyReq = (isHttps ? https : http).request(options, (proxyRes) => {
 			let data = '';
 			proxyRes.on('data', (chunk) => {
 				data += chunk;
@@ -395,6 +401,193 @@ const k8sLogsStreamHandler: Connect.NextHandleFunction = (req, res) => {
 	}
 };
 
+// Handler for /local/port-free endpoint - find a free local port
+const portFreeHandler: Connect.NextHandleFunction = async (req, res) => {
+	if (req.method !== "GET") {
+		res.statusCode = 405;
+		res.end("Method not allowed");
+		return;
+	}
+
+	const url = new URL(req.url || "", `http://localhost`);
+	const startPort = parseInt(url.searchParams.get("startPort") || String(DEFAULT_START_PORT), 10);
+	const max = parseInt(url.searchParams.get("max") || String(DEFAULT_MAX_PORTS), 10);
+
+	// Collect ports already used by active port-forwards
+	const activePorts = new Set(
+		Array.from(activePortForwards.values()).map(
+			(proc) => (proc as unknown as { _pfMeta?: { localPort: number } })._pfMeta?.localPort
+		).filter((p): p is number => p != null)
+	);
+
+	let port: number | null = null;
+	for (let p = startPort; p < startPort + max; p++) {
+		if (activePorts.has(p)) continue;
+		try {
+			const { stdout } = await execAsync(`lsof -ti :${p}`);
+			if (!stdout.trim()) {
+				port = p;
+				break;
+			}
+		} catch {
+			// lsof returns exit code 1 when port is free
+			port = p;
+			break;
+		}
+	}
+
+	res.setHeader("Content-Type", "application/json");
+	res.end(JSON.stringify({ port }));
+};
+
+// Handler for /local/port-forward endpoint - manage kubectl port-forward processes
+const portForwardHandler: Connect.NextHandleFunction = async (req, res) => {
+	if (req.method === "GET") {
+		const forwards = Array.from(activePortForwards.entries()).map(([key, proc]) => {
+			const [context, namespace, deployment] = key.split("/");
+			return {
+				context,
+				namespace,
+				deployment,
+				localPort: (proc as unknown as { _pfMeta?: { localPort: number; remotePort: number } })._pfMeta?.localPort || 0,
+				remotePort: (proc as unknown as { _pfMeta?: { localPort: number; remotePort: number } })._pfMeta?.remotePort || 0,
+			};
+		});
+		res.setHeader("Content-Type", "application/json");
+		res.end(JSON.stringify({ portForwards: forwards }));
+		return;
+	}
+
+	if (req.method === "DELETE") {
+		let body = "";
+		await new Promise((resolve) => {
+			req.on("data", (chunk) => {
+				body += chunk;
+			});
+			req.on("end", resolve);
+		});
+		let payload: { deployment?: string; namespace?: string; context?: string } = {};
+		try {
+			payload = JSON.parse(body);
+		} catch {
+			res.statusCode = 400;
+			res.end(JSON.stringify({ error: "Invalid JSON body", success: false }));
+			return;
+		}
+		const { deployment, namespace, context } = payload;
+		if (!deployment || !namespace) {
+			res.statusCode = 400;
+			res.end(JSON.stringify({ error: "Missing deployment or namespace", success: false }));
+			return;
+		}
+		const key = `${context || ""}/${namespace}/${deployment}`;
+		const existing = activePortForwards.get(key);
+		if (existing) {
+			existing.kill();
+			activePortForwards.delete(key);
+		}
+		res.setHeader("Content-Type", "application/json");
+		res.end(JSON.stringify({ success: true }));
+		return;
+	}
+
+	if (req.method === "POST") {
+		let body = "";
+		await new Promise((resolve) => {
+			req.on("data", (chunk) => {
+				body += chunk;
+			});
+			req.on("end", resolve);
+		});
+		let payload: { deployment?: string; namespace?: string; context?: string; localPort?: number; remotePort?: number } = {};
+		try {
+			payload = JSON.parse(body);
+		} catch {
+			res.statusCode = 400;
+			res.end(JSON.stringify({ error: "Invalid JSON body", success: false }));
+			return;
+		}
+		const { deployment, namespace, context } = payload;
+		if (!deployment || !namespace) {
+			res.statusCode = 400;
+			res.end(JSON.stringify({ error: "Missing deployment or namespace", success: false }));
+			return;
+		}
+
+		const key = `${context || ""}/${namespace}/${deployment}`;
+		const localPort = Number(payload.localPort);
+		const remotePort = Number(payload.remotePort);
+		if (!localPort || !remotePort) {
+			res.statusCode = 400;
+			res.end(JSON.stringify({ error: "Missing localPort or remotePort", success: false }));
+			return;
+		}
+
+		const existing = activePortForwards.get(key);
+		if (existing) {
+			existing.kill();
+			activePortForwards.delete(key);
+		}
+
+		const ctxFlag = context ? `--context=${context}` : "";
+		const nsFlag = `-n ${namespace}`;
+		const command = `kubectl port-forward deployment/${deployment} ${localPort}:${remotePort} ${nsFlag} ${ctxFlag}`;
+
+		console.log(`[port-forward] Starting: ${command}`);
+		const proc = spawn(command, { shell: true });
+
+		(proc as unknown as { _pfMeta: { localPort: number; remotePort: number } })._pfMeta = { localPort, remotePort };
+
+		let stderrBuffer = "";
+		proc.stderr.on("data", (data) => {
+			stderrBuffer += data.toString();
+			console.error(`[port-forward] stderr for ${key}:`, data.toString().trim());
+		});
+
+		proc.on("error", (err) => {
+			console.error(`[port-forward] Error for ${key}:`, err.message);
+			activePortForwards.delete(key);
+		});
+
+		proc.on("close", (code) => {
+			console.log(`[port-forward] Closed for ${key} with code:`, code);
+			activePortForwards.delete(key);
+		});
+
+		activePortForwards.set(key, proc);
+
+		const startTime = Date.now();
+		await new Promise((resolve) => {
+			const interval = setInterval(() => {
+				if (proc.killed || Date.now() - startTime > 3000) {
+					clearInterval(interval);
+					resolve(undefined);
+				}
+			}, 200);
+		});
+
+		if (proc.killed || stderrBuffer.toLowerCase().includes("error") || stderrBuffer.toLowerCase().includes("forbidden")) {
+			proc.kill();
+			activePortForwards.delete(key);
+			const rawError = stderrBuffer.trim();
+			const errorMsg = rawError.toLowerCase().includes("forbidden")
+				? "Prohibido"
+				: (rawError || "Port-forward failed");
+			res.setHeader("Content-Type", "application/json");
+			res.statusCode = 200;
+			res.end(JSON.stringify({ error: errorMsg, success: false }));
+			return;
+		}
+
+		res.setHeader("Content-Type", "application/json");
+		res.end(JSON.stringify({ success: true }));
+		return;
+	}
+
+	res.statusCode = 405;
+	res.end("Method not allowed");
+};
+
 // https://vite.dev/config/
 export default defineConfig({
 	plugins: [
@@ -416,6 +609,10 @@ export default defineConfig({
 				server.middlewares.use("/health-proxy", healthProxyHandler);
 				// Kubernetes logs stream endpoint - SSE streaming for k8s logs
 				server.middlewares.use("/local/k8s-logs-stream", k8sLogsStreamHandler);
+				// Port forward endpoint - manage kubectl port-forward processes
+				server.middlewares.use("/local/port-forward", portForwardHandler);
+				// Port free endpoint - find a free local port
+				server.middlewares.use("/local/port-free", portFreeHandler);
 			},
 			configurePreviewServer(server) {
 				// Same endpoint for preview mode
@@ -423,6 +620,8 @@ export default defineConfig({
 				server.middlewares.use("/local/script", scriptHandler);
 				server.middlewares.use("/health-proxy", healthProxyHandler);
 				server.middlewares.use("/local/k8s-logs-stream", k8sLogsStreamHandler);
+				server.middlewares.use("/local/port-forward", portForwardHandler);
+				server.middlewares.use("/local/port-free", portFreeHandler);
 			},
 		},
 	],

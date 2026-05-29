@@ -1,4 +1,4 @@
-import { Plug, Activity } from "lucide-react"
+import { Plug, Activity, Loader2 } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 
 interface PortForwardControlProps {
@@ -14,15 +14,16 @@ interface PortForwardControlProps {
 export function PortForwardControl({ value, placeholder = "8080", onChange, onConnect, onDisconnect, status, error }: PortForwardControlProps) {
 	const isActive = status === "success"
 	const isLoading = status === "loading"
+	const effectiveValue = value || placeholder || ""
 
 	const { data: hasHealth } = useQuery({
-		queryKey: ["health", "port-forward", value],
+		queryKey: ["health", "port-forward", effectiveValue],
 		queryFn: async () => {
-			const url = `http://localhost:${value}`
+			const url = `http://localhost:${effectiveValue}`
 			const res = await fetch(`/health-proxy?url=${encodeURIComponent(url)}`)
 			return res.ok
 		},
-		enabled: isActive && !!value,
+		enabled: isActive && !!effectiveValue,
 		refetchInterval: 30000,
 		retry: 1,
 	})
@@ -31,8 +32,9 @@ export function PortForwardControl({ value, placeholder = "8080", onChange, onCo
 		if (isActive) {
 			await onDisconnect()
 		} else {
-			if (!value) return
-			await onConnect(parseInt(value))
+			const port = parseInt(effectiveValue)
+			if (isNaN(port)) return
+			await onConnect(port)
 		}
 	}
 
@@ -48,25 +50,33 @@ export function PortForwardControl({ value, placeholder = "8080", onChange, onCo
 					className={`w-[4.2rem] px-1.5 py-0.5 text-xs rounded border bg-background text-center ${
 						isActive
 							? "border-success/50 text-success opacity-70 cursor-not-allowed"
-							: "border-input text-foreground placeholder:text-muted-foreground"
+							: isLoading
+								? "border-info/50 text-info/70 cursor-not-allowed animate-pulse"
+								: "border-input text-foreground placeholder:text-muted-foreground"
 					} focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1`}
 				/>
 				<button
 					type="button"
 					onClick={handleToggle}
-					disabled={!isActive && !value}
+					disabled={isLoading || (!isActive && !effectiveValue)}
 					className={`p-1 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
 						isActive
 							? "text-destructive hover:bg-destructive/10"
-							: "text-primary hover:bg-primary/10"
+							: isLoading
+								? "text-info cursor-not-allowed opacity-70"
+								: "text-primary hover:bg-primary/10"
 					} disabled:opacity-30 disabled:cursor-not-allowed`}
-					aria-label={isActive ? "Desconectar" : "Conectar"}
+					aria-label={isActive ? "Desconectar" : isLoading ? "Conectando..." : "Conectar"}
 				>
-					<Plug className={`w-3.5 h-3.5 ${isActive ? "rotate-180" : ""}`} />
+					{isLoading ? (
+						<Loader2 className="w-3.5 h-3.5 animate-spin" />
+					) : (
+						<Plug className={`w-3.5 h-3.5 ${isActive ? "rotate-180" : ""}`} />
+					)}
 				</button>
 				{hasHealth && (
 					<a
-						href={`http://localhost:${value}/health`}
+						href={`http://localhost:${effectiveValue}/health`}
 						target="_blank"
 						rel="noopener noreferrer"
 						className="p-1 rounded text-info hover:bg-info/10 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"

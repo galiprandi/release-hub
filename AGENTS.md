@@ -51,6 +51,9 @@ Después de escrituras, invalidar queries relevantes. Nunca `window.location.rel
 Ubicar archivos `.test.ts[x]` junto al archivo que prueban. Evitar carpetas `__tests__`.
 
 ### 9. UI y Tematización
+
+Ver `DESIGN.md` para tokens, patrones visuales y especificaciones de componentes compartidos. Reglas críticas de desarrollo:
+
 - **Anillos de foco**: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1`.
 - **Componentes compartidos**: Antes de crear uno nuevo, verificar si extiende `FilterBar`, `PageHeader`, `BaseDialog` o `DisplayInfo`. Todos los diálogos migrar a `BaseDialog`.
 - **Feedback**: Usar `StatusCard` para estados de carga, error y advertencia en monitores y Docker.
@@ -64,121 +67,13 @@ Ubicar archivos `.test.ts[x]` junto al archivo que prueban. Evitar carpetas `__t
 
 ### 10. Componente Table con Filtros Integrados
 
-El componente `Table` (`src/components/ui/Table.tsx`) incluye filtrado opcional integrado usando TanStack Table's column filtering API.
+Ver `DESIGN.md` para especificaciones visuales completas (`Table`, `FilterBar`, `StatusCard`). Reglas de implementación:
 
-#### Uso Básico (Modo No Controlado)
-
-```tsx
-<Table
-  columns={columns}
-  data={data}
-  filters={[
-    { label: 'GET', columnId: 'method', value: 'GET' },
-    { label: 'POST', columnId: 'method', value: 'POST' },
-  ]}
-/>
-```
-
-#### Uso con TanStack Router (Modo Controlado)
-
-Para persistir el estado del filtro en query params:
-
-```tsx
-// En la definición de la ruta
-export const Route = createFileRoute('/fetcher')({
-  component: FetcherPage,
-  validateSearch: (search: Record<string, unknown>) => {
-    return {
-      method: typeof search.method === 'string' ? search.method : undefined,
-    };
-  },
-});
-
-// En el componente
-function FetcherPage() {
-  const navigate = useNavigate({ from: '/fetcher' });
-  const search = useSearch({ from: '/fetcher' });
-
-  const activeFilter = useMemo(() => {
-    return search.method ? { id: 'method', value: search.method } : null;
-  }, [search.method]);
-
-  const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
-    navigate({
-      to: '.',
-      search: filter ? { method: filter.value } : {},
-    });
-  }, [navigate]);
-
-  return (
-    <Table
-      columns={columns}
-      data={data}
-      filters={[...]}
-      activeFilter={activeFilter}
-      onFilterChange={handleFilterChange}
-    />
-  );
-}
-```
-
-#### Contadores Opcionales en Filtros
-
-Los filtros pueden incluir contadores dinámicos opcionales:
-
-```tsx
-const filters = useMemo(() => {
-  return [
-    { label: 'Running', columnId: 'status', value: 'running', count: filterCounts.running },
-    { label: 'Stopped', columnId: 'status', value: 'stopped', count: filterCounts.stopped },
-  ];
-}, [filterCounts]);
-
-<Table
-  columns={columns}
-  data={data}
-  filters={filters}
-  activeFilter={activeFilter}
-  onFilterChange={handleFilterChange}
-/>
-```
-
-El botón "Todos" también muestra el total cuando los filtros tienen contadores.
-
-#### Configuración de Columnas para Filtrado
-
-Las columnas deben usar `accessorFn` o `accessorKey` correctamente:
-
-```tsx
-const columns: ColumnDef<QueryRecord>[] = [
-  {
-    id: "method",
-    accessorFn: (row) => {
-      const parsed = parseCurlForDisplay(row.curl);
-      return parsed?.method || '';
-    },
-    header: "Método",
-    cell: ({ row }) => <MethodCell query={row.original} />,
-    filterFn: 'equalsString', // Para coincidencia exacta
-  },
-  // ...
-]
-```
-
-#### Consideraciones de Rendimiento
-
-- **Memoizar columnas**: Usar `useMemo` para el array de columnas para evitar recreación
-- **Memoizar callbacks**: Usar `useCallback` para `onFilterChange` y `handleFilterChange`
-- **Memoizar activeFilter**: Derivar el filtro activo de query params con `useMemo`
-- **Memoizar filters con contadores**: Usar `useMemo` para el array de filtros cuando incluye contadores dinámicos
-- El componente Table internamente memoiza `effectiveColumnFilters` y `tableOptions` para prevenir re-renders
-
-#### Estilos de Filtros
-
-- **Activo**: `bg-info/20 text-info shadow-sm` (azul semántico)
-- **Inactivo**: `bg-muted text-foreground hover:bg-muted/80`
-- **Botón "Todos"**: Mismo comportamiento que filtros individuales
-- **Tamaño**: `px-2.5 py-1 text-xs` (compacto)
+- El componente `Table` (`src/components/ui/Table.tsx`) soporta filtrado integrado vía TanStack Table's column filtering API.
+- Soporta modo no controlado (prop `filters`) y controlado (props `activeFilter` + `onFilterChange`).
+- Filtros pueden incluir contadores dinámicos opcionales (`count`).
+- **Rendimiento**: Memoizar `columns`, `filters`, `activeFilter` y callbacks (`useMemo`/`useCallback`).
+- **Estilos de filtros**: Activo `bg-info/20 text-info shadow-sm`, Inactivo `bg-muted text-foreground hover:bg-muted/80`.
 
 ### 11. Validación de Build Antes de Commits y PRs
 - **Obligatorio antes de commit a main**: Ejecutar `node --run build` y verificar que no existan errores de compilación.

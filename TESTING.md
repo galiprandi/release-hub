@@ -27,7 +27,7 @@ import { runCommand } from '@/api/exec';
 vi.mock('@/api/exec', () => ({ runCommand: vi.fn() }));
 ```
 
-## 2. Testing Sequential Outputs
+## 3. Testing Sequential Outputs
 
 For complex flows requiring multiple CLI calls, use `mockResolvedValueOnce` sequentially.
 
@@ -37,13 +37,13 @@ vi.mocked(runCommand)
   .mockResolvedValueOnce({ stdout: 'second-output', stderr: '', success: true });
 ```
 
-## 3. Resilience and Sanitization
+## 4. Resilience and Sanitization
 
 - **Sanitization**: Always test that input sanitizers correctly reject malicious or malformed input (e.g., command injection attempts).
 - **Graceful Failure**: Ensure the adapter handles command failures (rejected promises) by logging the error and returning safe defaults (empty arrays, null, or false).
 - **Parsing Robustness**: CLI output can change. Use `--format json` whenever possible and test that parsers handle missing fields or malformed lines without crashing the entire flow.
 
-## 4. Coverage Targets
+## 5. Coverage Targets
 
 We target **100% statement coverage** for all API adapters. This includes testing:
 - Successful execution.
@@ -51,7 +51,7 @@ We target **100% statement coverage** for all API adapters. This includes testin
 - Sanitization edge cases.
 - Malformed/Unexpected output parsing.
 
-## 5. Testing UI Components (Resonance and Accessibility)
+## 6. Testing UI Components (Resonance and Accessibility)
 
 For shared UI components like `StatusCard`:
 - **States**: Test all visual variants and their respective CSS classes.

@@ -4,10 +4,6 @@
 
 ReleaseHub es una aplicación web **stateless** para visualizar pipelines CI/CD y gestionar releases GitHub sin clonación local de repositorios.
 
-## Prioridad Activa
-
-- **Fetcher Module**: Desarrollar un módulo estandarizado para obtener datos de múltiples fuentes (APIs, bases de datos, archivos) con un flujo de datos consistente y optimizado.
-
 ## Decisiones de Producto
 
 - Todas las operaciones sobre repositorios se realizarán exclusivamente a través de la API de GitHub, sin requerir ni modificar la versión clonada de los repositorios que el usuario puede tener en su equipo. De esta manera, se evita cualquier posibilidad de pérdida de cambios que el usuario puede estar trabajando localmente.

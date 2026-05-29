@@ -89,15 +89,11 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 - **Filas**: `hover:bg-muted/20`, `transition-colors`, `divide-y` en el `tbody`.
 - **Filtros Integrados**: Botones ultra-compactos `text-[10px] font-bold uppercase tracking-wider`.
 - **Celdas de Datos**: Nombres de elementos con `font-medium tracking-tight`, metadatos con `text-muted-foreground`.
+- **HTML Semántico**: Usar `scope="col"` en headers de tabla y `table` nativo con `border-collapse`.
 
 ### DisplayInfo
 - Abstracción para mostrar metadatos (commits, tags, autores) con iconos y colores semánticos.
 - Soporta tooltips automáticos para contenido truncado o fechas.
-
-### StatusCard (Blindaje y Resonancia)
-- **Estados**: Soporta `loading`, `error`, `warn` y `offline`.
-- **Visual**: Bordes sutiles con opacidad (`border-destructive/20`) y fondos lavados (`bg-destructive/10`) para evitar fatiga visual mientras se mantiene la categorización clara.
-- **Robustez**: Implementa `truncate` en el mensaje para prevenir desbordamientos en layouts densos.
 
 ### Fetcher & ImportQueryModal
 - **Interacciones**: Uso obligatorio de `ActionButton` para acciones de fila y controles de modal.
@@ -213,27 +209,6 @@ Usar negritas (`font-bold`, `font-semibold`) solo para elementos críticos:
 - Bordes sutiles: `border-border/20` o `border-border/30`
 - Fondo lavado: `bg-muted/10`
 
-### Tabla de Datos
-
-```tsx
-<table className="w-full text-left border-collapse">
-  <thead>
-    <tr className="bg-muted/40 border-b border-border/60">
-      <th scope="col" className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-        {/* Header */}
-      </th>
-    </tr>
-  </thead>
-  <tbody className="divide-y divide-border/40">
-    {/* Filas */}
-  </tbody>
-</table>
-```
-
-- `scope="col"` en headers de tabla
-- Bordes sutiles: `border-border/60` (thead), `divide-border/40` (tbody)
-- Fondo de header: `bg-muted/40`
-
 ### Headers de Tabla con Contexto
 
 Cuando se muestran múltiples tablas agrupadas por un contexto (ej: organizaciones en GitHub, contextos en Kubernetes), usar el contexto como header de la primera columna en lugar de un label genérico:
@@ -304,19 +279,6 @@ import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
 - `info`: Azul para información
 
 **Diccionario de acciones**: `ACTION_DEFINITIONS` incluye acciones predefinidas para Docker, GitHub, K8s, etc. Consultar `src/components/ui/actionDefinitions.ts` para el listado completo.
-
-### Reglas de Negritas
-
-**Usar negritas para**:
-- Headers de tabla
-- Badges de estado
-- Labels de métricas
-- Nombres de repos (opcional, según contexto)
-
-**NO usar negritas para**:
-- Texto descriptivo general
-- Metadata secundaria
-- Contenido de cuerpo
 
 ### Debug de Sticky
 

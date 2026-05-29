@@ -1,11 +1,13 @@
 import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Activity, RefreshCw, Trash2, ExternalLink, ChevronDown, ChevronUp, Copy } from 'lucide-react';
+import { Activity, ExternalLink, ChevronDown, CheckCircle2, XCircle, Circle } from 'lucide-react';
 import { useHealthMonitor } from '@/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
 import { Table } from '@/components/ui/Table';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PageLayout } from '../../layouts/PageLayout';
+import DayJS from '@/lib/dayjs';
+import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 
 export const Route = createFileRoute('/health/')({
   component: HealthMonitorPage,
@@ -16,48 +18,30 @@ export const Route = createFileRoute('/health/')({
   },
 });
 
-// Función para formatear tiempo relativo
-function formatTimeAgo(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffMins < 1) return 'ahora mismo';
-  if (diffMins < 60) return `hace ${diffMins} min`;
-  if (diffHours < 24) return `hace ${diffHours} h`;
-  if (diffDays < 7) return `hace ${diffDays} días`;
-  return date.toLocaleDateString();
-}
+const FOCUS_RING = "focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1";
 
 function InfoBanner() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg overflow-hidden">
+    <div className="bg-info/10 border border-info/20 rounded-xl overflow-hidden transition-all duration-200">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-blue-100/50 transition-colors"
+        className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-info/20 transition-colors ${FOCUS_RING}`}
       >
         <div className="flex items-center gap-2">
-          <Activity className="w-5 h-5 text-blue-600" />
-          <span className="font-medium text-blue-800">Cómo funciona</span>
+          <Activity className="w-5 h-5 text-info" />
+          <span className="font-bold tracking-tight text-info uppercase text-xs">Cómo funciona</span>
         </div>
-        {isExpanded ? (
-          <ChevronUp className="w-5 h-5 text-blue-600" />
-        ) : (
-          <ChevronDown className="w-5 h-5 text-blue-600" />
-        )}
+        <ChevronDown className={`w-5 h-5 text-info transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
       </button>
 
       {isExpanded && (
         <div className="px-4 pb-4">
-          <div className="text-sm text-blue-800 pt-2 border-t border-blue-200">
+          <div className="text-sm text-info/90 pt-2 border-t border-info/20">
             <ul className="space-y-1 list-disc list-inside">
               <li>Los endpoints se detectan automáticamente desde los pipelines de deploy</li>
-              <li>Se verifica el endpoint <code className="bg-blue-100 px-1 rounded">/health</code> en cada URL</li>
+              <li>Se verifica el endpoint <code className="bg-info/20 px-1 rounded font-mono">/health</code> en cada URL</li>
               <li>Los servicios se eliminan automáticamente cuando quitas un repo de favoritos</li>
             </ul>
           </div>
@@ -114,20 +98,20 @@ function ProductSection({
   });
 
   return (
-    <div className="bg-white rounded-lg border overflow-hidden">
+    <div className="bg-background rounded-xl border border-border/60 overflow-hidden shadow-sm">
       {/* Header del producto */}
-      <div className="flex items-center justify-between bg-gray-50 border-b px-3">
+      <div className="flex items-center justify-between bg-muted/40 border-b border-border/60 px-4 py-2">
         <div className="flex items-center gap-2">
           <Link
             to="/github/$org/$repo"
             params={{ org, repo: productName }}
-            className="font-semibold text-gray-800 hover:text-blue-600 transition-colors"
+            className={`font-medium tracking-tight text-foreground hover:text-primary transition-colors ${FOCUS_RING} rounded-md px-1 -ml-1`}
           >
             {productName}
           </Link>
-          <span className="text-sm text-gray-500">({services.length} servicios)</span>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">({services.length} servicios)</span>
         </div>
-        <div className="flex items-center gap-3 text-sm p-4">
+        <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-wider">
           {(() => {
             const healthy = endpoints.filter((ep) => ep.isHealthy === true).length;
             const unhealthy = endpoints.filter((ep) => ep.isHealthy === false).length;
@@ -135,20 +119,20 @@ function ProductSection({
             return (
               <>
                 {healthy > 0 && (
-                  <span className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <span className="flex items-center gap-1.5 text-success">
+                    <div className="w-1.5 h-1.5 rounded-full bg-success" />
                     {healthy} OK
                   </span>
                 )}
                 {pending > 0 && (
-                  <span className="flex items-center gap-1 text-gray-500">
-                    <div className="w-2 h-2 rounded-full bg-gray-400" />
-                    {pending} Pendientes
+                  <span className="flex items-center gap-1.5 text-muted-foreground">
+                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
+                    {pending} Pendiente
                   </span>
                 )}
                 {unhealthy > 0 && (
-                  <span className="flex items-center gap-1 text-red-600 font-medium">
-                    <div className="w-2 h-2 rounded-full bg-red-500" />
+                  <span className="flex items-center gap-1.5 text-destructive">
+                    <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
                     {unhealthy} Error
                   </span>
                 )}
@@ -200,7 +184,7 @@ function EndpointsTable({
     {
       accessorKey: "service",
       header: "Ruta",
-      cell: ({ row }) => <span className="font-medium text-gray-700">{row.original.service || '/'}</span>,
+      cell: ({ row }) => <span className="font-medium tracking-tight text-foreground">{row.original.service || '/'}</span>,
     },
     {
       id: "environment",
@@ -271,18 +255,19 @@ function EndpointsTable({
 }
 
 function StatusCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
-  if (endpoint.isHealthy === null) return <span className="text-gray-400">⚪</span>
-  if (endpoint.isHealthy === true) return <span className="text-green-500">🟢</span>
-  return <span className="text-red-500">🔴</span>
+  if (endpoint.isHealthy === null) return <Circle className="w-4 h-4 text-muted-foreground/40" />
+  if (endpoint.isHealthy === true) return <CheckCircle2 className="w-4 h-4 text-success" />
+  return <XCircle className="w-4 h-4 text-destructive" />
 }
 
 function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
+  const isProd = endpoint.environment === 'production';
   return (
     <span
-      className={`px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide ${
-        endpoint.environment === 'production'
-          ? 'bg-purple-100 text-purple-700'
-          : 'bg-blue-100 text-blue-700'
+      className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${
+        isProd
+          ? 'bg-primary/10 text-primary border-primary/20'
+          : 'bg-info/10 text-info border-info/20'
       }`}
     >
       {endpoint.environment}
@@ -293,7 +278,7 @@ function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMo
 function ResponseTimeCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
   if (endpoint.responseTime !== undefined) {
     return (
-      <span className={`text-xs ${endpoint.isHealthy ? 'text-green-600' : 'text-red-600'}`}>
+      <span className={`text-xs font-medium ${endpoint.isHealthy ? 'text-success' : 'text-destructive'}`}>
         {endpoint.responseTime}ms
       </span>
     )
@@ -319,19 +304,19 @@ function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>
   const truncatedMessage = errorMessage.length > 50 ? `${errorMessage.slice(0, 50)}...` : errorMessage
 
   return (
-    <span className="text-xs text-red-600" title={errorMessage}>
+    <span className="text-xs text-destructive font-medium" title={errorMessage}>
       {truncatedMessage}
     </span>
   )
 }
 
 function LastCheckedCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
-  return <span className="text-xs text-gray-400">{formatTimeAgo(endpoint.lastChecked)}</span>
+  return <span className="text-xs text-muted-foreground/60">{DayJS(endpoint.lastChecked).fromNow()}</span>
 }
 
 function UrlCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
   const truncatedUrl = endpoint.url.length > 60 ? `${endpoint.url.slice(0, 60)}...` : endpoint.url
-  return <span className="flex-1 text-xs text-gray-500" title={endpoint.url}>{truncatedUrl}</span>
+  return <span className="flex-1 text-xs text-muted-foreground/70 font-mono" title={endpoint.url}>{truncatedUrl}</span>
 }
 
 function ActionsCell({
@@ -346,38 +331,32 @@ function ActionsCell({
   onRemoveEndpoint: (id: string) => void
 }) {
   return (
-    <div className="flex items-center gap-0.5">
-      <button
+    <div className="flex items-center gap-1">
+      <ActionButton
+        action={ACTION_DEFINITIONS.refresh}
         onClick={() => onCheckEndpoint(endpoint.id)}
-        disabled={isChecking}
-        className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-        title="Verificar ahora"
-      >
-        <RefreshCw className={`w-3 h-3 ${isChecking ? 'animate-spin' : ''}`} />
-      </button>
-      <button
+        loading={isChecking}
+        size="sm"
+        tooltipSide="top"
+      />
+      <ActionButton
+        action={ACTION_DEFINITIONS.copy}
         onClick={() => navigator.clipboard.writeText(endpoint.url)}
-        className="p-1 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
-        title="Copiar URL"
-      >
-        <Copy className="w-3 h-3" />
-      </button>
-      <a
-        href={endpoint.url.endsWith('/') ? `${endpoint.url}health` : `${endpoint.url}/health`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="p-1 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-        title="Abrir /health"
-      >
-        <ExternalLink className="w-3 h-3" />
-      </a>
-      <button
+        size="sm"
+        tooltipSide="top"
+      />
+      <ActionButton
+        action={ACTION_DEFINITIONS.link}
+        onClick={() => window.open(endpoint.url.endsWith('/') ? `${endpoint.url}health` : `${endpoint.url}/health`, '_blank')}
+        size="sm"
+        tooltipSide="top"
+      />
+      <ActionButton
+        action={ACTION_DEFINITIONS.delete}
         onClick={() => onRemoveEndpoint(endpoint.id)}
-        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-        title="Eliminar del monitoreo"
-      >
-        <Trash2 className="w-3 h-3" />
-      </button>
+        size="sm"
+        tooltipSide="top"
+      />
     </div>
   )
 }
@@ -486,17 +465,20 @@ function HealthMonitorPage() {
   const headerActions = (
     <div className="flex gap-2">
       {stats.unhealthy > 0 && (
-        <button
+        <ActionButton
+          action={{
+            ...ACTION_DEFINITIONS.refresh,
+            label: isChecking ? 'Verificando...' : `Verificar ${stats.unhealthy}`,
+            color: "destructive"
+          }}
           onClick={() => {
             const unhealthy = filteredEndpoints.filter((ep) => ep.isHealthy === false);
             unhealthy.forEach((ep) => checkEndpoint(ep.id));
           }}
-          disabled={isChecking}
-          className="flex items-center justify-center gap-2 px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded-md hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
-          {isChecking ? 'Verificando...' : `Verificar ${stats.unhealthy}`}
-        </button>
+          loading={isChecking}
+          showLabel
+          className="bg-destructive/10 border border-destructive/20"
+        />
       )}
     </div>
   );
@@ -509,17 +491,19 @@ function HealthMonitorPage() {
     >
       <div className="space-y-6">
       {/* Ordenamiento */}
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-gray-600">Ordenar:</span>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as 'default' | 'errors' | 'recent')}
-          className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          <option value="default">Por defecto</option>
-          <option value="errors">Con errores primero</option>
-          <option value="recent">Más recientes</option>
-        </select>
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Ordenar por</span>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as 'default' | 'errors' | 'recent')}
+            className={`bg-muted/40 border border-border/60 rounded-lg px-3 py-1.5 text-xs font-bold uppercase tracking-tight text-foreground transition-all hover:bg-muted/60 ${FOCUS_RING}`}
+          >
+            <option value="default">Nombre (A-Z)</option>
+            <option value="errors">Errores Críticos</option>
+            <option value="recent">Recientes</option>
+          </select>
+        </div>
       </div>
 
       {/* Info banner - expandible */}
@@ -527,18 +511,25 @@ function HealthMonitorPage() {
 
       {/* Endpoints by product */}
       {filteredEndpoints.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed">
-          <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">No hay endpoints que coincidan con el filtro</p>
-          <p className="text-sm text-gray-400 mt-1">
-            {!activeFilter ? 'Navega a un producto favorito para detectar servicios automáticamente' : 'Intenta con otro filtro'}
+        <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-muted/5 border border-dashed border-border/40 rounded-2xl">
+          <div className="w-16 h-16 rounded-2xl bg-muted/20 flex items-center justify-center mb-4">
+            <Activity className="w-8 h-8 text-muted-foreground/40" />
+          </div>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-foreground mb-1">
+            Sin resultados
+          </h3>
+          <p className="text-xs text-muted-foreground max-w-[280px] mb-6">
+            {!activeFilter
+              ? 'Navega a un producto favorito para detectar servicios automáticamente y comenzar el monitoreo.'
+              : 'No hay servicios que coincidan con los filtros aplicados actualmente.'}
           </p>
           {!activeFilter && (
             <Link
               to="/github"
-              className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className={`inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm hover:opacity-90 transition-all ${FOCUS_RING}`}
             >
-              Ir al inicio
+              <ExternalLink className="w-3.5 h-3.5" />
+              Explorar Repositorios
             </Link>
           )}
         </div>

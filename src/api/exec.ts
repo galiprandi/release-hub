@@ -18,12 +18,12 @@ interface ExecResponse {
  * @returns Promise with stdout and stderr
  * @throws Error if command fails (success: false)
  */
-export const runCommand = async (command: string | string[]): Promise<ExecResponse> => {
+export const runCommand = async (command: string | string[], stdin?: string): Promise<ExecResponse> => {
   const finalCommand = Array.isArray(command) ? joinArgs(command) : command
 
   const response = await apiExec.post<ExecResponse>(
     '/exec',
-    { command: finalCommand },
+    { command: finalCommand, stdin },
     {
       headers: {
         'Content-Type': 'application/json',

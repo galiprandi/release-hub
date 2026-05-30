@@ -246,7 +246,7 @@ Componente reutilizable para botones de acción iconográficos con tooltip integ
 
 ## Security Validation Standard
 
-- **Shell Injection Protection**: Todos los comandos externos se ejecutan utilizando un sistema de escape POSIX-compatible.
+- **Shell Injection Protection**: Todos los comandos externos se ejecutan utilizando un sistema de escape POSIX-compatible vía `runCommand` con argumentos en array. El uso de `stdin` es obligatorio para el paso de payloads complejos para evitar vulnerabilidades de redirección.
 - **Verification**: Refactorizaciones de endurecimiento de shell deben ser verificadas por `src/api/security.test.ts`.
 - **Render-safe Ref Access**: El acceso a `.current` de los Refs de React está prohibido durante la fase de renderizado. Toda lógica de sincronización (ej: scroll en DiffViewer) debe encapsularse en event handlers estabilizados con `useCallback`.
 - **Type Safety Strategy**: Se prohíbe el uso de `any`. Se prioriza el uso de interfaces explícitas y `unknown` para asegurar la integridad de los datos en tiempo de compilación.

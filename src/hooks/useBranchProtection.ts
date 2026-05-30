@@ -57,7 +57,7 @@ export function useBranchProtection({ repo, enabled = true }: UseBranchProtectio
 		queryFn: async () => {
 			try {
 				// Get user permissions via gh API
-				const permResult = await runCommand(`gh api repos/${repo} --jq '{permissions, viewerPermission, viewerCanAdminister}'`)
+				const permResult = await runCommand(['gh', 'api', `repos/${repo}`, '--jq', '{permissions, viewerPermission, viewerCanAdminister}'])
 				const permissions = JSON.parse(permResult.stdout || '{}')
 
 				const isAdmin = permissions?.permissions?.admin ||
@@ -70,7 +70,7 @@ export function useBranchProtection({ repo, enabled = true }: UseBranchProtectio
 
 				// Try to get branch protection status
 				try {
-					const result = await runCommand(`gh api repos/${repo}/branches/main/protection`)
+					const result = await runCommand(['gh', 'api', `repos/${repo}/branches/main/protection`])
 					const protection = JSON.parse(result.stdout || '{}')
 					isLocked = protection.lock_branch?.enabled || false
 					hasProtection = true

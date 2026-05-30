@@ -23,8 +23,14 @@ export function useGitTagsSimple({
 	const { data: tags, ...rest } = useQuery<GitTagSimple[]>({
 		queryKey: queryKeys.git.tags(repo, limit),
 		queryFn: async () => {
-			const command = `gh api repos/${repo}/tags --paginate --jq '.[] | {name: .name, commit: .commit.sha, zipball_url: .zipball_url, tarball_url: .tarball_url}'`;
-			const response = await runCommand(command);
+			const response = await runCommand([
+				'gh',
+				'api',
+				`repos/${repo}/tags`,
+				'--paginate',
+				'--jq',
+				'.[] | {name: .name, commit: .commit.sha, zipball_url: .zipball_url, tarball_url: .tarball_url}',
+			]);
 
 			const tagLines = response.stdout
 				.trim()

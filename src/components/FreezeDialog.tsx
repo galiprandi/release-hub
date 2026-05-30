@@ -173,7 +173,7 @@ EOF`
 			<BaseDialog
 				open={open}
 				onOpenChange={handleOpenChange}
-				title={step === 'config' ? <>{isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />} {isLocked ? "Desbloquear Branch" : "Bloquear Branch"}</> : <><CheckCircle2 className="w-4 h-4 text-green-600" /> {isLocked ? "Branch Desbloqueado" : "Branch Bloqueado"}</>}
+				title={step === 'config' ? <>{isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />} {isLocked ? "Desbloquear Branch" : "Bloquear Branch"}</> : <><CheckCircle2 className="w-4 h-4 text-success" /> {isLocked ? "Branch Desbloqueado" : "Branch Bloqueado"}</>}
 				description="Gestión de bloqueo"
 				maxWidth={dialogWidth}
 			>
@@ -196,18 +196,18 @@ EOF`
 								readonly
 							/>
 
-							{error && <p className="text-sm text-red-600">{error}</p>}
+							{error && <p className="text-sm text-destructive">{error}</p>}
 						</div>
 
-						<div className="mt-4 pt-4 border-t flex justify-end flex-shrink-0">
+						<div className="mt-4 pt-4 border-t border-border/40 flex justify-end flex-shrink-0">
 							<button
 								onClick={handleToggleFreeze}
 								disabled={isToggling}
-								className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none ${
-									isLocked ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-600 hover:bg-gray-700"
+								className={`px-4 py-2 text-xs font-bold uppercase tracking-wider text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none ${
+									isLocked ? "bg-info hover:bg-info/90" : "bg-muted-foreground hover:bg-foreground"
 								}`}
 							>
-								{isToggling ? <><Loader2 className="w-4 h-4 animate-spin" /> Procesando...</> : <>{isLocked ? <><Lock className="w-4 h-4" /> Desbloquear</> : <><Lock className="w-4 h-4" /> Bloquear</>}</>}
+								{isToggling ? <><Loader2 className="w-4 h-4 animate-spin" /> Procesando...</> : <>{isLocked ? <><Unlock className="w-4 h-4" /> Desbloquear</> : <><Lock className="w-4 h-4" /> Bloquear</>}</>}
 							</button>
 						</div>
 					</div>
@@ -216,20 +216,20 @@ EOF`
 				{/* Step 2: Success */}
 				{step === 'success' && (
 					<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
-						<CheckCircle2 className="w-12 h-12 text-green-600" />
+						<CheckCircle2 className="w-12 h-12 text-success" />
 						<div>
-							<p className="text-lg font-semibold">{isLocked ? "Branch Desbloqueado" : "Branch Bloqueado"}</p>
+							<p className="text-lg font-semibold tracking-tight">{isLocked ? "Branch Desbloqueado" : "Branch Bloqueado"}</p>
 							<p className="text-sm text-muted-foreground mt-1">
-								{isLocked ? "El branch main de" : "El branch main de"} <strong>{repo}</strong> {isLocked ? "ya permite merges y pushes." : "ha sido bloqueado temporalmente."}
+								El branch main de <strong>{repo}</strong> {isLocked ? "ya permite merges y pushes." : "ha sido bloqueado temporalmente."}
 							</p>
 							{webhookUrl && (
-								<p className="text-xs text-muted-foreground mt-2">
+								<p className="text-xs text-muted-foreground mt-2 font-medium">
 									Notificación enviada al canal de Discord
 								</p>
 							)}
 						</div>
 						<Dialog.Close asChild>
-							<button className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+							<button className="mt-4 px-6 py-2 text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all shadow-sm">
 								Cerrar
 							</button>
 						</Dialog.Close>

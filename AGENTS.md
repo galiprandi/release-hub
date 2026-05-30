@@ -83,3 +83,8 @@ Ver `DESIGN.md` para especificaciones visuales completas (`Table`, `FilterBar`, 
 ## Mantenimiento de Skills
 
 Mantener `.windsurf/skills/` con flujos comunes, referencias de elementos y patrones nuevos para evitar snapshots repetitivos.
+
+### 12. Refinamiento Industrial (Carol)
+- **Higiene de Diálogos**: Todos los diálogos de sistema (Freeze, Promote, Redeploy) deben usar tokens semánticos y evitar colores hardcodeados (`bg-red-600`, etc.).
+- **ActionButton en Docker**: Los controles de contenedores y apertura de puertos en el módulo Docker deben usar `ActionButton` para mantener la consistencia táctil y visual.
+- **CTAs de Alta Jerarquía**: Los botones de acción principal en estados vacíos o diálogos deben usar `rounded-lg` con tipografía `font-bold uppercase tracking-wider` (o `tracking-tight` según el contexto) para una estética profesional.

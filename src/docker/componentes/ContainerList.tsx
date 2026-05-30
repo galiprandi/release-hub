@@ -1,7 +1,6 @@
 import { useState, forwardRef, useImperativeHandle, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { ExternalLink } from "lucide-react"
 import { getContainers, getContainerLogs, startContainer, restartContainer, stopContainer, type ContainerInfo } from "@/api/docker"
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys"
 import { LogsViewer } from "@/components/shared/LogsViewer"
@@ -222,8 +221,8 @@ function StatusCell({ container }: { container: ContainerInfo }) {
 		<span
 			className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase ${
 				running
-					? 'bg-success/20 text-success shadow-sm'
-					: 'bg-muted text-muted-foreground'
+					? 'bg-success/20 text-success border border-success/20 shadow-sm'
+					: 'bg-muted/40 text-muted-foreground border border-border/40'
 			}`}
 		>
 			{running ? 'Ejecutando' : 'Detenido'}
@@ -293,7 +292,7 @@ function PortsCell({ container }: { container: ContainerInfo }) {
 			<select
 				value={selectedPort}
 				onChange={(e) => setSelectedPort(e.target.value)}
-				className="text-[11px] font-bold border border-border/60 rounded-lg px-2 py-1 bg-muted/40 hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 cursor-pointer"
+				className="text-[11px] font-bold uppercase tracking-tight border border-border/60 rounded-lg px-2 py-1.5 bg-muted/40 hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 cursor-pointer"
 				aria-label="Seleccionar puerto"
 			>
 				{externalPorts.map((port, index) => (
@@ -302,16 +301,13 @@ function PortsCell({ container }: { container: ContainerInfo }) {
 					</option>
 				))}
 			</select>
-			<button
-				type="button"
+			<ActionButton
+				action={ACTION_DEFINITIONS.openPort}
 				onClick={() => handlePortClick(selectedPort)}
-				className="p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 disabled:opacity-30"
-				title={`Abrir puerto ${selectedPort}`}
-				aria-label={`Abrir puerto ${selectedPort}`}
 				disabled={!selectedPort}
-			>
-				<ExternalLink className="w-3.5 h-3.5" />
-			</button>
+				size="sm"
+				className="rounded-lg"
+			/>
 		</div>
 	)
 }

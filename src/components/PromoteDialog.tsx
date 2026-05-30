@@ -218,7 +218,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 				title={
 					<>
 						{step === 'config' && <><Rocket className="w-4 h-4" /> Configurar Lanzamiento</>}
-						{step === 'success' && <><CheckCircle2 className="w-4 h-4 text-green-600" /> Lanzamiento Exitoso</>}
+						{step === 'success' && <><CheckCircle2 className="w-4 h-4 text-success" /> Lanzamiento Exitoso</>}
 					</>
 				}
 				description="Proceso de promoción a producción"
@@ -260,7 +260,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 												type="button"
 												onClick={() => generateCommitSummary(pendingCommits)}
 												disabled={isGeneratingSummary || !summaryAvailable || !hasPendingCommits}
-												className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1 focus-visible:outline-none"
+											className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-ai hover:bg-ai/10 rounded transition-all disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
 												title="Regenerar descripción con IA"
 											>
 												{isGeneratingSummary ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
@@ -305,20 +305,20 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 										</button>
 									)}
 
-									{error && <p className="text-sm text-red-600">{error}</p>}
+									{error && <p className="text-sm text-destructive font-medium">{error}</p>}
 
 									{!canCreateTags && !isLoadingPerms && (
-										<p className="text-xs text-orange-600 bg-orange-50 p-2 rounded border border-orange-100">
+										<p className="text-[10px] font-bold uppercase tracking-wider text-warning bg-warning/10 p-2 rounded-lg border border-warning/20">
 											No tienes permisos de escritura en este repositorio para crear tags.
 										</p>
 									)}
 								</div>
 
-								<div className="mt-4 pt-4 border-t flex justify-end flex-shrink-0">
+								<div className="mt-4 pt-4 border-t border-border/40 flex justify-end flex-shrink-0">
 									<button
 										onClick={handleCreateTag}
 										disabled={isCreating || !tagName.trim() || (!canCreateTags && !isLoadingPerms)}
-										className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+										className="px-4 py-2 text-xs font-bold uppercase tracking-wider bg-destructive text-white rounded-lg hover:bg-destructive/90 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
 									>
 										{isCreating ? <><Loader2 className="w-4 h-4 animate-spin" /> Publicando...</> : <><Rocket className="w-4 h-4" /> Publicar Tag</>}
 									</button>
@@ -366,12 +366,12 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 					{/* Step 3: Success */}
 					{step === 'success' && (
 						<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
-							<CheckCircle2 className="w-12 h-12 text-green-600" />
+							<CheckCircle2 className="w-12 h-12 text-success" />
 							<div>
-								<p className="text-lg font-semibold">Tag <span className="font-mono">{tagName}</span> creado</p>
+								<p className="text-lg font-semibold tracking-tight">Tag <span className="font-mono">{tagName}</span> creado</p>
 								<p className="text-sm text-muted-foreground mt-1">El lanzamiento fue publicado correctamente en <strong>{repo}</strong>.</p>
 								{webhookUrl && (
-									<p className="text-xs text-muted-foreground mt-2">
+									<p className="text-xs text-muted-foreground mt-2 font-medium">
 										Notificación enviada al canal de Discord
 									</p>
 								)}
@@ -379,7 +379,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 							<button
 								type="button"
 								onClick={() => handleOpenChange(false)}
-								className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
+								className="mt-4 px-6 py-2 text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
 							>
 								Cerrar
 							</button>

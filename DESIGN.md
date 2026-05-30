@@ -26,7 +26,8 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Badges de Estado**: Usar `bg-success/20 text-success` para estados activos y `bg-muted text-muted-foreground` para estados inactivos o detenidos. Aplicar `font-bold uppercase tracking-wider text-[10px] rounded-md` para mayor legibilidad y consistencia.
 - **Acciones de Fila**: Botones iconográficos con `hover:bg-accent` y colores semánticos. Deben implementar el anillo de foco estándar del sistema.
 - **Feedback de Carga/Acceso**: Implementar `StatusCard` como componente estándar para todos los estados de carga, error y "offline".
-- **Tabla de Contenedores**: Bordes sutiles `border-border/60` y encabezados con `text-xs uppercase tracking-wider` para una estética profesional.
+- **Table of Contenedores**: Bordes sutiles `border-border/60` y encabezados con `text-xs uppercase tracking-wider` para una estética profesional. Badges de estado con `bg-success/20 text-success border border-success/20` para Running y `bg-muted/40 text-muted-foreground border border-border/40` para Stopped.
+- **Acciones Técnicas**: Uso sistemático de `ActionButton` para controles de contenedor y apertura de puertos. El selector de puertos debe usar `bg-muted/40` y `tracking-tight` para resonancia industrial.
 
 ## Componentes de Feedback
 
@@ -94,6 +95,11 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 ### DisplayInfo
 - Abstracción para mostrar metadatos (commits, tags, autores) con iconos y colores semánticos.
 - Soporta tooltips automáticos para contenido truncado o fechas.
+
+### Diálogos de Sistema (Freeze, Promote, Redeploy)
+- **Estándar de Botones**: Las acciones principales deben usar `text-xs font-bold uppercase tracking-wider rounded-lg` con tokens semánticos: `bg-info` (info), `bg-primary` (primary/redeploy), `bg-destructive` (destructive/promote), `bg-muted-foreground` (secondary).
+- **Feedback de Éxito**: Los iconos de confirmación (`CheckCircle2`) deben usar `text-success`. Los títulos de éxito deben usar `tracking-tight`.
+- **Higiene de Bordes**: Separadores internos con `border-t border-border/40`.
 
 ### Fetcher & ImportQueryModal
 - **Interacciones**: Uso obligatorio de `ActionButton` para acciones de fila y controles de modal.

@@ -28,6 +28,13 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Feedback de Carga/Acceso**: Implementar `StatusCard` como componente estándar para todos los estados de carga, error y "offline".
 - **Tabla de Contenedores**: Bordes sutiles `border-border/60` y encabezados con `text-xs uppercase tracking-wider` para una estética profesional.
 
+## Kubernetes UI Pattern (Resonancia Industrial)
+
+- **Badges de Estado (Deployments)**: Utilizar `bg-success/20 text-success border-success/20` (Healthy), `bg-info/20 text-info border-info/20` (Progressing), `bg-destructive/20 text-destructive border-destructive/20` (Degraded), y `bg-muted/40 text-muted-foreground border-border/40` (Unknown). Geometría `rounded-md` con fuente `text-[10px] font-bold uppercase tracking-wider`.
+- **Headers de Grupo (Contextos)**: Incluir icono `Boxes` con `text-primary/60`. Label con `text-xs font-bold uppercase tracking-wider text-muted-foreground`.
+- **Acciones**: Uso obligatorio de `ActionButton` (size="sm") para Logs y Favoritos. La visibilidad de acciones en fila debe activarse mediante `group-hover:opacity-100`.
+- **Búsqueda**: Inputs con `rounded-lg` y `bg-muted/40`. Resultados con `rounded-xl`, `shadow-xl` y `ActionButton` para interacciones rápidas.
+
 ## Componentes de Feedback
 
 ### StatusCard

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { applyCachePolicy } from '@/lib/queryKeys'
 import { useUserCollections } from '@/hooks/useUserCollections'
 import type { DeploymentInfo } from '@/api/kubectl'
+import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton'
 
 export function DeploymentSearch() {
   const [query, setQuery] = useState('')
@@ -154,7 +155,7 @@ export function DeploymentSearch() {
           onBlur={() => setIsEditable(false)}
           placeholder={`Búsqueda de deployments... (Cmd+K)`}
           aria-label="Búsqueda de deployments"
-          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted rounded-md text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
+          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/40 rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -179,7 +180,7 @@ export function DeploymentSearch() {
 
       {/* Dropdown Results */}
       {isOpen && (
-        <div className={`absolute top-full left-0 mt-2 ${searchWidth} bg-popover text-popover-foreground border rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100`}>
+        <div className={`absolute top-full left-0 mt-2 ${searchWidth} bg-popover text-popover-foreground border rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100`}>
           {isLoading ? (
             <div className="p-4 text-center text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
@@ -229,29 +230,11 @@ export function DeploymentSearch() {
 
                       {/* Actions */}
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-                        <button
-                          type="button"
+                        <ActionButton
+                          action={isFav ? ACTION_DEFINITIONS.removeFavorite : ACTION_DEFINITIONS.addFavorite}
                           onClick={() => toggleDeploymentFavorite(deploymentId)}
-                          className={`p-1.5 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
-                            isFav
-                              ? 'text-yellow-500 hover:text-yellow-600'
-                              : 'text-muted-foreground hover:text-yellow-500 hover:bg-yellow-500/10'
-                          }`}
-                          aria-label={
-                            isFav
-                              ? `Eliminar ${deployment.name} de favoritos`
-                              : `Agregar ${deployment.name} a favoritos`
-                          }
-                          title={
-                            isFav
-                              ? 'Eliminar de favoritos'
-                              : 'Agregar a favoritos'
-                          }
-                        >
-                          <Star
-                            className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`}
-                          />
-                        </button>
+                          size="sm"
+                        />
                       </div>
                     </div>
                   </div>

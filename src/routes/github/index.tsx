@@ -19,6 +19,7 @@ import { useUserReposSummary } from "@/hooks/useUserReposSummary";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTagsSimple } from "@/hooks/useGitTagsSimple";
 import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
+import type { PipelineEvent } from "@/pipeline-core/types";
 import { ProjectManagementDialog } from "@/components/ProjectManagementDialog";
 import { EmptyState } from "@/components/EmptyState";
 import DayJS from "@/lib/dayjs";
@@ -251,11 +252,12 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 	});
 
 	const pendingCount = useMemo(() => {
-		if (!commits || !prodPipeline.data?.git?.commit) return 0;
-		const prodCommitIndex = commits.findIndex(c => c.hash === prodPipeline.data!.git!.commit);
-		if (prodCommitIndex === -1) return commits.length;
-		return prodCommitIndex;
-	}, [commits, prodPipeline.data?.git?.commit]);
+		const prodCommitHash = prodPipeline.data?.git?.commit;
+		if (!commits || !prodCommitHash) return 0;
+
+		const prodCommitIndex = commits.findIndex((c) => c.hash === prodCommitHash);
+		return prodCommitIndex === -1 ? commits.length : prodCommitIndex;
+	}, [commits, prodPipeline.data]);
 
 	const isLoading = isLoadingCommits || isLoadingTags;
 
@@ -328,13 +330,11 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 		tag: latestTag?.name ?? "",
 		enabled: !!latestTag?.commit && !!latestTag?.name,
 	});
-	const productionStatus = prodPipeline.data ? {
-		status: getDeployStatus(prodPipeline.data.events),
-		updatedAt: prodPipeline.data.updated_at,
-		failedStage: prodPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.label.es,
-		errorDetail: prodPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.markdown,
-	} : { status: undefined };
-	const isProdLoading = prodPipeline.isLoading;
+
+	const productionStatus = useMemo(() =>
+		getPipelineStatusInfo(prodPipeline.data),
+		[prodPipeline.data]
+	);
 
 	if (isLoadingTags) {
 		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
@@ -346,7 +346,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 			org={org}
 			repo={name}
 			pipelineStatus={productionStatus}
-			isLoading={isProdLoading}
+			isLoading={prodPipeline.isLoading}
 		/>
 	) : <span className="text-muted-foreground/40 text-xs font-medium italic">Sin tags</span>;
 }
@@ -361,13 +361,11 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 		commit: latestCommit?.hash ?? "",
 		enabled: !!latestCommit?.hash,
 	});
-	const stagingStatus = stagingPipeline.data ? {
-		status: getDeployStatus(stagingPipeline.data.events),
-		updatedAt: stagingPipeline.data.updated_at,
-		failedStage: stagingPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.label.es,
-		errorDetail: stagingPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.markdown,
-	} : { status: undefined };
-	const isStagingLoading = stagingPipeline.isLoading;
+
+	const stagingStatus = useMemo(() =>
+		getPipelineStatusInfo(stagingPipeline.data),
+		[stagingPipeline.data]
+	);
 
 	if (isLoadingCommits) {
 		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
@@ -379,7 +377,7 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 			org={org}
 			repo={name}
 			pipelineStatus={stagingStatus}
-			isLoading={isStagingLoading}
+			isLoading={stagingPipeline.isLoading}
 		/>
 	) : <span className="text-muted-foreground/40 text-xs font-medium italic">Sin commits</span>;
 }
@@ -447,30 +445,71 @@ function ActionsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; i
 	);
 }
 
-// Función helper para determinar el estado del deploy basado en subevents de deploy
-function getDeployStatus(events: { state: string; id: string; subevents?: { id: string; state: string }[] }[]) {
+/**
+ * Unified helper to extract status information from a pipeline result.
+ * Avoids multiple iterations over the events array.
+ */
+function getPipelineStatusInfo(data: unknown) {
+	if (!data || typeof data !== "object") return { status: undefined };
+
+	const pipeline = data as {
+		events: (PipelineEvent & { label?: { es: string }; markdown?: string })[];
+		updated_at: string;
+	};
+
+	if (!pipeline.events || pipeline.events.length === 0) {
+		return { status: undefined };
+	}
+
+	let failedStage: string | undefined;
+	let errorDetail: string | undefined;
+
+	// Single pass to find the first failed stage and its details
+	for (const event of pipeline.events) {
+		if (event.state === "FAILED") {
+			failedStage = event.label?.es;
+			errorDetail = event.markdown;
+			break;
+		}
+	}
+
+	return {
+		status: getDeployStatus(pipeline.events),
+		updatedAt: pipeline.updated_at,
+		failedStage,
+		errorDetail,
+	};
+}
+
+/**
+ * Determines deploy status based on CD events and their subevents.
+ */
+function getDeployStatus(events: PipelineEvent[]) {
 	if (!events || events.length === 0) return undefined;
 
 	const lastEvent = events[events.length - 1];
 
-	// Si el último evento no es CD (Despliegue), usar su estado
+	// If last event is not CD (Deployment), use its status directly
 	if (lastEvent.id !== "CD") {
 		return lastEvent.state;
 	}
 
-	// Filtrar solo subevents de deploy (DEPLOY_*)
-	const deploySubevents = lastEvent.subevents?.filter((se: { id: string }) => se.id.startsWith("DEPLOY_")) || [];
+	const deploySubevents = lastEvent.subevents?.filter((se) => se.id.startsWith("DEPLOY_")) || [];
 
 	if (deploySubevents.length === 0) {
 		return lastEvent.state;
 	}
 
-	// Determinar el estado basado en los subevents de deploy
-	const hasFailed = deploySubevents.some((se: { state: string }) => se.state === "FAILED");
-	const hasWarn = deploySubevents.some((se: { state: string }) => se.state === "WARN");
-	const allSuccess = deploySubevents.every((se: { state: string }) => se.state === "SUCCESS");
+	// Determine state based on deploy subevents priority: FAILED > WARN > SUCCESS
+	let hasWarn = false;
+	let allSuccess = true;
 
-	if (hasFailed) return "FAILED";
+	for (const se of deploySubevents) {
+		if (se.state === "FAILED") return "FAILED";
+		if (se.state === "WARN") hasWarn = true;
+		if (se.state !== "SUCCESS") allSuccess = false;
+	}
+
 	if (hasWarn) return "WARN";
 	if (allSuccess) return "SUCCESS";
 	return lastEvent.state;

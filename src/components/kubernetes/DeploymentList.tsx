@@ -418,7 +418,7 @@ function ActionsCell({
 			<button
 				type="button"
 				onClick={() => onRemoveFavorite(deployment)}
-				className="p-1.5 text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+				className="p-1.5 text-warning hover:bg-warning/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 				aria-label="Eliminar de favoritos"
 			>
 				<Star className="w-4 h-4 fill-current" />

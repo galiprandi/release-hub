@@ -113,12 +113,12 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 							<div className="space-y-3">
 								<div className="bg-muted/50 rounded-lg p-3 space-y-2">
 									<div className="flex items-center gap-2 text-sm">
-										<span className={`${isExpired ? 'text-red-600' : 'text-green-600'} font-medium`}>
+										<span className={`${isExpired ? 'text-destructive' : 'text-success'} font-medium`}>
 											{isExpired ? '● Token expirado' : '● Token configurado'}
 										</span>
 									</div>
 									{expirationDate && (
-										<p className={`text-xs ${isExpired ? 'text-red-600' : 'text-muted-foreground'}`}>
+										<p className={`text-xs ${isExpired ? 'text-destructive' : 'text-muted-foreground'}`}>
 											{expirationDate}
 										</p>
 									)}
@@ -127,7 +127,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									type="button"
 									onClick={handleClearSekiToken}
-									className="flex items-center gap-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-2 rounded-md transition-colors w-full justify-center"
+									className="flex items-center gap-2 text-xs text-destructive hover:bg-destructive/10 px-3 py-2 rounded-md transition-colors w-full justify-center"
 								>
 									<Trash2 className="w-3.5 h-3.5" />
 									Revocar acceso
@@ -149,7 +149,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 											type="button"
 											onClick={handleSaveSekiToken}
 											disabled={!sekiTokenInput.trim() || isUpdating}
-											className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50 transition-colors"
+											className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded-md hover:opacity-90 disabled:opacity-50 transition-colors"
 										>
 											<Save className="w-3 h-3" />
 											Guardar
@@ -176,7 +176,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 							<div className="space-y-3">
 								<div className="bg-muted/50 rounded-lg p-3 space-y-2">
 									<div className="flex items-center gap-2 text-sm">
-										<span className="text-green-600 font-medium">● Webhook configurado</span>
+										<span className="text-success font-medium">● Webhook configurado</span>
 									</div>
 									<p className="text-xs text-muted-foreground font-mono break-all">
 										{settings.discordWebhook.slice(0, 50)}...
@@ -186,7 +186,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									type="button"
 									onClick={handleClearDiscordWebhook}
-									className="flex items-center gap-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-2 rounded-md transition-colors w-full justify-center"
+									className="flex items-center gap-2 text-xs text-destructive hover:bg-destructive/10 px-3 py-2 rounded-md transition-colors w-full justify-center"
 								>
 									<Trash2 className="w-3.5 h-3.5" />
 									Eliminar webhook
@@ -208,7 +208,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 											type="button"
 											onClick={handleSaveDiscordWebhook}
 											disabled={!discordWebhookInput.trim() || isUpdating}
-											className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50 transition-colors"
+											className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded-md hover:opacity-90 disabled:opacity-50 transition-colors"
 										>
 											<Save className="w-3 h-3" />
 											Guardar
@@ -252,7 +252,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 				{/* Footer */}
 				<div className="mt-6 pt-4 border-t flex-shrink-0">
 					<Dialog.Close asChild>
-						<button className="w-full px-4 py-2 text-sm font-medium bg-black text-white rounded-md hover:bg-gray-800 transition-colors">
+						<button className="w-full px-4 py-2 text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm">
 							Cerrar
 						</button>
 					</Dialog.Close>

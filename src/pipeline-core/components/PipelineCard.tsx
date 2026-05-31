@@ -23,12 +23,12 @@ export interface PipelineCardProps {
 
 const viewModeStyles: Record<ViewMode, { badge: string; accent: string }> = {
 	tags: {
-		badge: "bg-purple-50 text-purple-700 border border-purple-100",
-		accent: "bg-purple-500",
+		badge: "bg-tag/10 text-tag border border-tag/20",
+		accent: "bg-tag",
 	},
 	commits: {
-		badge: "bg-blue-50 text-blue-600 border border-blue-100",
-		accent: "bg-blue-500",
+		badge: "bg-commit/10 text-commit border border-commit/20",
+		accent: "bg-commit",
 	},
 }
 
@@ -46,13 +46,13 @@ export function PipelineCard({
 	return (
 		<div
 			className={`bg-card border rounded-xl p-4 transition-all duration-500 ${
-				isRunning ? 'ring-1 ring-blue-400/20 bg-blue-50/5 dark:bg-blue-900/5' : ''
+				isRunning ? 'ring-1 ring-info/20 bg-info/5' : ''
 			} ${className}`}
 		>
 			<div className="flex items-start gap-4">
 				<div
 					className={`w-1 rounded-full self-stretch ${
-						isRunning ? 'bg-blue-400 animate-pulse-slow' : style.accent
+						isRunning ? 'bg-info animate-pulse-slow' : style.accent
 					}`}
 				/>
 				<div className="flex-1 min-w-0 space-y-1.5">
@@ -63,7 +63,7 @@ export function PipelineCard({
 								{refType}
 							</span>
 							{isRunning && (
-								<span className="flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded-md animate-pulse-slow">
+								<span className="flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-bold bg-info/10 text-info rounded-md animate-pulse-slow">
 									<Loader2 className="w-3 h-3 animate-spin" />
 									EN PROGRESO
 								</span>

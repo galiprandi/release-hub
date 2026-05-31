@@ -227,8 +227,8 @@ export function RepoSearch() {
                           onClick={() => toggleFavorite(repo.fullName)}
                           className={`p-1.5 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
                             isFav
-                              ? 'text-yellow-500 hover:text-yellow-600'
-                              : 'text-muted-foreground hover:text-yellow-500 hover:bg-yellow-500/10'
+                              ? 'text-warning'
+                              : 'text-muted-foreground hover:text-warning hover:bg-warning/10'
                           }`}
                           aria-label={
                             isFav

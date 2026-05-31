@@ -8,7 +8,7 @@ function App() {
       <h1 className="text-2xl font-bold mb-4">ReleaseHub</h1>
 
       {isLoading && <p>Cargando información de repositorios...</p>}
-      {error && <p className="text-red-500">Error: {error.message}</p>}
+      {error && <p className="text-destructive">Error: {error.message}</p>}
       {data && (
         <div className="space-y-4">
           <div className="p-4 border rounded-lg">

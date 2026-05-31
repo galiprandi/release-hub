@@ -153,7 +153,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 						type="button"
 						onClick={handleSummarizeWithAI}
 						disabled={isGenerating || availability !== "available" || pendingCommits.length === 0}
-						className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded-md border border-purple-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						className="inline-flex items-center gap-2 px-3 py-2 text-xs font-bold uppercase tracking-wider text-ai hover:bg-ai/10 rounded-lg border border-ai/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 					>
 						{isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
 						{isGenerating ? getStatusMessage : "Resumir con IA"}

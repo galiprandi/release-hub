@@ -39,6 +39,9 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 ### DeployStatusIndicator
 - Implementación estricta de tokens semánticos: `text-success` (completado), `text-destructive` (fallido), `text-info` (en progreso), `text-warning` (advertencia).
 
+### Pipeline Status Normalization
+- La lógica de extracción de estados de pipeline debe centralizarse en funciones puras y estrictamente tipadas que realicen una única pasada sobre los eventos para identificar fallos (`failedStage`, `errorDetail`) y el estado general (`getDeployStatus`).
+
 ## Refinamiento de Componentes
 
 ### MiniTimeline

@@ -15,6 +15,7 @@ Antes de cualquier cambio:
 - **Código muerto**: Eliminar inmediatamente (no comentar) cualquier componente/ruta/utilidad sin referencias activas.
 - **Hooks hygiene**: Prohibido usar `useEffect` para sincronizar estados derivados o mutar el DOM. Usar `useRef` o event handlers. Prohibido acceder a `.current` de un Ref durante la fase de renderizado; encapsular lógica dependiente de Refs en `useCallback` o efectos para evitar inconsistencias en el renderizado de React. Para sincronizar estados de entrada con props (como en `QueryModal.tsx`), utilizar el patrón de verificación de valor previo durante el renderizado para evitar renders en cascada.
 - **Tokens semánticos**: En componentes de estado/feedback, usar exclusivamente los tokens de `DESIGN.md`. Nunca colores hardcodeados como `text-zinc-500` o `bg-red-500`.
+- **Pipeline Helpers**: Utilizar `getPipelineStatusInfo` para normalizar la extracción de estados y detalles de error desde objetos `PipelineData`, evitando iteraciones redundantes sobre el array de eventos.
 
 ### 1. Operaciones por Repositorio
 - **Solo remotas**: Todas las operaciones GitHub deben usar la API o `gh`. Nunca `git` local que requiera estar en el directorio del repo.

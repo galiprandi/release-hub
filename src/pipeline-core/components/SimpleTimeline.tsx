@@ -27,14 +27,17 @@ interface SimpleTimelineProps {
 const timelineStatusTextColor = (state: PipelineState) => {
 	switch (state) {
 		case "COMPLETED":
-			return "text-emerald-600"
+		case "SUCCESS":
+			return "text-success"
 		case "FAILED":
-			return "text-red-600"
+			return "text-destructive"
 		case "CANCELLED":
-			return "text-amber-600"
+			return "text-warning"
 		case "RUNNING":
 		case "STARTED":
-			return "text-blue-600"
+			return "text-info"
+		case "WARN":
+			return "text-warning"
 		default:
 			return "text-muted-foreground"
 	}
@@ -62,14 +65,17 @@ const timelineStatusIcon = (state: PipelineState) => {
 const timelineStatusColor = (state: PipelineState) => {
 	switch (state) {
 		case "COMPLETED":
-			return "bg-green-500"
+		case "SUCCESS":
+			return "bg-success"
 		case "FAILED":
-			return "bg-red-500"
+			return "bg-destructive"
 		case "CANCELLED":
-			return "bg-amber-500"
+			return "bg-warning"
 		case "RUNNING":
 		case "STARTED":
-			return "bg-blue-500 animate-pulse-slow shadow-[0_0_8px_rgba(59,130,246,0.4)]"
+			return "bg-info animate-pulse-slow shadow-[0_0_8px_var(--color-info)/40]"
+		case "WARN":
+			return "bg-warning"
 		default:
 			return "bg-muted"
 	}
@@ -134,7 +140,7 @@ export function SimpleTimeline({ events }: SimpleTimelineProps) {
 										</span>
 									</div>
 									{isRunning && (
-										<span className="text-xs text-blue-600 animate-pulse">
+										<span className="text-xs text-info animate-pulse">
 											en progreso
 										</span>
 									)}

@@ -385,7 +385,7 @@ Log: ${cleanLine}`;
 						type="button"
 						onClick={handleSummarizeWithAI}
 						disabled={isGenerating || availability !== "available" || !currentLogs}
-						className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+						className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-ai hover:bg-ai/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
 					>
 						{isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
 						{isGenerating ? getStatusMessage : "Resumir"}
@@ -554,7 +554,7 @@ Log: ${cleanLine}`;
 			tabIndex={0}
 			role="log"
 			aria-label="Panel de logs"
-			className="flex-1 min-h-0 overflow-auto bg-black text-green-400 font-mono text-xs p-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset focus-visible:outline-none rounded-b-md"
+			className="flex-1 min-h-0 overflow-auto bg-black text-success font-mono text-xs p-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset focus-visible:outline-none rounded-b-md"
 		>
 				{processedError && (
 					<div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg sticky top-0 z-10">
@@ -589,7 +589,7 @@ Log: ${cleanLine}`;
 				<pre 
 					ref={preRef} 
 					className={cn(
-						"min-w-0 flex-1 font-mono text-xs text-green-400 select-text",
+						"min-w-0 flex-1 font-mono text-xs text-success select-text",
 						wordWrap ? "whitespace-pre-wrap break-words" : "whitespace-pre overflow-x-auto"
 					)}
 				>

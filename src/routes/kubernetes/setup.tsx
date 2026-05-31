@@ -77,7 +77,7 @@ function KubernetesSetupPage() {
 				{results.map((result) => (
 					<div key={result.name}>
 						{result.isInstalled ? (
-							<div className="flex items-start gap-2 text-green-600 text-sm border border-green-200 rounded-lg p-4 bg-green-50/50">
+							<div className="flex items-start gap-2 text-success text-sm border border-success/20 rounded-lg p-4 bg-success/10">
 								<CheckCircle className="w-5 h-5 mt-0.5" />
 								<div className="flex-1">
 									<p className="font-medium">{result.name}</p>
@@ -117,12 +117,12 @@ function KubernetesSetupPage() {
 			</div>
 
 			{allRequiredInstalled && (
-				<div className="mt-8 p-4 bg-green-50 border border-green-200 rounded-lg">
-					<div className="flex items-center gap-2 text-green-700">
+				<div className="mt-8 p-4 bg-success/10 border border-success/20 rounded-lg">
+					<div className="flex items-center gap-2 text-success">
 						<CheckCircle className="w-5 h-5" />
 						<span className="font-medium">Configuración completada con éxito</span>
 					</div>
-					<p className="text-sm text-green-600 mt-1">Redirección a la página principal...</p>
+					<p className="text-sm text-success mt-1">Redirección a la página principal...</p>
 				</div>
 			)}
 		</div>
@@ -152,12 +152,12 @@ function MissingCard({
 	}, [commands, detectedOS]);
 
 	return (
-		<div className="border border-red-200 rounded-lg p-4 bg-red-50/50">
+		<div className="border border-destructive/20 rounded-lg p-4 bg-destructive/10">
 			<button
 				onClick={() => setOpen(!open)}
 				className="w-full flex items-center gap-3 text-left"
 			>
-				<XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+				<XCircle className="w-5 h-5 text-destructive flex-shrink-0" />
 				<div className="flex-1">
 					<h2 className="font-semibold flex items-center gap-2">
 						{icon}
@@ -215,7 +215,7 @@ function CopyButton({ text }: { text: string }) {
 			className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted-foreground/20"
 		>
 			{copied ? (
-				<ClipboardCheck className="w-4 h-4 text-green-600" />
+				<ClipboardCheck className="w-4 h-4 text-success" />
 			) : (
 				<Clipboard className="w-4 h-4 text-muted-foreground" />
 			)}

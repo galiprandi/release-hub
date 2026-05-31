@@ -12,52 +12,61 @@ export function stripAnsiCodes(text: string): string {
 }
 
 /**
- * Resalta una línea de log con colores según timestamps, niveles de log y filtros
+ * Resalta una línea de log con colores según timestamps, niveles de log y filtros.
+ * Implementa una estrategia de reemplazo que evita modificar el contenido dentro de etiquetas HTML
+ * ya insertadas, previniendo la corrupción del marcado (ej: evitar que el nivel 'INFO' coincida
+ * con la clase 'text-info').
  */
 export function highlightLogLine(line: string, filter?: string, customHighlight?: string): React.ReactNode {
 	if (!line) return line;
 
-	// Limpiar ANSI color codes antes de resaltar
+	// 1. Limpiar ANSI color codes
 	let highlighted = stripAnsiCodes(line);
 
-	// Patrón para timestamps (ej: 2024-04-30 10:00:00, Apr 30 10:00:00, etc.)
+	// 2. Reemplazar timestamps (se hace primero sobre texto plano)
 	const timestampPattern = /^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})|^(\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})|^(\d{2}:\d{2}:\d{2})/;
+	highlighted = highlighted.replace(timestampPattern, '<span class="text-info">$&</span>');
 
-	// Patrón para niveles de log
-	const logLevelPattern = /\b(INFO|WARN|WARNING|ERROR|ERR|DEBUG|FATAL|TRACE)\b/gi;
+	// Función helper para aplicar reemplazos evitando colisiones con etiquetas HTML
+	const safeReplace = (html: string, pattern: string, replacer: (match: string) => string, flags = "gi") => {
+		const regex = new RegExp(`(<[^>]+>)|(${pattern})`, flags);
+		return html.replace(regex, (_match, tag, text) => {
+			if (tag) return tag;
+			return replacer(text);
+		});
+	};
 
-	// Reemplazar timestamps
-	highlighted = highlighted.replace(timestampPattern, '<span class="text-blue-400">$&</span>');
-
-	// Reemplazar niveles de log
-	highlighted = highlighted.replace(logLevelPattern, (match) => {
+	// 3. Reemplazar niveles de log
+	highlighted = safeReplace(highlighted, "\\b(INFO|WARN|WARNING|ERROR|ERR|DEBUG|FATAL|TRACE)\\b", (match) => {
 		const level = match.toUpperCase();
-		let colorClass = 'text-gray-400';
+		let colorClass = 'text-muted-foreground';
 		if (level === 'ERROR' || level === 'ERR' || level === 'FATAL') {
-			colorClass = 'text-red-400 font-bold';
+			colorClass = 'text-destructive font-bold';
 		} else if (level === 'WARN' || level === 'WARNING') {
-			colorClass = 'text-yellow-400 font-bold';
+			colorClass = 'text-warning font-bold';
 		} else if (level === 'INFO') {
-			colorClass = 'text-green-400';
+			colorClass = 'text-success';
 		} else if (level === 'DEBUG' || level === 'TRACE') {
-			colorClass = 'text-purple-400';
+			colorClass = 'text-ai';
 		}
 		return `<span class="${colorClass}">${match}</span>`;
 	});
 
-	// Resaltar término de búsqueda
+	// 4. Resaltar término de búsqueda
 	if (filter && filter.trim()) {
 		const escapedFilter = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-		const filterPattern = new RegExp(`(${escapedFilter})`, 'gi');
-		highlighted = highlighted.replace(filterPattern, '<mark class="bg-yellow-500/30 text-yellow-200 rounded px-0.5">$1</mark>');
+		highlighted = safeReplace(highlighted, escapedFilter, (match) =>
+			`<mark class="bg-warning/30 text-warning rounded px-0.5">${match}</mark>`
+		);
 	}
 
-	// Resaltar término personalizado
+	// 5. Resaltar término personalizado
 	if (customHighlight && customHighlight.trim()) {
 		try {
 			const escapedCustom = customHighlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-			const customPattern = new RegExp(`(${escapedCustom})`, 'gi');
-			highlighted = highlighted.replace(customPattern, '<mark class="bg-purple-500/40 text-purple-200 rounded px-0.5 border border-purple-500/20">$1</mark>');
+			highlighted = safeReplace(highlighted, escapedCustom, (match) =>
+				`<mark class="bg-ai/40 text-ai rounded px-0.5 border border-ai/20">${match}</mark>`
+			);
 		} catch (e) {
 			console.warn('[logUtils] Invalid custom highlight regex/pattern:', e);
 		}

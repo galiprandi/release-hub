@@ -77,27 +77,27 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 
 	const getStatusIcon = () => {
 		if (!prStatus) return <Circle className="w-5 h-5 animate-pulse text-muted-foreground" />;
-		if (prStatus.merged) return <CheckCircle2 className="w-5 h-5 text-green-600" />;
+		if (prStatus.merged) return <CheckCircle2 className="w-5 h-5 text-success" />;
 		if (prStatus.status === "open") {
-			if (prStatus.mergeable_state === "clean") return <CheckCircle2 className="w-5 h-5 text-blue-600" />;
-			if (prStatus.mergeable_state === "unstable") return <AlertCircle className="w-5 h-5 text-yellow-600" />;
-			if (prStatus.mergeable_state === "dirty") return <AlertCircle className="w-5 h-5 text-red-600" />;
-			return <Circle className="w-5 h-5 text-blue-600" />;
+			if (prStatus.mergeable_state === "clean") return <CheckCircle2 className="w-5 h-5 text-info" />;
+			if (prStatus.mergeable_state === "unstable") return <AlertCircle className="w-5 h-5 text-warning" />;
+			if (prStatus.mergeable_state === "dirty") return <AlertCircle className="w-5 h-5 text-destructive" />;
+			return <Circle className="w-5 h-5 text-info" />;
 		}
-		if (prStatus.status === "closed") return <AlertCircle className="w-5 h-5 text-red-600" />;
+		if (prStatus.status === "closed") return <AlertCircle className="w-5 h-5 text-destructive" />;
 		return <Circle className="w-5 h-5 text-muted-foreground" />;
 	};
 
 	const getStatusColor = () => {
 		if (!prStatus) return "text-muted-foreground";
-		if (prStatus.merged) return "text-green-600";
+		if (prStatus.merged) return "text-success";
 		if (prStatus.status === "open") {
-			if (prStatus.mergeable_state === "clean") return "text-blue-600";
-			if (prStatus.mergeable_state === "unstable") return "text-yellow-600";
-			if (prStatus.mergeable_state === "dirty") return "text-red-600";
-			return "text-blue-600";
+			if (prStatus.mergeable_state === "clean") return "text-info";
+			if (prStatus.mergeable_state === "unstable") return "text-warning";
+			if (prStatus.mergeable_state === "dirty") return "text-destructive";
+			return "text-info";
 		}
-		if (prStatus.status === "closed") return "text-red-600";
+		if (prStatus.status === "closed") return "text-destructive";
 		return "text-muted-foreground";
 	};
 
@@ -131,7 +131,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 							<Dialog.Trigger asChild>
 								<button
 									type="button"
-									className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+									className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
 								>
 									<RefreshCw className="w-4 h-4" />
 									<span>Re Deploy</span>
@@ -161,8 +161,8 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 					<>
 						{step === "config" && <><RefreshCw className="w-4 h-4" /> Trigger Staging Redeploy</>}
 						{step === "executing" && <><Loader2 className="w-4 h-4 animate-spin" /> Ejecutando...</>}
-						{step === "success" && <><CheckCircle2 className="w-4 h-4 text-green-600" /> Redeploy Iniciado</>}
-						{step === "error" && <><RefreshCw className="w-4 h-4 text-red-600" /> Error</>}
+						{step === "success" && <><CheckCircle2 className="w-4 h-4 text-success" /> Redeploy Iniciado</>}
+						{step === "error" && <><RefreshCw className="w-4 h-4 text-destructive" /> Error</>}
 					</>
 				}
 				description="Proceso de forzar redeploy a staging"
@@ -198,7 +198,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 							<Dialog.Close asChild>
 								<button
 									type="button"
-									className="px-4 py-2 text-sm font-medium border rounded-md hover:bg-accent transition-colors"
+									className="px-4 py-2 text-xs font-bold uppercase tracking-wider border border-border/40 rounded-lg hover:bg-accent transition-colors"
 								>
 									Cancelar
 								</button>
@@ -206,7 +206,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 							<button
 								onClick={handleForceRedeploy}
 								disabled={isExecuting}
-								className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+								className="px-4 py-2 text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
 							>
 								{isExecuting ? (
 									<>
@@ -227,7 +227,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 				{/* Step 2: Executing */}
 				{step === "executing" && (
 					<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
-						<Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+						<Loader2 className="w-12 h-12 animate-spin text-info" />
 						<div>
 							<p className="text-lg font-semibold">Ejecutando script...</p>
 							<p className="text-sm text-muted-foreground mt-1">
@@ -255,7 +255,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 									href={prUrl}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
+									className="inline-flex items-center gap-1 text-sm text-info hover:underline"
 								>
 									Ver PR en GitHub
 									<ExternalLink className="w-3 h-3" />
@@ -263,7 +263,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 							)}
 						</div>
 						<Dialog.Close asChild>
-							<button className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+							<button className="mt-4 px-4 py-2 text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm">
 								Cerrar
 							</button>
 						</Dialog.Close>
@@ -273,14 +273,14 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 				{/* Step 4: Error */}
 				{step === "error" && (
 					<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
-						<RefreshCw className="w-12 h-12 text-red-600" />
+						<RefreshCw className="w-12 h-12 text-destructive" />
 						<div className="space-y-2">
 							<p className="text-lg font-semibold">Error</p>
-							<p className="text-sm text-red-600">{error}</p>
+							<p className="text-sm text-destructive">{error}</p>
 						</div>
 						<div className="flex gap-2">
 							<Dialog.Close asChild>
-								<button className="px-4 py-2 text-sm font-medium border rounded-md hover:bg-accent transition-colors">
+								<button className="px-4 py-2 text-xs font-bold uppercase tracking-wider border border-border/40 rounded-lg hover:bg-accent transition-colors">
 									Cerrar
 								</button>
 							</Dialog.Close>
@@ -289,7 +289,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 									setStep("config");
 									setError("");
 								}}
-								className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+								className="px-4 py-2 text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm"
 							>
 								Reintentar
 							</button>

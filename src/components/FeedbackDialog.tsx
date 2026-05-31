@@ -452,7 +452,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 												className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 ${
 													showOriginalError 
 														? 'bg-destructive/10 text-destructive' 
-														: 'bg-purple-500/10 text-purple-500'
+														: 'bg-ai/10 text-ai'
 												}`}
 											>
 												{showOriginalError ? (

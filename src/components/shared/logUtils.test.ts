@@ -24,20 +24,20 @@ describe('logUtils', () => {
 		it('should highlight timestamps at the beginning of the line', () => {
 			const line = '2024-04-30 10:00:00 This is a log';
 			const { container } = render(highlightLogLine(line) as React.ReactElement);
-			expect(container.querySelector('.text-blue-400')).toBeTruthy();
-			expect(container.querySelector('.text-blue-400')?.textContent).toBe('2024-04-30 10:00:00');
+			expect(container.querySelector('.text-info')).toBeTruthy();
+			expect(container.querySelector('.text-info')?.textContent).toBe('2024-04-30 10:00:00');
 		});
 
 		it('should highlight log levels with appropriate colors', () => {
 			const levels = [
-				{ level: 'ERROR', color: 'text-red-400' },
-				{ level: 'ERR', color: 'text-red-400' },
-				{ level: 'FATAL', color: 'text-red-400' },
-				{ level: 'WARN', color: 'text-yellow-400' },
-				{ level: 'WARNING', color: 'text-yellow-400' },
-				{ level: 'INFO', color: 'text-green-400' },
-				{ level: 'DEBUG', color: 'text-purple-400' },
-				{ level: 'TRACE', color: 'text-purple-400' },
+				{ level: 'ERROR', color: 'text-destructive' },
+				{ level: 'ERR', color: 'text-destructive' },
+				{ level: 'FATAL', color: 'text-destructive' },
+				{ level: 'WARN', color: 'text-warning' },
+				{ level: 'WARNING', color: 'text-warning' },
+				{ level: 'INFO', color: 'text-success' },
+				{ level: 'DEBUG', color: 'text-ai' },
+				{ level: 'TRACE', color: 'text-ai' },
 			];
 
 			levels.forEach(({ level, color }) => {
@@ -64,8 +64,8 @@ describe('logUtils', () => {
 			const { container } = render(highlightLogLine(line) as React.ReactElement);
 
 			expect(container.textContent).not.toContain(esc);
-			expect(container.querySelector('.text-blue-400')).toBeTruthy();
-			expect(container.querySelector('.text-red-400')).toBeTruthy();
+			expect(container.querySelector('.text-info')).toBeTruthy();
+			expect(container.querySelector('.text-destructive')).toBeTruthy();
 		});
 
 		it('should handle regex special characters in filter', () => {

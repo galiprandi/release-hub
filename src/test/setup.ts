@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom'
+import 'vitest-canvas-mock'
 import { expect, afterEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import * as matchers from '@testing-library/jest-dom/matchers'
@@ -45,4 +46,35 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
+})
+
+// Mock xterm
+vi.mock('@xterm/xterm', () => {
+  return {
+    Terminal: vi.fn().mockImplementation(() => ({
+      loadAddon: vi.fn(),
+      open: vi.fn(),
+      dispose: vi.fn(),
+      onData: vi.fn(),
+      onResize: vi.fn(),
+      write: vi.fn(),
+      clear: vi.fn(),
+      scrollToBottom: vi.fn(),
+    })),
+  }
+})
+
+vi.mock('@xterm/addon-fit', () => {
+  return {
+    FitAddon: vi.fn().mockImplementation(() => ({
+      fit: vi.fn(),
+      proposeDimensions: vi.fn().mockReturnValue({ cols: 80, rows: 24 }),
+    })),
+  }
+})
+
+vi.mock('@xterm/addon-web-links', () => {
+  return {
+    WebLinksAddon: vi.fn(),
+  }
 })

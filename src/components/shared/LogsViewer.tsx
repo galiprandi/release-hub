@@ -1,13 +1,14 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, Search, X, ClipboardCopy, Check, Sparkles, AlertCircle, Pause, Play, Terminal, ChevronUp, ChevronDown, WrapText, Hash, Highlighter, Maximize2, Minimize2 } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { LazyRender, useAISummarize } from "@galiprandi/react-tools";
+import { useAISummarize } from "@galiprandi/react-tools";
 import { useAIErrorProcessor } from "@/hooks/useAIErrorProcessor";
 import { useLogsAccumulator } from "@/hooks/useLogsAccumulator";
 import { AISummaryCard } from "@/components/AISummaryCard";
 import { BaseDialog } from "@/components/ui/BaseDialog";
-import { highlightLogLine, groupLogs, logLevelPattern, stripAnsiCodes } from "./logUtils";
+import { XTermLogs } from "./XTermLogs";
+import { groupLogs, logLevelPattern } from "./logUtils";
 import { IconButton } from "./IconButton";
 import { cn } from "@/lib/utils";
 
@@ -43,7 +44,6 @@ export function LogsViewer({
 	const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 	const autoScrollEnabledRef = useRef(autoScrollEnabled);
 	const containerRef = useRef<HTMLDivElement>(null);
-	const preRef = useRef<HTMLPreElement>(null);
 
 	const [wordWrap, setWordWrap] = useState(() => {
 		try {
@@ -97,36 +97,6 @@ export function LogsViewer({
 	}, [isExpanded]);
 	
 	const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
-
-	const {
-		data: lineExplanationData,
-		status: lineExplanationStatus,
-		error: lineAIError,
-		summarize: summarizeLine,
-		reset: resetLineAI
-	} = useAISummarize({
-		type: "teaser",
-		format: "plain-text",
-		length: "short",
-		outputLanguage: "es",
-	});
-
-	const [explainingLineIndex, setExplainingLineIndex] = useState<number | null>(null);
-
-	const handleExplainLine = useCallback(async (idx: number, lineText: string) => {
-		setExplainingLineIndex(idx);
-		resetLineAI();
-		
-		const cleanLine = stripAnsiCodes(lineText);
-		const prompt = `Analiza esta línea de error/advertencia de log de forma concisa y amigable. Explica qué significa el problema y cómo resolverlo en 1 o 2 frases cortas.
-Log: ${cleanLine}`;
-		
-		try {
-			await summarizeLine(prompt, "Eres un asistente de depuración técnico.");
-		} catch (err) {
-			console.error("Error explaining line:", err);
-		}
-	}, [summarizeLine, resetLineAI]);
 
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -197,10 +167,10 @@ Log: ${cleanLine}`;
 
 	const { processError } = useAIErrorProcessor();
 
-	// Estado para errores procesados por AI
+	// Estado para errores procesados por IA
 	const [processedError, setProcessedError] = useState<string | null>(null);
 
-	// Manejar errores de queries con AI
+	// Manejar errores de queries con IA
 	useEffect(() => {
 		const handleQueryError = async (err: unknown) => {
 			if (!err) return;
@@ -249,68 +219,6 @@ Log: ${cleanLine}`;
 		});
 		return indices;
 	}, [filteredLines, filter]);
-
-	const scrollToMatch = useCallback((matchIdx: number) => {
-		const lineIdx = matchingLineIndices[matchIdx];
-		if (lineIdx === undefined || !containerRef.current) return;
-
-		setAutoScrollEnabled(false);
-
-		const container = containerRef.current;
-		setTimeout(() => {
-			const element = container.querySelector(`[data-line-idx="${lineIdx}"]`);
-			if (element && typeof element.scrollIntoView === "function") {
-				element.scrollIntoView({ block: "center", behavior: "smooth" });
-			}
-		}, 50);
-	}, [matchingLineIndices]);
-
-	const scrollToBottom = useCallback(() => {
-		if (containerRef.current) {
-			containerRef.current.scrollTop = containerRef.current.scrollHeight;
-		}
-	}, []);
-
-	// ResizeObserver on <pre> to scroll when LazyRender content actually expands
-	useEffect(() => {
-		if (!preRef.current || !containerRef.current) return;
-
-		const pre = preRef.current;
-		const observer = new ResizeObserver(() => {
-			if (autoScrollEnabledRef.current) {
-				scrollToBottom();
-			}
-		});
-		observer.observe(pre);
-		return () => observer.disconnect();
-	}, [scrollToBottom]);
-
-	// Detect manual scroll and disable auto-scroll
-	useEffect(() => {
-		if (!containerRef.current) return;
-
-		const container = containerRef.current;
-		const handleScroll = () => {
-			// Disable auto-scroll if user scrolled away from the bottom.
-			// We use a threshold of 10px to account for subpixel rounding.
-			const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 10;
-			if (!isAtBottom && autoScrollEnabledRef.current) {
-				setAutoScrollEnabled(false);
-			}
-		};
-		container.addEventListener('scroll', handleScroll, { passive: true });
-		return () => {
-			container.removeEventListener('scroll', handleScroll);
-		};
-	}, []);
-
-	// Scroll to bottom immediately when auto-scroll is enabled
-	useEffect(() => {
-		if (autoScrollEnabled) {
-			scrollToBottom();
-		}
-	}, [autoScrollEnabled, scrollToBottom]);
-
 
 	const handleCopy = async () => {
 		const logsToCopy = filteredLines.join('\n');
@@ -465,7 +373,6 @@ Log: ${cleanLine}`;
 							onClick={() => {
 								setCurrentMatchIndex((prev) => {
 									const next = matchingLineIndices.length > 0 ? (prev - 1 + matchingLineIndices.length) % matchingLineIndices.length : 0;
-									scrollToMatch(next);
 									return next;
 								});
 							}}
@@ -477,7 +384,6 @@ Log: ${cleanLine}`;
 							onClick={() => {
 								setCurrentMatchIndex((prev) => {
 									const next = matchingLineIndices.length > 0 ? (prev + 1) % matchingLineIndices.length : 0;
-									scrollToMatch(next);
 									return next;
 								});
 							}}
@@ -554,10 +460,10 @@ Log: ${cleanLine}`;
 			tabIndex={0}
 			role="log"
 			aria-label="Panel de logs"
-			className="flex-1 min-h-0 overflow-auto bg-black text-green-400 font-mono text-xs p-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset focus-visible:outline-none rounded-b-md"
+			className="flex-1 min-h-0 flex flex-col bg-black p-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset focus-visible:outline-none rounded-b-md"
 		>
 				{processedError && (
-					<div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg sticky top-0 z-10">
+					<div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg sticky top-0 z-10 shrink-0">
 						<div className="flex items-center justify-between gap-2 mb-2">
 							<div className="flex items-center gap-2">
 								<AlertCircle className="w-4 h-4 text-destructive" />
@@ -586,13 +492,7 @@ Log: ${cleanLine}`;
 					isCopied={aiSummaryCopied}
 					variant="compact"
 				/>
-				<pre 
-					ref={preRef} 
-					className={cn(
-						"min-w-0 flex-1 font-mono text-xs text-green-400 select-text",
-						wordWrap ? "whitespace-pre-wrap break-words" : "whitespace-pre overflow-x-auto"
-					)}
-				>
+				<div className="flex-1 min-h-0 relative mt-2">
 					{currentIsLoading ? (
 						<div className="flex items-center justify-center gap-2 h-full text-muted-foreground py-8">
 							<Loader2 className="w-4 h-4 animate-spin" />
@@ -600,98 +500,14 @@ Log: ${cleanLine}`;
 						</div>
 					) : !currentLogs ? (
 						<span className="text-warning px-2 py-1 block">No hay logs disponibles</span>
-					) : filteredLines.length > 0 ? (
-						filteredLines.map((line: string, idx: number) => {
-							const isCurrentMatch = matchingLineIndices.includes(idx) && matchingLineIndices[currentMatchIndex] === idx;
-							
-							const hasAiExplanation = (() => {
-								const cleanLine = stripAnsiCodes(line).toUpperCase();
-								return cleanLine.includes("ERROR") || cleanLine.includes("ERR ") || cleanLine.includes("FATAL") || cleanLine.includes("WARN");
-							})();
-
-							return (
-								<div 
-									key={idx}
-									data-line-idx={idx}
-									className={cn(
-										"group flex items-start gap-2 py-0.5 px-2 rounded hover:bg-muted transition-colors duration-150 relative min-w-0 w-full",
-										isCurrentMatch ? "bg-warning/20 border-l-2 border-warning" : ""
-									)}
-								>
-									{/* Line Number Gutter */}
-									{showLineNumbers && (
-										<span className="text-muted-foreground/60 text-[10px] select-none text-right min-w-[2rem] pr-2 font-mono flex-shrink-0 border-r border-border mr-1">
-											{idx + 1}
-										</span>
-									)}
-
-									{/* Log Text Content */}
-									<div className="flex-1 min-w-0 font-mono">
-										<LazyRender placeholder={<span className="block h-4"/>}>
-											{highlightLogLine(line, filter, customHighlight)}
-										</LazyRender>
-
-										{/* AI Explanation Sub-Box */}
-										{explainingLineIndex === idx && (
-											<div className="mt-1.5 p-2 bg-muted border border-border rounded-md text-xs text-muted-foreground font-sans relative max-w-2xl shadow-lg z-10 animate-in fade-in slide-in-from-top-1">
-												<div className="flex items-center justify-between gap-2 mb-1.5 font-semibold text-muted-foreground">
-													<div className="flex items-center gap-1.5">
-														<Sparkles className="w-3.5 h-3.5 text-warning animate-pulse" />
-														<span>Explicación del Error (IA)</span>
-													</div>
-													<button
-														type="button"
-														onClick={(e) => {
-															e.stopPropagation();
-															setExplainingLineIndex(null);
-															resetLineAI();
-														}}
-														className="text-muted-foreground hover:text-foreground rounded transition-colors focus-visible:outline-none"
-														aria-label="Cerrar explicación"
-													>
-														<X className="w-3 h-3" />
-													</button>
-												</div>
-												{lineExplanationStatus === "summarizing" ? (
-													<div className="flex items-center gap-1.5 text-muted-foreground italic">
-														<Loader2 className="w-3.5 h-3.5 animate-spin text-warning" />
-														<span>Analizando error con IA local...</span>
-													</div>
-												) : lineExplanationStatus === "error" || lineAIError ? (
-													<span className="text-destructive">Error al consultar el modelo de IA local: {lineAIError?.message || "Servicio no disponible"}</span>
-												) : lineExplanationData ? (
-													<span className="whitespace-pre-wrap">{lineExplanationData}</span>
-												) : (
-													<span className="text-muted-foreground">Preparando explicación...</span>
-												)}
-											</div>
-										)}
-									</div>
-
-									{/* Hover Action Button (Sparkles to explain with AI) */}
-									{hasAiExplanation && explainingLineIndex !== idx && (
-										<button
-											type="button"
-											onClick={(e) => {
-												e.stopPropagation();
-												handleExplainLine(idx, line);
-											}}
-											className="opacity-0 group-hover:opacity-100 absolute right-2 top-0.5 p-1 bg-muted text-warning hover:text-warning/80 rounded border border-border shadow-md transition-opacity duration-150 z-10"
-											title="Explicar error con IA"
-											aria-label="Explicar error con IA"
-										>
-											<Sparkles className="w-3 h-3" />
-										</button>
-									)}
-								</div>
-							);
-						})
-					) : (filter || logLevelFilter !== "all") ? (
-						<span className="text-muted-foreground px-2 py-1 block">No se encontraron logs que coincidan con los filtros.</span>
 					) : (
-						<span className="px-2 py-1 block">{currentLogs || "No logs disponibles"}</span>
+						<XTermLogs
+							logs={filteredLines.join('\n')}
+							autoScroll={autoScrollEnabled}
+							className="h-full"
+						/>
 					)}
-				</pre>
+				</div>
 			</div>
 	);
 

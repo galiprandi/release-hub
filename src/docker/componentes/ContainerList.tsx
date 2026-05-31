@@ -1,10 +1,12 @@
 import { useState, forwardRef, useImperativeHandle, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, Terminal as TerminalIcon } from "lucide-react"
 import { getContainers, getContainerLogs, startContainer, restartContainer, stopContainer, type ContainerInfo } from "@/api/docker"
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys"
 import { LogsViewer } from "@/components/shared/LogsViewer"
+import { Terminal } from "@/components/shared/Terminal"
+import { BaseDialog } from "@/components/ui/BaseDialog"
 import { StatusCard } from "@/components/ui/StatusCard"
 import { Table } from "@/components/ui/Table"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -25,6 +27,7 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 	const queryClient = useQueryClient()
 	const [selectedContainer, setSelectedContainer] = useState<ContainerInfo | null>(null)
 	const [isLogsModalOpen, setIsLogsModalOpen] = useState(false)
+	const [isTerminalModalOpen, setIsTerminalModalOpen] = useState(false)
 
 	const { data: containers, isLoading, refetch } = useQuery({
 		queryKey: queryKeys.docker.containers(),
@@ -83,6 +86,12 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 		setIsLogsModalOpen(true)
 	}
 
+	const handleOpenTerminal = (container: ContainerInfo) => {
+		console.log('[ContainerList] Opening terminal for container:', container.name, 'ID:', container.id)
+		setSelectedContainer(container)
+		setIsTerminalModalOpen(true)
+	}
+
 	if (isLoading) {
 		return <StatusCard type="loading" message="Cargando contenedores..." />
 	}
@@ -104,6 +113,7 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 				onRestart={handleRestart}
 				onStop={handleStop}
 				onViewLogs={handleViewLogs}
+				onOpenTerminal={handleOpenTerminal}
 				filterCounts={filterCounts}
 				activeFilter={activeFilter}
 				onFilterChange={onFilterChange}
@@ -112,7 +122,7 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 			{isLogsModalOpen && selectedContainer &&
 				createPortal(
 					<LogsViewer
-						key={selectedContainer.id}
+						key={`logs-${selectedContainer.id}`}
 						fetchFn={fetchFn}
 						onClose={() => setIsLogsModalOpen(false)}
 						asModal={true}
@@ -120,6 +130,32 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 						selectedResourceId={selectedResourceId}
 						onResourceChange={handleResourceChange}
 					/>,
+					document.body
+				)
+			}
+
+			{isTerminalModalOpen && selectedContainer &&
+				createPortal(
+					<BaseDialog
+						open={true}
+						onOpenChange={(open) => !open && setIsTerminalModalOpen(false)}
+						title={
+							<div className="flex items-center gap-2">
+								<TerminalIcon className="w-4 h-4 text-primary" />
+								<span>Terminal: {selectedContainer.name}</span>
+							</div>
+						}
+						maxWidth="max-w-6xl"
+						className="w-[90vw] h-[80vh] !p-0"
+					>
+						<div className="flex-1 min-h-0 bg-black rounded-b-lg overflow-hidden">
+							<Terminal
+								type="docker"
+								name={selectedContainer.name}
+								className="border-none rounded-none h-full"
+							/>
+						</div>
+					</BaseDialog>,
 					document.body
 				)
 			}
@@ -133,6 +169,7 @@ function ContainersTable({
 	onRestart,
 	onStop,
 	onViewLogs,
+	onOpenTerminal,
 	filterCounts,
 	activeFilter,
 	onFilterChange,
@@ -142,6 +179,7 @@ function ContainersTable({
 	onRestart: (containerId: string) => void
 	onStop: (containerId: string) => void
 	onViewLogs: (container: ContainerInfo) => void
+	onOpenTerminal: (container: ContainerInfo) => void
 	filterCounts?: { all: number; running: number; stopped: number; exited: number }
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
@@ -186,10 +224,11 @@ function ContainersTable({
 					onRestart={onRestart}
 					onStop={onStop}
 					onViewLogs={onViewLogs}
+					onOpenTerminal={onOpenTerminal}
 				/>
 			),
 		},
-	], [onStart, onRestart, onStop, onViewLogs])
+	], [onStart, onRestart, onStop, onViewLogs, onOpenTerminal])
 
 	const filters = useMemo(() => {
 		if (!filterCounts) return []
@@ -322,12 +361,14 @@ function ActionsCell({
 	onRestart,
 	onStop,
 	onViewLogs,
+	onOpenTerminal,
 }: {
 	container: ContainerInfo
 	onStart: (containerId: string) => void
 	onRestart: (containerId: string) => void
 	onStop: (containerId: string) => void
 	onViewLogs: (container: ContainerInfo) => void
+	onOpenTerminal: (container: ContainerInfo) => void
 }) {
 	const running = isRunning(container.status)
 
@@ -336,6 +377,11 @@ function ActionsCell({
 			<ActionButton
 				action={ACTION_DEFINITIONS.viewLogs}
 				onClick={() => onViewLogs(container)}
+			/>
+			<ActionButton
+				action={ACTION_DEFINITIONS.openTerminal}
+				onClick={() => onOpenTerminal(container)}
+				disabled={!running}
 			/>
 			<ActionButton
 				action={ACTION_DEFINITIONS.startContainer}

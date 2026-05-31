@@ -45,6 +45,7 @@ import {
 export const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
 	// Docker actions
 	viewLogs: { icon: Terminal, label: "Ver logs", color: "default" },
+	openTerminal: { icon: Terminal, label: "Terminal", color: "primary" },
 	startContainer: { icon: Play, label: "Iniciar contenedor", color: "success" },
 	restartContainer: { icon: RefreshCw, label: "Reiniciar contenedor", color: "default" },
 	stopContainer: { icon: Square, label: "Detener contenedor", color: "destructive" },

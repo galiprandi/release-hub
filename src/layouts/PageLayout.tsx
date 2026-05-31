@@ -13,7 +13,8 @@ import {
   Settings,
   RefreshCw,
   Activity,
-  GitCompare
+  GitCompare,
+  Terminal
 } from 'lucide-react';
 import { useEffect } from 'react';
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -115,6 +116,9 @@ export function PageLayout({
             </li>
             <li>
               <NavIcon icon={Activity} label="Health Monitor" to="/health" pathname={pathname} />
+            </li>
+            <li>
+              <NavIcon icon={Terminal} label="Terminal" to="/terminal" pathname={pathname} />
             </li>
           </ul>
 

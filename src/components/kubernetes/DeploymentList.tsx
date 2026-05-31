@@ -1,9 +1,11 @@
 import { useState, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery } from "@tanstack/react-query"
-import { Star } from "lucide-react"
+import { Star, Terminal as TerminalIcon } from "lucide-react"
 import type { DeploymentInfo } from "@/api/kubectl"
 import { LogsViewer } from "@/components/shared/LogsViewer"
+import { Terminal } from "@/components/shared/Terminal"
+import { BaseDialog } from "@/components/ui/BaseDialog"
 import { StatusCard } from "@/components/ui/StatusCard"
 import { Table } from "@/components/ui/Table"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -47,6 +49,7 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 	const [selectedDeployment, setSelectedDeployment] = useState<DeploymentInfo | null>(null)
 	const [selectedContext, setSelectedContext] = useState<string | null>(null)
 	const [isLogsModalOpen, setIsLogsModalOpen] = useState(false)
+	const [isTerminalModalOpen, setIsTerminalModalOpen] = useState(false)
 	const [cachedDeployments, setCachedDeployments] = useState<Record<string, DeploymentInfo>>(loadDeploymentsFromStorage())
 	const { toggleDeploymentFavorite } = useUserCollections()
 
@@ -158,6 +161,13 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 		setIsLogsModalOpen(true)
 	}
 
+	const handleOpenTerminal = (deployment: DeploymentInfo, deploymentContext: string) => {
+		console.log('[DeploymentList] Opening terminal for deployment:', deployment.name, 'context:', deploymentContext)
+		setSelectedDeployment(deployment)
+		setSelectedContext(deploymentContext)
+		setIsTerminalModalOpen(true)
+	}
+
 	// Si no hay favoritos, no renderizar nada (el padre maneja el empty state)
 	if (!favorites || favorites.length === 0) {
 		return null
@@ -194,6 +204,7 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 								context={ctx}
 								isLoading={isLoading}
 								onViewLogs={handleViewLogs}
+								onOpenTerminal={handleOpenTerminal}
 								onRemoveFavorite={(deployment) => {
 									const deploymentId = `${ctx}/${deployment.namespace}/${deployment.name}`
 									toggleDeploymentFavorite(deploymentId)
@@ -214,7 +225,7 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 			{isLogsModalOpen && selectedDeployment &&
 				createPortal(
 					<LogsViewer
-						key={selectedDeployment.name}
+						key={`logs-${selectedDeployment.name}`}
 						fetchFn={fetchFn}
 						onClose={() => setIsLogsModalOpen(false)}
 						asModal={true}
@@ -222,6 +233,34 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 						selectedResourceId={selectedResourceId}
 						onResourceChange={handleResourceChange}
 					/>,
+					document.body
+				)
+			}
+
+			{isTerminalModalOpen && selectedDeployment &&
+				createPortal(
+					<BaseDialog
+						open={true}
+						onOpenChange={(open) => !open && setIsTerminalModalOpen(false)}
+						title={
+							<div className="flex items-center gap-2">
+								<TerminalIcon className="w-4 h-4 text-primary" />
+								<span>Terminal: {selectedDeployment.name}</span>
+							</div>
+						}
+						maxWidth="max-w-6xl"
+						className="w-[90vw] h-[80vh] !p-0"
+					>
+						<div className="flex-1 min-h-0 bg-black rounded-b-lg overflow-hidden">
+							<Terminal
+								type="k8s"
+								name={selectedDeployment.name}
+								namespace={selectedDeployment.namespace}
+								context={selectedContext || undefined}
+								className="border-none rounded-none h-full"
+							/>
+						</div>
+					</BaseDialog>,
 					document.body
 				)
 			}
@@ -234,6 +273,7 @@ function DeploymentsTable({
 	context,
 	isLoading,
 	onViewLogs,
+	onOpenTerminal,
 	onRemoveFavorite,
 	activeFilter,
 	onFilterChange,
@@ -242,6 +282,7 @@ function DeploymentsTable({
 	context: string
 	isLoading: boolean
 	onViewLogs: (deployment: DeploymentInfo, context: string) => void
+	onOpenTerminal: (deployment: DeploymentInfo, context: string) => void
 	onRemoveFavorite: (deployment: DeploymentInfo) => void
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
@@ -317,11 +358,12 @@ function DeploymentsTable({
 					deployment={row.original}
 					context={context}
 					onViewLogs={onViewLogs}
+					onOpenTerminal={onOpenTerminal}
 					onRemoveFavorite={onRemoveFavorite}
 				/>
 			),
 		},
-	], [context, isLoading, onViewLogs, onRemoveFavorite])
+	], [context, isLoading, onViewLogs, onOpenTerminal, onRemoveFavorite])
 
 	const dataWithContext = useMemo(() => sortedDeployments.map(d => ({ ...d, context })), [sortedDeployments, context])
 
@@ -402,11 +444,13 @@ function ActionsCell({
 	deployment,
 	context,
 	onViewLogs,
+	onOpenTerminal,
 	onRemoveFavorite,
 }: {
 	deployment: DeploymentInfo
 	context: string
 	onViewLogs: (deployment: DeploymentInfo, context: string) => void
+	onOpenTerminal: (deployment: DeploymentInfo, context: string) => void
 	onRemoveFavorite: (deployment: DeploymentInfo) => void
 }) {
 	return (
@@ -414,6 +458,10 @@ function ActionsCell({
 			<ActionButton
 				action={ACTION_DEFINITIONS.viewLogs}
 				onClick={() => onViewLogs(deployment, context)}
+			/>
+			<ActionButton
+				action={ACTION_DEFINITIONS.openTerminal}
+				onClick={() => onOpenTerminal(deployment, context)}
 			/>
 			<button
 				type="button"

@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TerminalRouteImport } from './routes/terminal'
 import { Route as KubernetesRouteImport } from './routes/kubernetes'
 import { Route as GithubRouteImport } from './routes/github'
 import { Route as FetcherRouteImport } from './routes/fetcher'
@@ -26,6 +27,11 @@ import { Route as FetcherSetupRouteImport } from './routes/fetcher/setup'
 import { Route as DockerSetupRouteImport } from './routes/docker/setup'
 import { Route as GithubOrgRepoRouteImport } from './routes/github/$org.$repo'
 
+const TerminalRoute = TerminalRouteImport.update({
+  id: '/terminal',
+  path: '/terminal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KubernetesRoute = KubernetesRouteImport.update({
   id: '/kubernetes',
   path: '/kubernetes',
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/fetcher': typeof FetcherRouteWithChildren
   '/github': typeof GithubRouteWithChildren
   '/kubernetes': typeof KubernetesRouteWithChildren
+  '/terminal': typeof TerminalRoute
   '/docker/setup': typeof DockerSetupRoute
   '/fetcher/setup': typeof FetcherSetupRoute
   '/github/setup': typeof GithubSetupRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/diff': typeof DiffRoute
+  '/terminal': typeof TerminalRoute
   '/docker/setup': typeof DockerSetupRoute
   '/fetcher/setup': typeof FetcherSetupRoute
   '/github/setup': typeof GithubSetupRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/fetcher': typeof FetcherRouteWithChildren
   '/github': typeof GithubRouteWithChildren
   '/kubernetes': typeof KubernetesRouteWithChildren
+  '/terminal': typeof TerminalRoute
   '/docker/setup': typeof DockerSetupRoute
   '/fetcher/setup': typeof FetcherSetupRoute
   '/github/setup': typeof GithubSetupRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/fetcher'
     | '/github'
     | '/kubernetes'
+    | '/terminal'
     | '/docker/setup'
     | '/fetcher/setup'
     | '/github/setup'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/diff'
+    | '/terminal'
     | '/docker/setup'
     | '/fetcher/setup'
     | '/github/setup'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/fetcher'
     | '/github'
     | '/kubernetes'
+    | '/terminal'
     | '/docker/setup'
     | '/fetcher/setup'
     | '/github/setup'
@@ -217,12 +229,20 @@ export interface RootRouteChildren {
   FetcherRoute: typeof FetcherRouteWithChildren
   GithubRoute: typeof GithubRouteWithChildren
   KubernetesRoute: typeof KubernetesRouteWithChildren
+  TerminalRoute: typeof TerminalRoute
   HealthIndexRoute: typeof HealthIndexRoute
   NovedadesIndexRoute: typeof NovedadesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terminal': {
+      id: '/terminal'
+      path: '/terminal'
+      fullPath: '/terminal'
+      preLoaderRoute: typeof TerminalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/kubernetes': {
       id: '/kubernetes'
       path: '/kubernetes'
@@ -399,6 +419,7 @@ const rootRouteChildren: RootRouteChildren = {
   FetcherRoute: FetcherRouteWithChildren,
   GithubRoute: GithubRouteWithChildren,
   KubernetesRoute: KubernetesRouteWithChildren,
+  TerminalRoute: TerminalRoute,
   HealthIndexRoute: HealthIndexRoute,
   NovedadesIndexRoute: NovedadesIndexRoute,
 }

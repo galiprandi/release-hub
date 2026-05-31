@@ -8,6 +8,7 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { DEFAULT_START_PORT, DEFAULT_MAX_PORTS } from "./src/config/portForward";
+import { setupTerminalMiddleware } from "./src/config/terminalMiddleware";
 
 const execAsync = promisify(exec);
 
@@ -601,6 +602,9 @@ export default defineConfig({
 		{
 			name: "cmd",
 			configureServer(server) {
+				if (server.httpServer) {
+					setupTerminalMiddleware(server.httpServer);
+				}
 				// Generic exec endpoint - executes any bash command
 				server.middlewares.use("/local/exec", execHandler);
 				// Script endpoint - executes scripts based on action
@@ -615,6 +619,9 @@ export default defineConfig({
 				server.middlewares.use("/local/port-free", portFreeHandler);
 			},
 			configurePreviewServer(server) {
+				if (server.httpServer) {
+					setupTerminalMiddleware(server.httpServer);
+				}
 				// Same endpoint for preview mode
 				server.middlewares.use("/local/exec", execHandler);
 				server.middlewares.use("/local/script", scriptHandler);

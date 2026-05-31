@@ -302,3 +302,4 @@ Si el header sticky no funciona:
 - **Fechas**: Uso obligatorio de `DayJS` para tiempo relativo (`.fromNow()`).
 - **Acciones**: Uso de `ActionButton` (size="sm") para todas las operaciones de fila.
 - **Empty State**: Implementar patrón de alta jerarquía con icono `Activity` (muted/20) y CTA claro para navegación.
+- **Dashboard Integration**: La salud de los servicios debe estar visible en el Dashboard de repositorios mediante indicadores compactos (puntos semánticos) que proporcionan un resumen rápido (OK/Error/Pendiente) sin navegación profunda.

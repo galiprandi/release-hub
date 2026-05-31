@@ -51,36 +51,34 @@ function KubernetesPage() {
 				searchComponent: isInstalled ? <DeploymentSearch /> : undefined
 			}}
 			isLoading={isCheckingInstall && safeDeploymentFavorites.length === 0}
+			showEmptyState={safeDeploymentFavorites.length === 0}
+			emptyState={{
+				icon: <Star className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />,
+				label: "Sin favoritos",
+				caption: "Agrega deployments a tus favoritos para verlos aquí y monitorear sus logs.",
+				action: (
+					<button
+						type="button"
+						onClick={() => {
+							const input = document.querySelector('input[placeholder*="Búsqueda de deployments"]') as HTMLInputElement;
+							if (input) {
+								input.focus();
+							}
+						}}
+						className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-bold uppercase tracking-wider shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+					>
+						<Search className="w-4 h-4" />
+						Buscar Deployments
+					</button>
+				)
+			}}
 		>
-			{safeDeploymentFavorites.length === 0 ? (
-				<div className="flex items-center justify-center w-full min-h-[400px]">
-					<div className="w-full border rounded-xl p-12 text-center text-muted-foreground bg-muted/20 border-dashed">
-						<Star className="w-10 h-10 mx-auto mb-4 opacity-20" />
-						<h3 className="text-lg font-medium text-foreground mb-1">Sin favoritos</h3>
-						<p className="text-sm max-w-xs mx-auto mb-6">Agrega deployments a tus favoritos para verlos aquí y monitorear sus logs.</p>
-						<button
-							type="button"
-							onClick={() => {
-								const input = document.querySelector('input[placeholder*="Búsqueda de deployments"]') as HTMLInputElement;
-								if (input) {
-									input.focus();
-								}
-							}}
-							className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-						>
-							<Search className="w-4 h-4" />
-							Buscar Deployments
-						</button>
-					</div>
-				</div>
-			) : (
-				<DeploymentList
-					favorites={safeDeploymentFavorites}
-					activeFilter={activeFilter}
-					onFilterChange={handleFilterChange}
-					isKubectlInstalled={isInstalled}
-				/>
-			)}
+			<DeploymentList
+				favorites={safeDeploymentFavorites}
+				activeFilter={activeFilter}
+				onFilterChange={handleFilterChange}
+				isKubectlInstalled={isInstalled}
+			/>
 		</PageLayout>
 	);
 }

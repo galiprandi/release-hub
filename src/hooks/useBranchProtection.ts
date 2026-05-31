@@ -4,6 +4,7 @@ import { queryKeys, applyCachePolicy } from '@/lib/queryKeys'
 
 interface UseBranchProtectionOptions {
 	repo: string
+	branch?: string
 	enabled?: boolean
 }
 
@@ -47,13 +48,13 @@ export interface BranchProtectionStatus {
 }
 
 /**
- * Hook to get branch protection status for a repository's main branch
+ * Hook to get branch protection status for a repository's branch
  * Returns whether the branch is locked (code freeze), if protection exists,
  * and if the user has admin permissions to manage it
  */
-export function useBranchProtection({ repo, enabled = true }: UseBranchProtectionOptions) {
+export function useBranchProtection({ repo, branch = 'main', enabled = true }: UseBranchProtectionOptions) {
 	return useQuery<BranchProtectionStatus>({
-		queryKey: queryKeys.repo.branchProtection(repo),
+		queryKey: queryKeys.repo.branchProtection(repo, branch),
 		queryFn: async () => {
 			try {
 				// Get user permissions via gh API
@@ -70,7 +71,7 @@ export function useBranchProtection({ repo, enabled = true }: UseBranchProtectio
 
 				// Try to get branch protection status
 				try {
-					const result = await runCommand(['gh', 'api', `repos/${repo}/branches/main/protection`])
+					const result = await runCommand(['gh', 'api', `repos/${repo}/branches/${branch}/protection`])
 					const protection = JSON.parse(result.stdout || '{}')
 					isLocked = protection.lock_branch?.enabled || false
 					hasProtection = true

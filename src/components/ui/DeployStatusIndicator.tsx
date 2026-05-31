@@ -1,5 +1,5 @@
 import * as Tooltip from "@radix-ui/react-tooltip"
-import { Circle } from "lucide-react"
+import { CheckCircle, XCircle, Loader2, AlertTriangle, HelpCircle } from "lucide-react"
 import DayJS from "@/lib/dayjs"
 
 interface DeployStatusIndicatorProps {
@@ -9,6 +9,17 @@ interface DeployStatusIndicatorProps {
 	errorDetail?: string
 	stage: "staging" | "production"
 	isLoading?: boolean
+	commitInfo?: {
+		hash?: string
+		shortHash?: string
+		author?: string
+		date?: string
+		message?: string
+	}
+	tagInfo?: {
+		name?: string
+		commit?: string
+	}
 }
 
 export function DeployStatusIndicator({
@@ -18,29 +29,63 @@ export function DeployStatusIndicator({
 	errorDetail,
 	stage,
 	isLoading,
+	commitInfo,
+	tagInfo,
 }: DeployStatusIndicatorProps) {
 	// Siempre mostrar el indicador cuando se llama al componente
 
-	const getStatusColor = () => {
-		if (isLoading) return "text-muted-foreground"
+	const getStatusConfig = () => {
+		if (isLoading) {
+			return {
+				icon: Loader2,
+				iconProps: { className: "animate-spin" },
+				badgeClass: "bg-muted/20 text-muted-foreground",
+				label: "Cargando"
+			}
+		}
 
 		switch (status?.toLowerCase()) {
 			case "success":
 			case "completed":
-				return "text-success"
+				return {
+					icon: CheckCircle,
+					iconProps: {},
+					badgeClass: "bg-success/20 text-success",
+					label: "Success"
+				}
 			case "failed":
 			case "error":
-				return "text-destructive"
+				return {
+					icon: XCircle,
+					iconProps: {},
+					badgeClass: "bg-destructive/20 text-destructive",
+					label: "Failed"
+				}
 			case "in_progress":
 			case "running":
 			case "pending":
 			case "started":
-				return "text-info animate-pulse-slow"
+				return {
+					icon: Loader2,
+					iconProps: { className: "animate-spin" },
+					badgeClass: "bg-info/20 text-info",
+					label: "Deploying"
+				}
 			case "warn":
 			case "warning":
-				return "text-warning"
+				return {
+					icon: AlertTriangle,
+					iconProps: {},
+					badgeClass: "bg-warning/20 text-warning",
+					label: "Warning"
+				}
 			default:
-				return "text-muted-foreground"
+				return {
+					icon: HelpCircle,
+					iconProps: {},
+					badgeClass: "bg-muted/20 text-muted-foreground",
+					label: "Unknown"
+				}
 		}
 	}
 
@@ -68,11 +113,26 @@ export function DeployStatusIndicator({
 			case "success":
 			case "completed":
 				return (
-					<div className="text-xs space-y-1">
+					<div className="text-xs space-y-2">
 						<div className="font-medium">Deploy exitoso</div>
 						{updatedAt && (
 							<div className="text-muted-foreground">
 								{DayJS(updatedAt).fromNow()}
+							</div>
+						)}
+						{tagInfo?.name && (
+							<div className="text-muted-foreground">
+								Tag: {tagInfo.name}
+							</div>
+						)}
+						{commitInfo?.author && (
+							<div className="text-muted-foreground">
+								Por: {commitInfo.author}
+							</div>
+						)}
+						{commitInfo?.message && (
+							<div className="text-muted-foreground italic max-w-xs truncate">
+								{commitInfo.message}
 							</div>
 						)}
 					</div>
@@ -80,7 +140,7 @@ export function DeployStatusIndicator({
 			case "failed":
 			case "error":
 				return (
-					<div className="text-xs space-y-1">
+					<div className="text-xs space-y-2">
 						<div className="font-medium text-destructive">Deploy falló</div>
 						{failedStage && (
 							<div className="text-muted-foreground">
@@ -92,6 +152,16 @@ export function DeployStatusIndicator({
 								{errorDetail}
 							</div>
 						)}
+						{tagInfo?.name && (
+							<div className="text-muted-foreground">
+								Tag: {tagInfo.name}
+							</div>
+						)}
+						{commitInfo?.author && (
+							<div className="text-muted-foreground">
+								Por: {commitInfo.author}
+							</div>
+						)}
 					</div>
 				)
 			case "in_progress":
@@ -99,21 +169,41 @@ export function DeployStatusIndicator({
 			case "pending":
 			case "started":
 				return (
-					<div className="text-xs space-y-1">
+					<div className="text-xs space-y-2">
 						<div className="font-medium">Deploy en progreso</div>
 						<div className="text-muted-foreground">
 							{stage === "staging" ? "Staging" : "Production"}
 						</div>
+						{commitInfo?.shortHash && (
+							<div className="text-muted-foreground">
+								Commit: {commitInfo.shortHash}
+							</div>
+						)}
+						{commitInfo?.author && (
+							<div className="text-muted-foreground">
+								Por: {commitInfo.author}
+							</div>
+						)}
 					</div>
 				)
 			case "warn":
 			case "warning":
 				return (
-					<div className="text-xs space-y-1">
+					<div className="text-xs space-y-2">
 						<div className="font-medium text-warning">Deploy con advertencias</div>
 						{updatedAt && (
 							<div className="text-muted-foreground">
 								{DayJS(updatedAt).fromNow()}
+							</div>
+						)}
+						{tagInfo?.name && (
+							<div className="text-muted-foreground">
+								Tag: {tagInfo.name}
+							</div>
+						)}
+						{commitInfo?.author && (
+							<div className="text-muted-foreground">
+								Por: {commitInfo.author}
 							</div>
 						)}
 					</div>
@@ -130,12 +220,20 @@ export function DeployStatusIndicator({
 		}
 	}
 
+	// Don't show anything if no status and not loading
+	if (!status && !isLoading) {
+		return null
+	}
+
+	const config = getStatusConfig()
+	const StatusIcon = config.icon
+
 	return (
 		<Tooltip.Provider>
 			<Tooltip.Root>
 				<Tooltip.Trigger asChild>
-					<span className="inline-flex items-center">
-						<Circle className={`w-3 h-3 fill-current ${getStatusColor()}`} />
+					<span className={`inline-flex items-center justify-center w-5 h-5 rounded-md border border-current/20 ${config.badgeClass}`}>
+						<StatusIcon className="w-3 h-3" {...config.iconProps} />
 					</span>
 				</Tooltip.Trigger>
 				<Tooltip.Portal>

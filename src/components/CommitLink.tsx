@@ -14,9 +14,16 @@ interface CommitLinkProps {
 	};
 	isLoading?: boolean;
 	showStatus?: boolean;
+	commitInfo?: {
+		hash?: string;
+		shortHash?: string;
+		author?: string;
+		date?: string;
+		message?: string;
+	};
 }
 
-export function CommitLink({ hash, org, repo, short = true, pipelineStatus, isLoading, showStatus = true }: CommitLinkProps) {
+export function CommitLink({ hash, org, repo, short = true, pipelineStatus, isLoading, showStatus = true, commitInfo }: CommitLinkProps) {
 	const displayHash = short ? hash.slice(0, 7) : hash;
 	const githubUrl = `https://github.com/${org}/${repo}/commit/${hash}`;
 
@@ -39,6 +46,7 @@ export function CommitLink({ hash, org, repo, short = true, pipelineStatus, isLo
 					errorDetail={pipelineStatus?.errorDetail}
 					stage="staging"
 					isLoading={isLoading}
+					commitInfo={commitInfo}
 				/>
 			)}
 		</div>

@@ -322,6 +322,9 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 	const { latestTag, isLoading: isLoadingTags } = useGitTagsSimple({
 		repo: repo.fullName,
 	});
+	const { commits } = useGitCommits({
+		repo: repo.fullName,
+	});
 	const prodPipeline = usePipelineWithHealth({
 		product: repo.fullName,
 		commit: latestTag?.commit ?? "",
@@ -336,6 +339,19 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 	} : { status: undefined };
 	const isProdLoading = prodPipeline.isLoading;
 
+	const tagCommitInfo = useMemo(() => {
+		if (!latestTag?.commit || !commits) return undefined;
+		const commit = commits.find(c => c.hash === latestTag.commit);
+		if (!commit) return undefined;
+		return {
+			hash: commit.hash,
+			shortHash: commit.shortHash,
+			author: commit.author,
+			date: commit.date,
+			message: commit.message,
+		};
+	}, [latestTag?.commit, commits]);
+
 	if (isLoadingTags) {
 		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
 	}
@@ -347,6 +363,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 			repo={name}
 			pipelineStatus={productionStatus}
 			isLoading={isProdLoading}
+			commitInfo={tagCommitInfo}
 		/>
 	) : <span className="text-muted-foreground/40 text-xs font-medium italic">Sin tags</span>;
 }
@@ -369,6 +386,17 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 	} : { status: undefined };
 	const isStagingLoading = stagingPipeline.isLoading;
 
+	const commitInfo = useMemo(() => {
+		if (!latestCommit) return undefined;
+		return {
+			hash: latestCommit.hash,
+			shortHash: latestCommit.shortHash,
+			author: latestCommit.author,
+			date: latestCommit.date,
+			message: latestCommit.message,
+		};
+	}, [latestCommit]);
+
 	if (isLoadingCommits) {
 		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
 	}
@@ -380,6 +408,7 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 			repo={name}
 			pipelineStatus={stagingStatus}
 			isLoading={isStagingLoading}
+			commitInfo={commitInfo}
 		/>
 	) : <span className="text-muted-foreground/40 text-xs font-medium italic">Sin commits</span>;
 }

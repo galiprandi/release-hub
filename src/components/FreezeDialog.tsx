@@ -28,8 +28,9 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 	const { webhookUrl } = useDiscordChannel(repo)
 	const [notificationsEnabled, setNotificationsEnabled] = useState(!!webhookUrl)
 	const { data: gitUser } = useGitUser()
+	const [branch, setBranch] = useState('main')
 
-	const { data: protectionStatus } = useBranchProtection({ repo })
+	const { data: protectionStatus } = useBranchProtection({ repo, branch })
 	const isLocked = protectionStatus?.isLocked || false
 	const canManage = protectionStatus?.canManage || false
 
@@ -39,6 +40,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 			setStep('config')
 			setNotificationsEnabled(!!webhookUrl)
 			setError("")
+			setBranch('main')
 		}
 	}
 
@@ -60,7 +62,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 			}
 
 			const result = await runCommand(
-				['gh', 'api', `repos/${repo}/branches/main/protection`, '--method', 'PUT', '--input', '-'],
+				['gh', 'api', `repos/${repo}/branches/${branch}/protection`, '--method', 'PUT', '--input', '-'],
 				JSON.stringify(protectionConfig)
 			)
 
@@ -73,7 +75,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 				await sendDiscordNotification(webhookUrl, repo, !isLocked)
 			}
 
-			queryClient.invalidateQueries({ queryKey: ['branch', 'protection', repo] })
+			queryClient.invalidateQueries({ queryKey: ['repo', 'branch-protection', repo, branch] })
 			setStep('success')
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Error al cambiar estado del freeze")
@@ -90,8 +92,8 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 			const embed = {
 				title: isFreezing ? "🔒 Code Freeze Activado" : "🔓 Code Freeze Desactivado",
 				description: isFreezing
-					? `El branch \`main\` de \`${repo}\` ha sido bloqueado temporalmente ${userName} desde ReleaseHub.`
-					: `El branch \`main\` de \`${repo}\` ha sido desbloqueado ${userName} desde ReleaseHub.`,
+					? `El branch \`${branch}\` de \`${repo}\` ha sido bloqueado temporalmente ${userName} desde ReleaseHub.`
+					: `El branch \`${branch}\` de \`${repo}\` ha sido desbloqueado ${userName} desde ReleaseHub.`,
 				color: isFreezing ? 15158332 : 3066993, // Red for freeze, Green for unfreeze
 				timestamp,
 				footer: {
@@ -155,9 +157,9 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 								<div className="text-xs space-y-1">
 									{canManage ? (
 										<>
-											<div className="font-medium">{isLocked ? "Desbloquear branch" : "Bloquear branch main"}</div>
+											<div className="font-medium">{isLocked ? "Desbloquear branch" : "Bloquear branch"}</div>
 											<div className="text-muted-foreground">
-												{isLocked ? "Permitir merges y pushes a main" : "Bloquear merges y pushes a main"}
+												{isLocked ? `Permitir merges y pushes a ${branch}` : `Bloquear merges y pushes a ${branch}`}
 											</div>
 										</>
 									) : (
@@ -180,12 +182,24 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 				{step === 'config' && (
 					<div className="flex flex-col flex-1 overflow-y-auto">
 						<div className="space-y-4">
-							<div className="text-sm">
-								{isLocked ? (
-									<p>Vas a <strong>desbloquear</strong> el branch main de <code className="font-mono bg-muted px-1 rounded">{repo}</code>. Esto permitirá merges y pushes nuevamente.</p>
-								) : (
-									<p>Vas a <strong>bloquear</strong> el branch main de <code className="font-mono bg-muted px-1 rounded">{repo}</code>. Esto bloqueará todos los merges y pushes hasta que lo desbloquees.</p>
-								)}
+							<div className="space-y-3">
+								<div>
+									<label className="block text-sm font-medium mb-1.5">Branch</label>
+									<input
+										type="text"
+										value={branch}
+										onChange={(e) => setBranch(e.target.value)}
+										className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+										placeholder="main"
+									/>
+								</div>
+								<div className="text-sm">
+									{isLocked ? (
+										<p>Vas a <strong>desbloquear</strong> el branch <code className="font-mono bg-muted px-1 rounded">{branch}</code> de <code className="font-mono bg-muted px-1 rounded">{repo}</code>. Esto permitirá merges y pushes nuevamente.</p>
+									) : (
+										<p>Vas a <strong>bloquear</strong> el branch <code className="font-mono bg-muted px-1 rounded">{branch}</code> de <code className="font-mono bg-muted px-1 rounded">{repo}</code>. Esto bloqueará todos los merges y pushes hasta que lo desbloquees.</p>
+									)}
+								</div>
 							</div>
 
 							<DiscordNotification
@@ -219,7 +233,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 						<div>
 							<p className="text-lg font-semibold">{isLocked ? "Branch Desbloqueado" : "Branch Bloqueado"}</p>
 							<p className="text-sm text-muted-foreground mt-1">
-								{isLocked ? "El branch main de" : "El branch main de"} <strong>{repo}</strong> {isLocked ? "ya permite merges y pushes." : "ha sido bloqueado temporalmente."}
+								{isLocked ? "El branch" : "El branch"} <strong>{branch}</strong> de <strong>{repo}</strong> {isLocked ? "ya permite merges y pushes." : "ha sido bloqueado temporalmente."}
 							</p>
 							{webhookUrl && (
 								<p className="text-xs text-muted-foreground mt-2">

@@ -39,6 +39,8 @@
 - should handle single quotes within arguments correctly
 - should neutralize backtick injection in kubectl commands
 - should neutralize command substitution in curl commands
+- should neutralize pipe injection in array-based commands
+- should neutralize redirection injection in array-based commands
 - should neutralize semicolon injection in docker commands
 
 ## Module: api/seki

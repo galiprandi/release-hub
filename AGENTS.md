@@ -75,7 +75,11 @@ Ver `DESIGN.md` para especificaciones visuales completas (`Table`, `FilterBar`, 
 - **Rendimiento**: Memoizar `columns`, `filters`, `activeFilter` y callbacks (`useMemo`/`useCallback`).
 - **Estilos de filtros**: Activo `bg-info/20 text-info shadow-sm`, Inactivo `bg-muted text-foreground hover:bg-muted/80`.
 
-### 11. Validación de Build Antes de Commits y PRs
+### 11. Salud de Servicios y Dashboard Resonance
+- **Integración de Salud**: El Dashboard de GitHub (`src/routes/github/index.tsx`) integra la visibilidad de salud de los servicios mediante `HealthCell`. Esta integración consume `useHealthMonitor` para proporcionar un resumen visual (puntos semánticos) que enlaza directamente con el monitor de salud filtrado por errores.
+- **Resonancia Industrial V2**: Todos los componentes de salud y búsqueda deben utilizar `ActionButton`, tokens semánticos y geometrías `rounded-xl` para mantener la consistencia del sistema de diseño.
+
+### 12. Validación de Build Antes de Commits y PRs
 - **Obligatorio antes de commit a main**: Ejecutar `node --run build` y verificar que no existan errores de compilación.
 - **Obligatorio antes de crear PR**: Ejecutar `node --run build` y verificar que no existan errores de compilación.
 - No proceder con commit o PR si el build falla.

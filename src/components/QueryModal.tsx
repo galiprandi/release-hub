@@ -26,20 +26,6 @@ interface CurlResponse {
 
 const MAX_HEADERS_DISPLAY = 7;
 
-function formatTimeAgo(dateString: string): string {
-	const date = new Date(dateString);
-	const now = new Date();
-	const diffMs = now.getTime() - date.getTime();
-	const diffMins = Math.floor(diffMs / 60000);
-	const diffHours = Math.floor(diffMins / 60);
-	const diffDays = Math.floor(diffHours / 24);
-
-	if (diffMins < 1) return 'ahora mismo';
-	if (diffMins < 60) return `hace ${diffMins} min`;
-	if (diffHours < 24) return `hace ${diffHours} h`;
-	return `hace ${diffDays} días`;
-}
-
 interface ParsedCurl {
 	method: string;
 	url: string;
@@ -76,6 +62,13 @@ function parseInitialCurl(curl?: string): ParsedCurl {
 
 export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 	const [form, setForm] = useState<ParsedCurl>(() => parseInitialCurl(query?.curl));
+	const [prevQueryId, setPrevQueryId] = useState<string | undefined>(query?.id);
+
+	if (query?.id !== prevQueryId) {
+		setForm(parseInitialCurl(query?.curl));
+		setPrevQueryId(query?.id);
+	}
+
 	const [isExecuting, setIsExecuting] = useState(false);
 	const [activeTab, setActiveTab] = useState<'body' | 'headers'>('body');
 	const [requestTab, setRequestTab] = useState<'params' | 'headers' | 'body'>(() =>
@@ -585,7 +578,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 											: response.status >= 400
 										? 'bg-destructive/20 text-destructive border-destructive/20'
 										: 'bg-warning/20 text-warning border-warning/20'
-									}`} title={query?.updatedAt ? formatTimeAgo(query.updatedAt) : new Date().toLocaleString()}>
+									}`} title={query?.updatedAt ? DayJS(query.updatedAt).format('LLL') : DayJS().format('LLL')}>
 									{response.status} {response.statusText}
 								</span>
 						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 border border-border/60 px-2 py-0.5 rounded-md">

@@ -78,6 +78,11 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 - Icono con fondo sutil (`bg-primary/10`).
 - Título con `tracking-tight` para mayor elegancia.
 
+### Technical Editors (JsonEditor)
+- **Cabecera**: `bg-muted/40` con bordes sutiles `border-border/60` y labels `text-[10px] font-bold uppercase tracking-wider`.
+- **Cuerpo**: `bg-muted/20` para lectura y `bg-background` para edición. Uso de `rounded-b-lg` y eliminación de bordes superiores para integración con la cabecera.
+- **Interacción**: Uso de `focus-visible:ring-primary` con `ring-offset-1`.
+
 ### FilterBar
 - **Variante Default**: Uso de `bg-muted` para botones inactivos y `bg-primary` para el activo.
 - **Variante Tabs**: Estética industrial de alta densidad. Contenedor `bg-muted` con padding `p-1`. Botones activos con `bg-background shadow-sm text-foreground` e inactivos con `text-muted-foreground hover:text-foreground`.

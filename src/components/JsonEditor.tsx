@@ -86,9 +86,9 @@ export function JsonEditor({
 
 	return (
 		<div>
-			<div className="flex items-center justify-between bg-g pb-1 px-4">
+			<div className="flex items-center justify-between bg-muted/40 border border-border/60 rounded-t-lg pb-1 px-4">
 				<div className="flex items-center gap-2">
-					<label className="text-xs font-medium">JSON</label>
+					<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">JSON</label>
 				</div>
 				<div className="flex items-center gap-2">
 					{onSearchChange && (
@@ -147,7 +147,7 @@ export function JsonEditor({
 			</div>
 			{readOnly ? (
 				<div className="relative">
-					<pre className={`w-full ${height} px-2.5 py-1.5 text-xs font-mono whitespace-pre-wrap break-all border rounded-md bg-muted/50 overflow-auto`}>
+					<pre className={`w-full ${height} px-2.5 py-1.5 text-xs font-mono whitespace-pre-wrap break-all border border-t-0 rounded-b-lg bg-muted/20 overflow-auto`}>
 						{getDisplayValue() || '(Sin respuesta)'}
 					</pre>
 					{value && (
@@ -163,7 +163,7 @@ export function JsonEditor({
 						onChange={(e) => onChange(e.target.value)}
 						placeholder={placeholder}
 						readOnly={readOnly}
-						className={`w-full ${height} px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono`}
+						className={`w-full ${height} px-2.5 py-1.5 text-sm border border-t-0 rounded-b-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono bg-background`}
 					/>
 					{value && (
 						<div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-background/80 px-1.5 py-0.5 rounded">

@@ -11,6 +11,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 import { PageLayout } from '@/layouts/PageLayout';
+import DayJS from '@/lib/dayjs';
 
 export const Route = createFileRoute('/fetcher/')({
 	component: FetcherPage,
@@ -21,21 +22,6 @@ export const Route = createFileRoute('/fetcher/')({
 	},
 });
 
-// Function to format relative time
-function formatTimeAgo(dateString: string): string {
-	const date = new Date(dateString);
-	const now = new Date();
-	const diffMs = now.getTime() - date.getTime();
-	const diffMins = Math.floor(diffMs / 60000);
-	const diffHours = Math.floor(diffMins / 60);
-	const diffDays = Math.floor(diffHours / 24);
-
-	if (diffMins < 1) return 'ahora mismo';
-	if (diffMins < 60) return `hace ${diffMins} min`;
-	if (diffHours < 24) return `hace ${diffHours} h`;
-	if (diffDays < 7) return `hace ${diffDays} días`;
-	return date.toLocaleDateString();
-}
 
 
 function FetcherPage() {
@@ -355,8 +341,8 @@ function UrlCell({ query }: { query: QueryRecord }) {
 
 function SentCell({ query }: { query: QueryRecord }) {
 	return (
-		<span className="text-sm text-muted-foreground" title={query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}>
-			{query.updatedAt ? formatTimeAgo(query.updatedAt) : 'Nunca'}
+		<span className="text-sm text-muted-foreground" title={query.updatedAt ? DayJS(query.updatedAt).format('LLL') : 'Nunca'}>
+			{query.updatedAt ? DayJS(query.updatedAt).fromNow() : 'Nunca'}
 		</span>
 	)
 }

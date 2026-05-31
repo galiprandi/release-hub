@@ -73,6 +73,14 @@
 - should suggest next version correctly
 - should toggle commits list with accessibility attributes
 
+## Module: Pipeline Core Types
+- should accept valid provider values
+- should accept valid state values
+- should accept valid view mode values
+- should create a valid pipeline event
+- should create valid pipeline data structure
+- should support minimal pipeline data
+
 ## Module: usePortForward
 - connects successfully
 - disconnects successfully
@@ -86,14 +94,6 @@
 ## Module: useRepoPermission
 - debe retornar objeto vacío si el JSON es inválido
 - debe retornar permisos cuando el comando es exitoso
-
-## Module: Pipeline Core Types
-- should accept valid provider values
-- should accept valid state values
-- should accept valid view mode values
-- should create a valid pipeline event
-- should create valid pipeline data structure
-- should support minimal pipeline data
 
 ## Module: diffEngine
 - should handle arrays

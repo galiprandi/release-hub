@@ -19,6 +19,7 @@ import { useUserReposSummary } from "@/hooks/useUserReposSummary";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTagsSimple } from "@/hooks/useGitTagsSimple";
 import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
+import { useHealthMonitor } from "@/hooks/useHealthMonitor";
 import { ProjectManagementDialog } from "@/components/ProjectManagementDialog";
 import { EmptyState } from "@/components/EmptyState";
 import DayJS from "@/lib/dayjs";
@@ -205,6 +206,11 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 			cell: ({ row }) => <CommitCell repo={row.original} />,
 		},
 		{
+			id: "health",
+			header: "Salud",
+			cell: ({ row }) => <HealthCell repo={row.original} />,
+		},
+		{
 			accessorKey: "updatedAt",
 			header: "Actividad",
 			cell: ({ row }) => <DateCell repo={row.original} />,
@@ -322,6 +328,9 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 	const { latestTag, isLoading: isLoadingTags } = useGitTagsSimple({
 		repo: repo.fullName,
 	});
+	const { commits } = useGitCommits({
+		repo: repo.fullName,
+	});
 	const prodPipeline = usePipelineWithHealth({
 		product: repo.fullName,
 		commit: latestTag?.commit ?? "",
@@ -336,6 +345,19 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 	} : { status: undefined };
 	const isProdLoading = prodPipeline.isLoading;
 
+	const tagCommitInfo = useMemo(() => {
+		if (!latestTag?.commit || !commits) return undefined;
+		const commit = commits.find(c => c.hash === latestTag.commit);
+		if (!commit) return undefined;
+		return {
+			hash: commit.hash,
+			shortHash: commit.shortHash,
+			author: commit.author,
+			date: commit.date,
+			message: commit.message,
+		};
+	}, [latestTag?.commit, commits]);
+
 	if (isLoadingTags) {
 		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
 	}
@@ -347,6 +369,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 			repo={name}
 			pipelineStatus={productionStatus}
 			isLoading={isProdLoading}
+			commitInfo={tagCommitInfo}
 		/>
 	) : <span className="text-muted-foreground/40 text-xs font-medium italic">Sin tags</span>;
 }
@@ -369,6 +392,17 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 	} : { status: undefined };
 	const isStagingLoading = stagingPipeline.isLoading;
 
+	const commitInfo = useMemo(() => {
+		if (!latestCommit) return undefined;
+		return {
+			hash: latestCommit.hash,
+			shortHash: latestCommit.shortHash,
+			author: latestCommit.author,
+			date: latestCommit.date,
+			message: latestCommit.message,
+		};
+	}, [latestCommit]);
+
 	if (isLoadingCommits) {
 		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
 	}
@@ -380,6 +414,7 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 			repo={name}
 			pipelineStatus={stagingStatus}
 			isLoading={isStagingLoading}
+			commitInfo={commitInfo}
 		/>
 	) : <span className="text-muted-foreground/40 text-xs font-medium italic">Sin commits</span>;
 }
@@ -399,6 +434,59 @@ function DateCell({ repo }: { repo: RepoInfo }) {
 			{DayJS(commitDate).fromNow()}
 		</div>
 	) : null;
+}
+
+function HealthCell({ repo }: { repo: RepoInfo }) {
+	const { getEndpointsByProduct } = useHealthMonitor();
+	const endpoints = getEndpointsByProduct(repo.fullName);
+
+	if (endpoints.length === 0) return null;
+
+	const healthyCount = endpoints.filter(e => e.isHealthy === true).length;
+	const unhealthyCount = endpoints.filter(e => e.isHealthy === false).length;
+	const pendingCount = endpoints.filter(e => e.isHealthy === null).length;
+
+	return (
+		<Tooltip.Provider>
+			<Tooltip.Root>
+				<Tooltip.Trigger asChild>
+					<Link
+						to="/health"
+						search={{ environment: unhealthyCount > 0 ? 'unhealthy' : undefined }}
+						className="flex items-center gap-1.5 hover:bg-muted/40 p-1 rounded-md transition-colors"
+					>
+						<div className="flex items-center -space-x-1">
+							{unhealthyCount > 0 && (
+								<div className="w-2.5 h-2.5 rounded-full bg-destructive border-2 border-background shadow-sm" />
+							)}
+							{healthyCount > 0 && (
+								<div className="w-2.5 h-2.5 rounded-full bg-success border-2 border-background shadow-sm" />
+							)}
+							{pendingCount > 0 && (
+								<div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/40 border-2 border-background shadow-sm" />
+							)}
+						</div>
+						<span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
+							{endpoints.length} serv.
+						</span>
+					</Link>
+				</Tooltip.Trigger>
+				<Tooltip.Portal>
+					<Tooltip.Content
+						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs z-50"
+						sideOffset={5}
+					>
+						<div className="space-y-1">
+							<p className="font-bold border-b border-border/40 pb-1 mb-1">Estado de Salud</p>
+							{healthyCount > 0 && <p className="text-success flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-success" /> {healthyCount} OK</p>}
+							{unhealthyCount > 0 && <p className="text-destructive flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-destructive" /> {unhealthyCount} Error</p>}
+							{pendingCount > 0 && <p className="text-muted-foreground flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" /> {pendingCount} Pendiente</p>}
+						</div>
+					</Tooltip.Content>
+				</Tooltip.Portal>
+			</Tooltip.Root>
+		</Tooltip.Provider>
+	);
 }
 
 function AuthorCell({ repo }: { repo: RepoInfo }) {

@@ -4,6 +4,8 @@
 
 ### 🗓️ 30 de Mayo de 2026
 
+- 🎉 **GitHub Dashboard: Integración de Salud** 🏥: Nueva columna de Salud en la tabla de repositorios. Ahora puedes ver el estado de salud de tus servicios (OK, Error, Pendiente) de un vistazo, sin salir del dashboard.
+- ✨ **Health Monitor V2**: Refinamiento estético del monitor de salud con estándares de Resonancia Industrial V2, incluyendo mejores headers, estados de carga y una experiencia de usuario más fluida con `ActionButton`.
 - 🎉 **GitHub: Gestión de Proyectos Integrada** 📂: Ahora puedes crear, editar y eliminar proyectos directamente desde el dashboard de repositorios. Se ha optimizado el flujo de trabajo eliminando la necesidad de navegar a repositorios individuales para gestionar tus colecciones.
 - ✨ **Resonancia Industrial V2**: Refinamiento estético de las tablas de repositorios con mejor jerarquía visual, tipografía técnica `tracking-tight` y estados de carga mejorados.
 - 🧹 **Higiene Técnica**: Eliminación de rutas de prueba obsoletas y limpieza de referencias legadas para mantener un sistema ágil y profesional.

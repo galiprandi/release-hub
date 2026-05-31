@@ -232,6 +232,7 @@ interface RepoBranchProtectionKey extends BaseQueryKey {
 	domain: "repo";
 	type: "branch-protection";
 	repo: string;
+	branch?: string;
 }
 
 type RepoQueryKey =
@@ -365,8 +366,8 @@ export const queryKeys = {
 	repo: {
 		permission: (repo: string): readonly ["repo", "permission", string] =>
 			["repo", "permission", repo],
-		branchProtection: (repo: string): readonly ["repo", "branch-protection", string] =>
-			["repo", "branch-protection", repo],
+		branchProtection: (repo: string, branch?: string): readonly ["repo", "branch-protection", string, string | undefined] =>
+			["repo", "branch-protection", repo, branch],
 	},
 
 	// User

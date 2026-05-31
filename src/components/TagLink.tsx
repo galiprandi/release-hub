@@ -13,9 +13,16 @@ interface TagLinkProps {
 	};
 	isLoading?: boolean;
 	showStatus?: boolean;
+	commitInfo?: {
+		hash?: string;
+		shortHash?: string;
+		author?: string;
+		date?: string;
+		message?: string;
+	};
 }
 
-export function TagLink({ tagName, org, repo, pipelineStatus, isLoading, showStatus = true }: TagLinkProps) {
+export function TagLink({ tagName, org, repo, pipelineStatus, isLoading, showStatus = true, commitInfo }: TagLinkProps) {
 	const githubUrl = `https://github.com/${org}/${repo}/releases/tag/${tagName}`;
 
 	return (
@@ -37,6 +44,8 @@ export function TagLink({ tagName, org, repo, pipelineStatus, isLoading, showSta
 					errorDetail={pipelineStatus?.errorDetail}
 					stage="production"
 					isLoading={isLoading}
+					commitInfo={commitInfo}
+					tagInfo={{ name: tagName }}
 				/>
 			)}
 		</div>

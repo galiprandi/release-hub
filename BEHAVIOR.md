@@ -42,6 +42,7 @@
 - should neutralize pipe injection in array-based commands
 - should neutralize redirection injection in array-based commands
 - should neutralize semicolon injection in docker commands
+- should throw error if command is not an array (runtime enforcement)
 
 ## Module: api/seki
 - fetchPipeline retorna el pipeline

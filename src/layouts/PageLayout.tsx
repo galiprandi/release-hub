@@ -22,6 +22,7 @@ import { SettingsDialog } from "@/components/SettingsDialog";
 import { GenericSearch } from "@/components/GenericSearch";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { EmptyState } from "@/components/EmptyState";
+import { useGitUser } from "@/hooks/useGitUser";
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -72,6 +73,7 @@ export function PageLayout({
   const [isDark, setIsDark] = useState(false);
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
+  const { data: gitUser } = useGitUser();
 
   // Determine if any loading state is true
   const isAnyLoading = Array.isArray(isLoading) ? isLoading.some(Boolean) : isLoading;
@@ -134,7 +136,7 @@ export function PageLayout({
         <div className="mt-4">
           <a href="https://github.com" target="_blank" rel="noreferrer" className="block" aria-label="Perfil de usuario en GitHub">
             <img
-              src="https://github.com/identicons/jasonlong.png"
+              src={gitUser?.avatar_url || "https://github.com/identicons/jasonlong.png"}
               alt="Avatar de usuario"
               className="w-8 h-8 rounded-full border border-border/60 hover:border-primary/60 transition-colors"
             />

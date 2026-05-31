@@ -62,8 +62,7 @@ Ver `DESIGN.md` para tokens, patrones visuales y especificaciones de componentes
 - **Fetcher Magic Clipboard**: El módulo Fetcher detecta automáticamente comandos cURL en el portapapeles al enfocar la ventana, abriendo el `QueryModal` para reducir la fricción.
 - **FilterBar**: Utilizar `variant="tabs"` para navegación de colecciones en dashboards. El contenedor debe ser `bg-muted` con padding `p-1`. Incluir gestión de proyectos integrada (Crear/Editar/Eliminar) en los dashboards para reducir la fricción en la organización de repositorios.
 - **Industrial Resonance V2**: Uso de `tracking-tight` para nombres de elementos, `rounded-xl` para contenedores principales y `rounded-lg` para botones de acción.
-- **Kubernetes Resonance Standard**: Deployment status badges deben usar tokens semánticos con 20% de opacidad y bordes. Encabezados de grupo para contextos deben usar icono `Boxes`. Todas las acciones de fila deben usar `ActionButton` (size="sm") y ser visibles solo en hover/focus usando el patrón `group`.
-- **Shell Hardening**: Todo comando CLI (gh, docker, kubectl, curl) debe usar `runCommand` con un array de argumentos. Parámetros dinámicos deben pasar por `quote()` o ser parte del array de `runCommand` (que internamente usa `joinArgs`). Prohibido concatenar strings sin escape para comandos. Para comandos complejos que requieren entrada de datos (JSON, etc.), usar el segundo parámetro `stdin` de `runCommand` en lugar de redirecciones de shell o Heredocs.
+- **Shell Hardening**: Todo comando CLI (gh, docker, kubectl, curl) debe usar `runCommand` con un array de argumentos (`string[]`). La firma de `runCommand` prohíbe estrictamente el uso de strings para evitar vulnerabilidades de inyección. Parámetros dinámicos deben ser elementos individuales del array. Para comandos complejos que requieren entrada de datos (JSON, etc.), usar el segundo parámetro `stdin` de `runCommand`.
 - **Type Hygiene**: Prohibido el uso de `any`. Usar interfaces explícitas o `unknown` con validación de tipos/aserciones seguras. Las funciones de utilidad deben estar estrictamente tipadas.
 
 ### 10. Componente Table con Filtros Integrados
@@ -76,7 +75,11 @@ Ver `DESIGN.md` para especificaciones visuales completas (`Table`, `FilterBar`, 
 - **Rendimiento**: Memoizar `columns`, `filters`, `activeFilter` y callbacks (`useMemo`/`useCallback`).
 - **Estilos de filtros**: Activo `bg-info/20 text-info shadow-sm`, Inactivo `bg-muted text-foreground hover:bg-muted/80`.
 
-### 11. Validación de Build Antes de Commits y PRs
+### 11. Salud de Servicios y Dashboard Resonance
+- **Integración de Salud**: El Dashboard de GitHub (`src/routes/github/index.tsx`) integra la visibilidad de salud de los servicios mediante `HealthCell`. Esta integración consume `useHealthMonitor` para proporcionar un resumen visual (puntos semánticos) que enlaza directamente con el monitor de salud filtrado por errores.
+- **Resonancia Industrial V2**: Todos los componentes de salud y búsqueda deben utilizar `ActionButton`, tokens semánticos y geometrías `rounded-xl` para mantener la consistencia del sistema de diseño.
+
+### 12. Validación de Build Antes de Commits y PRs
 - **Obligatorio antes de commit a main**: Ejecutar `node --run build` y verificar que no existan errores de compilación.
 - **Obligatorio antes de crear PR**: Ejecutar `node --run build` y verificar que no existan errores de compilación.
 - No proceder con commit o PR si el build falla.

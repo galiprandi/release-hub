@@ -2,6 +2,12 @@
 
 ---
 
+### 🗓️ 30 de Mayo de 2026
+
+- 🎉 **GitHub: Gestión de Proyectos Integrada** 📂: Ahora puedes crear, editar y eliminar proyectos directamente desde el dashboard de repositorios. Se ha optimizado el flujo de trabajo eliminando la necesidad de navegar a repositorios individuales para gestionar tus colecciones.
+- ✨ **Resonancia Industrial V2**: Refinamiento estético de las tablas de repositorios con mejor jerarquía visual, tipografía técnica `tracking-tight` y estados de carga mejorados.
+- 🧹 **Higiene Técnica**: Eliminación de rutas de prueba obsoletas y limpieza de referencias legadas para mantener un sistema ágil y profesional.
+
 ### 🗓️ 29 de Mayo de 2026
 
 - 🎉 **Kubernetes: Port-Forward Integrado** 🌐: Ahora puedes abrir túneles locales a tus deployments directamente desde la lista, con detección automática de puertos libres, control de conexión en un clic y acceso instantáneo al health check local.

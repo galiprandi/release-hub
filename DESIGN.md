@@ -85,7 +85,7 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 
 ### FilterBar
 - **Variante Default**: Uso de `bg-muted` para botones inactivos y `bg-primary` para el activo.
-- **Variante Tabs**: Estética industrial de alta densidad. Contenedor `bg-muted` con padding `p-1`. Botones activos con `bg-background shadow-sm text-foreground` e inactivos con `text-muted-foreground hover:text-foreground`.
+- **Variante Tabs**: Estética industrial de alta densidad. Contenedor `bg-muted` con padding `p-1`. Botones activos con `bg-background shadow-sm text-foreground` e inactivos con `text-muted-foreground hover:text-foreground`. Soporta `rightContent` para integrar acciones de gestión directamente en la barra de navegación.
 - Inputs con `border-input` y `bg-background`.
 
 ### Table (Resonancia Industrial)

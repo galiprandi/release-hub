@@ -13,13 +13,18 @@ interface ExecResponse {
 }
 
 /**
- * Execute any bash command via Vite dev server
- * @param command - Bash command to execute (as string or array of args)
+ * Execute any bash command via Vite dev server.
+ * Strictly enforces array-based arguments to prevent shell injection.
+ * @param command - Bash command to execute as an array of arguments
  * @returns Promise with stdout and stderr
- * @throws Error if command fails (success: false)
+ * @throws Error if command fails (success: false) or if command is not an array
  */
-export const runCommand = async (command: string | string[], stdin?: string): Promise<ExecResponse> => {
-  const finalCommand = Array.isArray(command) ? joinArgs(command) : command
+export const runCommand = async (command: string[], stdin?: string): Promise<ExecResponse> => {
+  if (!Array.isArray(command)) {
+    throw new Error('Security violation: runCommand requires an array of arguments to prevent shell injection.')
+  }
+
+  const finalCommand = joinArgs(command)
 
   const response = await apiExec.post<ExecResponse>(
     '/exec',

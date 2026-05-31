@@ -25,9 +25,13 @@ interface UsePipelineDetectorOptions {
  */
 const hasNxBuildWorkflow = async (org: string, repo: string): Promise<boolean> => {
   try {
-    const { stdout } = await runCommand(
-      `gh api repos/${org}/${repo}/actions/workflows --jq '.workflows[].name'`
-    )
+    const { stdout } = await runCommand([
+      'gh',
+      'api',
+      `repos/${org}/${repo}/actions/workflows`,
+      '--jq',
+      '.workflows[].name',
+    ])
     const workflows = stdout.trim().split('\n')
     return workflows.some((w) => w === 'Nx Build' || w === 'nx-build')
   } catch (error) {

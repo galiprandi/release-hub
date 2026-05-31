@@ -13,7 +13,7 @@ export function useGhCliSetup() {
 		queryKey: ["gh-cli", "version"],
 		queryFn: async () => {
 			try {
-				const result = await runCommand("gh --version");
+				const result = await runCommand(["gh", "--version"]);
 				return result.stdout.trim();
 			} catch {
 				return null;
@@ -26,7 +26,7 @@ export function useGhCliSetup() {
 		queryKey: ["gh-cli", "auth"],
 		queryFn: async () => {
 			try {
-				const result = await runCommand("gh auth status");
+				const result = await runCommand(["gh", "auth", "status"]);
 				return result.stdout;
 			} catch {
 				return null;

@@ -11,7 +11,7 @@ export function useJqSetup() {
 		queryKey: ["jq", "version"],
 		queryFn: async () => {
 			try {
-				const result = await runCommand("jq --version");
+				const result = await runCommand(["jq", "--version"]);
 				return result.stdout.trim();
 			} catch {
 				return null;

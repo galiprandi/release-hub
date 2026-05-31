@@ -62,7 +62,7 @@ Ver `DESIGN.md` para tokens, patrones visuales y especificaciones de componentes
 - **Fetcher Magic Clipboard**: El módulo Fetcher detecta automáticamente comandos cURL en el portapapeles al enfocar la ventana, abriendo el `QueryModal` para reducir la fricción.
 - **FilterBar**: Utilizar `variant="tabs"` para navegación de colecciones en dashboards. El contenedor debe ser `bg-muted` con padding `p-1`.
 - **Industrial Resonance V2**: Uso de `tracking-tight` para nombres de elementos, `rounded-xl` para contenedores principales y `rounded-lg` para botones de acción.
-- **Shell Hardening**: Todo comando CLI (gh, docker, kubectl, curl) debe usar `runCommand` con un array de argumentos. Parámetros dinámicos deben pasar por `quote()` o ser parte del array de `runCommand` (que internamente usa `joinArgs`). Prohibido concatenar strings sin escape para comandos.
+- **Shell Hardening**: Todo comando CLI (gh, docker, kubectl, curl) debe usar `runCommand` con un array de argumentos. Parámetros dinámicos deben pasar por `quote()` o ser parte del array de `runCommand` (que internamente usa `joinArgs`). Prohibido concatenar strings sin escape para comandos. Para comandos complejos que requieren entrada de datos (JSON, etc.), usar el segundo parámetro `stdin` de `runCommand` en lugar de redirecciones de shell o Heredocs.
 - **Type Hygiene**: Prohibido el uso de `any`. Usar interfaces explícitas o `unknown` con validación de tipos/aserciones seguras. Las funciones de utilidad deben estar estrictamente tipadas.
 
 ### 10. Componente Table con Filtros Integrados

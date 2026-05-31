@@ -173,9 +173,17 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 		setError("")
 		
 		try {
-			const command = `gh issue create --repo "${REPO}" --title "${aiTitle}" --body "${aiBody}"`
-			
-			const result = await runCommand(command)
+			const result = await runCommand([
+				'gh',
+				'issue',
+				'create',
+				'--repo',
+				REPO,
+				'--title',
+				aiTitle,
+				'--body',
+				aiBody,
+			])
 			
 			const url = result.stdout.trim()
 			setIssueUrl(url)

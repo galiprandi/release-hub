@@ -81,4 +81,40 @@ describe('Security Hardening', () => {
       expect(command).toContain("'O'\\''Reilly'")
     })
   })
+
+  describe('Complex Command Pipelines', () => {
+    it('should neutralize pipe injection in array-based commands', async () => {
+      const spy = vi.spyOn(apiExec, 'post').mockResolvedValue({
+        data: { success: true, stdout: '', stderr: '' }
+      })
+
+      const maliciousArg = 'arg | rm -rf /'
+      await executeCurlCommand([maliciousArg])
+
+      const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
+      const command = (lastCall[1] as { command: string }).command
+      // The pipe should be inside single quotes
+      expect(command).toContain("'arg | rm -rf /'")
+      // And there should be no unquoted pipes
+      const unquotedPipe = command.replace(/'[^']*'/g, '')
+      expect(unquotedPipe).not.toContain('|')
+    })
+
+    it('should neutralize redirection injection in array-based commands', async () => {
+      const spy = vi.spyOn(apiExec, 'post').mockResolvedValue({
+        data: { success: true, stdout: '', stderr: '' }
+      })
+
+      const maliciousArg = 'arg > /etc/passwd'
+      await executeCurlCommand([maliciousArg])
+
+      const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
+      const command = (lastCall[1] as { command: string }).command
+      // The redirection should be inside single quotes
+      expect(command).toContain("'arg > /etc/passwd'")
+      // And there should be no unquoted redirections
+      const unquotedRedirection = command.replace(/'[^']*'/g, '')
+      expect(unquotedRedirection).not.toContain('>')
+    })
+  })
 })

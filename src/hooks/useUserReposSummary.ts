@@ -58,8 +58,7 @@ export function useUserReposSummary(enabled = true) {
         }
       `
 
-      const command = `gh api graphql -f query='${query.replace(/\n/g, ' ')}'`
-      const result = await runCommand(command)
+      const result = await runCommand(['gh', 'api', 'graphql', '-f', `query=${query.replace(/\n/g, ' ')}`])
       const data = JSON.parse(result.stdout) as GraphQLResponse
 
       const orgs = data.data.viewer.organizations.nodes.map((org) => ({

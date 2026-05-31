@@ -39,6 +39,8 @@
 - should handle single quotes within arguments correctly
 - should neutralize backtick injection in kubectl commands
 - should neutralize command substitution in curl commands
+- should neutralize pipe injection in array-based commands
+- should neutralize redirection injection in array-based commands
 - should neutralize semicolon injection in docker commands
 
 ## Module: api/seki
@@ -107,6 +109,35 @@
 - retorna false si storage es nulo o JSON inválido
 - retorna true si el token existe
 
+## Module: BaseDialog
+- should accept maxWidth prop
+- should call onOpenChange when close button is clicked
+- should have proper accessibility attributes
+- should not render dialog when open is false
+- should render children
+- should render description when provided
+- should render dialog when open is true
+- should render title
+
+## Module: DialogCloseButton
+- should apply custom className when provided
+- should have proper accessibility attributes
+- should have screen reader text 'Cerrar'
+- should render the button with X icon
+
+## Module: StatusCard
+- applies focus ring classes to buttons
+- applies hover and transition classes to retry button
+- calls onClose when close button is clicked
+- does not render close button if onClose is not provided
+- does not render retry button if onRetry is not provided
+- handles long messages with truncate class
+- renders custom retry button styles for non-error/warn types
+- renders error state with retry button
+- renders loading state correctly
+- renders offline state correctly
+- renders warn state with retry button
+
 ## Module: LogsViewer
 - calls onResourceChange when resource is selected
 - copies logs to clipboard
@@ -141,34 +172,23 @@
 - should return the same text if no ANSI codes are present
 - should strip ANSI codes before highlighting
 
-## Module: BaseDialog
-- should accept maxWidth prop
-- should call onOpenChange when close button is clicked
-- should have proper accessibility attributes
-- should not render dialog when open is false
-- should render children
-- should render description when provided
-- should render dialog when open is true
-- should render title
+## Module: PipelineCard
+- applies custom className
+- does not show running indicator when isRunning is false
+- has different styling for commits vs tags
+- renders children when provided
+- renders meta parts correctly
+- renders tag ref type for tags
+- renders with basic props
+- shows running indicator when isRunning is true
 
-## Module: DialogCloseButton
-- should apply custom className when provided
-- should have proper accessibility attributes
-- should have screen reader text 'Cerrar'
-- should render the button with X icon
-
-## Module: StatusCard
-- applies focus ring classes to buttons
-- applies hover and transition classes to retry button
-- calls onClose when close button is clicked
-- does not render close button if onClose is not provided
-- does not render retry button if onRetry is not provided
-- handles long messages with truncate class
-- renders custom retry button styles for non-error/warn types
-- renders error state with retry button
-- renders loading state correctly
-- renders offline state correctly
-- renders warn state with retry button
+## Module: SimpleTimeline
+- displays duration in tooltip for completed events
+- limits display to first 6 events
+- renders empty timeline with no events
+- renders timeline with events
+- shows different states with different styling
+- shows tooltip on hover
 
 ## Module: Pipeline Adapters
 - should handle errors gracefully
@@ -190,21 +210,3 @@
 - should fetch and transform tag data
 - should return null for short refs or API errors
 - should transform events and subevents correctly
-
-## Module: PipelineCard
-- applies custom className
-- does not show running indicator when isRunning is false
-- has different styling for commits vs tags
-- renders children when provided
-- renders meta parts correctly
-- renders tag ref type for tags
-- renders with basic props
-- shows running indicator when isRunning is true
-
-## Module: SimpleTimeline
-- displays duration in tooltip for completed events
-- limits display to first 6 events
-- renders empty timeline with no events
-- renders timeline with events
-- shows different states with different styling
-- shows tooltip on hover

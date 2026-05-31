@@ -26,7 +26,7 @@ export function useRepoPermission({ repo, enabled = true }: UseRepoPermissionOpt
   return useQuery<RepoPermission>({
     queryKey: queryKeys.repo.permission(repo),
     queryFn: async () => {
-      const result = await runCommand(`gh api repos/${repo} --jq '{permissions, viewerPermission, viewerCanAdminister}'`)
+      const result = await runCommand(['gh', 'api', `repos/${repo}`, '--jq', '{permissions, viewerPermission, viewerCanAdminister}'])
       try {
         return JSON.parse(result.stdout || '{}')
       } catch {

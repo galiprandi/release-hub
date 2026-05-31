@@ -46,7 +46,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 		setIsToggling(true)
 		setError("")
 		try {
-			const tokenResult = await runCommand('gh auth token')
+			const tokenResult = await runCommand(['gh', 'auth', 'token'])
 			const token = tokenResult.stdout.trim()
 			if (!token) throw new Error("Sin token de GitHub configurado en gh CLI")
 
@@ -60,9 +60,8 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 			}
 
 			const result = await runCommand(
-				`gh api repos/${repo}/branches/main/protection --method PUT --input - << 'EOF'
-${JSON.stringify(protectionConfig)}
-EOF`
+				['gh', 'api', `repos/${repo}/branches/main/protection`, '--method', 'PUT', '--input', '-'],
+				JSON.stringify(protectionConfig)
 			)
 
 			if (result.stderr) {
@@ -137,10 +136,10 @@ EOF`
 								<button
 									type="button"
 									disabled={!canManage}
-									className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+									className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors shadow-sm ${
 										isLocked
-											? "bg-orange-600 text-white hover:bg-orange-700"
-											: "bg-slate-500 text-white hover:bg-slate-600"
+											? "bg-warning text-warning-foreground hover:bg-warning/90"
+											: "bg-muted text-muted-foreground hover:bg-muted/80"
 									} disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none`}
 								>
 									{isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}

@@ -14,7 +14,7 @@ export function useGitUser() {
     queryFn: async () => {
       // Use gh cli to get user info (remote operation)
       try {
-        const userResult = await runCommand('gh api user --jq "{name: .name, email: .email, avatar_url: .avatar_url}"')
+        const userResult = await runCommand(['gh', 'api', 'user', '--jq', '{name: .name, email: .email, avatar_url: .avatar_url}'])
         const userData = JSON.parse(userResult.stdout)
         return {
           name: userData.name || userData.login || null,

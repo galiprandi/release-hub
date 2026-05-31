@@ -102,14 +102,14 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 	const handleCreateTag = async () => {
 		if (!tagName.trim()) { setError("El nombre del Tag es requerido"); return }
 		// Obtener el commit más reciente de main
-		const latestCommitResult = await runCommand(`gh api repos/${repo}/commits/main --jq '.sha'`)
+		const latestCommitResult = await runCommand(['gh', 'api', `repos/${repo}/commits/main`, '--jq', '.sha'])
 		const targetCommit = latestCommitResult.stdout.trim()
 		if (!targetCommit) throw new Error("No se pudo obtener el commit más reciente de main")
 
 		setIsCreating(true)
 		setError("")
 		try {
-			const tokenResult = await runCommand('gh auth token')
+			const tokenResult = await runCommand(['gh', 'auth', 'token'])
 			const token = tokenResult.stdout.trim()
 			if (!token) throw new Error("Sin token de GitHub configurado en gh CLI")
 			const tagResponse = await axios.post(
@@ -190,7 +190,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 								type="button"
 								onClick={() => handleOpenChange(true)}
 								aria-haspopup="dialog"
-								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none shadow-sm"
 							>
 								<Rocket className="w-4 h-4" />
 								<span>Promocionar</span>
@@ -260,7 +260,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 												type="button"
 												onClick={() => generateCommitSummary(pendingCommits)}
 												disabled={isGeneratingSummary || !summaryAvailable || !hasPendingCommits}
-											className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-ai hover:bg-ai/10 rounded transition-all disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+												className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold uppercase tracking-wider text-ai hover:bg-ai/10 rounded transition-all disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
 												title="Regenerar descripción con IA"
 											>
 												{isGeneratingSummary ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}

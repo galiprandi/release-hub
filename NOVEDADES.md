@@ -2,6 +2,18 @@
 
 ---
 
+### 🗓️ 1 de Junio de 2026
+
+- 🎉 **Búsqueda**: Ahora puedes buscar archivos dentro de los repositorios usando el prefijo `file:` en el buscador global.
+- 🎉 **Terminal Kubernetes**: Nuevo acceso a consola interactiva directamente desde el sidebar de Kubernetes para conectarte a tus contenedores sin salir de la aplicación.
+- ✨ **Terminal**: Búsqueda integrada en la consola para encontrar rápidamente texto dentro de la salida de comandos.
+- ✨ **Kubernetes**: Selector de pods en el terminal para cambiar fácilmente entre contenedores durante una sesión.
+
+### 🗓️ 31 de Mayo de 2026
+
+- 🎉 **Consola Integrada**: Nueva terminal embebida con xterm.js para ejecutar comandos de forma interactiva directamente desde la interfaz.
+- ✨ **Congelamiento de Código**: Ahora puedes seleccionar la rama al aplicar un code freeze y contar con indicadores de estado de despliegue más claros.
+
 ### 🗓️ 30 de Mayo de 2026
 
 - 🎉 **GitHub Dashboard: Integración de Salud** 🏥: Nueva columna de Salud en la tabla de repositorios. Ahora puedes ver el estado de salud de tus servicios (OK, Error, Pendiente) de un vistazo, sin salir del dashboard.

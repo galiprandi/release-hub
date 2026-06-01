@@ -1,11 +1,8 @@
-import { exec } from 'node:child_process';
-import { promisify } from 'node:util';
+import { spawn } from 'node:child_process';
 import * as pty from 'node-pty';
 import { WebSocket, WebSocketServer } from 'ws';
 import { IncomingMessage } from 'http';
 import { Duplex } from 'stream';
-
-const execAsync = promisify(exec);
 
 interface ServerWithUpgrade {
   on(event: 'upgrade', listener: (request: IncomingMessage, socket: Duplex, head: Buffer) => void): void;
@@ -24,19 +21,19 @@ const spawnAsync = (
     let stdout = '';
     let stderr = '';
 
-    child.stdout.on('data', (data) => {
+    child.stdout.on('data', (data: Buffer) => {
       stdout += data.toString();
     });
 
-    child.stderr.on('data', (data) => {
+    child.stderr.on('data', (data: Buffer) => {
       stderr += data.toString();
     });
 
-    child.on('close', (code) => {
+    child.on('close', (code: number | null) => {
       resolve({ stdout, stderr, success: code === 0 });
     });
 
-    child.on('error', (err) => {
+    child.on('error', (err: Error) => {
       resolve({ stdout, stderr, success: false, error: err.message });
     });
   });

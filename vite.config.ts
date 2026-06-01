@@ -1,5 +1,4 @@
-import { exec, spawn } from "node:child_process";
-import { promisify } from "node:util";
+import { spawn } from "node:child_process";
 import http from "node:http";
 import https from "node:https";
 import type { Connect } from "vite";
@@ -9,8 +8,6 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { DEFAULT_START_PORT, DEFAULT_MAX_PORTS } from "./src/config/portForward";
 import { setupTerminalMiddleware } from "./src/config/terminalMiddleware";
-
-const execAsync = promisify(exec);
 
 /**
  * Execute a command using spawn without a shell.
@@ -311,7 +308,6 @@ const k8sLogsStreamHandler: Connect.NextHandleFunction = (req, res) => {
 	console.log(`[k8s-logs-stream] Starting: ${resourceType}/${name} in namespace: ${namespace || 'default'}`);
 
 	// Build kubectl logs command with -f (follow)
-	let command: string;
 	if (resourceType === "deployment") {
 		// For deployments, we need to get the selector first
 		const args = ["kubectl", "get", "deployment", name, "-o", "jsonpath={.spec.selector.matchLabels}"];

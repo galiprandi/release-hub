@@ -23,12 +23,10 @@ describe('Security Hardening', () => {
         // Sanitizer caught it, which is also good security
       }
 
-      // If it passed the sanitizer, it should be quoted by joinArgs/quote
       const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
       if (lastCall) {
-        const command = (lastCall[1] as { command: string }).command
-        expect(command).toContain("'abc; rm -rf /'")
-        expect(command).not.toMatch(/docker start abc; rm -rf \//)
+        const args = (lastCall[1] as { args: string[] }).args
+        expect(args).toContain(maliciousId)
       }
     })
 
@@ -46,8 +44,8 @@ describe('Security Hardening', () => {
 
       const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
       if (lastCall) {
-        const command = (lastCall[1] as { command: string }).command
-        expect(command).toContain("'web-`id`'")
+        const args = (lastCall[1] as { args: string[] }).args
+        expect(args).toContain(maliciousName)
       }
     })
 
@@ -60,11 +58,8 @@ describe('Security Hardening', () => {
       await executeCurlCommand([maliciousUrl])
 
       const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
-      const command = (lastCall[1] as { command: string }).command
-      expect(command).toContain("'https://example.com$(whoami)'")
-      // The whole command string will contain it, but it should be inside single quotes
-      // and NOT appear as a bare word
-      expect(command).not.toMatch(/[^']https:\/\/example\.com\$\(whoami\)/)
+      const args = (lastCall[1] as { args: string[] }).args
+      expect(args).toContain(maliciousUrl)
     })
 
     it('should handle single quotes within arguments correctly', async () => {
@@ -76,9 +71,8 @@ describe('Security Hardening', () => {
       await executeCurlCommand([argWithQuote])
 
       const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
-      const command = (lastCall[1] as { command: string }).command
-      // POSIX quote for O'Reilly is 'O'\''Reilly'
-      expect(command).toContain("'O'\\''Reilly'")
+      const args = (lastCall[1] as { args: string[] }).args
+      expect(args).toContain(argWithQuote)
     })
 
     it('should throw error if command is not an array (runtime enforcement)', async () => {
@@ -97,12 +91,8 @@ describe('Security Hardening', () => {
       await executeCurlCommand([maliciousArg])
 
       const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
-      const command = (lastCall[1] as { command: string }).command
-      // The pipe should be inside single quotes
-      expect(command).toContain("'arg | rm -rf /'")
-      // And there should be no unquoted pipes
-      const unquotedPipe = command.replace(/'[^']*'/g, '')
-      expect(unquotedPipe).not.toContain('|')
+      const args = (lastCall[1] as { args: string[] }).args
+      expect(args).toContain(maliciousArg)
     })
 
     it('should neutralize redirection injection in array-based commands', async () => {
@@ -114,12 +104,8 @@ describe('Security Hardening', () => {
       await executeCurlCommand([maliciousArg])
 
       const lastCall = spy.mock.calls[spy.mock.calls.length - 1]
-      const command = (lastCall[1] as { command: string }).command
-      // The redirection should be inside single quotes
-      expect(command).toContain("'arg > /etc/passwd'")
-      // And there should be no unquoted redirections
-      const unquotedRedirection = command.replace(/'[^']*'/g, '')
-      expect(unquotedRedirection).not.toContain('>')
+      const args = (lastCall[1] as { args: string[] }).args
+      expect(args).toContain(maliciousArg)
     })
   })
 })

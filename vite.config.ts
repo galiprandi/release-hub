@@ -12,6 +12,44 @@ import { setupTerminalMiddleware } from "./src/config/terminalMiddleware";
 
 const execAsync = promisify(exec);
 
+/**
+ * Execute a command using spawn without a shell.
+ * This is the secure alternative to exec/execAsync.
+ */
+const spawnAsync = (
+	args: string[],
+	stdin?: string,
+): Promise<{ stdout: string; stderr: string; success: boolean; error?: string }> => {
+	return new Promise((resolve) => {
+		const [cmd, ...cmdArgs] = args;
+		const child = spawn(cmd, cmdArgs, { shell: false });
+
+		let stdout = "";
+		let stderr = "";
+
+		child.stdout.on("data", (data) => {
+			stdout += data.toString();
+		});
+
+		child.stderr.on("data", (data) => {
+			stderr += data.toString();
+		});
+
+		if (stdin && child.stdin) {
+			child.stdin.write(stdin);
+			child.stdin.end();
+		}
+
+		child.on("close", (code) => {
+			resolve({ stdout, stderr, success: code === 0 });
+		});
+
+		child.on("error", (err) => {
+			resolve({ stdout, stderr, success: false, error: err.message });
+		});
+	});
+};
+
 const activePortForwards = new Map<string, ReturnType<typeof spawn>>();
 
 // Handler for /local/exec endpoint - works in both dev and preview
@@ -22,7 +60,8 @@ const execHandler: Connect.NextHandleFunction = async (req, res) => {
 		return;
 	}
 
-	let command = "";
+	let args: string[] = [];
+	let stdin = "";
 
 	if (req.method === "POST") {
 		let body = "";
@@ -34,46 +73,54 @@ const execHandler: Connect.NextHandleFunction = async (req, res) => {
 		});
 		try {
 			const parsed = JSON.parse(body);
-			command = parsed.command;
+			args = parsed.args;
+			stdin = parsed.stdin;
 		} catch {
 			res.statusCode = 400;
 			res.end(JSON.stringify({ error: "Invalid JSON body" }));
 			return;
 		}
 	} else {
-		// GET method - command from query param
+		// GET method - args from query param (JSON stringified array)
 		const url = new URL(req.url || "", `http://localhost`);
-		command = url.searchParams.get("command") || "";
+		const argsParam = url.searchParams.get("args") || "[]";
+		try {
+			args = JSON.parse(argsParam);
+		} catch {
+			args = [];
+		}
 	}
 
-	if (!command || typeof command !== "string") {
+	if (!Array.isArray(args) || args.length === 0) {
 		res.statusCode = 400;
-		res.end(JSON.stringify({ error: "Missing command" }));
+		res.end(JSON.stringify({ error: "Missing or invalid args" }));
 		return;
 	}
 
-	console.log(`RUN: ${command}`);
+	console.log(`RUN: ${args.join(" ")}`);
 
-	try {
-		const { stdout, stderr } = await execAsync(command);
+	const result = await spawnAsync(args, stdin);
 
-		console.log(`SUCCESS: stdout length: ${stdout.length}, stderr length: ${stderr.length}`);
-
-		res.setHeader("Content-Type", "application/json");
-		res.end(JSON.stringify({ stdout, stderr, success: true }));
-	} catch (error) {
-		console.error(`ERROR executing command:`, error);
+	if (result.success) {
+		console.log(
+			`SUCCESS: stdout length: ${result.stdout.length}, stderr length: ${result.stderr.length}`,
+		);
 		res.setHeader("Content-Type", "application/json");
 		res.end(
 			JSON.stringify({
-				error: error instanceof Error ? error.message : "Command failed",
-				stderr:
-					error instanceof Error && "stderr" in error
-						? (error as { stderr: string }).stderr
-						: "",
-				stdout: error instanceof Error && "stdout" in error
-					? (error as { stdout: string }).stdout
-					: "",
+				stdout: result.stdout,
+				stderr: result.stderr,
+				success: true,
+			}),
+		);
+	} else {
+		console.error(`ERROR executing command:`, result.error || "Command failed");
+		res.setHeader("Content-Type", "application/json");
+		res.end(
+			JSON.stringify({
+				error: result.error || "Command failed",
+				stderr: result.stderr,
+				stdout: result.stdout,
 				success: false,
 			}),
 		);
@@ -199,12 +246,13 @@ const scriptHandler: Connect.NextHandleFunction = async (req, res) => {
 	}
 
 	const scriptPath = `./scripts/${action}.sh`;
-	const command = `${scriptPath} ${repo}`;
+	const args = [scriptPath, repo];
 
-	console.log(`RUN: ${command}`);
+	console.log(`RUN: ${args.join(" ")}`);
 
 	try {
-		const { stdout, stderr } = await execAsync(command);
+		const { stdout, stderr, success, error } = await spawnAsync(args);
+		if (!success) throw new Error(error || "Script failed");
 
 		// Extract PR URL from output
 		const prUrlMatch = stdout.match(/https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/\d+/);
@@ -266,13 +314,13 @@ const k8sLogsStreamHandler: Connect.NextHandleFunction = (req, res) => {
 	let command: string;
 	if (resourceType === "deployment") {
 		// For deployments, we need to get the selector first
-		const nsFlag = namespace ? `-n ${namespace}` : "";
-		const ctxFlag = context ? `--context=${context}` : "";
-		command = `kubectl get deployment ${name} ${nsFlag} ${ctxFlag} -o jsonpath='{.spec.selector.matchLabels}'`;
-		
-		exec(command, (error, stdout) => {
-			if (error) {
-				res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+		const args = ["kubectl", "get", "deployment", name, "-o", "jsonpath={.spec.selector.matchLabels}"];
+		if (namespace) args.push("-n", namespace);
+		if (context) args.push("--context", context);
+
+		spawnAsync(args).then(({ stdout, success, error }) => {
+			if (!success) {
+				res.write(`data: ${JSON.stringify({ error: error || "Failed to get deployment selector" })}\n\n`);
 				res.end();
 				return;
 			}
@@ -287,12 +335,15 @@ const k8sLogsStreamHandler: Connect.NextHandleFunction = (req, res) => {
 			try {
 				const labels = JSON.parse(selector);
 				const labelSelector = Object.entries(labels).map(([k, v]) => `${k}=${v}`).join(',');
-				
+
 				// First check if there are pods with this selector
-				const checkCommand = `kubectl get pods ${nsFlag} ${ctxFlag} -l ${labelSelector} -o jsonpath='{.items}'`;
-				exec(checkCommand, (checkError, checkStdout) => {
-					if (checkError) {
-						res.write(`data: ${JSON.stringify({ error: checkError.message })}\n\n`);
+				const checkArgs = ["kubectl", "get", "pods", "-l", labelSelector, "-o", "jsonpath={.items}"];
+				if (namespace) checkArgs.push("-n", namespace);
+				if (context) checkArgs.push("--context", context);
+
+				spawnAsync(checkArgs).then(({ stdout: checkStdout, success: checkSuccess, error: checkError }) => {
+					if (!checkSuccess) {
+						res.write(`data: ${JSON.stringify({ error: checkError || "Failed to check pods" })}\n\n`);
 						res.end();
 						return;
 					}
@@ -305,9 +356,11 @@ const k8sLogsStreamHandler: Connect.NextHandleFunction = (req, res) => {
 					}
 
 					// Pods exist, proceed with logs
-					const logsCommand = `kubectl logs ${nsFlag} ${ctxFlag} -l ${labelSelector} -f --tail=100`;
+					const logsArgs = ["kubectl", "logs", "-l", labelSelector, "-f", "--tail=100"];
+					if (namespace) logsArgs.push("-n", namespace);
+					if (context) logsArgs.push("--context", context);
 
-					const logsProcess = spawn(logsCommand, { shell: true });
+					const logsProcess = spawn(logsArgs[0], logsArgs.slice(1), { shell: false });
 
 					logsProcess.stdout.on("data", (data) => {
 						const lines = data.toString().split("\n").filter(Boolean);
@@ -346,14 +399,14 @@ const k8sLogsStreamHandler: Connect.NextHandleFunction = (req, res) => {
 		});
 	} else {
 		// For pods
-		const nsFlag = namespace ? `-n ${namespace}` : "";
-		const ctxFlag = context ? `--context=${context}` : "";
-		
 		// First check if pod exists
-		const checkCommand = `kubectl get pod ${name} ${nsFlag} ${ctxFlag} -o jsonpath='{.metadata.name}'`;
-		exec(checkCommand, (checkError, checkStdout) => {
-			if (checkError) {
-				res.write(`data: ${JSON.stringify({ error: checkError.message })}\n\n`);
+		const checkArgs = ["kubectl", "get", "pod", name, "-o", "jsonpath={.metadata.name}"];
+		if (namespace) checkArgs.push("-n", namespace);
+		if (context) checkArgs.push("--context", context);
+
+		spawnAsync(checkArgs).then(({ stdout: checkStdout, success: checkSuccess, error: checkError }) => {
+			if (!checkSuccess) {
+				res.write(`data: ${JSON.stringify({ error: checkError || "Pod not found" })}\n\n`);
 				res.end();
 				return;
 			}
@@ -365,9 +418,11 @@ const k8sLogsStreamHandler: Connect.NextHandleFunction = (req, res) => {
 				return;
 			}
 
-			const logsCommand = `kubectl logs ${name} ${nsFlag} ${ctxFlag} -f --tail=100`;
+			const logsArgs = ["kubectl", "logs", name, "-f", "--tail=100"];
+			if (namespace) logsArgs.push("-n", namespace);
+			if (context) logsArgs.push("--context", context);
 
-			const logsProcess = spawn(logsCommand, { shell: true });
+			const logsProcess = spawn(logsArgs[0], logsArgs.slice(1), { shell: false });
 
 			logsProcess.stdout.on("data", (data) => {
 				const lines = data.toString().split("\n").filter(Boolean);
@@ -424,14 +479,8 @@ const portFreeHandler: Connect.NextHandleFunction = async (req, res) => {
 	let port: number | null = null;
 	for (let p = startPort; p < startPort + max; p++) {
 		if (activePorts.has(p)) continue;
-		try {
-			const { stdout } = await execAsync(`lsof -ti :${p}`);
-			if (!stdout.trim()) {
-				port = p;
-				break;
-			}
-		} catch {
-			// lsof returns exit code 1 when port is free
+		const { stdout, success } = await spawnAsync(["lsof", "-ti", `:${p}`]);
+		if (!success || !stdout.trim()) {
 			port = p;
 			break;
 		}
@@ -530,12 +579,11 @@ const portForwardHandler: Connect.NextHandleFunction = async (req, res) => {
 			activePortForwards.delete(key);
 		}
 
-		const ctxFlag = context ? `--context=${context}` : "";
-		const nsFlag = `-n ${namespace}`;
-		const command = `kubectl port-forward deployment/${deployment} ${localPort}:${remotePort} ${nsFlag} ${ctxFlag}`;
+		const args = ["kubectl", "port-forward", `deployment/${deployment}`, `${localPort}:${remotePort}`, "-n", namespace];
+		if (context) args.push(`--context=${context}`);
 
-		console.log(`[port-forward] Starting: ${command}`);
-		const proc = spawn(command, { shell: true });
+		console.log(`[port-forward] Starting: ${args.join(" ")}`);
+		const proc = spawn(args[0], args.slice(1), { shell: false });
 
 		(proc as unknown as { _pfMeta: { localPort: number; remotePort: number } })._pfMeta = { localPort, remotePort };
 

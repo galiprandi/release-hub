@@ -11,16 +11,46 @@ interface ServerWithUpgrade {
   on(event: 'upgrade', listener: (request: IncomingMessage, socket: Duplex, head: Buffer) => void): void;
 }
 
-async function resolveNameToPod(name: string, namespace: string, context?: string | null): Promise<string | null> {
-  const ctxFlag = context ? `--context=${context}` : '';
-  const nsFlag = `-n ${namespace}`;
+/**
+ * Secure alternative to execAsync for internal middleware use.
+ */
+const spawnAsync = (
+  args: string[],
+): Promise<{ stdout: string; stderr: string; success: boolean; error?: string }> => {
+  return new Promise((resolve) => {
+    const [cmd, ...cmdArgs] = args;
+    const child = spawn(cmd, cmdArgs, { shell: false });
 
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (data) => {
+      stdout += data.toString();
+    });
+
+    child.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+
+    child.on('close', (code) => {
+      resolve({ stdout, stderr, success: code === 0 });
+    });
+
+    child.on('error', (err) => {
+      resolve({ stdout, stderr, success: false, error: err.message });
+    });
+  });
+};
+
+async function resolveNameToPod(name: string, namespace: string, context?: string | null): Promise<string | null> {
   try {
     // First: check if name is already a pod
-    const checkPodCmd = `kubectl get pod ${name} ${nsFlag} ${ctxFlag} -o jsonpath='{.metadata.name}'`;
-    const { stdout: podCheckRaw } = await execAsync(checkPodCmd);
+    const checkPodArgs = ['kubectl', 'get', 'pod', name, '-n', namespace, '-o', 'jsonpath={.metadata.name}'];
+    if (context) checkPodArgs.push('--context', context);
+
+    const { stdout: podCheckRaw, success: podCheckSuccess } = await spawnAsync(checkPodArgs);
     const podCheck = podCheckRaw.trim();
-    if (podCheck && podCheck !== 'null' && podCheck !== '') {
+    if (podCheckSuccess && podCheck && podCheck !== 'null' && podCheck !== '') {
       return podCheck;
     }
   } catch {
@@ -29,19 +59,23 @@ async function resolveNameToPod(name: string, namespace: string, context?: strin
 
   try {
     // Get deployment selector
-    const selectorCmd = `kubectl get deployment ${name} ${nsFlag} ${ctxFlag} -o jsonpath='{.spec.selector.matchLabels}'`;
-    const { stdout: selectorRaw } = await execAsync(selectorCmd);
+    const selectorArgs = ['kubectl', 'get', 'deployment', name, '-n', namespace, '-o', 'jsonpath={.spec.selector.matchLabels}'];
+    if (context) selectorArgs.push('--context', context);
+
+    const { stdout: selectorRaw, success: selectorSuccess } = await spawnAsync(selectorArgs);
     const selector = selectorRaw.trim();
-    if (!selector || selector === 'null') return null;
+    if (!selectorSuccess || !selector || selector === 'null') return null;
 
     const labels = JSON.parse(selector);
     const labelSelector = Object.entries(labels).map(([k, v]) => `${k}=${v}`).join(',');
 
     // Get first running pod matching selector
-    const podCmd = `kubectl get pods ${nsFlag} ${ctxFlag} -l ${labelSelector} --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}'`;
-    const { stdout: podNameRaw } = await execAsync(podCmd);
+    const podArgs = ['kubectl', 'get', 'pods', '-n', namespace, '-l', labelSelector, '--field-selector=status.phase=Running', '-o', 'jsonpath={.items[0].metadata.name}'];
+    if (context) podArgs.push('--context', context);
+
+    const { stdout: podNameRaw, success: podNameSuccess } = await spawnAsync(podArgs);
     const podName = podNameRaw.trim();
-    if (!podName || podName === 'null') return null;
+    if (!podNameSuccess || !podName || podName === 'null') return null;
 
     return podName;
   } catch {

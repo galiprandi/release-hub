@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { joinArgs } from '@/utils/shell'
 
 export const apiExec = axios.create({
   baseURL: '/local',
@@ -24,11 +23,9 @@ export const runCommand = async (command: string[], stdin?: string): Promise<Exe
     throw new Error('Security violation: runCommand requires an array of arguments to prevent shell injection.')
   }
 
-  const finalCommand = joinArgs(command)
-
   const response = await apiExec.post<ExecResponse>(
     '/exec',
-    { command: finalCommand, stdin },
+    { args: command, stdin },
     {
       headers: {
         'Content-Type': 'application/json',

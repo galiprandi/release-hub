@@ -3,7 +3,11 @@ import { WebSocket, WebSocketServer } from 'ws';
 import { IncomingMessage } from 'http';
 import { Duplex } from 'stream';
 
-export function setupTerminalMiddleware(server: any) {
+interface ServerWithUpgrade {
+  on(event: 'upgrade', listener: (request: IncomingMessage, socket: Duplex, head: Buffer) => void): void;
+}
+
+export function setupTerminalMiddleware(server: ServerWithUpgrade) {
   const wss = new WebSocketServer({ noServer: true });
 
   server.on('upgrade', (request: IncomingMessage, socket: Duplex, head: Buffer) => {
@@ -37,17 +41,31 @@ export function setupTerminalMiddleware(server: any) {
       command = 'docker';
       args = ['exec', '-it', name!, 'sh', '-c', 'command -v bash >/dev/null && exec bash || exec sh'];
     } else {
-      command = process.platform === 'win32' ? 'powershell.exe' : 'bash';
+      if (process.platform === 'win32') {
+        command = 'powershell.exe';
+      } else if (process.platform === 'darwin') {
+        command = 'zsh';
+      } else {
+        command = 'bash';
+      }
       args = [];
     }
 
-    const term = pty.spawn(command, args, {
-      name: 'xterm-color',
-      cols: 80,
-      rows: 24,
-      cwd: process.cwd(),
-      env: process.env as Record<string, string>,
-    });
+    let term: pty.IPty;
+    try {
+      term = pty.spawn(command, args, {
+        name: 'xterm-color',
+        cols: 80,
+        rows: 24,
+        cwd: process.cwd(),
+        env: process.env as Record<string, string>,
+      });
+    } catch (spawnError) {
+      console.error(`[Terminal] Failed to spawn ${command}:`, spawnError);
+      ws.send(`\r\n[ERROR] Failed to start terminal: ${spawnError instanceof Error ? spawnError.message : String(spawnError)}\r\n`);
+      ws.close();
+      return;
+    }
 
     console.log(`[Terminal] Started ${command} ${args.join(' ')} (PID: ${term.pid})`);
 

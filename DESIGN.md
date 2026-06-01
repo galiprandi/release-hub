@@ -26,7 +26,7 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Badges de Estado**: Usar `bg-success/20 text-success` para estados activos y `bg-muted text-muted-foreground` para estados inactivos o detenidos. Aplicar `font-bold uppercase tracking-wider text-[10px] rounded-md` para mayor legibilidad y consistencia.
 - **Acciones de Fila**: Botones iconográficos con `hover:bg-accent` y colores semánticos. Deben implementar el anillo de foco estándar del sistema.
 - **Feedback de Carga/Acceso**: Implementar `StatusCard` como componente estándar para todos los estados de carga, error y "offline".
-- **Tabla de Contenedores**: Bordes sutiles `border-border/60` y encabezados con `text-xs uppercase tracking-wider` para una estética profesional.
+- **Table (Resonancia Industrial)**: Bordes sutiles `border-border/60` y encabezados con `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60` para una estética técnica de alta densidad.
 
 ## Kubernetes UI Pattern (Resonancia Industrial)
 
@@ -97,7 +97,7 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 
 ### Table (Resonancia Industrial)
 - **Contenedor**: `rounded-xl`, `border-border/60`, `shadow-sm`, `overflow-hidden`, `bg-background`.
-- **Encabezados**: `bg-muted/40` con celdas `text-xs font-bold uppercase tracking-wider text-muted-foreground border-b border-border/60`.
+- **Encabezados**: `bg-muted/40` con celdas `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 border-b border-border/60`.
 - **Filas**: `hover:bg-muted/20`, `transition-colors`, `divide-y` en el `tbody`.
 - **Filtros Integrados**: Botones ultra-compactos `text-[10px] font-bold uppercase tracking-wider`.
 - **Celdas de Datos**: Nombres de elementos con `font-medium tracking-tight`, metadatos con `text-muted-foreground`.

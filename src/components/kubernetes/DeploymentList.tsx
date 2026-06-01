@@ -183,6 +183,12 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 		retry: 0,
 	})
 
+	// Compute default pod (first Running, fallback to first available)
+	const defaultPod = deploymentPods && deploymentPods.length > 0
+		? (deploymentPods.find(p => p.status === 'Running') || deploymentPods[0])
+		: null
+	const activePodName = selectedPodName || defaultPod?.name || null
+
 	// Si no hay favoritos, no renderizar nada (el padre maneja el empty state)
 	if (!favorites || favorites.length === 0) {
 		return null
@@ -266,12 +272,11 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 						headerExtra={
 							deploymentPods && deploymentPods.length > 0 && (
 								<select
-									value={selectedPodName || ''}
+									value={activePodName || ''}
 									onChange={(e) => setSelectedPodName(e.target.value || null)}
 									className="text-xs bg-muted border rounded px-2 py-1 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
 									aria-label="Seleccionar pod"
 								>
-									<option value="">Pod por defecto</option>
 									{deploymentPods.map((pod) => (
 										<option key={pod.name} value={pod.name}>
 											{pod.name} ({pod.status})
@@ -285,10 +290,10 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 					>
 						<div className="flex-1 min-h-0 bg-black rounded-b-lg overflow-hidden">
 							<Terminal
-								key={`terminal-${selectedPodName || 'default'}`}
+								key={`terminal-${activePodName || 'default'}`}
 								type="k8s"
 								name={selectedDeployment.name}
-								podName={selectedPodName || undefined}
+								podName={activePodName || undefined}
 								namespace={selectedDeployment.namespace}
 								context={selectedContext || undefined}
 								className="border-none rounded-none h-full"

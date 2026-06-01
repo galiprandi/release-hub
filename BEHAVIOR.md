@@ -112,19 +112,14 @@
 ## Module: LogsViewer
 - calls onResourceChange when resource is selected
 - copies logs to clipboard
-- disables auto-scroll on manual scroll
 - enables auto-scroll when clicking play button
 - filters logs by level
 - highlights search term and calculates match count
-- persists options to and loads them from localStorage
 - renders as modal when asModal is true
 - renders logs correctly
 - shows empty message when no logs
 - toggles auto-scroll
-- toggles custom highlighter option and accepts input
 - toggles expand/collapse full screen option in modal mode
-- toggles line numbers option
-- toggles word wrap option
 
 ## Module: logUtils
 - should detect JSON start with {

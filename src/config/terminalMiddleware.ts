@@ -11,9 +11,21 @@ interface ServerWithUpgrade {
   on(event: 'upgrade', listener: (request: IncomingMessage, socket: Duplex, head: Buffer) => void): void;
 }
 
-async function resolveDeploymentToPod(name: string, namespace: string, context?: string | null): Promise<string | null> {
+async function resolveNameToPod(name: string, namespace: string, context?: string | null): Promise<string | null> {
   const ctxFlag = context ? `--context=${context}` : '';
   const nsFlag = `-n ${namespace}`;
+
+  try {
+    // First: check if name is already a pod
+    const checkPodCmd = `kubectl get pod ${name} ${nsFlag} ${ctxFlag} -o jsonpath='{.metadata.name}'`;
+    const { stdout: podCheckRaw } = await execAsync(checkPodCmd);
+    const podCheck = podCheckRaw.trim();
+    if (podCheck && podCheck !== 'null' && podCheck !== '') {
+      return podCheck;
+    }
+  } catch {
+    // Not a pod, continue to deployment resolution
+  }
 
   try {
     // Get deployment selector
@@ -67,7 +79,7 @@ export function setupTerminalMiddleware(server: ServerWithUpgrade) {
         ws.close();
         return;
       }
-      const podName = await resolveDeploymentToPod(name, namespace, context);
+      const podName = await resolveNameToPod(name, namespace, context);
       if (!podName) {
         ws.send(`\r\n[ERROR] No running pods found for deployment "${name}" in namespace "${namespace}"\r\n`);
         ws.close();

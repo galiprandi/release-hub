@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { Terminal as XTerm } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
+import { SearchAddon } from '@xterm/addon-search';
 import '@xterm/xterm/css/xterm.css';
 
 interface XTermLogsProps {
@@ -10,11 +11,35 @@ interface XTermLogsProps {
   className?: string;
 }
 
-export function XTermLogs({ logs, autoScroll = true, className }: XTermLogsProps) {
+export interface XTermLogsHandle {
+  findNext: (term: string) => boolean;
+  findPrevious: (term: string) => boolean;
+  clearSearch: () => void;
+}
+
+export const XTermLogs = forwardRef<XTermLogsHandle, XTermLogsProps>(function XTermLogs(
+  { logs, autoScroll = true, className },
+  ref
+) {
   const terminalRef = useRef<HTMLDivElement>(null);
   const xtermRef = useRef<XTerm | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
+  const searchAddonRef = useRef<SearchAddon | null>(null);
   const lastLogsRef = useRef<string>('');
+
+  useImperativeHandle(ref, () => ({
+    findNext: (term: string) => {
+      if (!searchAddonRef.current || !term) return false;
+      return searchAddonRef.current.findNext(term, { incremental: false });
+    },
+    findPrevious: (term: string) => {
+      if (!searchAddonRef.current || !term) return false;
+      return searchAddonRef.current.findPrevious(term, { incremental: false });
+    },
+    clearSearch: () => {
+      searchAddonRef.current?.clearDecorations();
+    },
+  }), []);
 
   useEffect(() => {
     if (!terminalRef.current) return;
@@ -24,8 +49,24 @@ export function XTermLogs({ logs, autoScroll = true, className }: XTermLogsProps
       fontSize: 12,
       fontFamily: 'JetBrains Mono, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
       theme: {
-        background: '#09090b', // zinc-950
-        foreground: '#e4e4e7', // zinc-200
+        background: '#09090b',
+        foreground: '#e4e4e7',
+        black: '#71717a',
+        brightBlack: '#a1a1aa',
+        red: '#f87171',
+        brightRed: '#fca5a5',
+        green: '#4ade80',
+        brightGreen: '#86efac',
+        yellow: '#facc15',
+        brightYellow: '#fde047',
+        blue: '#60a5fa',
+        brightBlue: '#93c5fd',
+        magenta: '#c084fc',
+        brightMagenta: '#d8b4fe',
+        cyan: '#22d3ee',
+        brightCyan: '#67e8f9',
+        white: '#e4e4e7',
+        brightWhite: '#fafafa',
       },
       disableStdin: true,
       convertEol: true,
@@ -34,14 +75,17 @@ export function XTermLogs({ logs, autoScroll = true, className }: XTermLogsProps
     });
 
     const fitAddon = new FitAddon();
+    const searchAddon = new SearchAddon();
     term.loadAddon(fitAddon);
     term.loadAddon(new WebLinksAddon());
+    term.loadAddon(searchAddon);
 
     term.open(terminalRef.current);
     fitAddon.fit();
 
     xtermRef.current = term;
     fitAddonRef.current = fitAddon;
+    searchAddonRef.current = searchAddon;
 
     const handleResize = () => {
       fitAddon.fit();
@@ -51,8 +95,9 @@ export function XTermLogs({ logs, autoScroll = true, className }: XTermLogsProps
     return () => {
       window.removeEventListener('resize', handleResize);
       term.dispose();
+      searchAddonRef.current = null;
     };
-  }, []);
+  }, [ref]);
 
   useEffect(() => {
     if (xtermRef.current) {
@@ -63,13 +108,11 @@ export function XTermLogs({ logs, autoScroll = true, className }: XTermLogsProps
       }
 
       if (logs.startsWith(lastLogsRef.current) && lastLogsRef.current.length > 0) {
-        // Incremental update
         const newPart = logs.substring(lastLogsRef.current.length);
         if (newPart) {
           xtermRef.current.write(newPart);
         }
       } else {
-        // Full rewrite (if logs were filtered or completely changed)
         xtermRef.current.clear();
         xtermRef.current.write(logs);
       }
@@ -88,4 +131,4 @@ export function XTermLogs({ logs, autoScroll = true, className }: XTermLogsProps
       className={`w-full h-full bg-[#09090b] rounded-md overflow-hidden ${className}`}
     />
   );
-}
+});

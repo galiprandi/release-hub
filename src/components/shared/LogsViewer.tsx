@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2, Search, X, ClipboardCopy, Check, Sparkles, AlertCircle, Pause, Play, Terminal, ChevronUp, ChevronDown, WrapText, Hash, Highlighter, Maximize2, Minimize2 } from "lucide-react";
+import { Loader2, X, ClipboardCopy, Check, Sparkles, AlertCircle, Pause, Play, Terminal, Maximize2, Minimize2, Search, ChevronUp, ChevronDown } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { useAISummarize } from "@galiprandi/react-tools";
 import { useAIErrorProcessor } from "@/hooks/useAIErrorProcessor";
 import { useLogsAccumulator } from "@/hooks/useLogsAccumulator";
 import { AISummaryCard } from "@/components/AISummaryCard";
 import { BaseDialog } from "@/components/ui/BaseDialog";
-import { XTermLogs } from "./XTermLogs";
+import { XTermLogs, type XTermLogsHandle } from "./XTermLogs";
 import { groupLogs, logLevelPattern } from "./logUtils";
 import { IconButton } from "./IconButton";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,6 @@ export function LogsViewer({
 }: LogsViewerProps) {
 	const queryClient = useQueryClient();
 
-	const [filter, setFilter] = useState("");
 	const [logLevelFilter, setLogLevelFilter] = useState<"all" | "ERROR" | "WARN" | "INFO" | "DEBUG">("all");
 	const [copied, setCopied] = useState(false);
 	const [aiSummaryCopied, setAiSummaryCopied] = useState(false);
@@ -45,24 +44,6 @@ export function LogsViewer({
 	const autoScrollEnabledRef = useRef(autoScrollEnabled);
 	const containerRef = useRef<HTMLDivElement>(null);
 
-	const [wordWrap, setWordWrap] = useState(() => {
-		try {
-			const saved = localStorage.getItem("release_hub_logs_word_wrap");
-			return saved !== null ? JSON.parse(saved) : false;
-		} catch {
-			return false;
-		}
-	});
-	const [showLineNumbers, setShowLineNumbers] = useState(() => {
-		try {
-			const saved = localStorage.getItem("release_hub_logs_line_numbers");
-			return saved !== null ? JSON.parse(saved) : false;
-		} catch {
-			return false;
-		}
-	});
-	const [customHighlight, setCustomHighlight] = useState("");
-	const [showCustomHighlight, setShowCustomHighlight] = useState(false);
 	const [isExpanded, setIsExpanded] = useState(() => {
 		try {
 			const saved = localStorage.getItem("release_hub_logs_expanded");
@@ -72,21 +53,10 @@ export function LogsViewer({
 		}
 	});
 
-	useEffect(() => {
-		try {
-			localStorage.setItem("release_hub_logs_word_wrap", JSON.stringify(wordWrap));
-		} catch (e) {
-			console.error("Error saving wordWrap to localStorage:", e);
-		}
-	}, [wordWrap]);
-
-	useEffect(() => {
-		try {
-			localStorage.setItem("release_hub_logs_line_numbers", JSON.stringify(showLineNumbers));
-		} catch (e) {
-			console.error("Error saving showLineNumbers to localStorage:", e);
-		}
-	}, [showLineNumbers]);
+	const [filter, setFilter] = useState("");
+	const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+	const searchInputRef = useRef<HTMLInputElement>(null);
+	const xtermRef = useRef<XTermLogsHandle>(null);
 
 	useEffect(() => {
 		try {
@@ -96,10 +66,6 @@ export function LogsViewer({
 		}
 	}, [isExpanded]);
 	
-	const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
-
-	const searchInputRef = useRef<HTMLInputElement>(null);
-
 	const { data: logsData, isLoading, error } = useLogsAccumulator({
 		fetchFn,
 		resourceId: selectedResourceId || '',
@@ -208,20 +174,31 @@ export function LogsViewer({
 		return groupsToProcess.flatMap(group => group.split("\n"));
 	})();
 
-	const matchingLineIndices = useMemo(() => {
-		if (!filter || !filter.trim()) return [];
-		const filterLower = filter.toLowerCase();
-		const indices: number[] = [];
-		filteredLines.forEach((line, idx) => {
-			if (line.toLowerCase().includes(filterLower)) {
-				indices.push(idx);
-			}
-		});
-		return indices;
+	const matchCount = useMemo(() => {
+		if (!filter || !filter.trim()) return 0;
+		const escaped = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		const regex = new RegExp(escaped, 'gi');
+		const text = filteredLines.join('\n');
+		return (text.match(regex) || []).length;
 	}, [filteredLines, filter]);
 
+	useEffect(() => {
+		if (filter.trim()) {
+			const found = xtermRef.current?.findNext(filter);
+			setCurrentMatchIndex(found ? 0 : -1);
+		} else {
+			xtermRef.current?.clearSearch();
+			setCurrentMatchIndex(0);
+		}
+	}, [filter]);
+
+	function stripAnsiCodes(text: string): string {
+		// eslint-disable-next-line no-control-regex
+		return text.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
+	}
+
 	const handleCopy = async () => {
-		const logsToCopy = filteredLines.join('\n');
+		const logsToCopy = stripAnsiCodes(filteredLines.join('\n'));
 		if (!logsToCopy) return;
 		await navigator.clipboard.writeText(logsToCopy);
 		setCopied(true);
@@ -362,75 +339,36 @@ export function LogsViewer({
 					</Tooltip.Portal>
 				</Tooltip.Root>
 
-				{/* Match Navigation (Iconos compactos) */}
 				{filter.trim() !== "" && (
 					<div className="flex items-center gap-0.5 border border-border rounded px-1.5 bg-muted h-8 ml-2">
 						<span className="text-[10px] text-muted-foreground select-none font-mono min-w-[2.5rem] text-center">
-							{matchingLineIndices.length > 0 ? `${currentMatchIndex + 1}/${matchingLineIndices.length}` : "0/0"}
+							{matchCount > 0 ? `${currentMatchIndex + 1}/${matchCount}` : "0/0"}
 						</span>
 						<IconButton
 							icon={<ChevronUp className="w-3.5 h-3.5" />}
 							onClick={() => {
-								setCurrentMatchIndex((prev) => {
-									const next = matchingLineIndices.length > 0 ? (prev - 1 + matchingLineIndices.length) % matchingLineIndices.length : 0;
-									return next;
-								});
+								const found = xtermRef.current?.findPrevious(filter);
+								if (found && matchCount > 0) {
+									setCurrentMatchIndex((prev) => (prev - 1 + matchCount) % matchCount);
+								}
 							}}
 							tooltip="Coincidencia anterior"
-							disabled={matchingLineIndices.length === 0}
+							disabled={matchCount === 0}
 						/>
 						<IconButton
 							icon={<ChevronDown className="w-3.5 h-3.5" />}
 							onClick={() => {
-								setCurrentMatchIndex((prev) => {
-									const next = matchingLineIndices.length > 0 ? (prev + 1) % matchingLineIndices.length : 0;
-									return next;
-								});
+								const found = xtermRef.current?.findNext(filter);
+								if (found && matchCount > 0) {
+									setCurrentMatchIndex((prev) => (prev + 1) % matchCount);
+								}
 							}}
 							tooltip="Coincidencia siguiente"
-							disabled={matchingLineIndices.length === 0}
+							disabled={matchCount === 0}
 						/>
 					</div>
 				)}
 
-				<div className="w-px h-6 bg-border mx-2" />
-
-				{/* Highlighter Personalizado (Icono compacto) */}
-				<div className="flex items-center gap-1">
-					<IconButton
-						icon={<Highlighter className="w-4 h-4" />}
-						onClick={() => {
-							setShowCustomHighlight(!showCustomHighlight);
-							if (showCustomHighlight) setCustomHighlight("");
-						}}
-						active={showCustomHighlight || !!customHighlight}
-						tooltip="Resaltado personalizado"
-					/>
-					{showCustomHighlight && (
-						<input
-							type="text"
-							placeholder="Resaltar..."
-							value={customHighlight}
-							onChange={(e) => setCustomHighlight(e.target.value)}
-							className="h-8 w-24 bg-muted border border-border text-xs px-2 rounded text-foreground placeholder-muted-foreground focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-none"
-							aria-label="Término para resaltar"
-						/>
-					)}
-				</div>
-
-				<IconButton
-					icon={<WrapText className="w-4 h-4" />}
-					onClick={() => setWordWrap(!wordWrap)}
-					active={wordWrap}
-					tooltip="Ajuste de línea"
-				/>
-
-				<IconButton
-					icon={<Hash className="w-4 h-4" />}
-					onClick={() => setShowLineNumbers(!showLineNumbers)}
-					active={showLineNumbers}
-					tooltip="Mostrar números de línea"
-				/>
 			</div>
 			<div className="w-px h-6 bg-border mx-2" />
 			<IconButton
@@ -502,6 +440,7 @@ export function LogsViewer({
 						<span className="text-warning px-2 py-1 block">No hay logs disponibles</span>
 					) : (
 						<XTermLogs
+							ref={xtermRef}
 							logs={filteredLines.join('\n')}
 							autoScroll={autoScrollEnabled}
 							className="h-full"

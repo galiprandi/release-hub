@@ -370,13 +370,11 @@ export async function getResourceLogs(resourceType: 'deployment' | 'pod', name: 
 }
 
 /**
- * Clean logs by removing ANSI escape codes and fixing escaped quotes
+ * Clean logs by fixing escaped quotes and backslashes.
+ * ANSI escape codes are preserved so xterm.js can render colors.
  */
 function cleanLogs(logs: string): string {
-  const escapeChar = String.fromCharCode(27);
-  const ansiRegex = new RegExp(`${escapeChar}\\[[0-9;]*m`, 'g');
   return logs
-    .replace(ansiRegex, '') // Remove ANSI escape codes
     .replace(/\\"/g, '"') // Fix escaped quotes
     .replace(/\\\\/g, '\\'); // Fix double backslashes
 }

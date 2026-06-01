@@ -84,6 +84,16 @@ Ver `DESIGN.md` para especificaciones visuales completas (`Table`, `FilterBar`, 
 - **Obligatorio antes de crear PR**: Ejecutar `node --run build` y verificar que no existan errores de compilación.
 - No proceder con commit o PR si el build falla.
 
+### 12. Estado Compartible vía URL (TanStack Router Search Params)
+
+**Objetivo**: Toda vista de la aplicación debe ser replicable y compartible exactamente a través de la URL. El estado visual (filtros, selecciones, modales abiertos) debe vivir en los search params, no en memoria local.
+
+- **Search Param APIs**: Usar las APIs de search params de TanStack Router (schemas, validación, type-safety) para sincronizar estado entre UI y URL.
+- **Modales desde URL**: Los modales/dialogs deben poder abrirse y configurarse via search params. Ejemplo: `/kubernetes?logs=argentina-arcus/task-notifier-dp&logOptions={lines:true,search:vendor,...}` debe abrir directamente el modal de logs del deploy con esas props aplicadas.
+- **Serialización**: Para objetos complejos en search params, usar `JSON.stringify`/`JSON.parse` con schema validation de TanStack Router (`zod` o similar) para garantizar type-safety.
+- **Shareability**: Cualquier usuario que acceda a la misma URL debe ver exactamente la misma vista, con los mismos filtros, selecciones y modales abiertos.
+- **No state managers locales para estado compartible**: Evitar useState/useReducer para estado que deba persistir en la URL; delegar a TanStack Router's search param state management.
+
 ## Mantenimiento de Skills
 
 Mantener `.windsurf/skills/` con flujos comunes, referencias de elementos y patrones nuevos para evitar snapshots repetitivos.

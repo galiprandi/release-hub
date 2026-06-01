@@ -20,7 +20,7 @@ describe('api/exec', () => {
       const result = await runCommand(['echo', 'hello', 'world'])
 
       expect(result).toEqual(mockResponse.data)
-      expect(spy).toHaveBeenCalledWith('/exec', { command: "'echo' 'hello' 'world'", stdin: undefined }, expect.any(Object))
+      expect(spy).toHaveBeenCalledWith('/exec', { args: ['echo', 'hello', 'world'], stdin: undefined }, expect.any(Object))
     })
 
     it('should throw error when success is false', async () => {

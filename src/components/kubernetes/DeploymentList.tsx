@@ -3,7 +3,6 @@ import { createPortal } from "react-dom"
 import { useQuery } from "@tanstack/react-query"
 import { Boxes, Terminal as TerminalIcon } from "lucide-react"
 import type { DeploymentInfo } from "@/api/kubectl"
-import { getPodsForDeployment } from "@/api/kubectl"
 import { LogsViewer } from "@/components/shared/LogsViewer"
 import { Terminal } from "@/components/shared/Terminal"
 import { BaseDialog } from "@/components/ui/BaseDialog"
@@ -176,6 +175,7 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 		queryKey: ['kubectl', 'pods-for-deployment', selectedDeployment?.name, selectedDeployment?.namespace, selectedContext],
 		queryFn: async () => {
 			if (!selectedDeployment || !selectedContext) return []
+			const { getPodsForDeployment } = await import('@/api/kubectl')
 			return getPodsForDeployment(selectedDeployment.name, selectedDeployment.namespace, selectedContext)
 		},
 		enabled: isTerminalModalOpen && !!selectedDeployment && !!selectedContext,

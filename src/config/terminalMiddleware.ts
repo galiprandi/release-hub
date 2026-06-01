@@ -1,10 +1,40 @@
+import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
 import * as pty from 'node-pty';
 import { WebSocket, WebSocketServer } from 'ws';
 import { IncomingMessage } from 'http';
 import { Duplex } from 'stream';
 
+const execAsync = promisify(exec);
+
 interface ServerWithUpgrade {
   on(event: 'upgrade', listener: (request: IncomingMessage, socket: Duplex, head: Buffer) => void): void;
+}
+
+async function resolveDeploymentToPod(name: string, namespace: string, context?: string | null): Promise<string | null> {
+  const ctxFlag = context ? `--context=${context}` : '';
+  const nsFlag = `-n ${namespace}`;
+
+  try {
+    // Get deployment selector
+    const selectorCmd = `kubectl get deployment ${name} ${nsFlag} ${ctxFlag} -o jsonpath='{.spec.selector.matchLabels}'`;
+    const { stdout: selectorRaw } = await execAsync(selectorCmd);
+    const selector = selectorRaw.trim();
+    if (!selector || selector === 'null') return null;
+
+    const labels = JSON.parse(selector);
+    const labelSelector = Object.entries(labels).map(([k, v]) => `${k}=${v}`).join(',');
+
+    // Get first running pod matching selector
+    const podCmd = `kubectl get pods ${nsFlag} ${ctxFlag} -l ${labelSelector} --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}'`;
+    const { stdout: podNameRaw } = await execAsync(podCmd);
+    const podName = podNameRaw.trim();
+    if (!podName || podName === 'null') return null;
+
+    return podName;
+  } catch {
+    return null;
+  }
 }
 
 export function setupTerminalMiddleware(server: ServerWithUpgrade) {
@@ -20,7 +50,7 @@ export function setupTerminalMiddleware(server: ServerWithUpgrade) {
     }
   });
 
-  wss.on('connection', (ws: WebSocket, request: IncomingMessage) => {
+  wss.on('connection', async (ws: WebSocket, request: IncomingMessage) => {
     const url = new URL(request.url || '', `http://${request.headers.host}`);
     const type = url.searchParams.get('type');
     const name = url.searchParams.get('name');
@@ -32,8 +62,19 @@ export function setupTerminalMiddleware(server: ServerWithUpgrade) {
     let args: string[] = [];
 
     if (type === 'k8s') {
+      if (!name) {
+        ws.send('\r\n[ERROR] Missing deployment name\r\n');
+        ws.close();
+        return;
+      }
+      const podName = await resolveDeploymentToPod(name, namespace, context);
+      if (!podName) {
+        ws.send(`\r\n[ERROR] No running pods found for deployment "${name}" in namespace "${namespace}"\r\n`);
+        ws.close();
+        return;
+      }
       command = 'kubectl';
-      args = ['exec', '-it', name!, '-n', namespace];
+      args = ['exec', '-it', podName, '-n', namespace];
       if (context) args.push('--context', context);
       if (container) args.push('-c', container);
       args.push('--', 'sh', '-c', 'command -v bash >/dev/null && exec bash || exec sh');

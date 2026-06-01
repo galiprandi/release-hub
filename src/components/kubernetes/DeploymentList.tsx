@@ -3,6 +3,7 @@ import { createPortal } from "react-dom"
 import { useQuery } from "@tanstack/react-query"
 import { Star, Terminal as TerminalIcon } from "lucide-react"
 import type { DeploymentInfo } from "@/api/kubectl"
+import { getPodsForDeployment } from "@/api/kubectl"
 import { LogsViewer } from "@/components/shared/LogsViewer"
 import { Terminal } from "@/components/shared/Terminal"
 import { BaseDialog } from "@/components/ui/BaseDialog"
@@ -50,6 +51,7 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 	const [selectedContext, setSelectedContext] = useState<string | null>(null)
 	const [isLogsModalOpen, setIsLogsModalOpen] = useState(false)
 	const [isTerminalModalOpen, setIsTerminalModalOpen] = useState(false)
+	const [selectedPodName, setSelectedPodName] = useState<string | null>(null)
 	const [cachedDeployments, setCachedDeployments] = useState<Record<string, DeploymentInfo>>(loadDeploymentsFromStorage())
 	const { toggleDeploymentFavorite } = useUserCollections()
 
@@ -165,8 +167,21 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 		console.log('[DeploymentList] Opening terminal for deployment:', deployment.name, 'context:', deploymentContext)
 		setSelectedDeployment(deployment)
 		setSelectedContext(deploymentContext)
+		setSelectedPodName(null)
 		setIsTerminalModalOpen(true)
 	}
+
+	// Fetch pods for the selected deployment (for terminal pod selector)
+	const { data: deploymentPods } = useQuery({
+		queryKey: ['kubectl', 'pods-for-deployment', selectedDeployment?.name, selectedDeployment?.namespace, selectedContext],
+		queryFn: async () => {
+			if (!selectedDeployment || !selectedContext) return []
+			return getPodsForDeployment(selectedDeployment.name, selectedDeployment.namespace, selectedContext)
+		},
+		enabled: isTerminalModalOpen && !!selectedDeployment && !!selectedContext,
+		refetchOnWindowFocus: false,
+		retry: 0,
+	})
 
 	// Si no hay favoritos, no renderizar nada (el padre maneja el empty state)
 	if (!favorites || favorites.length === 0) {
@@ -248,13 +263,32 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 								<span>Terminal: {selectedDeployment.name}</span>
 							</div>
 						}
+						headerExtra={
+							deploymentPods && deploymentPods.length > 0 && (
+								<select
+									value={selectedPodName || ''}
+									onChange={(e) => setSelectedPodName(e.target.value || null)}
+									className="text-xs bg-muted border rounded px-2 py-1 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+									aria-label="Seleccionar pod"
+								>
+									<option value="">Pod por defecto</option>
+									{deploymentPods.map((pod) => (
+										<option key={pod.name} value={pod.name}>
+											{pod.name} ({pod.status})
+										</option>
+									))}
+								</select>
+							)
+						}
 						maxWidth="max-w-6xl"
 						className="w-[90vw] h-[80vh] !p-0"
 					>
 						<div className="flex-1 min-h-0 bg-black rounded-b-lg overflow-hidden">
 							<Terminal
+								key={`terminal-${selectedPodName || 'default'}`}
 								type="k8s"
 								name={selectedDeployment.name}
+								podName={selectedPodName || undefined}
 								namespace={selectedDeployment.namespace}
 								context={selectedContext || undefined}
 								className="border-none rounded-none h-full"

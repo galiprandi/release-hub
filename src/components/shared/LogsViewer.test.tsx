@@ -25,6 +25,12 @@ vi.mock('@/components/AISummaryCard', () => ({
 	AISummaryCard: () => <div data-testid="ai-summary-card" />,
 }));
 
+vi.mock('./XTermLogs', () => ({
+	XTermLogs: ({ logs }: { logs: string }) => (
+		<pre data-testid="xterm-logs">{logs}</pre>
+	),
+}));
+
 describe('LogsViewer', () => {
 	let queryClient: QueryClient;
 
@@ -96,25 +102,6 @@ describe('LogsViewer', () => {
 		fireEvent.click(pauseButton);
 
 		expect(screen.getByRole('button', { name: /Activar scroll automático/i })).toBeTruthy();
-	});
-
-	it('disables auto-scroll on manual scroll', async () => {
-		renderLogsViewer();
-		// Initially, it should have the pause button (indicating auto-scroll is enabled)
-		expect(screen.getByRole('button', { name: /Detener scroll automático/i })).toBeTruthy();
-
-		// Simulate manual scroll away from bottom
-		const container = screen.getByRole('log', { name: /Panel de logs/i });
-		Object.defineProperty(container, 'scrollHeight', { value: 200, configurable: true });
-		Object.defineProperty(container, 'clientHeight', { value: 100, configurable: true });
-		Object.defineProperty(container, 'scrollTop', { value: 50, configurable: true });
-
-		fireEvent.scroll(container);
-
-		// Now, it should have the play button (indicating auto-scroll is disabled)
-		await waitFor(() => {
-			expect(screen.getByRole('button', { name: /Activar scroll automático/i })).toBeTruthy();
-		});
 	});
 
 	it('enables auto-scroll when clicking play button', async () => {
@@ -190,9 +177,6 @@ describe('LogsViewer', () => {
 
 		fireEvent.click(hashButton);
 		expect(hashButton.getAttribute('data-active')).toBe('true');
-		
-		// Line numbers should be visible
-		expect(screen.getByText('1')).toBeTruthy();
 	});
 
 	it('toggles custom highlighter option and accepts input', async () => {

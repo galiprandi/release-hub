@@ -7,13 +7,14 @@ import '@xterm/xterm/css/xterm.css';
 interface TerminalProps {
   type: 'k8s' | 'docker' | 'local';
   name?: string;
+  podName?: string;
   namespace?: string;
   context?: string;
   container?: string;
   className?: string;
 }
 
-export function Terminal({ type, name, namespace, context, container, className }: TerminalProps) {
+export function Terminal({ type, name, podName, namespace, context, container, className }: TerminalProps) {
   const terminalRef = useRef<HTMLDivElement>(null);
   const xtermRef = useRef<XTerm | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
@@ -63,9 +64,10 @@ export function Terminal({ type, name, namespace, context, container, className 
     // Setup WebSocket
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
+    const targetName = podName || name;
     const params = new URLSearchParams({
       type,
-      ...(name && { name }),
+      ...(targetName && { name: targetName }),
       ...(namespace && { namespace }),
       ...(context && { context }),
       ...(container && { container }),
@@ -113,7 +115,7 @@ export function Terminal({ type, name, namespace, context, container, className 
       ws.close();
       term.dispose();
     };
-  }, [type, name, namespace, context, container]);
+  }, [type, name, podName, namespace, context, container]);
 
   return (
     <div

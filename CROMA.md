@@ -8,3 +8,10 @@
 **Estado**: En progreso (Draft)
 **Objetivo**: Maximizar la visibilidad de la salud de los servicios directamente en el dashboard de repositorios y elevar la resonancia industrial del módulo de Health.
 **Impacto**: Reducción del "Time to Value" al eliminar la necesidad de navegar profundamente para conocer el estado de salud de un producto.
+
+### 🗓️ 1 de Junio de 2026
+**Tarea**: Refinamiento estético GitHub Dashboard & Detail (Industrial Resonance V2).
+**Branch**: `🐜-Carol-refactor-github-resonance`
+**Estado**: Finalizado
+**Objetivo**: Elevar la precisión visual y consistencia de los dashboards de GitHub.
+**Impacto**: Mejora en la legibilidad técnica y jerarquía visual mediante el uso estricto de opacidades semánticas (20%) y tipografía técnica (`text-[10px]`).

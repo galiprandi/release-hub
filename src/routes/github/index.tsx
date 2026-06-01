@@ -212,9 +212,9 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		{
 			accessorKey: "name",
 			header: () => (
-				<div className="flex items-center gap-2">
-					<Building2 className="w-4 h-4 text-primary/60" />
-					<span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{org}</span>
+				<div className="flex items-center gap-2.5">
+					<Building2 className="w-3.5 h-3.5 text-primary/40" />
+					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{org}</span>
 				</div>
 			),
 			cell: ({ row }) => <RepoNameCell repo={row.original} />,
@@ -318,7 +318,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 								<button
 									type="button"
 									onClick={() => setIsCommitsModalOpen(true)}
-									className="inline-flex items-center gap-1 text-[10px] bg-warning/10 text-warning px-2 py-0.5 rounded-full border border-warning/20 font-bold cursor-pointer hover:bg-warning/20 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+									className="inline-flex items-center gap-1 text-[10px] bg-warning/20 text-warning px-2 py-0.5 rounded-full border border-warning/20 font-bold cursor-pointer hover:bg-warning/30 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 								>
 									<GitPullRequestCreateArrow className="w-2.5 h-2.5" />
 									<span>{pendingCount}</span>
@@ -481,13 +481,13 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 					>
 						<div className="flex items-center -space-x-1">
 							{unhealthyCount > 0 && (
-								<div className="w-2.5 h-2.5 rounded-full bg-destructive border-2 border-background shadow-sm" />
+								<div className="w-2.5 h-2.5 rounded-full bg-destructive/20 border border-destructive shadow-sm" />
 							)}
 							{healthyCount > 0 && (
-								<div className="w-2.5 h-2.5 rounded-full bg-success border-2 border-background shadow-sm" />
+								<div className="w-2.5 h-2.5 rounded-full bg-success/20 border border-success shadow-sm" />
 							)}
 							{pendingCount > 0 && (
-								<div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/40 border-2 border-background shadow-sm" />
+								<div className="w-2.5 h-2.5 rounded-full bg-muted/40 border border-border/40 shadow-sm" />
 							)}
 						</div>
 						<span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
@@ -542,10 +542,11 @@ function ActionsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; i
 	});
 
 	return (
-		<div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+		<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
 			<FreezeDialog repo={repo.fullName} iconOnly={true} />
 			<ForceRedeployDialog repo={repo.fullName} iconOnly={true} />
 			<PromoteDialog repo={repo.fullName} latestTag={latestTag?.name} iconOnly={true} />
+			<div className="w-px h-4 bg-border/40 mx-0.5" />
 			<ActionButton
 				action={ACTION_DEFINITIONS.manageProjects}
 				onClick={() => setIsProjectSelectionOpen(true)}

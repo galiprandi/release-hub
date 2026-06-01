@@ -125,4 +125,5 @@ export const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
 	unfreezeBranch: { icon: Unlock, label: "Desbloquear", color: "success" },
 	promoteToProd: { icon: Rocket, label: "Promocionar a producción", color: "destructive" },
 	forceRedeploy: { icon: RefreshCw, label: "Redeploy", color: "primary" },
+	manageProjects: { icon: FolderPlus, label: "Gestionar Proyectos", color: "default" },
 }

@@ -1,5 +1,6 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState, useSearch, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo, useCallback } from "react";
+import { z } from "zod";
 import { Loader2, Star, Building2, FolderOpen, FolderPlus, Search, GitPullRequestCreateArrow, Settings2 } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { CommitLink } from "@/components/CommitLink";
@@ -21,15 +22,23 @@ import { useGitTagsSimple } from "@/hooks/useGitTagsSimple";
 import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
 import { useHealthMonitor } from "@/hooks/useHealthMonitor";
 import { ProjectManagementDialog } from "@/components/ProjectManagementDialog";
+import { ProjectSelectionDialog } from "@/components/ProjectSelectionDialog";
 import { EmptyState } from "@/components/EmptyState";
 import DayJS from "@/lib/dayjs";
 
+const dashboardSearchSchema = z.object({
+	tab: z.string().optional().catch("favorites"),
+});
+
 export const Route = createFileRoute("/github/")({
+	validateSearch: (search) => dashboardSearchSchema.parse(search),
 	component: Dashboard,
 });
 
 function Dashboard() {
-	const { favorites, projects, activeTab, setActiveTab, toggleFavorite } = useUserCollections();
+	const { tab: activeTab = "favorites" } = useSearch({ from: "/github/" });
+	const navigate = useNavigate({ from: "/github/" });
+	const { favorites, projects, toggleFavorite } = useUserCollections();
 	const { isLoading: isLoadingRepos, data: summaryData } = useUserReposSummary();
 	const { location } = useRouterState();
 	const isIndexRoute = location.pathname === "/github";
@@ -107,7 +116,7 @@ function Dashboard() {
 				<FilterBar
 					filters={tabs}
 					activeFilter={activeTab}
-					onFilterChange={(value) => setActiveTab(value)}
+					onFilterChange={(value) => navigate({ search: (prev: any) => ({ ...prev, tab: value }) })}
 					variant="tabs"
 					label="Colecciones:"
 					rightContent={
@@ -142,17 +151,32 @@ function Dashboard() {
 										className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-bold uppercase tracking-wider shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 									>
 										<Search className="w-4 h-4" />
-										Buscar Repositorios
+										Descubrir Repositorios
 									</button>
 								) : (
-									<button
-										type="button"
-										onClick={handleManageProjects}
-										className="inline-flex items-center gap-2 px-6 py-2.5 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all text-xs font-bold uppercase tracking-wider border border-border/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-									>
-										<Settings2 className="w-4 h-4" />
-										Gestionar Proyectos
-									</button>
+									<div className="flex flex-wrap items-center justify-center gap-3">
+										<button
+											type="button"
+											onClick={() => {
+												const input = document.querySelector('input[placeholder*="Búsqueda"]') as HTMLInputElement;
+												if (input) {
+													input.focus();
+												}
+											}}
+											className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-bold uppercase tracking-wider shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+										>
+											<Search className="w-4 h-4" />
+											Añadir Repositorios
+										</button>
+										<button
+											type="button"
+											onClick={handleManageProjects}
+											className="inline-flex items-center gap-2 px-6 py-2.5 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all text-xs font-bold uppercase tracking-wider border border-border/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+										>
+											<Settings2 className="w-4 h-4" />
+											Gestionar Proyecto
+										</button>
+									</div>
 								)}
 							</div>
 						}
@@ -512,6 +536,7 @@ function AuthorCell({ repo }: { repo: RepoInfo }) {
 
 function ActionsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; isFavorite: boolean; onToggleFavorite: (product: string) => void }) {
 	const [org, name] = repo.fullName.split("/");
+	const [isProjectSelectionOpen, setIsProjectSelectionOpen] = useState(false);
 	const { latestTag } = useGitTagsSimple({
 		repo: repo.fullName,
 	});
@@ -522,6 +547,11 @@ function ActionsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; i
 			<ForceRedeployDialog repo={repo.fullName} iconOnly={true} />
 			<PromoteDialog repo={repo.fullName} latestTag={latestTag?.name} iconOnly={true} />
 			<ActionButton
+				action={ACTION_DEFINITIONS.manageProjects}
+				onClick={() => setIsProjectSelectionOpen(true)}
+				size="sm"
+			/>
+			<ActionButton
 				action={ACTION_DEFINITIONS.openGitHub}
 				onClick={() => window.open(`https://github.com/${org}/${name}`, '_blank')}
 				size="sm"
@@ -530,6 +560,11 @@ function ActionsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; i
 				action={isFavorite ? ACTION_DEFINITIONS.removeFavorite : ACTION_DEFINITIONS.addFavorite}
 				onClick={() => onToggleFavorite(repo.fullName)}
 				size="sm"
+			/>
+			<ProjectSelectionDialog
+				isOpen={isProjectSelectionOpen}
+				onOpenChange={setIsProjectSelectionOpen}
+				repoFullName={repo.fullName}
 			/>
 		</div>
 	);

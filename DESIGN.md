@@ -256,6 +256,10 @@ Antes de crear componentes nuevos, verificar si extienden:
 
 Componente reutilizable para botones de acción iconográficos con tooltip integrado. Estándar para todas las acciones de fila en tablas (Docker, K8s, repos, etc.).
 
+### ProjectSelectionDialog
+
+Componente para la gestión rápida de asignación de repositorios a proyectos desde el dashboard. Utiliza `BaseDialog` y permite el toggle de pertenencia a colecciones existentes.
+
 ## Security Validation Standard
 
 - **Shell Injection Protection**: Todos los comandos externos se ejecutan utilizando un sistema de escape POSIX-compatible vía `runCommand` con argumentos en array (`string[]`). La interfaz de `runCommand` está estrictamente tipada para rechazar strings, eliminando la posibilidad de inyecciones por concatenación accidental. El uso de `stdin` es obligatorio para el paso de payloads complejos para evitar vulnerabilidades de redirección.

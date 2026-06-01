@@ -1,10 +1,23 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { Search, Loader2, GitBranch, X } from 'lucide-react'
+import { Search, Loader2, GitBranch, X, FileCode } from 'lucide-react'
 import { useRepoSearch } from '@/hooks/useRepoSearch'
+import { useFileSearch, isFileSearchQuery } from '@/hooks/useFileSearch'
 import { useUserCollections } from '@/hooks/useUserCollections'
 import { useUserReposSummary } from '@/hooks/useUserReposSummary'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton'
+
+interface UnifiedResult {
+  id: string
+  type: 'repo' | 'file'
+  fullName: string
+  name: string
+  description?: string | null
+  updatedAt?: string
+  path?: string
+  htmlUrl?: string
+  repository?: string
+}
 
 export function RepoSearch() {
   const [query, setQuery] = useState('')
@@ -16,18 +29,45 @@ export function RepoSearch() {
   const searchWidth = 'w-[35dvw]'
   const navigate = useNavigate()
 
+  const isFileMode = isFileSearchQuery(query)
+
   // Load summary for total count
   const { data: summaryData } = useUserReposSummary()
 
-  // Search repos on-demand with debounce
-  const { data: searchData, isLoading } = useRepoSearch({ searchTerm: query })
+  // Search repos or files depending on query prefix
+  const { data: repoSearchData, isLoading: isRepoLoading } = useRepoSearch({
+    searchTerm: isFileMode ? '' : query,
+  })
+  const { data: fileSearchData, isLoading: isFileLoading } = useFileSearch({
+    searchTerm: isFileMode ? query : '',
+  })
+
+  const isLoading = isFileMode ? isFileLoading : isRepoLoading
 
   const { toggleFavorite, isFavorite } = useUserCollections()
 
-  // Results from search API
-  const results = useMemo(() => {
-    return searchData?.results || []
-  }, [searchData?.results])
+  // Normalize results to unified type
+  const results = useMemo<UnifiedResult[]>(() => {
+    if (isFileMode) {
+      return (fileSearchData || []).map((item) => ({
+        id: `${item.repositoryFullName}:${item.path}`,
+        type: 'file' as const,
+        fullName: item.repositoryFullName,
+        name: item.name,
+        path: item.path,
+        htmlUrl: item.htmlUrl,
+        repository: item.repository,
+      }))
+    }
+    return (repoSearchData?.results || []).map((repo) => ({
+      id: repo.fullName,
+      type: 'repo' as const,
+      fullName: repo.fullName,
+      name: repo.name,
+      description: repo.description,
+      updatedAt: repo.updatedAt,
+    }))
+  }, [isFileMode, fileSearchData, repoSearchData])
 
   const handleSelect = () => {
     setQuery('')
@@ -41,7 +81,11 @@ export function RepoSearch() {
     inputRef.current?.focus()
   }
 
-  const handleOpenInNewTab = (fullName: string) => {
+  const handleOpenInNewTab = (url: string) => {
+    window.open(url, '_blank')
+  }
+
+  const handleOpenRepoInNewTab = (fullName: string) => {
     window.open(`https://github.com/${fullName}`, '_blank')
   }
 
@@ -84,14 +128,18 @@ export function RepoSearch() {
         }
         if (event.key === 'Enter' && selectedIndex >= 0) {
           event.preventDefault()
-          const repo = results[selectedIndex]
-          if (repo) {
-            const [org, name] = repo.fullName.split('/')
-            navigate({
-              to: '/product/$org/$product',
-              params: { org, product: name },
-              search: { stage: 'staging', event: 'commit' },
-            })
+          const item = results[selectedIndex]
+          if (item) {
+            if (item.type === 'repo') {
+              const [org, name] = item.fullName.split('/')
+              navigate({
+                to: '/product/$org/$product',
+                params: { org, product: name },
+                search: { stage: 'staging', event: 'commit' },
+              })
+            } else if (item.type === 'file' && item.htmlUrl) {
+              handleOpenInNewTab(item.htmlUrl)
+            }
             handleSelect()
           }
         }
@@ -135,7 +183,9 @@ export function RepoSearch() {
             if (query.length >= 2) setIsOpen(true);
           }}
           onBlur={() => setIsEditable(false)}
-          placeholder={`Búsqueda en ${summaryData?.total || 0} repositorios... (Cmd+K)`}
+          placeholder={isFileMode
+            ? 'Buscar archivo: file:AGENTS.md'
+            : `Búsqueda en ${summaryData?.total || 0} repositorios... (Cmd+K)`}
           aria-label="Búsqueda de repositorios"
           className={`${searchWidth} pl-9 pr-14 py-2 bg-muted rounded-md text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
           autoComplete="off"
@@ -166,11 +216,17 @@ export function RepoSearch() {
           {isLoading ? (
             <div className="p-4 text-center text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
-              <p className="text-sm">Cargando información de repositorios...</p>
+              <p className="text-sm">
+                {isFileMode ? 'Buscando archivos...' : 'Cargando información de repositorios...'}
+              </p>
             </div>
           ) : !hasResults ? (
             <div className="p-4 text-center text-muted-foreground">
-              <GitBranch className="w-5 h-5 mx-auto mb-2 opacity-50" />
+              {isFileMode ? (
+                <FileCode className="w-5 h-5 mx-auto mb-2 opacity-50" />
+              ) : (
+                <GitBranch className="w-5 h-5 mx-auto mb-2 opacity-50" />
+              )}
               <p className="text-sm">
                 {query.length >= 2
                   ? 'Sin resultados coincidentes'
@@ -179,14 +235,62 @@ export function RepoSearch() {
             </div>
           ) : (
             <div id="repo-search-results" role="listbox" className="max-h-80 overflow-y-auto">
-              {results.map((repo, index) => {
-                const isFav = isFavorite(repo.fullName)
-                const [org, name] = repo.fullName.split('/')
+              {results.map((item, index) => {
                 const isSelected = index === selectedIndex
+
+                if (item.type === 'file') {
+                  return (
+                    <div
+                      key={item.id}
+                      role="option"
+                      aria-selected={isSelected}
+                      id={`repo-option-${index}`}
+                      className={`group p-3 border-b last:border-b-0 transition-colors ${
+                        isSelected ? 'bg-muted' : 'hover:bg-muted/50'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex-1 min-w-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (item.htmlUrl) handleOpenInNewTab(item.htmlUrl)
+                              handleSelect()
+                            }}
+                            className="block text-left w-full"
+                          >
+                            <div className="flex items-center gap-2">
+                              <FileCode className="w-4 h-4 text-warning shrink-0" />
+                              <span className="font-medium text-sm truncate">
+                                {item.name}
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1 truncate">
+                              {item.path}
+                            </p>
+                            <p className="text-xs text-muted-foreground/60 mt-1">
+                              {item.fullName}
+                            </p>
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                          <ActionButton
+                            action={ACTION_DEFINITIONS.openGitHub}
+                            onClick={() => item.htmlUrl && handleOpenInNewTab(item.htmlUrl)}
+                            size="sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )
+                }
+
+                const isFav = isFavorite(item.fullName)
+                const [org, name] = item.fullName.split('/')
 
                 return (
                   <div
-                    key={repo.fullName}
+                    key={item.id}
                     role="option"
                     aria-selected={isSelected}
                     id={`repo-option-${index}`}
@@ -206,18 +310,20 @@ export function RepoSearch() {
                           <div className="flex items-center gap-2">
                             <GitBranch className="w-4 h-4 text-primary" />
                             <span className="font-medium text-sm truncate">
-                              {repo.fullName}
+                              {item.fullName}
                             </span>
                           </div>
-                          {repo.description && (
+                          {item.description && (
                             <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                              {repo.description}
+                              {item.description}
                             </p>
                           )}
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Actualización:{' '}
-                            {new Date(repo.updatedAt).toLocaleDateString()}
-                          </p>
+                          {item.updatedAt && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Actualización:{' '}
+                              {new Date(item.updatedAt).toLocaleDateString()}
+                            </p>
+                          )}
                         </Link>
                       </div>
 
@@ -225,12 +331,12 @@ export function RepoSearch() {
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
                         <ActionButton
                           action={isFav ? ACTION_DEFINITIONS.removeFavorite : ACTION_DEFINITIONS.addFavorite}
-                          onClick={() => toggleFavorite(repo.fullName)}
+                          onClick={() => toggleFavorite(item.fullName)}
                           size="sm"
                         />
                         <ActionButton
                           action={ACTION_DEFINITIONS.openGitHub}
-                          onClick={() => handleOpenInNewTab(repo.fullName)}
+                          onClick={() => handleOpenRepoInNewTab(item.fullName)}
                           size="sm"
                         />
                       </div>
@@ -254,7 +360,11 @@ export function RepoSearch() {
                 <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">Esc</kbd> Cerrar
               </span>
             </div>
-            <span>{results.length} resultados</span>
+            <span>
+              {isFileMode && results.length > 0 && results[0]?.type === 'file'
+                ? `${results.length} archivos`
+                : `${results.length} resultados`}
+            </span>
           </div>
         </div>
       )}

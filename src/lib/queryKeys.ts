@@ -378,6 +378,8 @@ export const queryKeys = {
 		reposSummary: (): readonly ["user", "reposSummary"] => ["user", "reposSummary"],
 		repoSearch: (searchTerm: string): readonly ["user", "repoSearch", string] =>
 			["user", "repoSearch", searchTerm],
+		fileSearch: (searchTerm: string): readonly ["user", "fileSearch", string] =>
+			["user", "fileSearch", searchTerm],
 	},
 
 	// Settings

@@ -28,6 +28,13 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Feedback de Carga/Acceso**: Implementar `StatusCard` como componente estándar para todos los estados de carga, error y "offline".
 - **Tabla de Contenedores**: Bordes sutiles `border-border/60` y encabezados con `text-xs uppercase tracking-wider` para una estética profesional.
 
+## Kubernetes UI Pattern (Resonancia Industrial)
+
+- **Badges de Estado (Deployments)**: Utilizar `bg-success/20 text-success border-success/20` (Healthy), `bg-info/20 text-info border-info/20` (Progressing), `bg-destructive/20 text-destructive border-destructive/20` (Degraded), y `bg-muted/40 text-muted-foreground border-border/40` (Unknown). Geometría `rounded-md` con fuente `text-[10px] font-bold uppercase tracking-wider`.
+- **Headers de Grupo (Contextos)**: Incluir icono `Boxes` con `text-primary/60`. Label con `text-xs font-bold uppercase tracking-wider text-muted-foreground`.
+- **Acciones**: Uso obligatorio de `ActionButton` (size="sm") para Logs y Favoritos. La visibilidad de acciones en fila debe activarse mediante `group-hover:opacity-100`.
+- **Búsqueda**: Inputs con `rounded-lg` y `bg-muted/40`. Resultados con `rounded-xl`, `shadow-xl` y `ActionButton` para interacciones rápidas.
+
 ## Componentes de Feedback
 
 ### StatusCard
@@ -251,7 +258,7 @@ Componente reutilizable para botones de acción iconográficos con tooltip integ
 
 ## Security Validation Standard
 
-- **Shell Injection Protection**: Todos los comandos externos se ejecutan utilizando un sistema de escape POSIX-compatible vía `runCommand` con argumentos en array. El uso de `stdin` es obligatorio para el paso de payloads complejos para evitar vulnerabilidades de redirección.
+- **Shell Injection Protection**: Todos los comandos externos se ejecutan utilizando un sistema de escape POSIX-compatible vía `runCommand` con argumentos en array (`string[]`). La interfaz de `runCommand` está estrictamente tipada para rechazar strings, eliminando la posibilidad de inyecciones por concatenación accidental. El uso de `stdin` es obligatorio para el paso de payloads complejos para evitar vulnerabilidades de redirección.
 - **Verification**: Refactorizaciones de endurecimiento de shell deben ser verificadas por `src/api/security.test.ts`.
 - **Render-safe Ref Access**: El acceso a `.current` de los Refs de React está prohibido durante la fase de renderizado. Toda lógica de sincronización (ej: scroll en DiffViewer) debe encapsularse en event handlers estabilizados con `useCallback`.
 - **Type Safety Strategy**: Se prohíbe el uso de `any`. Se prioriza el uso de interfaces explícitas y `unknown` para asegurar la integridad de los datos en tiempo de compilación.
@@ -302,3 +309,4 @@ Si el header sticky no funciona:
 - **Fechas**: Uso obligatorio de `DayJS` para tiempo relativo (`.fromNow()`).
 - **Acciones**: Uso de `ActionButton` (size="sm") para todas las operaciones de fila.
 - **Empty State**: Implementar patrón de alta jerarquía con icono `Activity` (muted/20) y CTA claro para navegación.
+- **Dashboard Integration**: La salud de los servicios debe estar visible en el Dashboard de repositorios mediante indicadores compactos (puntos semánticos) que proporcionan un resumen rápido (OK/Error/Pendiente) sin navegación profunda.

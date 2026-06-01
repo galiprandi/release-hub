@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { Search, Star, ExternalLink, Loader2, GitBranch, X } from 'lucide-react'
+import { Search, Loader2, GitBranch, X } from 'lucide-react'
 import { useRepoSearch } from '@/hooks/useRepoSearch'
 import { useUserCollections } from '@/hooks/useUserCollections'
 import { useUserReposSummary } from '@/hooks/useUserReposSummary'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton'
 
 export function RepoSearch() {
   const [query, setQuery] = useState('')
@@ -222,38 +223,16 @@ export function RepoSearch() {
 
                       {/* Actions */}
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-                        <button
-                          type="button"
+                        <ActionButton
+                          action={isFav ? ACTION_DEFINITIONS.removeFavorite : ACTION_DEFINITIONS.addFavorite}
                           onClick={() => toggleFavorite(repo.fullName)}
-                          className={`p-1.5 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
-                            isFav
-                              ? 'text-yellow-500 hover:text-yellow-600'
-                              : 'text-muted-foreground hover:text-yellow-500 hover:bg-yellow-500/10'
-                          }`}
-                          aria-label={
-                            isFav
-                              ? `Eliminar ${repo.fullName} de favoritos`
-                              : `Agregar ${repo.fullName} a favoritos`
-                          }
-                          title={
-                            isFav
-                              ? 'Eliminar de favoritos'
-                              : 'Agregar a favoritos'
-                          }
-                        >
-                          <Star
-                            className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`}
-                          />
-                        </button>
-                        <button
-                          type="button"
+                          size="sm"
+                        />
+                        <ActionButton
+                          action={ACTION_DEFINITIONS.openGitHub}
                           onClick={() => handleOpenInNewTab(repo.fullName)}
-                          className="p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-                          aria-label={`Abrir ${repo.fullName} en GitHub`}
-                          title="Abrir en GitHub"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </button>
+                          size="sm"
+                        />
                       </div>
                     </div>
                   </div>

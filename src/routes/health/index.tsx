@@ -4,6 +4,7 @@ import { Activity, ExternalLink, ChevronDown, CheckCircle2, XCircle, Circle } fr
 import { useHealthMonitor } from '@/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
 import { Table } from '@/components/ui/Table';
+import { EmptyState } from '@/components/EmptyState';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PageLayout } from '../../layouts/PageLayout';
 import DayJS from '@/lib/dayjs';
@@ -266,8 +267,8 @@ function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMo
     <span
       className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${
         isProd
-          ? 'bg-primary/10 text-primary border-primary/20'
-          : 'bg-info/10 text-info border-info/20'
+          ? 'bg-primary/20 text-primary border-primary/20'
+          : 'bg-info/20 text-info border-info/20'
       }`}
     >
       {endpoint.environment}
@@ -511,28 +512,22 @@ function HealthMonitorPage() {
 
       {/* Endpoints by product */}
       {filteredEndpoints.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-muted/5 border border-dashed border-border/40 rounded-2xl">
-          <div className="w-16 h-16 rounded-2xl bg-muted/20 flex items-center justify-center mb-4">
-            <Activity className="w-8 h-8 text-muted-foreground/40" />
-          </div>
-          <h3 className="text-sm font-bold uppercase tracking-wider text-foreground mb-1">
-            Sin resultados
-          </h3>
-          <p className="text-xs text-muted-foreground max-w-[280px] mb-6">
-            {!activeFilter
-              ? 'Navega a un producto favorito para detectar servicios automáticamente y comenzar el monitoreo.'
-              : 'No hay servicios que coincidan con los filtros aplicados actualmente.'}
-          </p>
-          {!activeFilter && (
+        <EmptyState
+          icon={<Activity className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />}
+          label="Sin resultados"
+          caption={!activeFilter
+            ? 'Navega a un producto favorito para detectar servicios automáticamente y comenzar el monitoreo.'
+            : 'No hay servicios que coincidan con los filtros aplicados actualmente.'}
+          action={!activeFilter && (
             <Link
               to="/github"
-              className={`inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm hover:opacity-90 transition-all ${FOCUS_RING}`}
+              className={`inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm hover:opacity-90 transition-all ${FOCUS_RING}`}
             >
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ExternalLink className="w-4 h-4" />
               Explorar Repositorios
             </Link>
           )}
-        </div>
+        />
       ) : (
         <div className="space-y-4">
           {sortedProducts.map((product) => (

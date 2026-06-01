@@ -42,6 +42,7 @@
 - should neutralize pipe injection in array-based commands
 - should neutralize redirection injection in array-based commands
 - should neutralize semicolon injection in docker commands
+- should throw error if command is not an array (runtime enforcement)
 
 ## Module: api/seki
 - fetchPipeline retorna el pipeline
@@ -73,14 +74,6 @@
 - should suggest next version correctly
 - should toggle commits list with accessibility attributes
 
-## Module: Pipeline Core Types
-- should accept valid provider values
-- should accept valid state values
-- should accept valid view mode values
-- should create a valid pipeline event
-- should create valid pipeline data structure
-- should support minimal pipeline data
-
 ## Module: usePortForward
 - connects successfully
 - disconnects successfully
@@ -95,6 +88,14 @@
 - debe retornar objeto vacío si el JSON es inválido
 - debe retornar permisos cuando el comando es exitoso
 
+## Module: Pipeline Core Types
+- should accept valid provider values
+- should accept valid state values
+- should accept valid view mode values
+- should create a valid pipeline event
+- should create valid pipeline data structure
+- should support minimal pipeline data
+
 ## Module: diffEngine
 - should handle arrays
 - should identify additions
@@ -108,35 +109,6 @@
 - retorna false si sekiToken es nulo o no existe
 - retorna false si storage es nulo o JSON inválido
 - retorna true si el token existe
-
-## Module: BaseDialog
-- should accept maxWidth prop
-- should call onOpenChange when close button is clicked
-- should have proper accessibility attributes
-- should not render dialog when open is false
-- should render children
-- should render description when provided
-- should render dialog when open is true
-- should render title
-
-## Module: DialogCloseButton
-- should apply custom className when provided
-- should have proper accessibility attributes
-- should have screen reader text 'Cerrar'
-- should render the button with X icon
-
-## Module: StatusCard
-- applies focus ring classes to buttons
-- applies hover and transition classes to retry button
-- calls onClose when close button is clicked
-- does not render close button if onClose is not provided
-- does not render retry button if onRetry is not provided
-- handles long messages with truncate class
-- renders custom retry button styles for non-error/warn types
-- renders error state with retry button
-- renders loading state correctly
-- renders offline state correctly
-- renders warn state with retry button
 
 ## Module: LogsViewer
 - calls onResourceChange when resource is selected
@@ -205,3 +177,32 @@
 - renders timeline with events
 - shows different states with different styling
 - shows tooltip on hover
+
+## Module: BaseDialog
+- should accept maxWidth prop
+- should call onOpenChange when close button is clicked
+- should have proper accessibility attributes
+- should not render dialog when open is false
+- should render children
+- should render description when provided
+- should render dialog when open is true
+- should render title
+
+## Module: DialogCloseButton
+- should apply custom className when provided
+- should have proper accessibility attributes
+- should have screen reader text 'Cerrar'
+- should render the button with X icon
+
+## Module: StatusCard
+- applies focus ring classes to buttons
+- applies hover and transition classes to retry button
+- calls onClose when close button is clicked
+- does not render close button if onClose is not provided
+- does not render retry button if onRetry is not provided
+- handles long messages with truncate class
+- renders custom retry button styles for non-error/warn types
+- renders error state with retry button
+- renders loading state correctly
+- renders offline state correctly
+- renders warn state with retry button

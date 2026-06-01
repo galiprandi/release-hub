@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery } from "@tanstack/react-query"
-import { Star, Terminal as TerminalIcon } from "lucide-react"
+import { Boxes, Terminal as TerminalIcon } from "lucide-react"
 import type { DeploymentInfo } from "@/api/kubectl"
 import { getPodsForDeployment } from "@/api/kubectl"
 import { LogsViewer } from "@/components/shared/LogsViewer"
@@ -349,7 +349,8 @@ function DeploymentsTable({
 			accessorKey: "name",
 			header: () => (
 				<div className="flex items-center gap-2">
-					<span>{context}</span>
+					<Boxes className="w-4 h-4 text-primary/60" />
+					<span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{context}</span>
 				</div>
 			),
 			cell: ({ row }) => <DeploymentNameCell deployment={row.original} isLoading={isLoading} />,
@@ -421,28 +422,28 @@ function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentI
 	if (isLoading) {
 		return (
 			<div className="flex items-center gap-2">
-				<div className="h-4 bg-muted rounded w-32" />
+				<div className="h-4 bg-muted/40 rounded w-32 animate-pulse" />
 			</div>
 		)
 	}
 
-	return <span className="font-medium text-foreground text-sm">{deployment.name}</span>
+	return <span className="font-medium tracking-tight text-foreground text-sm">{deployment.name}</span>
 }
 
 function StatusCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
 	if (isLoading) {
-		return <div className="h-6 bg-muted rounded w-16" />
+		return <div className="h-6 bg-muted/40 rounded w-16 animate-pulse" />
 	}
 
 	const variants: Record<string, string> = {
-		healthy: 'bg-success/20 text-success',
-		progressing: 'bg-info/20 text-info',
-		degraded: 'bg-destructive/20 text-destructive',
-		unknown: 'bg-muted text-muted-foreground',
+		healthy: 'bg-success/20 text-success border-success/20',
+		progressing: 'bg-info/20 text-info border-info/20',
+		degraded: 'bg-destructive/20 text-destructive border-destructive/20',
+		unknown: 'bg-muted/40 text-muted-foreground border-border/40',
 	}
 
 	return (
-		<span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase ${variants[deployment.status] || variants.unknown}`}>
+		<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-wider uppercase ${variants[deployment.status] || variants.unknown}`}>
 			{deployment.status}
 		</span>
 	)
@@ -493,23 +494,20 @@ function ActionsCell({
 	onRemoveFavorite: (deployment: DeploymentInfo) => void
 }) {
 	return (
-		<div className="flex items-center justify-end gap-1.5">
+		<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
 			<ActionButton
 				action={ACTION_DEFINITIONS.viewLogs}
 				onClick={() => onViewLogs(deployment, context)}
+				size="sm"
 			/>
 			<ActionButton
 				action={ACTION_DEFINITIONS.openTerminal}
 				onClick={() => onOpenTerminal(deployment, context)}
 			/>
-			<button
-				type="button"
+			<ActionButton
+				action={ACTION_DEFINITIONS.removeFavorite}
 				onClick={() => onRemoveFavorite(deployment)}
-				className="p-1.5 text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-				aria-label="Eliminar de favoritos"
-			>
-				<Star className="w-4 h-4 fill-current" />
-			</button>
+			/>
 		</div>
 	)
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { apiExec } from './exec'
+import { apiExec, runCommand } from './exec'
 import { startContainer } from './docker'
 import { getDeployment } from './kubectl'
 import { executeCurlCommand } from './curl'
@@ -79,6 +79,11 @@ describe('Security Hardening', () => {
       const command = (lastCall[1] as { command: string }).command
       // POSIX quote for O'Reilly is 'O'\''Reilly'
       expect(command).toContain("'O'\\''Reilly'")
+    })
+
+    it('should throw error if command is not an array (runtime enforcement)', async () => {
+      // @ts-expect-error - testing runtime check for non-array input
+      await expect(runCommand('ls -la')).rejects.toThrow('Security violation: runCommand requires an array of arguments')
     })
   })
 

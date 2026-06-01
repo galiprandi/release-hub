@@ -91,7 +91,10 @@ export function groupLogs(logText: string): string[] {
 		
 		// kafka-client logs (info:, silly:, error:)
 		if (/^info:|^silly:|^error:|^warn:/.test(cleanLine)) return true;
-		
+
+		// Pipe-separated format: service | component | env | timestamp | LEVEL | ...
+		if (/\|\s*(INFO|DEBUG|ERROR|WARN|WARNING|TRACE|FATAL)\s*\|/.test(cleanLine)) return true;
+
 		return false;
 	};
 

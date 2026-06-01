@@ -14,7 +14,7 @@ import {
   RefreshCw,
   Activity,
   GitCompare,
-  Terminal
+  Terminal as TerminalIcon
 } from 'lucide-react';
 import { useEffect } from 'react';
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -24,6 +24,8 @@ import { GenericSearch } from "@/components/GenericSearch";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { EmptyState } from "@/components/EmptyState";
 import { useGitUser } from "@/hooks/useGitUser";
+import { BaseDialog } from "@/components/ui/BaseDialog";
+import { Terminal } from "@/components/shared/Terminal";
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -118,7 +120,7 @@ export function PageLayout({
               <NavIcon icon={Activity} label="Health Monitor" to="/health" pathname={pathname} />
             </li>
             <li>
-              <NavIcon icon={Terminal} label="Terminal" to="/terminal" pathname={pathname} />
+              <TerminalIconModal />
             </li>
           </ul>
 
@@ -325,7 +327,7 @@ function FeedbackIcon() {
 
 function SettingsIcon() {
   const [open, setOpen] = useState(false);
-  
+
   const buttonContent = (
     <button
       onClick={() => setOpen(true)}
@@ -361,6 +363,66 @@ function SettingsIcon() {
     <>
       {contentWithTooltip}
       <SettingsDialog open={open} onOpenChange={setOpen} showTrigger={false} />
+    </>
+  );
+}
+
+function TerminalIconModal() {
+  const [open, setOpen] = useState(false);
+
+  const buttonContent = (
+    <button
+      onClick={() => setOpen(true)}
+      className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none text-muted-foreground hover:text-foreground hover:bg-muted/60"
+      aria-label="Terminal"
+    >
+      <TerminalIcon className="w-5 h-5" aria-hidden="true" />
+    </button>
+  );
+
+  const contentWithTooltip = (
+    <Tooltip.Provider delayDuration={0}>
+      <Tooltip.Root>
+        <Tooltip.Trigger asChild>
+          {buttonContent}
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content
+            side="right"
+            sideOffset={10}
+            className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
+            role="tooltip"
+          >
+            Terminal
+            <Tooltip.Arrow className="fill-popover" />
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+    </Tooltip.Provider>
+  );
+
+  return (
+    <>
+      {contentWithTooltip}
+      <BaseDialog
+        open={open}
+        onOpenChange={setOpen}
+        title={
+          <div className="flex items-center gap-2">
+            <TerminalIcon className="w-4 h-4 text-primary" />
+            <span>Terminal del Sistema</span>
+          </div>
+        }
+        maxWidth="max-w-6xl"
+        className="w-[90vw] h-[80vh] !p-0"
+      >
+        <div className="flex-1 min-h-0 bg-black rounded-b-lg overflow-hidden">
+          <Terminal
+            type="local"
+            className="border-none rounded-none h-full"
+          />
+        </div>
+      </BaseDialog>
     </>
   );
 }

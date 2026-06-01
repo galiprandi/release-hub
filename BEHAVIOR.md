@@ -73,6 +73,14 @@
 - should suggest next version correctly
 - should toggle commits list with accessibility attributes
 
+## Module: Pipeline Core Types
+- should accept valid provider values
+- should accept valid state values
+- should accept valid view mode values
+- should create a valid pipeline event
+- should create valid pipeline data structure
+- should support minimal pipeline data
+
 ## Module: usePortForward
 - connects successfully
 - disconnects successfully
@@ -87,14 +95,6 @@
 - debe retornar objeto vacío si el JSON es inválido
 - debe retornar permisos cuando el comando es exitoso
 
-## Module: Pipeline Core Types
-- should accept valid provider values
-- should accept valid state values
-- should accept valid view mode values
-- should create a valid pipeline event
-- should create valid pipeline data structure
-- should support minimal pipeline data
-
 ## Module: diffEngine
 - should handle arrays
 - should identify additions
@@ -108,35 +108,6 @@
 - retorna false si sekiToken es nulo o no existe
 - retorna false si storage es nulo o JSON inválido
 - retorna true si el token existe
-
-## Module: LogsViewer
-- calls onResourceChange when resource is selected
-- copies logs to clipboard
-- enables auto-scroll when clicking play button
-- filters logs by level
-- highlights search term and calculates match count
-- renders as modal when asModal is true
-- renders logs correctly
-- shows empty message when no logs
-- toggles auto-scroll
-- toggles expand/collapse full screen option in modal mode
-
-## Module: logUtils
-- should detect JSON start with {
-- should detect kafka-client levels
-- should detect new logs by various patterns
-- should detect various bracket patterns
-- should group multi-line logs correctly
-- should handle empty input
-- should handle logs starting with ANSI codes
-- should handle regex special characters in filter
-- should highlight filter terms
-- should highlight log levels with appropriate colors
-- should highlight timestamps at the beginning of the line
-- should remove ANSI escape codes from text
-- should return null/undefined if line is empty
-- should return the same text if no ANSI codes are present
-- should strip ANSI codes before highlighting
 
 ## Module: BaseDialog
 - should accept maxWidth prop
@@ -166,6 +137,35 @@
 - renders loading state correctly
 - renders offline state correctly
 - renders warn state with retry button
+
+## Module: LogsViewer
+- calls onResourceChange when resource is selected
+- copies logs to clipboard
+- enables auto-scroll when clicking play button
+- filters logs by level
+- highlights search term and calculates match count
+- renders as modal when asModal is true
+- renders logs correctly
+- shows empty message when no logs
+- toggles auto-scroll
+- toggles expand/collapse full screen option in modal mode
+
+## Module: logUtils
+- should detect JSON start with {
+- should detect kafka-client levels
+- should detect new logs by various patterns
+- should detect various bracket patterns
+- should group multi-line logs correctly
+- should handle empty input
+- should handle logs starting with ANSI codes
+- should handle regex special characters in filter
+- should highlight filter terms
+- should highlight log levels with appropriate colors
+- should highlight timestamps at the beginning of the line
+- should remove ANSI escape codes from text
+- should return null/undefined if line is empty
+- should return the same text if no ANSI codes are present
+- should strip ANSI codes before highlighting
 
 ## Module: Pipeline Adapters
 - should handle errors gracefully

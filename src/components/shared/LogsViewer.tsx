@@ -158,7 +158,9 @@ export function LogsViewer({
 		let groupsToProcess = logGroups;
 		if (logLevelFilter !== "all") {
 			groupsToProcess = logGroups.filter(group => {
-				const match = group.match(logLevelPattern);
+				// Solo buscar el nivel de log en la primera línea del grupo
+				const firstLine = group.split("\n")[0];
+				const match = firstLine.match(logLevelPattern);
 				if (!match) return false;
 				const level = match[0].toUpperCase();
 				if (logLevelFilter === "ERROR") {

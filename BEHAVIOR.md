@@ -139,45 +139,6 @@
 - should return the same text if no ANSI codes are present
 - should strip ANSI codes before highlighting
 
-## Module: Pipeline Adapters
-- should handle errors gracefully
-- should handle invalid JSON in settings gracefully
-- should have correct name
-- should have required properties
-- should not support when Nx Build workflow does not exist
-- should not support when no token exists
-- should support when Nx Build workflow exists
-- should support when token exists
-
-## Module: pulsarAdapter
-- should fetch and transform pulsar data correctly
-- should return null when no workflow runs are found
-- should support repos with Nx Build workflow
-
-## Module: sekiAdapter
-- should fetch and transform commit data
-- should fetch and transform tag data
-- should return null for short refs or API errors
-- should transform events and subevents correctly
-
-## Module: PipelineCard
-- applies custom className
-- does not show running indicator when isRunning is false
-- has different styling for commits vs tags
-- renders children when provided
-- renders meta parts correctly
-- renders tag ref type for tags
-- renders with basic props
-- shows running indicator when isRunning is true
-
-## Module: SimpleTimeline
-- displays duration in tooltip for completed events
-- limits display to first 6 events
-- renders empty timeline with no events
-- renders timeline with events
-- shows different states with different styling
-- shows tooltip on hover
-
 ## Module: BaseDialog
 - should accept maxWidth prop
 - should call onOpenChange when close button is clicked
@@ -206,3 +167,42 @@
 - renders loading state correctly
 - renders offline state correctly
 - renders warn state with retry button
+
+## Module: PipelineCard
+- applies custom className
+- does not show running indicator when isRunning is false
+- has different styling for commits vs tags
+- renders children when provided
+- renders meta parts correctly
+- renders tag ref type for tags
+- renders with basic props
+- shows running indicator when isRunning is true
+
+## Module: SimpleTimeline
+- displays duration in tooltip for completed events
+- limits display to first 6 events
+- renders empty timeline with no events
+- renders timeline with events
+- shows different states with different styling
+- shows tooltip on hover
+
+## Module: Pipeline Adapters
+- should handle errors gracefully
+- should handle invalid JSON in settings gracefully
+- should have correct name
+- should have required properties
+- should not support when Nx Build workflow does not exist
+- should not support when no token exists
+- should support when Nx Build workflow exists
+- should support when token exists
+
+## Module: pulsarAdapter
+- should fetch and transform pulsar data correctly
+- should return null when no workflow runs are found
+- should support repos with Nx Build workflow
+
+## Module: sekiAdapter
+- should fetch and transform commit data
+- should fetch and transform tag data
+- should return null for short refs or API errors
+- should transform events and subevents correctly

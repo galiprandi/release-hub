@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { Search, Star, Loader2, X, Terminal } from 'lucide-react'
+import { Search, Loader2, X, Terminal } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { applyCachePolicy } from '@/lib/queryKeys'
 import { useUserCollections } from '@/hooks/useUserCollections'

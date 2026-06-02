@@ -259,10 +259,10 @@ function StatusCell({ container }: { container: ContainerInfo }) {
 
 	return (
 		<span
-			className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase ${
+			className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-wider uppercase ${
 				running
-					? 'bg-success/20 text-success shadow-sm'
-					: 'bg-muted text-muted-foreground'
+					? 'bg-success/20 text-success border-success/20 shadow-sm'
+					: 'bg-muted/40 text-muted-foreground border-border/40'
 			}`}
 		>
 			{running ? 'Ejecutando' : 'Detenido'}
@@ -332,7 +332,7 @@ function PortsCell({ container }: { container: ContainerInfo }) {
 			<select
 				value={selectedPort}
 				onChange={(e) => setSelectedPort(e.target.value)}
-				className="text-[11px] font-bold border border-border/60 rounded-lg px-2 py-1 bg-muted/40 hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 cursor-pointer"
+				className="text-[10px] font-bold uppercase tracking-wider border border-border/40 rounded-lg px-2 py-1 bg-muted/40 hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 cursor-pointer"
 				aria-label="Seleccionar puerto"
 			>
 				{externalPorts.map((port, index) => (
@@ -344,7 +344,7 @@ function PortsCell({ container }: { container: ContainerInfo }) {
 			<button
 				type="button"
 				onClick={() => handlePortClick(selectedPort)}
-				className="p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 disabled:opacity-30"
+				className="p-1.5 text-primary/60 hover:text-primary hover:bg-primary/10 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 disabled:opacity-30"
 				title={`Abrir puerto ${selectedPort}`}
 				aria-label={`Abrir puerto ${selectedPort}`}
 				disabled={!selectedPort}

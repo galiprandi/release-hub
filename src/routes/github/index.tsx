@@ -285,7 +285,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 		const prodCommitIndex = commits.findIndex(c => c.hash === prodPipeline.data!.git!.commit);
 		if (prodCommitIndex === -1) return commits.length;
 		return prodCommitIndex;
-	}, [commits, prodPipeline.data?.git?.commit]);
+	}, [commits, prodPipeline.data]);
 
 	const isLoading = isLoadingCommits || isLoadingTags;
 
@@ -380,7 +380,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 			date: commit.date,
 			message: commit.message,
 		};
-	}, [latestTag?.commit, commits]);
+	}, [latestTag, commits]);
 
 	if (isLoadingTags) {
 		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;

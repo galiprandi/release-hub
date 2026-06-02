@@ -5,6 +5,12 @@ import axios from 'axios'
 /**
  * WebMCP API Types (Proposed Standard)
  */
+interface InputSchema {
+  type: 'object'
+  properties: Record<string, { type: string; description?: string }>
+  required?: string[]
+}
+
 interface ModelContext {
   registerTool(tool: WebMCPTool, options?: { signal?: AbortSignal; exposedTo?: string[] }): void
   getTools(): Promise<WebMCPTool[]>
@@ -14,7 +20,7 @@ interface ModelContext {
 interface WebMCPTool {
   name: string
   description: string
-  inputSchema: Record<string, unknown>
+  inputSchema: InputSchema
   execute(input: Record<string, unknown>): Promise<unknown>
 }
 
@@ -44,8 +50,8 @@ export function useWebMCP() {
         },
         required: ['query'],
       },
-      execute: async (input) => {
-        const { query } = input as { query: string }
+      execute: async ({ query }) => {
+        if (typeof query !== 'string') throw new Error('Query must be a string');
         try {
           const userResult = await runCommand(['gh', 'api', '/user', '--jq', '.login'])
           const username = userResult.stdout.trim()
@@ -97,8 +103,8 @@ export function useWebMCP() {
         },
         required: ['repo'],
       },
-      execute: async (input) => {
-        const { repo } = input as { repo: string }
+      execute: async ({ repo }) => {
+        if (typeof repo !== 'string') throw new Error('Repo must be a string');
         try {
           // Get latest commit
           const commitResult = await runCommand([
@@ -148,8 +154,10 @@ export function useWebMCP() {
         },
         required: ['repo', 'tagName'],
       },
-      execute: async (input) => {
-        const { repo, tagName, tagMessage } = input as { repo: string; tagName: string; tagMessage?: string }
+      execute: async ({ repo, tagName, tagMessage }) => {
+        if (typeof repo !== 'string' || typeof tagName !== 'string') {
+          throw new Error('Repo and tagName must be strings');
+        }
         try {
           // Verify authentication and get token
           const tokenResult = await runCommand(['gh', 'auth', 'token'])

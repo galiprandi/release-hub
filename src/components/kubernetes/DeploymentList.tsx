@@ -349,8 +349,8 @@ function DeploymentsTable({
 			accessorKey: "name",
 			header: () => (
 				<div className="flex items-center gap-2">
-					<Boxes className="w-4 h-4 text-primary/60" />
-					<span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{context}</span>
+					<Boxes className="w-4 h-4 text-primary/40" />
+					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{context}</span>
 				</div>
 			),
 			cell: ({ row }) => <DeploymentNameCell deployment={row.original} isLoading={isLoading} />,
@@ -453,7 +453,7 @@ function AgeCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoad
 	if (isLoading) {
 		return <div className="h-4 bg-muted rounded w-10" />
 	}
-	return <span className="text-sm text-muted-foreground">{deployment.age}</span>
+	return <span className="text-xs font-medium text-muted-foreground tracking-tight">{deployment.age}</span>
 }
 
 function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {

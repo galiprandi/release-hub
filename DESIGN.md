@@ -17,8 +17,8 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 
 ## Industrial Resonance V2 - Refinamientos de Elite
 
-- **Tipografía Técnica**: Uso sistemático de `tracking-tight` para nombres de elementos y `tracking-wider` para labels en mayúsculas.
-- **Jerarquía de Color**: Aplicación estricta de opacidades semánticas (10-20%) para fondos de contenedores de estado (ej: `bg-success/10 border-success/20`).
+- **Tipografía Técnica**: Uso sistemático de `tracking-tight` para nombres de elementos (vía `text-sm font-medium`) y `tracking-wider` para labels en mayúsculas (vía `text-[10px] font-bold`).
+- **Jerarquía de Color**: Aplicación estricta de opacidades semánticas (20-40%) para fondos de contenedores de estado (ej: `bg-success/20 border-success/20`).
 - **Geometría**: Evolución de `rounded-md` a `rounded-xl` para contenedores principales y `rounded-lg` para elementos de acción, suavizando la estética industrial sin perder su carácter técnico.
 
 ## Docker UI Pattern (Resonancia Industrial)

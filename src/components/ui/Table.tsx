@@ -119,7 +119,7 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 				<div className="px-4 py-3 border-b border-border/60 bg-muted/20">
 					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
 						<div className="flex items-center gap-2">
-							<span className="text-xs font-bold uppercase tracking-tight text-muted-foreground">{filterLabel}</span>
+							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{filterLabel}</span>
 							<div className="flex items-center gap-1.5">
 								<button
 									type="button"
@@ -182,7 +182,7 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 													key={header.id}
 													scope="col"
 													className={clsx(
-														"text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b border-border/60",
+														"text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 border-b border-border/60",
 														isFirstColumn && "w-full",
 														!isFirstColumn && !columnWidth && "whitespace-nowrap",
 														columnWidth && "overflow-hidden text-ellipsis whitespace-nowrap",
@@ -259,14 +259,14 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 								>
 									Anterior
 								</button>
-								<span className="text-xs font-bold uppercase tracking-tighter text-muted-foreground">
+								<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
 									Página <span className="text-foreground">{pagination.pageIndex + 1}</span> de <span className="text-foreground">{pageCount}</span>
 								</span>
 								<button
 									type="button"
 									onClick={() => table.nextPage()}
 									disabled={!table.getCanNextPage()}
-									className="px-4 py-1.5 text-xs font-bold uppercase tracking-tight border border-border/60 rounded-md bg-background hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+									className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider border border-border/60 rounded-md bg-background hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 								>
 									Siguiente
 								</button>

@@ -5,17 +5,23 @@ import axios from 'axios'
 /**
  * WebMCP API Types (Proposed Standard)
  */
+interface InputSchema {
+  type: 'object'
+  properties: Record<string, { type: string; description?: string }>
+  required?: string[]
+}
+
 interface ModelContext {
   registerTool(tool: WebMCPTool, options?: { signal?: AbortSignal; exposedTo?: string[] }): void
   getTools(): Promise<WebMCPTool[]>
-  executeTool(tool: WebMCPTool, input: string, options?: { signal?: AbortSignal }): Promise<any>
+  executeTool(tool: WebMCPTool, input: string, options?: { signal?: AbortSignal }): Promise<unknown>
 }
 
 interface WebMCPTool {
   name: string
   description: string
-  inputSchema: any
-  execute(input: any): Promise<any>
+  inputSchema: InputSchema
+  execute(input: Record<string, unknown>): Promise<unknown>
 }
 
 declare global {
@@ -45,6 +51,7 @@ export function useWebMCP() {
         required: ['query'],
       },
       execute: async ({ query }) => {
+        if (typeof query !== 'string') throw new Error('Query must be a string');
         try {
           const userResult = await runCommand(['gh', 'api', '/user', '--jq', '.login'])
           const username = userResult.stdout.trim()
@@ -97,6 +104,7 @@ export function useWebMCP() {
         required: ['repo'],
       },
       execute: async ({ repo }) => {
+        if (typeof repo !== 'string') throw new Error('Repo must be a string');
         try {
           // Get latest commit
           const commitResult = await runCommand([
@@ -147,6 +155,9 @@ export function useWebMCP() {
         required: ['repo', 'tagName'],
       },
       execute: async ({ repo, tagName, tagMessage }) => {
+        if (typeof repo !== 'string' || typeof tagName !== 'string') {
+          throw new Error('Repo and tagName must be strings');
+        }
         try {
           // Verify authentication and get token
           const tokenResult = await runCommand(['gh', 'auth', 'token'])

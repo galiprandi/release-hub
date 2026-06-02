@@ -270,8 +270,8 @@ Componente para la gestión rápida de asignación de repositorios a proyectos d
 
 - **Shell Injection Protection**: Todos los comandos externos se ejecutan utilizando un sistema de escape POSIX-compatible vía `runCommand` con argumentos en array (`string[]`). La interfaz de `runCommand` está estrictamente tipada para rechazar strings, eliminando la posibilidad de inyecciones por concatenación accidental. El backend utiliza ejecución directa vía `spawn` sin shell (`shell: false`), lo que neutraliza por completo los ataques de inyección al tratar los argumentos como datos puros en lugar de comandos de terminal. El uso de `stdin` es obligatorio para el paso de payloads complejos.
 - **Verification**: Refactorizaciones de endurecimiento de shell deben ser verificadas por `src/api/security.test.ts`.
-- **Render-safe Ref Access**: El acceso a `.current` de los Refs de React está prohibido durante la fase de renderizado. Toda lógica de sincronización (ej: scroll en DiffViewer) debe encapsularse en event handlers estabilizados con `useCallback`.
-- **Type Safety Strategy**: Se prohíbe el uso de `any`. Se prioriza el uso de interfaces explícitas y `unknown` para asegurar la integridad de los datos en tiempo de compilación.
+- **Render-safe Ref Access**: El acceso a `.current` de los Refs de React está prohibido durante la fase de renderizado. Toda lógica de sincronización (ej: scroll en DiffViewer) debe encapsularse en event handlers estabilizados con `useCallback`. Para flujos de datos asíncronos o streaming, usar Refs para rastrear el estado procesado y evitar renders en cascada.
+- **Type Safety Strategy**: Se prohíbe el uso de `any`. Se prioriza el uso de interfaces explícitas y `unknown` para asegurar la integridad de los datos en tiempo de compilación. La integración con WebMCP debe seguir un esquema de validación estricto en los handlers de ejecución.
 
 **Uso básico**:
 ```tsx

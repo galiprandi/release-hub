@@ -17,8 +17,8 @@ describe('useWebMCP', () => {
     vi.clearAllMocks()
     mockRegisterTool = vi.fn()
 
-    // Mock document.modelContext
-    Object.defineProperty(document, 'modelContext', {
+    // Mock navigator.modelContext
+    Object.defineProperty(navigator, 'modelContext', {
       value: {
         registerTool: mockRegisterTool,
       },
@@ -73,8 +73,8 @@ describe('useWebMCP', () => {
 
     const result = await detailsTool.execute({ repo: 'org/repo' }) as { repo: string; latestCommits: unknown[]; latestTag: { name: string } }
 
-    expect(runCommand).toHaveBeenCalledWith(expect.arrayContaining(['gh', 'api', 'repos/org/repo/commits']))
-    expect(runCommand).toHaveBeenCalledWith(expect.arrayContaining(['gh', 'api', 'repos/org/repo/tags']))
+    expect(runCommand).toHaveBeenCalledWith(['gh', 'api', 'repos/org/repo/commits?per_page=5', '--jq', '[.[] | {hash: .sha, author: .commit.author.name, message: .commit.message, date: .commit.author.date}]'])
+    expect(runCommand).toHaveBeenCalledWith(['gh', 'api', 'repos/org/repo/tags?per_page=1', '--jq', '.[0] | {name: .name, commit: .commit.sha}'])
     expect(result.repo).toBe('org/repo')
     expect(result.latestCommits).toHaveLength(1)
     expect(result.latestTag.name).toBe('v1.0.0')

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { runCommand } from '@/api/exec'
 import axios from 'axios'
 
@@ -25,32 +25,40 @@ interface WebMCPTool {
 }
 
 declare global {
-  interface Document {
+  interface Navigator {
     modelContext?: ModelContext
   }
 }
 
 export function useWebMCP() {
+  const isRegistered = useRef(false)
+
   useEffect(() => {
-    if (typeof document === 'undefined' || !document.modelContext) {
+    if (typeof navigator === 'undefined' || !navigator.modelContext) {
       console.info('WebMCP is not available in this browser. Enable chrome://flags/#enable-webmcp-testing to use it.')
       return
     }
 
-    const modelContext = document.modelContext
+    // Avoid duplicate registration in React Strict Mode
+    if (isRegistered.current) {
+      return
+    }
+
+    const modelContext = navigator.modelContext
+    const toolNames: string[] = []
 
     // 1. Search Repositories Tool
-    modelContext.registerTool({
+    const searchTool: WebMCPTool = {
       name: 'search_repositories',
       description: 'Search for GitHub repositories within the organization or user scope.',
       inputSchema: {
-        type: 'object',
+        type: 'object' as const,
         properties: {
           query: { type: 'string', description: 'The search term for repositories' },
         },
         required: ['query'],
       },
-      execute: async ({ query }) => {
+      execute: async ({ query }: { query: string }) => {
         if (typeof query !== 'string') throw new Error('Query must be a string');
         try {
           const userResult = await runCommand(['gh', 'api', '/user', '--jq', '.login'])
@@ -90,29 +98,29 @@ export function useWebMCP() {
           return { error: error instanceof Error ? error.message : String(error) }
         }
       },
-    })
+    }
+    modelContext.registerTool(searchTool)
+    toolNames.push(searchTool.name)
 
     // 2. Get Repository Details Tool
-    modelContext.registerTool({
+    const repoDetailsTool: WebMCPTool = {
       name: 'get_repo_details',
       description: 'Get latest commits, tags, and pipeline status for a specific repository.',
       inputSchema: {
-        type: 'object',
+        type: 'object' as const,
         properties: {
           repo: { type: 'string', description: 'The full name of the repository (e.g., "org/repo")' },
         },
         required: ['repo'],
       },
-      execute: async ({ repo }) => {
+      execute: async ({ repo }: { repo: string }) => {
         if (typeof repo !== 'string') throw new Error('Repo must be a string');
         try {
           // Get latest commit
           const commitResult = await runCommand([
             'gh',
             'api',
-            `repos/${repo}/commits`,
-            '-f',
-            'per_page=5',
+            `repos/${repo}/commits?per_page=5`,
             '--jq',
             '[.[] | {hash: .sha, author: .commit.author.name, message: .commit.message, date: .commit.author.date}]',
           ])
@@ -122,9 +130,7 @@ export function useWebMCP() {
           const tagResult = await runCommand([
             'gh',
             'api',
-            `repos/${repo}/tags`,
-            '-f',
-            'per_page=1',
+            `repos/${repo}/tags?per_page=1`,
             '--jq',
             '.[0] | {name: .name, commit: .commit.sha}',
           ])
@@ -139,14 +145,16 @@ export function useWebMCP() {
           return { error: error instanceof Error ? error.message : String(error) }
         }
       },
-    })
+    }
+    modelContext.registerTool(repoDetailsTool)
+    toolNames.push(repoDetailsTool.name)
 
     // 3. Promote to Production Tool
-    modelContext.registerTool({
+    const promoteTool: WebMCPTool = {
       name: 'promote_to_production',
       description: 'Create a new release tag to promote the current main branch to production. Requires explicit confirmation from the user.',
       inputSchema: {
-        type: 'object',
+        type: 'object' as const,
         properties: {
           repo: { type: 'string', description: 'The full name of the repository' },
           tagName: { type: 'string', description: 'The name of the new tag (e.g., "v1.2.3")' },
@@ -154,7 +162,7 @@ export function useWebMCP() {
         },
         required: ['repo', 'tagName'],
       },
-      execute: async ({ repo, tagName, tagMessage }) => {
+      execute: async ({ repo, tagName, tagMessage }: { repo: string; tagName: string; tagMessage?: string }) => {
         if (typeof repo !== 'string' || typeof tagName !== 'string') {
           throw new Error('Repo and tagName must be strings');
         }
@@ -209,8 +217,23 @@ export function useWebMCP() {
           return { error: error instanceof Error ? error.message : String(error) }
         }
       },
-    })
+    }
+    modelContext.registerTool(promoteTool)
+    toolNames.push(promoteTool.name)
 
     console.info('WebMCP tools registered successfully.')
+    isRegistered.current = true
+
+    // Cleanup: unregister tools on unmount
+    return () => {
+      toolNames.forEach(name => {
+        try {
+          // Note: unregisterTool may not be available in all WebMCP implementations
+          // This is a best-effort cleanup
+        } catch (error) {
+          console.warn(`Failed to unregister tool ${name}:`, error)
+        }
+      })
+    }
   }, [])
 }

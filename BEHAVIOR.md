@@ -88,6 +88,12 @@
 - debe retornar objeto vacío si el JSON es inválido
 - debe retornar permisos cuando el comando es exitoso
 
+## Module: useWebMCP
+- get_repo_details tool calls runCommand correctly
+- promote_to_production tool calls APIs correctly
+- registers all tools on mount
+- search_repositories tool calls runCommand correctly
+
 ## Module: Pipeline Core Types
 - should accept valid provider values
 - should accept valid state values

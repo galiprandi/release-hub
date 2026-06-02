@@ -28,30 +28,28 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
 	});
 
 	// Handle streaming data updates
+	const lastProcessedDataRef = useRef<string | null>(null);
+
 	useEffect(() => {
-		if (data && status === "prompting") {
-			setMessages(prev => {
-				const lastMessage = prev[prev.length - 1];
-				if (lastMessage && lastMessage.role === "assistant") {
-					const newMessages = [...prev];
-					newMessages[newMessages.length - 1] = { ...lastMessage, content: data };
-					return newMessages;
-				} else {
-					return [...prev, { role: "assistant", content: data }];
-				}
-			});
-		} else if (status === "success" && data) {
-            // Ensure the final message is updated when streaming finishes
-            setMessages(prev => {
-				const lastMessage = prev[prev.length - 1];
-				if (lastMessage && lastMessage.role === "assistant") {
-					const newMessages = [...prev];
-					newMessages[newMessages.length - 1] = { ...lastMessage, content: data };
-					return newMessages;
-				}
-                return prev;
-			});
-        }
+		if (status === "prompting" || status === "success") {
+			if (data && data !== lastProcessedDataRef.current) {
+				setMessages(prev => {
+					const lastMessage = prev[prev.length - 1];
+					if (lastMessage && lastMessage.role === "assistant") {
+						const newMessages = [...prev];
+						newMessages[newMessages.length - 1] = { ...lastMessage, content: data };
+						return newMessages;
+					} else {
+						return [...prev, { role: "assistant", content: data }];
+					}
+				});
+				lastProcessedDataRef.current = data;
+			}
+		}
+
+		if (status === "idle" || status === "error") {
+			lastProcessedDataRef.current = null;
+		}
 	}, [data, status]);
 
 	// Auto-scroll to bottom
@@ -187,6 +185,7 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
 						/>
 						<button
 							onClick={handleSend}
+							aria-label="Enviar mensaje"
 							disabled={!input.trim() || status === "prompting" || status === "initializing" || status === "downloading"}
 							className={`p-2 rounded-lg transition-all ${
 								input.trim() && status !== "prompting"

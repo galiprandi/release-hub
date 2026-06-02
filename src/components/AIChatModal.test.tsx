@@ -20,7 +20,7 @@ vi.mock("streamdown", () => ({
 
 // Mock BaseDialog to just render children if open
 vi.mock("@/components/ui/BaseDialog", () => ({
-	BaseDialog: ({ children, open, title, headerExtra }: any) => (
+	BaseDialog: ({ children, open, title, headerExtra }: { children: React.ReactNode; open: boolean; title: React.ReactNode; headerExtra: React.ReactNode }) => (
 		open ? (
 			<div data-testid="base-dialog">
 				<div>{title}</div>
@@ -56,17 +56,17 @@ describe("AIChatModal", () => {
 	it("calls prompt when send button is clicked", async () => {
 		const mockPrompt = vi.fn();
 		const { useAIPrompt } = await import("@galiprandi/react-tools");
-		(useAIPrompt as any).mockReturnValue({
+		vi.mocked(useAIPrompt).mockReturnValue({
 			data: "",
 			status: "idle",
 			prompt: mockPrompt,
 			reset: vi.fn(),
 			error: null,
-		});
+		} as unknown as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 		const textarea = screen.getByPlaceholderText("Pregunta algo sobre ReleaseHub...");
-		const sendButton = screen.getByRole("button", { name: "" }); // Send button has no text but icon
+		const sendButton = screen.getByRole("button", { name: "Enviar mensaje" });
 
 		fireEvent.change(textarea, { target: { value: "Test prompt" } });
 		fireEvent.click(sendButton);
@@ -78,13 +78,13 @@ describe("AIChatModal", () => {
 	it("calls reset when clear button is clicked", async () => {
 		const mockReset = vi.fn();
 		const { useAIPrompt } = await import("@galiprandi/react-tools");
-		(useAIPrompt as any).mockReturnValue({
+		vi.mocked(useAIPrompt).mockReturnValue({
 			data: "",
 			status: "idle",
 			prompt: vi.fn(),
 			reset: mockReset,
 			error: null,
-		});
+		} as unknown as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 		const clearButton = screen.getByRole("button", { name: /Limpiar/i });

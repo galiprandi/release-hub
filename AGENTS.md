@@ -64,6 +64,7 @@ Ver `DESIGN.md` para tokens, patrones visuales y especificaciones de componentes
 - **Industrial Resonance V2**: Uso de `tracking-tight` para nombres de elementos, `rounded-xl` para contenedores principales y `rounded-lg` para botones de acción.
 - **Shell Hardening**: Todo comando CLI (gh, docker, kubectl, curl) debe usar `runCommand` con un array de argumentos (`string[]`). La firma de `runCommand` prohíbe estrictamente el uso de strings para evitar vulnerabilidades de inyección. Parámetros dinámicos deben ser elementos individuales del array. Para comandos complejos que requieren entrada de datos (JSON, etc.), usar el segundo parámetro `stdin` de `runCommand`. El backend está blindado para ejecutar comandos directamente sin shell; está estrictamente prohibido el uso de `exec`, `execAsync` o `spawn(..., { shell: true })` en cualquier handler de `vite.config.ts` o middleware.
 - **Type Hygiene**: Prohibido el uso de `any`. Usar interfaces explícitas o `unknown` con validación de tipos/aserciones seguras. Las funciones de utilidad deben estar estrictamente tipadas.
+- **WebMCP Type Safety**: Las herramientas registradas en `useWebMCP.ts` deben validar estrictamente sus entradas mediante type guards antes de su ejecución para garantizar integridad en la comunicación con el modelo.
 
 ### 10. Componente Table con Filtros Integrados
 

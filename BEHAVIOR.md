@@ -42,7 +42,12 @@
 - should neutralize pipe injection in array-based commands
 - should neutralize redirection injection in array-based commands
 - should neutralize semicolon injection in docker commands
+- should reject argument injection in repo parameter
+- should reject path traversal in action parameter
 - should throw error if command is not an array (runtime enforcement)
+- should validate Docker container names correctly
+- should validate Kubernetes contexts correctly
+- should validate Kubernetes resource names correctly
 
 ## Module: api/seki
 - fetchPipeline retorna el pipeline

@@ -5,6 +5,7 @@ import { applyCachePolicy } from '@/lib/queryKeys'
 import { useUserCollections } from '@/hooks/useUserCollections'
 import type { DeploymentInfo } from '@/api/kubectl'
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton'
+import { DeploymentProjectSelectionDialog } from './DeploymentProjectSelectionDialog'
 
 export function DeploymentSearch() {
   const [query, setQuery] = useState('')
@@ -54,6 +55,8 @@ export function DeploymentSearch() {
   }, [query, allDeployments])
 
   const { toggleDeploymentFavorite, isDeploymentFavorite } = useUserCollections()
+  const [isProjectSelectionOpen, setIsProjectSelectionOpen] = useState(false)
+  const [deploymentToAssign, setDeploymentToAssign] = useState<string | null>(null)
 
   const handleSelect = () => {
     setQuery('')
@@ -132,6 +135,11 @@ export function DeploymentSearch() {
   }, [selectedIndex, isOpen])
 
   const hasResults = results.length > 0
+
+  const handleManageProjects = (deploymentId: string) => {
+    setDeploymentToAssign(deploymentId)
+    setIsProjectSelectionOpen(true)
+  }
 
   return (
     <div ref={containerRef} className="relative">
@@ -231,6 +239,11 @@ export function DeploymentSearch() {
                       {/* Actions */}
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
                         <ActionButton
+                          action={ACTION_DEFINITIONS.manageProjects}
+                          onClick={() => handleManageProjects(deploymentId)}
+                          size="sm"
+                        />
+                        <ActionButton
                           action={isFav ? ACTION_DEFINITIONS.removeFavorite : ACTION_DEFINITIONS.addFavorite}
                           onClick={() => toggleDeploymentFavorite(deploymentId)}
                           size="sm"
@@ -259,6 +272,14 @@ export function DeploymentSearch() {
             <span>{results.length} resultados</span>
           </div>
         </div>
+      )}
+
+      {isProjectSelectionOpen && deploymentToAssign && (
+        <DeploymentProjectSelectionDialog
+          isOpen={isProjectSelectionOpen}
+          onOpenChange={setIsProjectSelectionOpen}
+          deploymentId={deploymentToAssign}
+        />
       )}
     </div>
   )

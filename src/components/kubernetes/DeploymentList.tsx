@@ -11,6 +11,7 @@ import { Table } from "@/components/ui/Table"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useUserCollections } from "@/hooks/useUserCollections"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
+import { DeploymentProjectSelectionDialog } from "./DeploymentProjectSelectionDialog"
 import { PortForwardControl } from "@/components/ui/PortForwardControl"
 import { usePortForward } from "@/hooks/usePortForward"
 import { usePortFree } from "@/hooks/usePortFree"
@@ -162,12 +163,20 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 		setIsLogsModalOpen(true)
 	}
 
+	const [isProjectSelectionOpen, setIsProjectSelectionOpen] = useState(false)
+	const [deploymentToAssign, setDeploymentToAssign] = useState<string | null>(null)
+
 	const handleOpenTerminal = (deployment: DeploymentInfo, deploymentContext: string) => {
 		console.log('[DeploymentList] Opening terminal for deployment:', deployment.name, 'context:', deploymentContext)
 		setSelectedDeployment(deployment)
 		setSelectedContext(deploymentContext)
 		setSelectedPodName(null)
 		setIsTerminalModalOpen(true)
+	}
+
+	const handleManageProjects = (deployment: DeploymentInfo, deploymentContext: string) => {
+		setDeploymentToAssign(`${deploymentContext}/${deployment.namespace}/${deployment.name}`)
+		setIsProjectSelectionOpen(true)
 	}
 
 	// Fetch pods for the selected deployment (for terminal pod selector)
@@ -235,6 +244,7 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 									saveDeploymentsToStorage(updated)
 									setCachedDeployments(updated)
 								}}
+								onManageProjects={handleManageProjects}
 								activeFilter={activeFilter}
 								onFilterChange={onFilterChange}
 							/>
@@ -303,6 +313,14 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 					document.body
 				)
 			}
+
+			{isProjectSelectionOpen && deploymentToAssign && (
+				<DeploymentProjectSelectionDialog
+					isOpen={isProjectSelectionOpen}
+					onOpenChange={setIsProjectSelectionOpen}
+					deploymentId={deploymentToAssign}
+				/>
+			)}
 		</>
 	)
 }
@@ -314,6 +332,7 @@ function DeploymentsTable({
 	onViewLogs,
 	onOpenTerminal,
 	onRemoveFavorite,
+	onManageProjects,
 	activeFilter,
 	onFilterChange,
 }: {
@@ -323,6 +342,7 @@ function DeploymentsTable({
 	onViewLogs: (deployment: DeploymentInfo, context: string) => void
 	onOpenTerminal: (deployment: DeploymentInfo, context: string) => void
 	onRemoveFavorite: (deployment: DeploymentInfo) => void
+	onManageProjects: (deployment: DeploymentInfo, context: string) => void
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
@@ -400,10 +420,11 @@ function DeploymentsTable({
 					onViewLogs={onViewLogs}
 					onOpenTerminal={onOpenTerminal}
 					onRemoveFavorite={onRemoveFavorite}
+					onManageProjects={onManageProjects}
 				/>
 			),
 		},
-	], [context, isLoading, onViewLogs, onOpenTerminal, onRemoveFavorite])
+	], [context, isLoading, onViewLogs, onOpenTerminal, onRemoveFavorite, onManageProjects])
 
 	const dataWithContext = useMemo(() => sortedDeployments.map(d => ({ ...d, context })), [sortedDeployments, context])
 
@@ -486,12 +507,14 @@ function ActionsCell({
 	onViewLogs,
 	onOpenTerminal,
 	onRemoveFavorite,
+	onManageProjects,
 }: {
 	deployment: DeploymentInfo
 	context: string
 	onViewLogs: (deployment: DeploymentInfo, context: string) => void
 	onOpenTerminal: (deployment: DeploymentInfo, context: string) => void
 	onRemoveFavorite: (deployment: DeploymentInfo) => void
+	onManageProjects: (deployment: DeploymentInfo, context: string) => void
 }) {
 	return (
 		<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -503,6 +526,12 @@ function ActionsCell({
 			<ActionButton
 				action={ACTION_DEFINITIONS.openTerminal}
 				onClick={() => onOpenTerminal(deployment, context)}
+			/>
+			<div className="w-px h-4 bg-border/40 mx-0.5" />
+			<ActionButton
+				action={ACTION_DEFINITIONS.manageProjects}
+				onClick={() => onManageProjects(deployment, context)}
+				size="sm"
 			/>
 			<ActionButton
 				action={ACTION_DEFINITIONS.removeFavorite}

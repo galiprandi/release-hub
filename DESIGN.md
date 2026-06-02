@@ -53,6 +53,12 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - Los dots de la línea de tiempo tienen un tamaño estándar de `h-2.5 w-8` y utilizan `focus-visible:ring-offset-1` para accesibilidad.
 - El `HoverCardContent` se presenta sin padding interno base (`p-0`) para permitir secciones con bordes limpios y fondos sutiles.
 
+### AI Chat & Prompt
+- **Asistente AI**: Chat global estilo ChatGPT accesible desde el sidebar.
+- **Hook useAIPrompt**: Utiliza la versión v3.7.0+ de `@galiprandi/react-tools` para procesamiento local.
+- **Feedback Visual**: Utiliza el token semántico `ai` para resaltar elementos relacionados con inteligencia artificial.
+- **Markdown**: El contenido generado debe renderizarse siempre usando el componente `Streamdown`.
+
 ### AISummaryCard
 - Utiliza `bg-ai` para el fondo y `text-ai-foreground` para el texto.
 - Los iconos deben estar contenidos en un div con `bg-white/10` y un anillo sutil (`ring-white/20`) para mejorar la resonancia visual.

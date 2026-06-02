@@ -15,3 +15,10 @@
 **Estado**: Finalizado
 **Objetivo**: Elevar la precisión visual y consistencia de los dashboards de GitHub.
 **Impacto**: Mejora en la legibilidad técnica y jerarquía visual mediante el uso estricto de opacidades semánticas (20%) y tipografía técnica (`text-[10px]`).
+
+### 🗓️ 5 de Junio de 2026
+**Tarea**: Integración de Asistente AI (ChatGPT Style) y actualización de herramientas.
+**Branch**: `🐜-Carol-refactor-ai-assistant-resonance`
+**Estado**: Finalizado
+**Objetivo**: Integrar un chat de IA local para asistencia técnica directa en la plataforma.
+**Impacto**: Empoderamiento del usuario mediante asistencia contextual inmediata, reduciendo la curva de aprendizaje de la plataforma.

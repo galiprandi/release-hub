@@ -101,6 +101,54 @@ export function setupTerminalMiddleware(server: ServerWithUpgrade) {
     const context = url.searchParams.get('context');
     const container = url.searchParams.get('container');
 
+    // Validation patterns
+    const k8sNameRegex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
+    const contextRegex = /^[a-zA-Z0-9_./-]+$/;
+    const dockerNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
+
+    // Validate type
+    if (type && !['k8s', 'docker', 'local'].includes(type)) {
+      ws.send('\r\n[ERROR] Invalid terminal type\r\n');
+      ws.close();
+      return;
+    }
+
+    // Validate name if present
+    if (name) {
+      const isK8s = type === 'k8s';
+      const nameRegex = isK8s ? k8sNameRegex : dockerNameRegex;
+      if (!nameRegex.test(name)) {
+        ws.send(`\r\n[ERROR] Invalid ${isK8s ? 'resource' : 'container'} name format\r\n`);
+        ws.close();
+        return;
+      }
+    }
+
+    // Validate namespace if present
+    if (namespace && namespace !== 'default' && !k8sNameRegex.test(namespace)) {
+      ws.send('\r\n[ERROR] Invalid namespace format\r\n');
+      ws.close();
+      return;
+    }
+
+    // Validate context if present
+    if (context && !contextRegex.test(context)) {
+      ws.send('\r\n[ERROR] Invalid context format\r\n');
+      ws.close();
+      return;
+    }
+
+    // Validate container if present
+    if (container) {
+      const isK8s = type === 'k8s';
+      const containerRegex = isK8s ? k8sNameRegex : dockerNameRegex;
+      if (!containerRegex.test(container)) {
+        ws.send('\r\n[ERROR] Invalid container name format\r\n');
+        ws.close();
+        return;
+      }
+    }
+
     let command = '';
     let args: string[] = [];
 

@@ -242,6 +242,21 @@ const scriptHandler: Connect.NextHandleFunction = async (req, res) => {
 		// Use defaults if body is invalid
 	}
 
+	// Sanitize action and repo to prevent path traversal and argument injection
+	if (!/^[a-zA-Z0-9-]+$/.test(action)) {
+		res.statusCode = 400;
+		res.end(JSON.stringify({ error: "Invalid action name", success: false }));
+		return;
+	}
+
+	// Repo should follow org/repo pattern or just alphanumeric/hyphen/underscore
+	// Explicitly disallow .. to prevent path traversal even if individual scripts are not careful
+	if (!/^[a-zA-Z0-9._/-]+$/.test(repo) || repo.includes('..')) {
+		res.statusCode = 400;
+		res.end(JSON.stringify({ error: "Invalid repo name", success: false }));
+		return;
+	}
+
 	const scriptPath = `./scripts/${action}.sh`;
 	const args = [scriptPath, repo];
 

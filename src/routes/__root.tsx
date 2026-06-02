@@ -2,11 +2,14 @@ import { createRootRoute, Outlet, useNavigate, useRouterState } from "@tanstack/
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useEffect, useState } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { useWebMCP } from "@/hooks/useWebMCP";
 
 function RootLayout() {
 	const navigate = useNavigate();
 	const routerState = useRouterState();
 	const [showSpinner, setShowSpinner] = useState(true);
+
+	useWebMCP();
 
 	useEffect(() => {
 		const timer = setTimeout(() => setShowSpinner(false), 2000);

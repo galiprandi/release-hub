@@ -47,6 +47,13 @@
 ## Module: api/seki
 - fetchPipeline retorna el pipeline
 
+## Module: AIChatModal
+- calls prompt when send button is clicked
+- calls reset when clear button is clicked
+- does not render when closed
+- renders correctly when open
+- updates input value on change
+
 ## Module: CommitsModal
 - should filter commits
 - should render commits when open

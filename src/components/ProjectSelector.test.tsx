@@ -19,10 +19,13 @@ const mockSetActiveTab = vi.fn()
 vi.mock("@/hooks/useUserCollections", () => ({
 	useUserCollections: vi.fn(() => ({
 		favorites: [],
+		deploymentFavorites: [],
 		projects: [],
 		activeTab: "favorites",
 		toggleFavorite: mockToggleFavorite,
 		isFavorite: mockIsFavorite,
+		toggleDeploymentFavorite: vi.fn(),
+		isDeploymentFavorite: vi.fn(),
 		createProject: mockCreateProject,
 		updateProject: mockUpdateProject,
 		deleteProject: mockDeleteProject,
@@ -31,6 +34,11 @@ vi.mock("@/hooks/useUserCollections", () => ({
 		toggleRepoInProject: mockToggleRepoInProject,
 		getProjectsForRepo: mockGetProjectsForRepo,
 		isRepoInProject: mockIsRepoInProject,
+		addDeploymentToProject: vi.fn(),
+		removeDeploymentFromProject: vi.fn(),
+		toggleDeploymentInProject: vi.fn(),
+		getProjectsForDeployment: vi.fn(),
+		isDeploymentInProject: vi.fn(),
 		setActiveTab: mockSetActiveTab,
 	})),
 }))
@@ -72,6 +80,11 @@ describe("ProjectSelector", () => {
 			toggleRepoInProject: mockToggleRepoInProject,
 			getProjectsForRepo: mockGetProjectsForRepo,
 			isRepoInProject: mockIsRepoInProject,
+			addDeploymentToProject: vi.fn(),
+			removeDeploymentFromProject: vi.fn(),
+			toggleDeploymentInProject: vi.fn(),
+			getProjectsForDeployment: vi.fn(),
+			isDeploymentInProject: vi.fn(),
 			setActiveTab: mockSetActiveTab,
 		})
 	})
@@ -92,8 +105,8 @@ describe("ProjectSelector", () => {
 
 	it("should render projects when they exist", () => {
 		const mockProjects = [
-			{ id: "1", name: "Project 1", description: "Desc 1", repos: [] },
-			{ id: "2", name: "Project 2", description: "Desc 2", repos: [] }
+			{ id: "1", name: "Project 1", description: "Desc 1", repos: [], deployments: [] },
+			{ id: "2", name: "Project 2", description: "Desc 2", repos: [], deployments: [] }
 		]
 		vi.mocked(useUserCollections).mockReturnValue({
 			favorites: [],
@@ -112,6 +125,11 @@ describe("ProjectSelector", () => {
 			toggleRepoInProject: mockToggleRepoInProject,
 			getProjectsForRepo: mockGetProjectsForRepo,
 			isRepoInProject: mockIsRepoInProject,
+			addDeploymentToProject: vi.fn(),
+			removeDeploymentFromProject: vi.fn(),
+			toggleDeploymentInProject: vi.fn(),
+			getProjectsForDeployment: vi.fn(),
+			isDeploymentInProject: vi.fn(),
 			setActiveTab: mockSetActiveTab,
 		})
 

@@ -9,6 +9,7 @@ export interface Project {
 	name: string;
 	description: string;
 	repos: string[];
+	deployments: string[];
 }
 
 export interface UserCollections {
@@ -26,7 +27,16 @@ function loadCollectionsFromStorage(): UserCollections {
 	try {
 		const stored = localStorage.getItem(STORAGE_KEY);
 		if (stored) {
-			return JSON.parse(stored);
+			const data = JSON.parse(stored);
+			// Migration: ensure all projects have the deployments array
+			if (data.projects) {
+				data.projects = data.projects.map((p: any) => ({
+					...p,
+					repos: p.repos || [],
+					deployments: p.deployments || []
+				}));
+			}
+			return data;
 		}
 	} catch (error) {
 		console.error("[UserCollections] Failed to load from localStorage:", error);
@@ -115,7 +125,7 @@ export function useUserCollections() {
 
 	/* ---------- Projects ---------- */
 	const createProject = useCallback(
-		(name: string, description: string, initialRepos?: string[]) => {
+		(name: string, description: string, initialRepos?: string[], initialDeployments?: string[]) => {
 			const id = name
 				.toLowerCase()
 				.replace(/[^a-z0-9]+/g, "-")
@@ -130,6 +140,7 @@ export function useUserCollections() {
 						name,
 						description: description || "",
 						repos: initialRepos || [],
+						deployments: initialDeployments || [],
 					},
 				],
 			};
@@ -227,6 +238,69 @@ export function useUserCollections() {
 		[data.projects]
 	);
 
+	const addDeploymentToProject = useCallback(
+		(projectId: string, deployment: string) => {
+			const next = {
+				...data,
+				projects: (data.projects || []).map((p) =>
+					p.id === projectId && !p.deployments.includes(deployment)
+						? { ...p, deployments: [...p.deployments, deployment] }
+						: p
+				),
+			};
+			setCollections(next);
+		},
+		[data, setCollections]
+	);
+
+	const removeDeploymentFromProject = useCallback(
+		(projectId: string, deployment: string) => {
+			const next = {
+				...data,
+				projects: (data.projects || []).map((p) =>
+					p.id === projectId
+						? { ...p, deployments: p.deployments.filter((d) => d !== deployment) }
+						: p
+				),
+			};
+			setCollections(next);
+		},
+		[data, setCollections]
+	);
+
+	const toggleDeploymentInProject = useCallback(
+		(projectId: string, deployment: string) => {
+			const next = {
+				...data,
+				projects: (data.projects || []).map((p) => {
+					if (p.id !== projectId) return p;
+					const hasDeployment = p.deployments.includes(deployment);
+					return {
+						...p,
+						deployments: hasDeployment
+							? p.deployments.filter((d) => d !== deployment)
+							: [...p.deployments, deployment],
+					};
+				}),
+			};
+			setCollections(next);
+		},
+		[data, setCollections]
+	);
+
+	const getProjectsForDeployment = useCallback(
+		(deployment: string) => (data.projects || []).filter((p) => p.deployments.includes(deployment)),
+		[data.projects]
+	);
+
+	const isDeploymentInProject = useCallback(
+		(projectId: string, deployment: string) =>
+			(data.projects || []).some(
+				(p) => p.id === projectId && p.deployments.includes(deployment)
+			),
+		[data.projects]
+	);
+
 	/* ---------- Active tab ---------- */
 	const setActiveTab = useCallback(
 		(tab: string) => {
@@ -252,6 +326,11 @@ export function useUserCollections() {
 		toggleRepoInProject,
 		getProjectsForRepo,
 		isRepoInProject,
+		addDeploymentToProject,
+		removeDeploymentFromProject,
+		toggleDeploymentInProject,
+		getProjectsForDeployment,
+		isDeploymentInProject,
 		setActiveTab,
 	};
 }

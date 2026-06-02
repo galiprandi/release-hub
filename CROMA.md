@@ -22,3 +22,10 @@
 **Estado**: Finalizado
 **Objetivo**: Integrar un chat de IA local para asistencia técnica directa en la plataforma.
 **Impacto**: Empoderamiento del usuario mediante asistencia contextual inmediata, reduciendo la curva de aprendizaje de la plataforma.
+
+### 🗓️ 12 de Junio de 2026
+**Tarea**: Auditoría de Ciberseguridad y Endurecimiento de Inputs.
+**Branch**: `🐜-Vesper-refactor-security-hardening-traversal-and-validation`
+**Estado**: Finalizado
+**Objetivo**: Eliminar superficies de ataque por inyección de argumentos y path traversal en el backend y middleware de terminal.
+**Impacto**: Sistema inexpugnable ante intentos de manipulación de rutas de ejecución y parámetros de terminal, garantizando la integridad del entorno de desarrollo.

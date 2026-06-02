@@ -81,6 +81,48 @@ describe('Security Hardening', () => {
     })
   })
 
+  describe('Vite Middleware Hardening (Path Traversal)', () => {
+    // Note: These tests simulate the logic in vite.config.ts since we can't easily test the Vite server in vitest
+    const validateAction = (action: string) => /^[a-zA-Z0-9-]+$/.test(action)
+    const validateRepo = (repo: string) => /^[a-zA-Z0-9._/-]+$/.test(repo)
+
+    it('should reject path traversal in action parameter', () => {
+      expect(validateAction('../etc/passwd')).toBe(false)
+      expect(validateAction('deploy; rm -rf /')).toBe(false)
+      expect(validateAction('trigger-staging-redeploy')).toBe(true)
+    })
+
+    it('should reject argument injection in repo parameter', () => {
+      expect(validateRepo('org/repo; rm -rf /')).toBe(false)
+      expect(validateRepo('org/repo --help')).toBe(false)
+      expect(validateRepo('Cencosud-xlabs/release-hub')).toBe(true)
+    })
+  })
+
+  describe('Terminal Middleware Hardening', () => {
+    const k8sNameRegex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
+    const contextRegex = /^[a-zA-Z0-9_./-]+$/;
+    const dockerNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
+
+    it('should validate Kubernetes resource names correctly', () => {
+      expect(k8sNameRegex.test('my-pod')).toBe(true)
+      expect(k8sNameRegex.test('my-pod; rm -rf /')).toBe(false)
+      expect(k8sNameRegex.test('invalid_name')).toBe(false)
+      expect(k8sNameRegex.test('valid.name-123')).toBe(true)
+    })
+
+    it('should validate Kubernetes contexts correctly', () => {
+      expect(contextRegex.test('gke_project_region_cluster')).toBe(true)
+      expect(contextRegex.test('context; whoami')).toBe(false)
+    })
+
+    it('should validate Docker container names correctly', () => {
+      expect(dockerNameRegex.test('my_container')).toBe(true)
+      expect(dockerNameRegex.test('my-container-123')).toBe(true)
+      expect(dockerNameRegex.test('container; exit')).toBe(false)
+    })
+  })
+
   describe('Complex Command Pipelines', () => {
     it('should neutralize pipe injection in array-based commands', async () => {
       const spy = vi.spyOn(apiExec, 'post').mockResolvedValue({

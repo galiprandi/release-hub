@@ -8,14 +8,14 @@ import axios from 'axios'
 interface ModelContext {
   registerTool(tool: WebMCPTool, options?: { signal?: AbortSignal; exposedTo?: string[] }): void
   getTools(): Promise<WebMCPTool[]>
-  executeTool(tool: WebMCPTool, input: string, options?: { signal?: AbortSignal }): Promise<any>
+  executeTool(tool: WebMCPTool, input: string, options?: { signal?: AbortSignal }): Promise<unknown>
 }
 
 interface WebMCPTool {
   name: string
   description: string
-  inputSchema: any
-  execute(input: any): Promise<any>
+  inputSchema: Record<string, unknown>
+  execute(input: Record<string, unknown>): Promise<unknown>
 }
 
 declare global {
@@ -44,7 +44,8 @@ export function useWebMCP() {
         },
         required: ['query'],
       },
-      execute: async ({ query }) => {
+      execute: async (input) => {
+        const { query } = input as { query: string }
         try {
           const userResult = await runCommand(['gh', 'api', '/user', '--jq', '.login'])
           const username = userResult.stdout.trim()
@@ -96,7 +97,8 @@ export function useWebMCP() {
         },
         required: ['repo'],
       },
-      execute: async ({ repo }) => {
+      execute: async (input) => {
+        const { repo } = input as { repo: string }
         try {
           // Get latest commit
           const commitResult = await runCommand([
@@ -146,7 +148,8 @@ export function useWebMCP() {
         },
         required: ['repo', 'tagName'],
       },
-      execute: async ({ repo, tagName, tagMessage }) => {
+      execute: async (input) => {
+        const { repo, tagName, tagMessage } = input as { repo: string; tagName: string; tagMessage?: string }
         try {
           // Verify authentication and get token
           const tokenResult = await runCommand(['gh', 'auth', 'token'])

@@ -116,7 +116,7 @@ function Dashboard() {
 				<FilterBar
 					filters={tabs}
 					activeFilter={activeTab}
-					onFilterChange={(value) => navigate({ search: (prev: any) => ({ ...prev, tab: value }) })}
+					onFilterChange={(value) => navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab: value }) })}
 					variant="tabs"
 					label="Colecciones:"
 					rightContent={

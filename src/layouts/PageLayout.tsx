@@ -14,12 +14,14 @@ import {
   RefreshCw,
   Activity,
   GitCompare,
+  Sparkles,
   Terminal as TerminalIcon
 } from 'lucide-react';
 import { useEffect } from 'react';
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
 import { SettingsDialog } from "@/components/SettingsDialog";
+import { AIChatModal } from "@/components/AIChatModal";
 import { GenericSearch } from "@/components/GenericSearch";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { EmptyState } from "@/components/EmptyState";
@@ -121,6 +123,9 @@ export function PageLayout({
             </li>
             <li>
               <TerminalIconModal />
+            </li>
+            <li>
+              <AIChatIcon />
             </li>
           </ul>
 
@@ -321,6 +326,48 @@ function FeedbackIcon() {
     <>
       {contentWithTooltip}
       <FeedbackDialog open={open} onOpenChange={setOpen} showTrigger={false} />
+    </>
+  );
+}
+
+function AIChatIcon() {
+  const [open, setOpen] = useState(false);
+
+  const buttonContent = (
+    <button
+      onClick={() => setOpen(true)}
+      className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none text-muted-foreground hover:text-ai hover:bg-ai/10"
+      aria-label="Asistente AI"
+    >
+      <Sparkles className="w-5 h-5" aria-hidden="true" />
+    </button>
+  );
+
+  const contentWithTooltip = (
+    <Tooltip.Provider delayDuration={0}>
+      <Tooltip.Root>
+        <Tooltip.Trigger asChild>
+          {buttonContent}
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content
+            side="right"
+            sideOffset={10}
+            className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
+            role="tooltip"
+          >
+            Asistente AI
+            <Tooltip.Arrow className="fill-popover" />
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+    </Tooltip.Provider>
+  );
+
+  return (
+    <>
+      {contentWithTooltip}
+      <AIChatModal isOpen={open} onClose={() => setOpen(false)} />
     </>
   );
 }

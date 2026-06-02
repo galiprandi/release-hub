@@ -32,7 +32,7 @@ describe('useWebMCP', () => {
 
     expect(mockRegisterTool).toHaveBeenCalledTimes(3)
 
-    const registeredTools = mockRegisterTool.mock.calls.map(call => call[0].name)
+    const registeredTools = mockRegisterTool.mock.calls.map((call: any[]) => call[0].name)
     expect(registeredTools).toContain('search_repositories')
     expect(registeredTools).toContain('get_repo_details')
     expect(registeredTools).toContain('promote_to_production')
@@ -40,7 +40,7 @@ describe('useWebMCP', () => {
 
   it('search_repositories tool calls runCommand correctly', async () => {
     renderHook(() => useWebMCP())
-    const searchTool = mockRegisterTool.mock.calls.find(call => call[0].name === 'search_repositories')[0]
+    const searchTool = mockRegisterTool.mock.calls.find((call: any[]) => call[0].name === 'search_repositories')[0]
 
     vi.mocked(runCommand).mockResolvedValueOnce({ stdout: 'user_login', stderr: '', success: true }) // for /user
     vi.mocked(runCommand).mockResolvedValueOnce({
@@ -58,7 +58,7 @@ describe('useWebMCP', () => {
 
   it('get_repo_details tool calls runCommand correctly', async () => {
     renderHook(() => useWebMCP())
-    const detailsTool = mockRegisterTool.mock.calls.find(call => call[0].name === 'get_repo_details')[0]
+    const detailsTool = mockRegisterTool.mock.calls.find((call: any[]) => call[0].name === 'get_repo_details')[0]
 
     vi.mocked(runCommand).mockResolvedValueOnce({
       stdout: JSON.stringify([{ hash: 'sha1', author: 'me', message: 'feat', date: 'now' }]),
@@ -82,7 +82,7 @@ describe('useWebMCP', () => {
 
   it('promote_to_production tool calls APIs correctly', async () => {
     renderHook(() => useWebMCP())
-    const promoteTool = mockRegisterTool.mock.calls.find(call => call[0].name === 'promote_to_production')[0]
+    const promoteTool = mockRegisterTool.mock.calls.find((call: any[]) => call[0].name === 'promote_to_production')[0]
 
     vi.mocked(runCommand).mockResolvedValueOnce({ stdout: 'my-token', stderr: '', success: true }) // for token
     vi.mocked(runCommand).mockResolvedValueOnce({ stdout: 'target-sha', stderr: '', success: true }) // for main commit

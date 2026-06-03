@@ -26,8 +26,7 @@ fi
 
 # 3. Install Dependencies
 echo "📦 Installing dependencies..."
-npm cache clean --force
-npm install
+npm install --registry=https://registry.npmjs.org/
 
 # 4. Build Application
 echo "🏗️  Building application..."

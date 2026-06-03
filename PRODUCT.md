@@ -14,4 +14,4 @@ ReleaseHub es una aplicación web **stateless** para visualizar pipelines CI/CD 
 
 - **Visibilidad Omnipresente de Salud**: El estado de salud de los servicios debe ser una métrica de primer nivel, accesible directamente desde el dashboard de repositorios para minimizar la fricción y el "Time to Value" en la detección de incidencias.
 
-- **Asistencia Inteligente Ubicua**: Integración de un asistente AI local basado en Gemini Nano para proporcionar soporte contextual, resúmenes técnicos y ayuda interactiva sin que los datos salgan del navegador del usuario.
+- **Asistencia Inteligente Ubicua**: Integración de un asistente AI local basado en Gemini Nano con soporte multimodal (imágenes/audio) y perfiles especializados para proporcionar soporte contextual, resúmenes técnicos y ayuda interactiva sin que los datos salgan del navegador del usuario.

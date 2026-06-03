@@ -15,6 +15,7 @@ import {
   Activity,
   GitCompare,
   Sparkles,
+  Camera,
   Terminal as TerminalIcon
 } from 'lucide-react';
 import { useEffect } from 'react';
@@ -28,6 +29,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { useGitUser } from "@/hooks/useGitUser";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { Terminal } from "@/components/shared/Terminal";
+import html2canvas from 'html2canvas';
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -203,6 +205,7 @@ export function PageLayout({
                   {isDark ? <Sun className="w-4 h-4" aria-hidden="true" /> : <Moon className="w-4 h-4" aria-hidden="true" />}
                 </button>
               )}
+              <ScreenshotButton />
             </div>
           </header>
           {/* Gradient separator for sticky header */}
@@ -332,6 +335,22 @@ function FeedbackIcon() {
 
 function AIChatIcon() {
   const [open, setOpen] = useState(false);
+  const [initialFile, setInitialFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    const handleOpenWithFile = (e: CustomEvent<{ file: File }>) => {
+      setInitialFile(e.detail.file);
+      setOpen(true);
+    };
+
+    window.addEventListener('open-ai-chat-with-file' as any, handleOpenWithFile as any);
+    return () => window.removeEventListener('open-ai-chat-with-file' as any, handleOpenWithFile as any);
+  }, []);
+
+  const handleClose = () => {
+    setOpen(false);
+    setInitialFile(null);
+  };
 
   const buttonContent = (
     <button
@@ -367,8 +386,65 @@ function AIChatIcon() {
   return (
     <>
       {contentWithTooltip}
-      <AIChatModal isOpen={open} onClose={() => setOpen(false)} />
+      <AIChatModal isOpen={open} onClose={handleClose} initialFile={initialFile} />
     </>
+  );
+}
+
+function ScreenshotButton() {
+  const [isCapturing, setIsCapturing] = useState(false);
+
+  const handleCapture = async () => {
+    setIsCapturing(true);
+    try {
+      const canvas = await html2canvas(document.body, {
+        allowTaint: true,
+        useCORS: true,
+        logging: false,
+        backgroundColor: null,
+      });
+
+      canvas.toBlob(async (blob) => {
+        if (blob) {
+          const file = new File([blob], `screenshot-${Date.now()}.png`, { type: 'image/png' });
+          const event = new CustomEvent('open-ai-chat-with-file', { detail: { file } });
+          window.dispatchEvent(event);
+        }
+      }, 'image/png');
+    } catch (err) {
+      console.error('Failed to capture screenshot:', err);
+    } finally {
+      setIsCapturing(false);
+    }
+  };
+
+  return (
+    <Tooltip.Provider delayDuration={0}>
+      <Tooltip.Root>
+        <Tooltip.Trigger asChild>
+          <button
+            onClick={handleCapture}
+            disabled={isCapturing}
+            className={`p-2 transition-colors ${
+              isCapturing ? 'text-ai animate-pulse' : 'text-muted-foreground hover:text-ai'
+            }`}
+            aria-label="Tomar captura y preguntar a IA"
+          >
+            <Camera className="w-4 h-4" />
+          </button>
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content
+            side="bottom"
+            sideOffset={10}
+            className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
+          >
+            Tomar captura y preguntar
+            <Tooltip.Arrow className="fill-popover" />
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+    </Tooltip.Provider>
   );
 }
 

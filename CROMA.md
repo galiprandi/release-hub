@@ -36,3 +36,10 @@
 **Estado**: Finalizado
 **Objetivo**: Eliminar superficies de ataque por inyección de argumentos y path traversal en el backend y middleware de terminal.
 **Impacto**: Sistema inexpugnable ante intentos de manipulación de rutas de ejecución y parámetros de terminal, garantizando la integridad del entorno de desarrollo.
+
+### 🗓️ 3 de Junio de 2026
+**Tarea**: Evolución del Asistente AI: Multimodalidad y Perfiles.
+**Branch**: `🐜-Uma-refactor-ai-multimodal-profiles`
+**Estado**: Finalizado
+**Objetivo**: Dotar al asistente de capacidades de visión y audio, selectores de perfiles especializados y control granular de generación.
+**Impacto**: Salto cualitativo en la utilidad del asistente, permitiendo diagnósticos basados en capturas y optimización de flujos de trabajo según el perfil de IA seleccionado.

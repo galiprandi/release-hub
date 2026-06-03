@@ -64,7 +64,6 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const { data, status, prompt, reset, error } = useAIPrompt({
-		key: activeProfileId,
 		initialPrompts: [
 			{ role: "system", content: activeProfile.systemPrompt }
 		],

@@ -9,10 +9,7 @@ set -e
 
 echo "🛠️  Starting ReleaseHub Installation..."
 
-# 1. Check for dependencies
-./scripts/healthcheck.sh || exit 1
-
-# 2. Clone or Update Repository
+# 1. Clone or Update Repository
 if [ -d "$INSTALL_DIR" ]; then
     echo "🔄 Repository exists at $INSTALL_DIR. Updating..."
     cd "$INSTALL_DIR"
@@ -23,6 +20,9 @@ else
     git clone "$REPO_URL" "$INSTALL_DIR"
     cd "$INSTALL_DIR"
 fi
+
+# 2. Check for dependencies
+./scripts/healthcheck.sh || exit 1
 
 # 3. Install Dependencies
 echo "📦 Installing dependencies..."

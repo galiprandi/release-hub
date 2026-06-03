@@ -97,4 +97,4 @@ Ver `DESIGN.md` para especificaciones visuales completas (`Table`, `FilterBar`, 
 
 ## Mantenimiento de Skills
 
-Mantener `.windsurf/skills/` con flujos comunes, referencias de elementos y patrones nuevos para evitar snapshots repetitivos.
+Mantener `.devin/skills/` con flujos comunes, referencias de elementos y patrones nuevos para evitar snapshots repetitivos.

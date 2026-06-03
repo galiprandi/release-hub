@@ -248,28 +248,33 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 		>
 			<>
 				{/* URL and method controls */}
-				<div className="flex items-center gap-3 p-4 border-b flex-shrink-0">
-					<div className="w-24 flex-shrink-0">
-						<select
-							value={form.method}
-							onChange={(e) => {
-								const newMethod = e.target.value;
-								setForm(prev => ({ ...prev, method: newMethod }));
-								// Auto-switch tab: GET -> params, others -> body
-								if (newMethod === 'GET') {
-									setRequestTab('params');
-								} else {
-									setRequestTab('body');
-								}
-							}}
-							className="w-full px-2.5 py-1.5 text-sm border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
-						>
-							{['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
-								<option key={m} value={m}>{m}</option>
-							))}
-						</select>
-					</div>
-					<div className="flex-1 min-w-0">
+				<div className="flex items-center gap-3 p-4 border-b bg-muted/10 flex-shrink-0">
+					<div className="flex-1 flex items-center gap-0.5 bg-background border border-input rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1 transition-all">
+						<div className="relative border-r border-input">
+							<select
+								value={form.method}
+								onChange={(e) => {
+									const newMethod = e.target.value;
+									setForm(prev => ({ ...prev, method: newMethod }));
+									// Auto-switch tab: GET -> params, others -> body
+									if (newMethod === 'GET') {
+										setRequestTab('params');
+									} else {
+										setRequestTab('body');
+									}
+								}}
+								className="appearance-none bg-muted/40 px-3 py-2 pr-8 text-[10px] font-bold uppercase tracking-wider focus:outline-none cursor-pointer hover:bg-muted/60 transition-colors"
+							>
+								{['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
+									<option key={m} value={m}>{m}</option>
+								))}
+							</select>
+							<div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+								<svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="19 9l-7 7-7-7" />
+								</svg>
+							</div>
+						</div>
 						<input
 							type="text"
 							value={form.url}
@@ -288,8 +293,8 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 								}
 								setForm(prev => ({ ...prev, url: newUrl, queryParams: newQueryParams }));
 							}}
-							className="w-full px-2.5 py-1.5 text-sm border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono transition-shadow"
-							placeholder="https://..."
+							className="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none font-mono"
+							placeholder="https://api.example.com/v1/resource"
 						/>
 					</div>
 					<ActionButton
@@ -349,7 +354,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 									{requestTab === 'params' && (
 										<div>
 											<div className="flex items-center justify-between mb-1.5">
-												<label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Query Params</label>
+												<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Query Params</label>
 												<ActionButton
 													action={{ icon: Plus, label: "Agregar", color: "primary" }}
 													onClick={() => setForm(prev => ({
@@ -409,7 +414,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 									{requestTab === 'headers' && (
 										<div>
 											<div className="flex items-center justify-between mb-1.5">
-												<label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Headers</label>
+												<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Headers</label>
 												<ActionButton
 													action={{ icon: Plus, label: "Agregar", color: "primary" }}
 													onClick={() => setForm(prev => ({
@@ -550,10 +555,11 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 												onSearchChange={setBodySearchQuery}
 											/>
 										) : (
-											<div className="text-xs font-mono space-y-1 bg-muted/50 rounded-md p-3">
+											<div className="text-[11px] font-mono space-y-1.5 bg-muted/20 border border-border/40 rounded-lg p-4 h-full overflow-auto">
 												{Object.entries(response.headers).map(([key, value]) => (
-													<div key={key}>
-														<span className="font-semibold">{key}:</span> {value}
+													<div key={key} className="flex gap-2 pb-1 border-b border-border/20 last:border-0">
+														<span className="font-bold text-muted-foreground min-w-[120px] shrink-0 uppercase tracking-tighter">{key}:</span>
+														<span className="text-foreground break-all">{value}</span>
 													</div>
 												))}
 											</div>
@@ -570,22 +576,22 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 
 					{/* Footer with timing info - spans full width */}
 					{response && (
-						<div className="px-4 py-3 border-t border-border/40 flex items-center justify-between flex-shrink-0">
+						<div className="px-4 py-3 border-t border-border/40 bg-muted/20 flex items-center justify-between flex-shrink-0">
 							<div className="flex items-center gap-3">
-						<span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${
+								<span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${
 										response.status >= 200 && response.status < 300
-									? 'bg-success/20 text-success border-success/20'
+											? 'bg-success/20 text-success border-success/20'
 											: response.status >= 400
-										? 'bg-destructive/20 text-destructive border-destructive/20'
-										: 'bg-warning/20 text-warning border-warning/20'
+												? 'bg-destructive/20 text-destructive border-destructive/20'
+												: 'bg-warning/20 text-warning border-warning/20'
 									}`} title={query?.updatedAt ? DayJS(query.updatedAt).format('LLL') : DayJS().format('LLL')}>
 									{response.status} {response.statusText}
 								</span>
-						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 border border-border/60 px-2 py-0.5 rounded-md">
+								<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 bg-muted/40 border border-border/40 px-2 py-0.5 rounded-md">
 									{response.responseTime}ms
 								</span>
 							</div>
-							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">
 								{DayJS(query?.updatedAt || new Date()).fromNow()}
 							</span>
 						</div>

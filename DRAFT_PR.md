@@ -1,27 +1,26 @@
-# PR Draft: 🐜 Vesper - Security Hardening (Traversal & Validation)
+# 🐜 Carol: refactor(fetcher) resonance
 
-## Scope of Refinements
-This PR focuses on eliminating latent security vulnerabilities and improving the robustness of the system's execution layer.
+## Scope of Work
 
-### 1. Path Traversal Protection in `vite.config.ts`
-- **Current State**: The `scriptHandler` accepts an `action` parameter which is used to construct a file path without sufficient validation.
-- **Improvement**: Implementing strict alphanumeric sanitization for the `action` parameter to ensure it remains within the intended `./scripts/` directory and only executes valid script files.
+Refining the Fetcher module to align with the **Industrial Resonance V2** design standard.
 
-### 2. Terminal Middleware Input Validation
-- **Current State**: The `terminalMiddleware.ts` extracts `name`, `namespace`, `context`, and `container` parameters from URL search params and passes them directly to `pty.spawn` or `kubectl`.
-- **Improvement**: Adding regex-based validation for all terminal-related parameters to prevent argument injection and ensure compliance with Kubernetes/Docker naming standards.
+### 🎯 Objectives
 
-### 3. TypeScript Hygiene (Elimination of `any`)
-- **Current State**: Some legacy `any` types remain in `useWebMCP.ts` and `src/routes/github/index.tsx`.
-- **Improvement**: Replacing `any` with explicit interfaces or `unknown` to ensure type safety and align with the repository's hygiene standards.
+1.  **Fetcher Dashboard (`/fetcher`)**:
+    *   Migrate legacy empty state to the centralized `EmptyState` component for better consistency.
+    *   Elevate `QueriesTable` with V2 table aesthetics:
+        *   `text-[10px]` metadata cells.
+        *   Group hover actions and vertical dividers.
+        *   Standardized semantic badges (20% opacity).
+2.  **Query Modal**:
+    *   Refine input section (Method/URL) for better visual flow.
+    *   Standardize internal tabs with `FilterBar` aesthetics.
+    *   Harmonize response metadata in the footer using semantic tokens.
+3.  **Consistency & Hygiene**:
+    *   Eliminate hardcoded status colors.
+    *   Ensure strict accessibility (aria-labels).
+    *   Update `DESIGN.md` and `CROMA.md`.
 
-### 4. Security Test Suite Expansion
-- **Current State**: Existing security tests focus on `runCommand`.
-- **Improvement**: Adding new test cases to `src/api/security.test.ts` that specifically target path traversal and terminal input validation.
+## Territory Block
 
-## Status
-- [x] Territory Blocked
-- [ ] Path Traversal Protection
-- [ ] Terminal Validation
-- [ ] Type Hygiene
-- [ ] Testing & Verification
+This PR blocks the Fetcher module for refinements.

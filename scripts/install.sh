@@ -26,6 +26,7 @@ fi
 
 # 3. Install Dependencies
 echo "📦 Installing dependencies..."
+npm cache clean --force
 npm install
 
 # 4. Build Application

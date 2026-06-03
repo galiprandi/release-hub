@@ -262,7 +262,7 @@ Antes de crear componentes nuevos, verificar si extienden:
 
 ### ActionButton
 
-Componente reutilizable para botones de acción iconográficos con tooltip integrado. Estándar para todas las acciones de fila en tablas (Docker, K8s, repos, etc.).
+Componente reutilizable para botones de acción iconográficos con tooltip integrado. Estándar para todas las acciones de fila en tablas (Docker, K8s, repos, fetcher, etc.).
 
 ### ProjectSelectionDialog
 
@@ -311,6 +311,13 @@ Si el header sticky no funciona:
 2. Verificar que el elemento con `sticky` tenga un ancestro con scroll
 3. Usar `sticky top-0` (no `top-4` u otro valor a menos que sea intencional)
 4. Verificar `z-index` (debe ser mayor que elementos detrás)
+### Fetcher Resonance Standard
+- **Empty State**: Migración obligatoria al componente `EmptyState` centralizado con icono `Send` (muted/40).
+- **Table Metadata**: Uso de `text-[10px] font-bold uppercase tracking-wider` para columnas de 'Método', 'Status', 'Tiempo' y 'Enviado'.
+- **URL Display**: Estructura de doble línea con dominio (font-medium) y path (text-[10px] uppercase).
+- **Row Actions**: Uso de `ActionButton` con divisores verticales (`w-px h-4 bg-border/40`) para agrupar acciones lógicamente.
+- **Query Modal**: Header de input integrado (Method select + URL) con `bg-muted/10` y focus-within ring. Respuesta con headers detallados en `text-[11px]` y labels con `tracking-tighter`.
+
 ### GitHub Repository Detail Standard
 - **Pipeline Monitor**: Uso obligatorio de `UnifiedPipelineMonitor`.
 - **Navegación**: Utilizar `FilterBar` con `variant="tabs"` para alternar entre vistas (Commits/Tags).

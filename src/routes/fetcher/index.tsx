@@ -4,6 +4,7 @@ import { Send } from 'lucide-react';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
 import { StatusCard } from '@/components/ui/StatusCard';
+import { EmptyState } from '@/components/EmptyState';
 import { QueryModal } from '@/components/QueryModal';
 import { Table } from '@/components/ui/Table';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
@@ -181,15 +182,11 @@ function FetcherPage() {
 				loadingHistory ? (
 					<StatusCard type="loading" message="Cargando historial..." />
 				) : history.length === 0 ? (
-					<div className="text-center py-20 bg-muted/10 rounded-xl border border-border/40 flex flex-col items-center justify-center">
-						<div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mb-4">
-							<Send className="w-8 h-8 text-muted-foreground" />
-						</div>
-						<h3 className="text-lg font-bold tracking-tight text-foreground">Historial Vacío</h3>
-						<p className="text-muted-foreground max-w-xs mx-auto mt-1">
-							Pega un comando cURL en la barra superior o copia uno al portapapeles para comenzar.
-						</p>
-					</div>
+					<EmptyState
+						icon={<Send className="w-8 h-8 text-muted-foreground/40" />}
+						label="Historial Vacío"
+						caption="Pega un comando cURL en la barra superior o copia uno al portapapeles para comenzar."
+					/>
 				) : (
 					<QueriesTable
 						queries={history}
@@ -333,15 +330,20 @@ function UrlCell({ query }: { query: QueryRecord }) {
 
 	const fullPath = parsed.path.length > 80 ? `${parsed.path.slice(0, 80)}...` : parsed.path
 	return (
-		<span className="text-sm text-muted-foreground">
-			{parsed.domain}{fullPath}
-		</span>
+		<div className="flex flex-col">
+			<span className="text-sm font-medium text-foreground truncate max-w-md">
+				{parsed.domain}
+			</span>
+			<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 truncate max-w-md">
+				{fullPath}
+			</span>
+		</div>
 	)
 }
 
 function SentCell({ query }: { query: QueryRecord }) {
 	return (
-		<span className="text-sm text-muted-foreground" title={query.updatedAt ? DayJS(query.updatedAt).format('LLL') : 'Nunca'}>
+		<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60" title={query.updatedAt ? DayJS(query.updatedAt).format('LLL') : 'Nunca'}>
 			{query.updatedAt ? DayJS(query.updatedAt).fromNow() : 'Nunca'}
 		</span>
 	)
@@ -350,7 +352,7 @@ function SentCell({ query }: { query: QueryRecord }) {
 function StatusCell({ query }: { query: QueryRecord }) {
 	if (query.response?.status) {
 		const { status } = query.response
-		let style = "bg-muted text-muted-foreground border-border/60"
+		let style = "bg-muted/40 text-muted-foreground border-border/40"
 		if (status >= 200 && status < 300) style = "bg-success/20 text-success border-success/20"
 		else if (status >= 400 && status < 500) style = "bg-warning/20 text-warning border-warning/20"
 		else if (status >= 500) style = "bg-destructive/20 text-destructive border-destructive/20"
@@ -361,13 +363,13 @@ function StatusCell({ query }: { query: QueryRecord }) {
 			</span>
 		)
 	}
-	return <span className="text-muted-foreground text-xs">-</span>
+	return <span className="text-muted-foreground/40 text-[10px] font-bold uppercase tracking-wider">-</span>
 }
 
 function ResponseTimeCell({ query }: { query: QueryRecord }) {
 	if (query.response?.responseTime) {
 		const { responseTime } = query.response
-		let style = "bg-muted text-muted-foreground border-border/60"
+		let style = "bg-muted/40 text-muted-foreground border-border/40"
 		if (responseTime < 200) style = "bg-success/20 text-success border-success/20"
 		else if (responseTime > 1000) style = "bg-destructive/20 text-destructive border-destructive/20"
 
@@ -377,7 +379,7 @@ function ResponseTimeCell({ query }: { query: QueryRecord }) {
 			</span>
 		)
 	}
-	return <span className="text-muted-foreground text-xs">-</span>
+	return <span className="text-muted-foreground/40 text-[10px] font-bold uppercase tracking-wider">-</span>
 }
 
 function ActionsCell({
@@ -396,13 +398,14 @@ function ActionsCell({
 	isDeleting: boolean
 }) {
 	return (
-		<div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+		<div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-all duration-200">
 			<ActionButton
 				action={ACTION_DEFINITIONS.send}
 				onClick={() => onOpenModal(query)}
 				size="sm"
 				className="text-success hover:bg-success/10"
 			/>
+			<div className="w-px h-4 bg-border/40 mx-0.5" />
 			<ActionButton
 				action={ACTION_DEFINITIONS.copyCurl}
 				onClick={() => onCopyCurl(query)}
@@ -415,6 +418,7 @@ function ActionsCell({
 					size="sm"
 				/>
 			)}
+			<div className="w-px h-4 bg-border/40 mx-0.5" />
 			<ActionButton
 				action={ACTION_DEFINITIONS.delete}
 				onClick={() => onDelete(query.id)}

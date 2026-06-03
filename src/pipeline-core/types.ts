@@ -5,7 +5,7 @@
 
 export type ViewMode = 'commits' | 'tags'
 export type PipelineProvider = 'seki' | 'pulsar' | null
-export type PipelineState = 'IDLE' | 'STARTED' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
+export type PipelineState = 'IDLE' | 'STARTED' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED' | 'SUCCESS' | 'WARN'
 
 export interface PipelineEvent {
 	id: string

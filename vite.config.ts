@@ -94,6 +94,15 @@ const execHandler: Connect.NextHandleFunction = async (req, res) => {
 		return;
 	}
 
+	// Block common shell metacharacters for security
+	const injectionPattern = /[;&|><]/;
+	if (args.some(arg => typeof arg === 'string' && injectionPattern.test(arg))) {
+		console.error(`[SECURITY BLOCKED] Potential shell injection attempt detected in args: ${JSON.stringify(args)}`);
+		res.statusCode = 400;
+		res.end(JSON.stringify({ error: "Security violation: shell metacharacters detected" }));
+		return;
+	}
+
 	console.log(`RUN: ${args.join(" ")}`);
 
 	const result = await spawnAsync(args, stdin);
@@ -243,15 +252,16 @@ const scriptHandler: Connect.NextHandleFunction = async (req, res) => {
 	}
 
 	// Sanitize action and repo to prevent path traversal and argument injection
+	// Strict alphanumeric and hyphen for action ensures it stays within ./scripts/
 	if (!/^[a-zA-Z0-9-]+$/.test(action)) {
 		res.statusCode = 400;
 		res.end(JSON.stringify({ error: "Invalid action name", success: false }));
 		return;
 	}
 
-	// Repo should follow org/repo pattern or just alphanumeric/hyphen/underscore
-	// Explicitly disallow .. to prevent path traversal even if individual scripts are not careful
-	if (!/^[a-zA-Z0-9._/-]+$/.test(repo) || repo.includes('..')) {
+	// Repo should follow org/repo pattern (alphanumeric, hyphen, underscore, dot, slash)
+	// Explicitly disallow .. and ensure it doesn't start with a hyphen to prevent flag injection
+	if (!/^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(repo) || repo.includes('..')) {
 		res.statusCode = 400;
 		res.end(JSON.stringify({ error: "Invalid repo name", success: false }));
 		return;

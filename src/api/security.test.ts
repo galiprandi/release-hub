@@ -84,31 +84,36 @@ describe('Security Hardening', () => {
   describe('Vite Middleware Hardening (Path Traversal)', () => {
     // Note: These tests simulate the logic in vite.config.ts since we can't easily test the Vite server in vitest
     const validateAction = (action: string) => /^[a-zA-Z0-9-]+$/.test(action)
-    const validateRepo = (repo: string) => /^[a-zA-Z0-9._/-]+$/.test(repo)
+    const validateRepo = (repo: string) => /^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(repo) && !repo.includes('..')
 
     it('should reject path traversal in action parameter', () => {
       expect(validateAction('../etc/passwd')).toBe(false)
+      expect(validateAction('scripts/deploy')).toBe(false) // Only alphanumeric and hyphens
       expect(validateAction('deploy; rm -rf /')).toBe(false)
       expect(validateAction('trigger-staging-redeploy')).toBe(true)
     })
 
-    it('should reject argument injection in repo parameter', () => {
+    it('should reject argument injection and path traversal in repo parameter', () => {
       expect(validateRepo('org/repo; rm -rf /')).toBe(false)
       expect(validateRepo('org/repo --help')).toBe(false)
+      expect(validateRepo('-flag-injection')).toBe(false) // Must start with alphanumeric
+      expect(validateRepo('org/repo/../../etc/passwd')).toBe(false)
       expect(validateRepo('Cencosud-xlabs/release-hub')).toBe(true)
     })
   })
 
   describe('Terminal Middleware Hardening', () => {
+    // RFC 1123 DNS Subdomain standards
     const k8sNameRegex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
-    const contextRegex = /^[a-zA-Z0-9_./-]+$/;
+    const contextRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
     const dockerNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
 
     it('should validate Kubernetes resource names correctly', () => {
       expect(k8sNameRegex.test('my-pod')).toBe(true)
       expect(k8sNameRegex.test('my-pod; rm -rf /')).toBe(false)
       expect(k8sNameRegex.test('invalid_name')).toBe(false)
-      expect(k8sNameRegex.test('valid.name-123')).toBe(true)
+      expect(k8sNameRegex.test('valid.name.with.dots')).toBe(true) // Subdomains allow dots
+      expect(k8sNameRegex.test('UpperCase')).toBe(false)
     })
 
     it('should validate Kubernetes contexts correctly', () => {

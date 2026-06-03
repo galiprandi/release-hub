@@ -101,13 +101,14 @@ export function setupTerminalMiddleware(server: ServerWithUpgrade) {
     const context = url.searchParams.get('context');
     const container = url.searchParams.get('container');
 
-    // Validation patterns
+    // Validation patterns (RFC 1123 for K8s DNS labels/subdomains, standard Docker container names)
     const k8sNameRegex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
-    const contextRegex = /^[a-zA-Z0-9_./-]+$/;
+    const k8sNamespaceRegex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
+    const contextRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
     const dockerNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
 
     // Validate type
-    if (type && !['k8s', 'docker', 'local'].includes(type)) {
+    if (!type || !['k8s', 'docker', 'local'].includes(type)) {
       ws.send('\r\n[ERROR] Invalid terminal type\r\n');
       ws.close();
       return;
@@ -115,17 +116,16 @@ export function setupTerminalMiddleware(server: ServerWithUpgrade) {
 
     // Validate name if present
     if (name) {
-      const isK8s = type === 'k8s';
-      const nameRegex = isK8s ? k8sNameRegex : dockerNameRegex;
+      const nameRegex = type === 'k8s' ? k8sNameRegex : dockerNameRegex;
       if (!nameRegex.test(name)) {
-        ws.send(`\r\n[ERROR] Invalid ${isK8s ? 'resource' : 'container'} name format\r\n`);
+        ws.send(`\r\n[ERROR] Invalid ${type === 'k8s' ? 'resource' : 'container'} name format\r\n`);
         ws.close();
         return;
       }
     }
 
     // Validate namespace if present
-    if (namespace && namespace !== 'default' && !k8sNameRegex.test(namespace)) {
+    if (namespace && namespace !== 'default' && !k8sNamespaceRegex.test(namespace)) {
       ws.send('\r\n[ERROR] Invalid namespace format\r\n');
       ws.close();
       return;

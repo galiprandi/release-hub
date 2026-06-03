@@ -107,6 +107,14 @@
 - registers all tools on mount
 - search_repositories tool calls runCommand correctly
 
+## Module: Pipeline Core Types
+- should accept valid provider values
+- should accept valid state values
+- should accept valid view mode values
+- should create a valid pipeline event
+- should create valid pipeline data structure
+- should support minimal pipeline data
+
 ## Module: diffEngine
 - should handle arrays
 - should identify additions
@@ -120,14 +128,6 @@
 - retorna false si sekiToken es nulo o no existe
 - retorna false si storage es nulo o JSON inválido
 - retorna true si el token existe
-
-## Module: Pipeline Core Types
-- should accept valid provider values
-- should accept valid state values
-- should accept valid view mode values
-- should create a valid pipeline event
-- should create valid pipeline data structure
-- should support minimal pipeline data
 
 ## Module: LogsViewer
 - calls onResourceChange when resource is selected

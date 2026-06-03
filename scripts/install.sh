@@ -46,17 +46,14 @@ cd "$INSTALL_DIR" && ./scripts/start.sh "\$@"
 EOF
 chmod +x "$INSTALL_DIR/bin/$BINARY_NAME"
 
-# Try to link to /usr/local/bin (requires sudo often, so we handle it gracefully)
+# Try to link to /usr/local/bin (without sudo to avoid credential prompts)
 DEST="/usr/local/bin/$BINARY_NAME"
 if [ -w "/usr/local/bin" ]; then
     ln -sf "$INSTALL_DIR/bin/$BINARY_NAME" "$DEST"
     echo "✅ Success! Link created at $DEST"
 else
-    echo "⚠️  Could not write to /usr/local/bin. Trying with sudo..."
-    sudo ln -sf "$INSTALL_DIR/bin/$BINARY_NAME" "$DEST" || {
-        echo "❌ Could not create link. Please add this to your .zshrc or .bashrc:"
-        echo "alias $BINARY_NAME=\"$INSTALL_DIR/bin/$BINARY_NAME\""
-    }
+    echo "⚠️  Could not write to /usr/local/bin. Please add this to your .zshrc or .bashrc:"
+    echo "alias $BINARY_NAME=\"$INSTALL_DIR/bin/$BINARY_NAME\""
 fi
 
 echo ""

@@ -42,6 +42,20 @@ rhub
 
 The application will automatically open in your default browser so you can start managing your repositories instantly.
 
+### Uninstall
+
+To completely remove ReleaseHub from your system:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/galiprandi/release-hub/main/scripts/uninstall.sh | bash
+```
+
+This will remove:
+- The installation directory (`~/.release-hub`)
+- The symbolic link in `/usr/local/bin/rhub` (if present)
+
+If you added an alias to your `.zshrc` or `.bashrc`, you'll need to remove it manually.
+
 ---
 
 ## 🛠️ Local Development

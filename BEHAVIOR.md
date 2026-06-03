@@ -53,11 +53,12 @@
 - fetchPipeline retorna el pipeline
 
 ## Module: AIChatModal
-- calls prompt when send button is clicked
+- calls prompt with multimodal signature when send button is clicked
 - calls reset when clear button is clicked
-- does not render when closed
+- handles file selection and shows preview
 - renders correctly when open
-- updates input value on change
+- shows stop button during prompting and calls reset on click
+- switches profiles and updates messages
 
 ## Module: CommitsModal
 - should filter commits
@@ -128,35 +129,6 @@
 - retorna false si storage es nulo o JSON inválido
 - retorna true si el token existe
 
-## Module: BaseDialog
-- should accept maxWidth prop
-- should call onOpenChange when close button is clicked
-- should have proper accessibility attributes
-- should not render dialog when open is false
-- should render children
-- should render description when provided
-- should render dialog when open is true
-- should render title
-
-## Module: DialogCloseButton
-- should apply custom className when provided
-- should have proper accessibility attributes
-- should have screen reader text 'Cerrar'
-- should render the button with X icon
-
-## Module: StatusCard
-- applies focus ring classes to buttons
-- applies hover and transition classes to retry button
-- calls onClose when close button is clicked
-- does not render close button if onClose is not provided
-- does not render retry button if onRetry is not provided
-- handles long messages with truncate class
-- renders custom retry button styles for non-error/warn types
-- renders error state with retry button
-- renders loading state correctly
-- renders offline state correctly
-- renders warn state with retry button
-
 ## Module: LogsViewer
 - calls onResourceChange when resource is selected
 - copies logs to clipboard
@@ -185,6 +157,35 @@
 - should return null/undefined if line is empty
 - should return the same text if no ANSI codes are present
 - should strip ANSI codes before highlighting
+
+## Module: BaseDialog
+- should accept maxWidth prop
+- should call onOpenChange when close button is clicked
+- should have proper accessibility attributes
+- should not render dialog when open is false
+- should render children
+- should render description when provided
+- should render dialog when open is true
+- should render title
+
+## Module: DialogCloseButton
+- should apply custom className when provided
+- should have proper accessibility attributes
+- should have screen reader text 'Cerrar'
+- should render the button with X icon
+
+## Module: StatusCard
+- applies focus ring classes to buttons
+- applies hover and transition classes to retry button
+- calls onClose when close button is clicked
+- does not render close button if onClose is not provided
+- does not render retry button if onRetry is not provided
+- handles long messages with truncate class
+- renders custom retry button styles for non-error/warn types
+- renders error state with retry button
+- renders loading state correctly
+- renders offline state correctly
+- renders warn state with retry button
 
 ## Module: Pipeline Adapters
 - should handle errors gracefully

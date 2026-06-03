@@ -44,6 +44,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 		length: "short",
 		outputLanguage: "es",
 		streaming: true,
+		warmup: false,
 	})
 
 	const availability = useMemo(() => 

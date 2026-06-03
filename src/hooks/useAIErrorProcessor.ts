@@ -15,6 +15,7 @@ export function useAIErrorProcessor(options: UseAIErrorProcessorOptions = {}) {
 		format: "plain-text",
 		length: "short",
 		outputLanguage: "es",
+		warmup: false,
 	})
 
 	const availability = useMemo(() => 

@@ -73,6 +73,13 @@ interface UseUnifiedPipelineOptions {
 	viewMode: ViewMode
 	/** Commit hash for commits view, tag name for tags view */
 	ref: string
+	/**
+	 * Full 40-character commit hash.
+	 * REQUIRED when viewMode is 'tags' and provider is 'seki'.
+	 * The Seki API needs `/pipelines/:commit/:tag`; omitting this produces
+	 * a broken URL with a double slash. Must come from the tag object (e.g. latestTag?.commit).
+	 */
+	commit?: string
 	enabled?: boolean
 }
 
@@ -99,6 +106,7 @@ export function useUnifiedPipeline({
 	repo,
 	viewMode,
 	ref,
+	commit,
 	enabled = true,
 }: UseUnifiedPipelineOptions): UseUnifiedPipelineResult {
 	// First detect which provider to use
@@ -120,7 +128,7 @@ export function useUnifiedPipeline({
 			}
 			
 			console.log(`[UnifiedPipeline] Fetching from ${provider} for ${org}/${repo} (${viewMode})`)
-			const result = await adapter.fetch(org, repo, viewMode, ref)
+			const result = await adapter.fetch(org, repo, viewMode, ref, commit)
 			
 			if (!result) {
 				throw new Error('Pipeline data not found')

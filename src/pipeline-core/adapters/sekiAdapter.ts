@@ -100,11 +100,23 @@ export const sekiAdapter: PipelineAdapter = {
 		return hasSekiToken()
 	},
 	
+	/**
+	 * Fetch pipeline data from Seki.
+	 *
+	 * WARNING: For `viewMode === 'tags'` the `commit` parameter is **required**
+	 * and must be the full 40-character commit hash associated with the tag.
+	 * The Seki API endpoint is `/products/:org/:repo/pipelines/:commit/:tag`.
+	 * Passing an empty string or omitting `commit` produces a double-slash URL
+	 * (`/pipelines//tag`) which returns 404 or no data.
+	 *
+	 * @param commit - Full commit hash (required when viewMode is 'tags')
+	 */
 	async fetch(
 		org: string,
 		repo: string,
 		viewMode: ViewMode,
-		ref: string
+		ref: string,
+		commit?: string
 	): Promise<PipelineData | null> {
 		const fullProduct = `${org}/${repo}`
 		
@@ -113,14 +125,14 @@ export const sekiAdapter: PipelineAdapter = {
 			
 			if (viewMode === 'tags') {
 				// For production, we need a tag (ref should be the tag name)
-				// Note: This adapter is not used by the old system that uses fetchPipelineWithTag
-				// The old system uses usePipelineWithTag directly
+				// and a commit hash for the Seki API
 				if (!ref || ref.length < 5) {
 					return null
 				}
-				// For the unified system, we would need to pass the commit separately
-				// This is a limitation of the current unified adapter design
-				response = await fetchPipelineWithTag(fullProduct, '', ref)
+				if (!commit || commit.length < 7) {
+					return null
+				}
+				response = await fetchPipelineWithTag(fullProduct, commit, ref)
 			} else {
 				// For commits view, we need a commit hash
 				if (!ref || ref.length < 7) {

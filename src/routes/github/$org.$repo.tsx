@@ -72,6 +72,7 @@ function ProductIndex() {
 					repo={repo}
 					viewMode={viewMode}
 					ref={monitorRef}
+					commit={!isCommits ? latestTag?.commit : undefined}
 				/>
 			</div>
 

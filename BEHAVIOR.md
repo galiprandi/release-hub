@@ -206,6 +206,7 @@
 - should fetch and transform commit data
 - should fetch and transform tag data
 - should return null for short refs or API errors
+- should return null for tag data without commit
 - should transform events and subevents correctly
 
 ## Module: PipelineCard

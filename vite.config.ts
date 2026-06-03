@@ -49,7 +49,19 @@ const spawnAsync = (
 
 const activePortForwards = new Map<string, ReturnType<typeof spawn>>();
 
-// Handler for /local/exec endpoint - works in both dev and preview
+/**
+ * Handler for /local/exec endpoint - works in both dev and preview
+ *
+ * SECURITY: Commands are executed via spawn(..., { shell: false }), which means
+ * each array element is passed as a single argument. Shell metacharacters like | ; > <
+ * inside an argument are treated as literal text by the target process (e.g. jq),
+ * NOT as shell operators. Adding a regex to block them here breaks legitimate commands
+ * (e.g. gh api --jq '.[] | {name}') without adding any real security benefit.
+ *
+ * The actual security guarantees come from:
+ * 1. runCommand() requiring an array of arguments (rejecting strings)
+ * 2. spawn() with shell: false, which bypasses the shell entirely
+ */
 const execHandler: Connect.NextHandleFunction = async (req, res) => {
 	if (req.method !== "POST" && req.method !== "GET") {
 		res.statusCode = 405;
@@ -94,14 +106,10 @@ const execHandler: Connect.NextHandleFunction = async (req, res) => {
 		return;
 	}
 
-	// Block common shell metacharacters for security
-	const injectionPattern = /[;&|><]/;
-	if (args.some(arg => typeof arg === 'string' && injectionPattern.test(arg))) {
-		console.error(`[SECURITY BLOCKED] Potential shell injection attempt detected in args: ${JSON.stringify(args)}`);
-		res.statusCode = 400;
-		res.end(JSON.stringify({ error: "Security violation: shell metacharacters detected" }));
-		return;
-	}
+	// NOTE: Do NOT add a shell-metacharacter regex here.
+	// With spawn(shell: false) these chars are harmless literal text.
+	// A previous regex /[;&|><]/ broke all gh api --jq commands.
+	// See: https://github.com/galiprandi/release-hub/issues/TODO
 
 	console.log(`RUN: ${args.join(" ")}`);
 

@@ -51,8 +51,13 @@ export interface PipelineAdapter {
 	name: PipelineProvider
 	/** Check if this adapter supports the given repository */
 	supports: (org: string, repo: string) => Promise<boolean>
-	/** Fetch pipeline data */
-	fetch: (org: string, repo: string, viewMode: ViewMode, ref: string) => Promise<PipelineData | null>
+	/**
+	 * Fetch pipeline data.
+	 * @param commit - Full commit hash. REQUIRED for Seki tags view
+	 *   because the endpoint is `/pipelines/:commit/:tag`. Omitting it
+	 *   creates a double-slash URL and breaks the request.
+	 */
+	fetch: (org: string, repo: string, viewMode: ViewMode, ref: string, commit?: string) => Promise<PipelineData | null>
 }
 
 // UI Component Types

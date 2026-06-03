@@ -21,15 +21,24 @@ interface UnifiedPipelineMonitorProps {
 	viewMode: ViewMode
 	/** Commit hash for commits view, tag name for tags view */
 	ref: string
+	/**
+	 * Full 40-character commit hash associated with the tag.
+	 * REQUIRED when viewMode is 'tags' — the Seki API endpoint is
+	 * `/pipelines/:commit/:tag`, so passing an empty string produces
+	 * a double-slash URL and a 404. Must come from the tag object
+	 * (e.g. latestTag?.commit), NOT from the latest staging commit.
+	 */
+	commit?: string
 }
 
-export function UnifiedPipelineMonitor({ org, repo, viewMode, ref }: UnifiedPipelineMonitorProps) {
+export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: UnifiedPipelineMonitorProps) {
 	const queryClient = useQueryClient()
 	const { data, provider, isLoading, error, refetch } = useUnifiedPipeline({
 		org,
 		repo,
 		viewMode,
 		ref,
+		commit,
 	})
 
 	const handleRetry = () => {

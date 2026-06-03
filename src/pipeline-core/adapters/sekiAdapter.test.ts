@@ -16,10 +16,15 @@ describe('sekiAdapter', () => {
   it('should fetch and transform tag data', async () => {
     const mockData = { state: 'FAILED', created_at: '2025-01-01', git: { commit: 'abc', ref: 'v1.0.0', commit_message: 'msg', commit_author: 'auth' }, events: [] }
     vi.mocked(sekiApi.fetchPipelineWithTag).mockResolvedValue({ data: mockData } as unknown as Awaited<ReturnType<typeof sekiApi.fetchPipelineWithTag>>)
-    const result = await sekiAdapter.fetch('o', 'r', 'tags', 'v1.0.0')
+    const result = await sekiAdapter.fetch('o', 'r', 'tags', 'v1.0.0', 'abcdef1234567890abcdef1234567890abcdef12')
     expect(result?.state).toBe('FAILED')
     expect(result?.ref).toBe('v1.0.0')
     expect(result?.refType).toBe('TAG')
+  })
+
+  it('should return null for tag data without commit', async () => {
+    expect(await sekiAdapter.fetch('o', 'r', 'tags', 'v1.0.0')).toBeNull()
+    expect(await sekiAdapter.fetch('o', 'r', 'tags', 'v1.0.0', 'short')).toBeNull()
   })
 
   it('should transform events and subevents correctly', async () => {

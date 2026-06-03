@@ -1,0 +1,55 @@
+{
+  "state": "FAILED",
+  "created_at": "2026-06-03T16:00:00Z",
+  "updated_at": "2026-06-03T16:30:00Z",
+  "git": {
+    "commit": "9d3bda906618b28a2837956f9d1b4226b6cfae5e",
+    "commit_message": "chore: enable service deployment",
+    "commit_author": "vane",
+    "ref": null
+  },
+  "events": [
+    {
+      "id": "build",
+      "name": "Build",
+      "state": "FAIL",
+      "started_at": "2026-06-03T16:00:00Z",
+      "completed_at": "2026-06-03T16:15:00Z",
+      "subevents": [
+        {
+          "id": "docker-build",
+          "name": "Docker Build",
+          "state": "FAIL",
+          "started_at": "2026-06-03T16:00:00Z",
+          "completed_at": "2026-06-03T16:15:00Z",
+          "markdown": "# Docker Build Failed\n\n**Error:** Build failed with exit code 1\n\n**Details:**\n- Step: RUN npm install\n- Error: ERESOLVE unable to resolve dependency tree\n- Package: react@18.2.0 conflicts with react@17.0.2\n\n**Solution:** Update package.json to resolve dependency conflicts"
+        }
+      ]
+    },
+    {
+      "id": "deploy",
+      "name": "Deploy",
+      "state": "FAIL",
+      "started_at": "2026-06-03T16:15:00Z",
+      "completed_at": "2026-06-03T16:30:00Z",
+      "subevents": [
+        {
+          "id": "k8s-deploy",
+          "name": "Kubernetes Deployment",
+          "state": "FAIL",
+          "started_at": "2026-06-03T16:15:00Z",
+          "completed_at": "2026-06-03T16:30:00Z",
+          "markdown": "# Kubernetes Deployment Failed\n\n**Error:** Deployment rollout failed\n\n**Details:**\n- Deployment: mobile-bff-deployment\n- Namespace: argentina-arcus\n- Reason: Liveness probe failed\n- Pod: mobile-bff-7d8f9c6b5d-x4k2p\n\n**Logs:**\n```\nLiveness probe failed: HTTP GET http://localhost:3000/health failed: status 503 Service Unavailable\nReadiness probe failed: HTTP GET http://localhost:3000/ready failed: status 503 Service Unavailable\n```\n\n**Solution:** Check application logs and ensure health endpoints are responding correctly"
+        },
+        {
+          "id": "validation",
+          "name": "JIRA Validation",
+          "state": "FAIL",
+          "started_at": "2026-06-03T16:20:00Z",
+          "completed_at": "2026-06-03T16:25:00Z",
+          "markdown": "# JIRA Validation Failed\n\n**Error:** JIRA ticket validation failed\n\n**Details:**\n- Ticket: ARARG-9999\n- Status: Invalid transition\n- Current status: In Progress\n- Required status: Ready for Deploy\n\n**Solution:** Update JIRA ticket status to 'Ready for Deploy' before deploying"
+        }
+      ]
+    }
+  ]
+}

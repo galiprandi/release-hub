@@ -44,6 +44,8 @@ export interface PipelineData {
 	}
 	/** Last updated timestamp */
 	updatedAt: string
+	/** Error markdown from failed pipeline (if state is FAILED) */
+	errorMarkdown?: string
 }
 
 export interface PipelineAdapter {

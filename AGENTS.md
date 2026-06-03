@@ -85,7 +85,10 @@ Ver `DESIGN.md` para especificaciones visuales completas (`Table`, `FilterBar`, 
 - **Obligatorio antes de crear PR**: Ejecutar `node --run build` y verificar que no existan errores de compilación.
 - No proceder con commit o PR si el build falla.
 
-### 12. Estado Compartible vía URL (TanStack Router Search Params)
+### 13. Componentes de Pipeline (Seki, Pulsar)
+- **PROHIBIDO modificar sin consentimiento explícito**: No se debe cambiar nada de los componentes de pipeline (Seki, Pulsar, o cualquier otro proveedor) sin el consentimiento explícito del usuario. Esto incluye pero no se limita a: adaptadores, tipos, componentes de UI de pipeline, lógica de detección, transformación de datos, y cualquier código relacionado con el sistema de pipeline unificado.
+
+### 14. Estado Compartible vía URL (TanStack Router Search Params)
 
 **Objetivo**: Toda vista de la aplicación debe ser replicable y compartible exactamente a través de la URL. El estado visual (filtros, selecciones, modales abiertos) debe vivir en los search params, no en memoria local.
 

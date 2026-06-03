@@ -3,7 +3,7 @@
  * Reusable card for displaying pipeline status from any provider
  */
 
-import { Loader2 } from 'lucide-react'
+import { Loader2, AlertTriangle } from 'lucide-react'
 import type { ViewMode } from '../types'
 
 export type MetaPart = {
@@ -16,6 +16,8 @@ export interface PipelineCardProps {
 	displayRef: string
 	refType: 'COMMIT' | 'TAG'
 	isRunning?: boolean
+	hasError?: boolean
+	onViewError?: () => void
 	metaParts: MetaPart[]
 	children?: React.ReactNode
 	className?: string
@@ -37,6 +39,8 @@ export function PipelineCard({
 	displayRef,
 	refType,
 	isRunning = false,
+	hasError = false,
+	onViewError,
 	metaParts,
 	children,
 	className = '',
@@ -62,12 +66,21 @@ export function PipelineCard({
 							<span className={`px-1.5 py-0 text-[10px] rounded uppercase tracking-wide ${style.badge}`}>
 								{refType}
 							</span>
-							{isRunning && (
+							{isRunning ? (
 								<span className="flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded-md animate-pulse-slow">
 									<Loader2 className="w-3 h-3 animate-spin" />
 									EN PROGRESO
 								</span>
-							)}
+							) : hasError && onViewError ? (
+								<button
+									type="button"
+									onClick={onViewError}
+									className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-bold text-destructive hover:text-destructive/80 hover:bg-destructive/10 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none focus-visible:ring-offset-1"
+								>
+									<AlertTriangle className="w-3 h-3" />
+									Ver error
+								</button>
+							) : null}
 						</div>
 						{children && <div className="self-start">{children}</div>}
 					</div>

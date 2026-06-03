@@ -66,18 +66,40 @@ function flattenSekiEvents(events: SekiEvent[]): PipelineEvent[] {
 }
 
 /**
+ * Extract error markdown from failed pipeline events
+ */
+function extractErrorMarkdown(events: SekiEvent[]): string | undefined {
+	const failedSubevents: string[] = []
+	
+	for (const event of events) {
+		if (event.subevents?.length) {
+			for (const sub of event.subevents) {
+				if (sub.state === 'FAIL' || sub.state === 'FAILED') {
+					if (sub.markdown) {
+						failedSubevents.push(sub.markdown)
+					}
+				}
+			}
+		}
+	}
+	
+	return failedSubevents.length > 0 ? failedSubevents.join('\n\n---\n\n') : undefined
+}
+
+/**
  * Transform Seki response to unified PipelineData
  */
 function transformSekiData(data: PipelineStatusResponse, viewMode: ViewMode): PipelineData {
 	const isTags = viewMode === 'tags'
 	const ref = isTags && data.git.ref ? data.git.ref : data.git.commit.slice(0, 7)
-	
+	const state = mapSekiState(data.state)
+
 	return {
 		id: `seki-${data.git.commit}`,
 		provider: 'seki',
 		ref,
 		refType: isTags && data.git.ref ? 'TAG' : 'COMMIT',
-		state: mapSekiState(data.state),
+		state,
 		startedAt: data.created_at,
 		completedAt: undefined,
 		events: flattenSekiEvents(data.events),
@@ -87,6 +109,20 @@ function transformSekiData(data: PipelineStatusResponse, viewMode: ViewMode): Pi
 			author: data.git.commit_author,
 		},
 		updatedAt: data.updated_at,
+		errorMarkdown: state === 'FAILED' ? extractErrorMarkdown(data.events) : undefined,
+	}
+}
+
+/**
+ * Load mock data for testing
+ */
+async function loadMockData(): Promise<PipelineStatusResponse | null> {
+	try {
+		const response = await fetch('/seki-failed-response.json')
+		if (!response.ok) return null
+		return await response.json()
+	} catch {
+		return null
 	}
 }
 
@@ -119,10 +155,18 @@ export const sekiAdapter: PipelineAdapter = {
 		commit?: string
 	): Promise<PipelineData | null> {
 		const fullProduct = `${org}/${repo}`
-		
+
+		// Use mock for testing argentina-arcus with specific commit
+		if (org === 'Cencosud-xlabs' && repo === 'argentina-arcus' && ref.startsWith('9d3bda9')) {
+			const mockData = await loadMockData()
+			if (mockData) {
+				return transformSekiData(mockData, viewMode)
+			}
+		}
+
 		try {
 			let response
-			
+
 			if (viewMode === 'tags') {
 				// For production, we need a tag (ref should be the tag name)
 				// and a commit hash for the Seki API
@@ -140,7 +184,7 @@ export const sekiAdapter: PipelineAdapter = {
 				}
 				response = await fetchPipeline(fullProduct, ref)
 			}
-			
+
 			// Transform the response to unified format
 			return transformSekiData(response.data, viewMode)
 		} catch (error) {

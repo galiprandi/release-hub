@@ -394,6 +394,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 			pipelineStatus={productionStatus}
 			isLoading={isProdLoading}
 			commitInfo={tagCommitInfo}
+			navigateToRepo={true}
 		/>
 	) : <span className="text-muted-foreground/40 text-xs font-medium italic">Sin tags</span>;
 }
@@ -439,6 +440,7 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 			pipelineStatus={stagingStatus}
 			isLoading={isStagingLoading}
 			commitInfo={commitInfo}
+			navigateToRepo={true}
 		/>
 	) : <span className="text-muted-foreground/40 text-xs font-medium italic">Sin commits</span>;
 }

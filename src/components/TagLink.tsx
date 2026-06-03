@@ -1,4 +1,5 @@
 import { Tag } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { DeployStatusIndicator } from "./ui/DeployStatusIndicator";
 
 interface TagLinkProps {
@@ -20,22 +21,35 @@ interface TagLinkProps {
 		date?: string;
 		message?: string;
 	};
+	navigateToRepo?: boolean;
 }
 
-export function TagLink({ tagName, org, repo, pipelineStatus, isLoading, showStatus = true, commitInfo }: TagLinkProps) {
+export function TagLink({ tagName, org, repo, pipelineStatus, isLoading, showStatus = true, commitInfo, navigateToRepo = false }: TagLinkProps) {
 	const githubUrl = `https://github.com/${org}/${repo}/releases/tag/${tagName}`;
 
 	return (
 		<div className="flex items-center gap-1.5">
-			<a
-				href={githubUrl}
-				target="_blank"
-				rel="noopener noreferrer"
-				className="flex items-center gap-1.5 text-sm font-mono text-tag hover:text-tag/80 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
-			>
-				<Tag className="w-4 h-4" />
-				{tagName}
-			</a>
+			{navigateToRepo ? (
+				<Link
+					to="/github/$org/$repo"
+					params={{ org, repo }}
+					search={{ view: "tags" }}
+					className="flex items-center gap-1.5 text-sm font-mono text-tag hover:text-tag/80 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+				>
+					<Tag className="w-4 h-4" />
+					{tagName}
+				</Link>
+			) : (
+				<a
+					href={githubUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="flex items-center gap-1.5 text-sm font-mono text-tag hover:text-tag/80 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+				>
+					<Tag className="w-4 h-4" />
+					{tagName}
+				</a>
+			)}
 			{showStatus && (
 				<DeployStatusIndicator
 					status={pipelineStatus?.status}

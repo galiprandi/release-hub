@@ -2,6 +2,14 @@
 
 ---
 
+### 🗓️ 3 de Junio de 2026
+
+- 🎉 **Asistente AI Potenciado** ✨:
+  - **Selector de Perfiles**: Elige entre un asistente General, un Optimizador de Prompts o un Especialista DevOps. Cada perfil cuenta con su propio system prompt para respuestas más precisas y contextuales.
+  - **Soporte Multimodal**: Ahora puedes adjuntar imágenes y audio a tus consultas. El sistema incluye una previsualización de archivos antes del envío.
+  - **Control de Generación**: Nuevo botón de "Stop" para interrumpir la generación de respuestas de la IA instantáneamente.
+  - **Refinamiento Visual**: Header del asistente con mejor jerarquía y estilo Industrial Resonance V2.
+
 ### 🗓️ 1 de Junio de 2026
 
 - 🎉 **Búsqueda**: Ahora puedes buscar archivos dentro de los repositorios usando el prefijo `file:` en el buscador global.

@@ -58,6 +58,8 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Hook useAIPrompt**: Utiliza la versión v3.7.0+ de `@galiprandi/react-tools` para procesamiento local.
 - **Feedback Visual**: Utiliza el token semántico `ai` para resaltar elementos relacionados con inteligencia artificial.
 - **Markdown**: El contenido generado debe renderizarse siempre usando el componente `Streamdown`.
+- **Multimodalidad**: El chat soporta `expectedInputs` para texto, imágenes y audio. Las previsualizaciones deben usar bordes sutiles `border-border/40` y tipografía `text-[10px]` para metadatos del archivo.
+- **Perfiles**: La cabecera del modal debe mostrar el perfil activo con su icono correspondiente (`Sparkles`, `Wand2`, `Terminal`) y etiquetas con el estándar de tipografía técnica (`font-bold uppercase tracking-wider`).
 
 ### AISummaryCard
 - Utiliza `bg-ai` para el fondo y `text-ai-foreground` para el texto.

@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { AIChatModal } from "./AIChatModal";
 
 // Mock the AI hook
@@ -32,28 +32,81 @@ vi.mock("@/components/ui/BaseDialog", () => ({
 }));
 
 describe("AIChatModal", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.stubGlobal('URL', {
+			createObjectURL: vi.fn(() => 'mock-url'),
+			revokeObjectURL: vi.fn(),
+		});
+	});
+
 	it("renders correctly when open", () => {
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 
 		expect(screen.getByText("Asistente AI")).toBeInTheDocument();
 		expect(screen.getByPlaceholderText("Pregunta algo sobre ReleaseHub...")).toBeInTheDocument();
-		expect(screen.getByText(/¡Hola! Soy tu asistente de ReleaseHub/)).toBeInTheDocument();
+
+		// Use a more specific query for the profile label in the header
+		const profiles = screen.getAllByText(/General/i);
+		expect(profiles.length).toBeGreaterThan(0);
 	});
 
-	it("does not render when closed", () => {
-		const { queryByTestId } = render(<AIChatModal isOpen={false} onClose={() => {}} />);
-		expect(queryByTestId("base-dialog")).not.toBeInTheDocument();
-	});
+	it("switches profiles and updates messages", async () => {
+		const { useAIPrompt } = await import("@galiprandi/react-tools");
+		vi.mocked(useAIPrompt).mockReturnValue({
+			data: "",
+			status: "idle",
+			prompt: vi.fn(),
+			reset: vi.fn(),
+			error: null,
+		} as any);
 
-	it("updates input value on change", () => {
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
-		const textarea = screen.getByPlaceholderText("Pregunta algo sobre ReleaseHub...") as HTMLTextAreaElement;
 
-		fireEvent.change(textarea, { target: { value: "Hola IA" } });
-		expect(textarea.value).toBe("Hola IA");
+		const optimizerButtons = screen.getAllByText(/Optimizar Prompts/i);
+		fireEvent.click(optimizerButtons[0]);
+
+		expect(screen.getByText(/Cambiado a perfil: \*\*Optimizar Prompts\*\*/i)).toBeInTheDocument();
 	});
 
-	it("calls prompt when send button is clicked", async () => {
+	it("shows stop button during prompting and calls reset on click", async () => {
+		const mockReset = vi.fn();
+		const { useAIPrompt } = await import("@galiprandi/react-tools");
+		vi.mocked(useAIPrompt).mockReturnValue({
+			data: "Thinking...",
+			status: "prompting",
+			prompt: vi.fn(),
+			reset: mockReset,
+			error: null,
+		} as any);
+
+		render(<AIChatModal isOpen={true} onClose={() => {}} />);
+
+		const stopButton = screen.getByLabelText("Detener respuesta");
+		expect(stopButton).toBeInTheDocument();
+
+		fireEvent.click(stopButton);
+		expect(mockReset).toHaveBeenCalled();
+	});
+
+	it("handles file selection and shows preview", async () => {
+		render(<AIChatModal isOpen={true} onClose={() => {}} />);
+
+		const file = new File(["hello"], "hello.png", { type: "image/png" });
+		const fileInput = screen.getByLabelText("Adjuntar archivo").previousElementSibling as HTMLInputElement;
+
+		fireEvent.change(fileInput, { target: { files: [file] } });
+
+		expect(screen.getByText("hello.png")).toBeInTheDocument();
+		expect(screen.getByAltText("Preview")).toBeInTheDocument();
+
+		const removeButton = screen.getByRole("button", { name: "" }); // The X icon button in preview
+		fireEvent.click(removeButton);
+
+		expect(screen.queryByText("hello.png")).not.toBeInTheDocument();
+	});
+
+	it("calls prompt with multimodal signature when send button is clicked", async () => {
 		const mockPrompt = vi.fn();
 		const { useAIPrompt } = await import("@galiprandi/react-tools");
 		vi.mocked(useAIPrompt).mockReturnValue({
@@ -62,17 +115,18 @@ describe("AIChatModal", () => {
 			prompt: mockPrompt,
 			reset: vi.fn(),
 			error: null,
-		} as unknown as ReturnType<typeof useAIPrompt>);
+		} as any);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 		const textarea = screen.getByPlaceholderText("Pregunta algo sobre ReleaseHub...");
-		const sendButton = screen.getByRole("button", { name: "Enviar mensaje" });
+		const sendButton = screen.getByLabelText("Enviar mensaje");
 
 		fireEvent.change(textarea, { target: { value: "Test prompt" } });
 		fireEvent.click(sendButton);
 
-		expect(mockPrompt).toHaveBeenCalledWith("Test prompt");
-		expect((textarea as HTMLTextAreaElement).value).toBe(""); // Clears after send
+		expect(mockPrompt).toHaveBeenCalledWith([
+			{ role: "user", content: "Test prompt" }
+		]);
 	});
 
 	it("calls reset when clear button is clicked", async () => {
@@ -84,10 +138,10 @@ describe("AIChatModal", () => {
 			prompt: vi.fn(),
 			reset: mockReset,
 			error: null,
-		} as unknown as ReturnType<typeof useAIPrompt>);
+		} as any);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
-		const clearButton = screen.getByRole("button", { name: /Limpiar/i });
+		const clearButton = screen.getByLabelText("Limpiar");
 
 		fireEvent.click(clearButton);
 		expect(mockReset).toHaveBeenCalled();

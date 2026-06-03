@@ -42,7 +42,7 @@
 - should neutralize pipe injection in array-based commands
 - should neutralize redirection injection in array-based commands
 - should neutralize semicolon injection in docker commands
-- should reject argument injection in repo parameter
+- should reject argument injection and path traversal in repo parameter
 - should reject path traversal in action parameter
 - should throw error if command is not an array (runtime enforcement)
 - should validate Docker container names correctly

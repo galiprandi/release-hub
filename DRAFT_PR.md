@@ -1,27 +1,22 @@
-# PR Draft: 🐜 Vesper - Security Hardening (Traversal & Validation)
+# PR Draft: 🐜 Fiona: refactor(hygiene) technical entropy cleanup
 
-## Scope of Refinements
-This PR focuses on eliminating latent security vulnerabilities and improving the robustness of the system's execution layer.
+## Scope
+This PR focuses on eliminating technical entropy and standardizing core components to Industrial Resonance V2.
 
-### 1. Path Traversal Protection in `vite.config.ts`
-- **Current State**: The `scriptHandler` accepts an `action` parameter which is used to construct a file path without sufficient validation.
-- **Improvement**: Implementing strict alphanumeric sanitization for the `action` parameter to ensure it remains within the intended `./scripts/` directory and only executes valid script files.
+### 1. React Hygiene & Optimization
+- **AIChatModal.tsx**: Refactor `useEffect` to eliminate synchronous `setState` calls that trigger cascading renders.
+- **QueryModal.tsx**: Refactor to avoid render-phase state updates for props synchronization.
 
-### 2. Terminal Middleware Input Validation
-- **Current State**: The `terminalMiddleware.ts` extracts `name`, `namespace`, `context`, and `container` parameters from URL search params and passes them directly to `pty.spawn` or `kubectl`.
-- **Improvement**: Adding regex-based validation for all terminal-related parameters to prevent argument injection and ensure compliance with Kubernetes/Docker naming standards.
+### 2. Type Safety (Zero `any` Policy)
+- **useUserCollections.ts**: Replace `any` in storage migration logic with strict interfaces.
+- **PageLayout.tsx**: Correctly type `CustomEvent` for screenshot integration, removing `any` casts.
+- **AIChatModal.test.tsx**: Refactor mocks to eliminate `any` and ensure type-safe testing.
 
-### 3. TypeScript Hygiene (Elimination of `any`)
-- **Current State**: Some legacy `any` types remain in `useWebMCP.ts` and `src/routes/github/index.tsx`.
-- **Improvement**: Replacing `any` with explicit interfaces or `unknown` to ensure type safety and align with the repository's hygiene standards.
+### 3. Industrial Resonance V2 Standardization
+- **QueryModal.tsx**: Comprehensive visual audit to ensure use of semantic tokens, `ActionButton`, and V2 geometries (`rounded-xl`, `bg-muted/40`).
 
-### 4. Security Test Suite Expansion
-- **Current State**: Existing security tests focus on `runCommand`.
-- **Improvement**: Adding new test cases to `src/api/security.test.ts` that specifically target path traversal and terminal input validation.
-
-## Status
-- [x] Territory Blocked
-- [ ] Path Traversal Protection
-- [ ] Terminal Validation
-- [ ] Type Hygiene
-- [ ] Testing & Verification
+## Verification Plan
+- [ ] `npm run lint` passes without warnings.
+- [ ] `npm run build` completes successfully.
+- [ ] Unit tests for `AIChatModal` and `useUserCollections` pass.
+- [ ] Manual verification of `QueryModal` UI resonance.

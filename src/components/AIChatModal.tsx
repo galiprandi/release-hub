@@ -38,19 +38,6 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 	const [attachedFile, setAttachedFile] = useState<File | null>(null);
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-	// Handle initial file injection
-	useEffect(() => {
-		if (isOpen && initialFile) {
-			setAttachedFile(initialFile);
-			if (initialFile.type.startsWith("image/")) {
-				const url = URL.createObjectURL(initialFile);
-				setPreviewUrl(url);
-			}
-			// Focus input after a short delay
-			setTimeout(() => inputRef.current?.focus(), 200);
-		}
-	}, [isOpen, initialFile]);
-
 	const activeProfile = useMemo(() =>
 		AI_PROFILES.find(p => p.id === activeProfileId) || AI_PROFILES[0]
 	, [activeProfileId]);
@@ -58,6 +45,46 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 	const [messages, setMessages] = useState<AIPromptMessage[]>([
 		{ role: "assistant", content: `¡Hola! Soy tu asistente (${activeProfile.label}). ¿En qué puedo ayudarte hoy?` }
 	]);
+
+	// Sync state with props/internal selection during render to avoid cascading renders
+	const [prevInitialFile, setPrevInitialFile] = useState<File | null | undefined>(undefined);
+	const [prevProfileId, setPrevProfileId] = useState(activeProfileId);
+
+	if (isOpen && initialFile && initialFile !== prevInitialFile) {
+		setPrevInitialFile(initialFile);
+		setAttachedFile(initialFile);
+		if (!initialFile.type.startsWith("image/")) {
+			setPreviewUrl(null);
+		}
+	}
+
+	if (activeProfileId !== prevProfileId) {
+		setPrevProfileId(activeProfileId);
+		setMessages([
+			{ role: "assistant", content: `Cambiado a perfil: **${activeProfile.label}**. ¿En qué puedo ayudarte?` }
+		]);
+		setAttachedFile(null);
+		setPreviewUrl(null);
+	}
+
+	// Handle preview URL side effects
+	useEffect(() => {
+		if (attachedFile?.type.startsWith("image/")) {
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				setPreviewUrl(reader.result as string);
+			};
+			reader.readAsDataURL(attachedFile);
+		}
+	}, [attachedFile]);
+
+	// Focus input when modal opens or initial file is injected
+	useEffect(() => {
+		if (isOpen) {
+			const timer = setTimeout(() => inputRef.current?.focus(), initialFile ? 200 : 100);
+			return () => clearTimeout(timer);
+		}
+	}, [isOpen, initialFile]);
 
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -75,15 +102,6 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 		streaming: true,
 		warmup: true
 	});
-
-	// Reset chat when profile changes
-	useEffect(() => {
-		setMessages([
-			{ role: "assistant", content: `Cambiado a perfil: **${activeProfile.label}**. ¿En qué puedo ayudarte?` }
-		]);
-		setAttachedFile(null);
-		setPreviewUrl(null);
-	}, [activeProfileId, activeProfile.label]);
 
 	// Handle streaming data updates
 	const lastProcessedDataRef = useRef<string | null>(null);
@@ -116,13 +134,6 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 			scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
 		}
 	}, [messages, data]);
-
-	// Focus input on open
-	useEffect(() => {
-		if (isOpen) {
-			setTimeout(() => inputRef.current?.focus(), 100);
-		}
-	}, [isOpen]);
 
 	const handleSend = async () => {
 		if (!input.trim() || status === "prompting") return;

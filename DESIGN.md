@@ -274,6 +274,7 @@ Componente para la gestión rápida de asignación de repositorios a proyectos d
 - **Verification**: Refactorizaciones de endurecimiento de shell deben ser verificadas por `src/api/security.test.ts`.
 - **Render-safe Ref Access**: El acceso a `.current` de los Refs de React está prohibido durante la fase de renderizado. Toda lógica de sincronización (ej: scroll en DiffViewer) debe encapsularse en event handlers estabilizados con `useCallback`. Para flujos de datos asíncronos o streaming, usar Refs para rastrear el estado procesado y evitar renders en cascada.
 - **Type Safety Strategy**: Se prohíbe el uso de `any`. Se prioriza el uso de interfaces explícitas y `unknown` para asegurar la integridad de los datos en tiempo de compilación. La integración con WebMCP debe seguir un esquema de validación estricto en los handlers de ejecución.
+- **React State Synchronization Standard**: Para sincronizar el estado interno de un componente con props externas (ej: `initialFile` en `AIChatModal.tsx`), se utiliza el patrón de sincronización durante el renderizado (prevProp vs currentProp). Esto evita el uso de `useEffect` para `setState` síncronos, eliminando renders en cascada y cumpliendo con `react-hooks/set-state-in-effect`.
 
 **Uso básico**:
 ```tsx

@@ -248,7 +248,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 		>
 			<>
 				{/* URL and method controls */}
-				<div className="flex items-center gap-3 p-4 border-b flex-shrink-0">
+				<div className="flex items-center gap-3 p-4 border-b border-border/60 flex-shrink-0">
 					<div className="w-24 flex-shrink-0">
 						<select
 							value={form.method}
@@ -262,7 +262,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 									setRequestTab('body');
 								}
 							}}
-							className="w-full px-2.5 py-1.5 text-sm border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
+							className="w-full px-2.5 py-1.5 text-sm border border-border/60 bg-muted/40 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
 						>
 							{['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
 								<option key={m} value={m}>{m}</option>
@@ -288,7 +288,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 								}
 								setForm(prev => ({ ...prev, url: newUrl, queryParams: newQueryParams }));
 							}}
-							className="w-full px-2.5 py-1.5 text-sm border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono transition-shadow"
+							className="w-full px-2.5 py-1.5 text-sm border border-border/60 bg-muted/40 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono transition-shadow"
 							placeholder="https://..."
 						/>
 					</div>
@@ -305,7 +305,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 					{/* Main content grid */}
 					<div className="flex-1 grid grid-cols-2 overflow-hidden">
 						{/* Left side: Editable form */}
-						<div className="p-4 border-r flex flex-col">
+						<div className="p-4 border-r border-border/60 flex flex-col">
 							<div className="space-y-4 flex-1 flex flex-col">
 								{/* Request tabs */}
 								<div className="flex p-1 bg-muted/40 border border-border/60 rounded-lg gap-1 items-center flex-shrink-0">
@@ -349,7 +349,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 									{requestTab === 'params' && (
 										<div>
 											<div className="flex items-center justify-between mb-1.5">
-												<label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Query Params</label>
+												<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Query Params</label>
 												<ActionButton
 													action={{ icon: Plus, label: "Agregar", color: "primary" }}
 													onClick={() => setForm(prev => ({
@@ -374,7 +374,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 																	setForm(prev => ({ ...prev, queryParams: newQueryParams }));
 																}}
 																placeholder="Key"
-																className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
+																className="w-full px-2.5 py-1.5 text-xs border border-border/60 bg-muted/20 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
 														/>
 															<input
 																	type="text"
@@ -384,7 +384,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 																		queryParams: { ...prev.queryParams, [key]: e.target.value }
 																	}))}
 																	placeholder="Value"
-																	className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
+																	className="w-full px-2.5 py-1.5 text-xs border border-border/60 bg-muted/20 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
 															/>
 															<ActionButton
 																	action={ACTION_DEFINITIONS.delete}
@@ -409,7 +409,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 									{requestTab === 'headers' && (
 										<div>
 											<div className="flex items-center justify-between mb-1.5">
-												<label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Headers</label>
+												<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Headers</label>
 												<ActionButton
 													action={{ icon: Plus, label: "Agregar", color: "primary" }}
 													onClick={() => setForm(prev => ({
@@ -436,7 +436,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 																			setForm(prev => ({ ...prev, headers: newHeaders }));
 																		}}
 																	placeholder="Header name"
-																	className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
+																	className="w-full px-2.5 py-1.5 text-xs border border-border/60 bg-muted/20 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
 															/>
 															{key.toLowerCase() === 'authorization' ? (
 																	<div className="relative">
@@ -448,10 +448,10 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 																					headers: { ...prev.headers, [key]: e.target.value }
 																				}))}
 																			placeholder="Value"
-																			className={`w-full px-2.5 py-1.5 pr-8 text-xs border bg-background rounded-md focus:outline-none focus-visible:ring-2 transition-shadow ${
+																			className={`w-full px-2.5 py-1.5 pr-8 text-xs border bg-muted/20 rounded-lg focus:outline-none focus-visible:ring-2 transition-shadow ${
 																				form.isTokenExpired && value.trim().length > 0
 																						? 'bg-warning/10 border-warning text-warning-foreground focus-visible:ring-warning'
-																						: 'focus-visible:ring-primary border-input'
+																						: 'focus-visible:ring-primary border-border/60'
 																				}`}
 																	/>
 																	{form.isTokenExpired && value.trim().length > 0 && (
@@ -467,7 +467,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 																					headers: { ...prev.headers, [key]: e.target.value }
 																				}))}
 																			placeholder="Value"
-																			className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
+																			className="w-full px-2.5 py-1.5 text-xs border border-border/60 bg-muted/20 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
 																		/>
 															)}
 															<ActionButton
@@ -550,10 +550,10 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 												onSearchChange={setBodySearchQuery}
 											/>
 										) : (
-											<div className="text-xs font-mono space-y-1 bg-muted/50 rounded-md p-3">
+											<div className="text-xs font-mono space-y-1 bg-muted/20 border border-border/60 rounded-lg p-3">
 												{Object.entries(response.headers).map(([key, value]) => (
 													<div key={key}>
-														<span className="font-semibold">{key}:</span> {value}
+														<span className="font-bold text-muted-foreground/60 uppercase text-[10px] tracking-wider">{key}:</span> <span className="text-foreground/80">{value}</span>
 													</div>
 												))}
 											</div>

@@ -56,10 +56,12 @@ describe("AIChatModal", () => {
 		vi.mocked(useAIPrompt).mockReturnValue({
 			data: "",
 			status: "idle",
-			prompt: vi.fn(),
+			prompt: vi.fn().mockResolvedValue(undefined),
 			reset: vi.fn(),
 			error: null,
-		} as any);
+			warmup: vi.fn(),
+			initialized: true,
+		} as unknown as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 
@@ -75,10 +77,12 @@ describe("AIChatModal", () => {
 		vi.mocked(useAIPrompt).mockReturnValue({
 			data: "Thinking...",
 			status: "prompting",
-			prompt: vi.fn(),
+			prompt: vi.fn().mockResolvedValue(undefined),
 			reset: mockReset,
 			error: null,
-		} as any);
+			warmup: vi.fn(),
+			initialized: true,
+		} as unknown as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 
@@ -107,7 +111,7 @@ describe("AIChatModal", () => {
 	});
 
 	it("calls prompt with multimodal signature when send button is clicked", async () => {
-		const mockPrompt = vi.fn();
+		const mockPrompt = vi.fn().mockResolvedValue(undefined);
 		const { useAIPrompt } = await import("@galiprandi/react-tools");
 		vi.mocked(useAIPrompt).mockReturnValue({
 			data: "",
@@ -115,7 +119,9 @@ describe("AIChatModal", () => {
 			prompt: mockPrompt,
 			reset: vi.fn(),
 			error: null,
-		} as any);
+			warmup: vi.fn(),
+			initialized: true,
+		} as unknown as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 		const textarea = screen.getByPlaceholderText("Pregunta algo sobre ReleaseHub...");
@@ -135,10 +141,12 @@ describe("AIChatModal", () => {
 		vi.mocked(useAIPrompt).mockReturnValue({
 			data: "",
 			status: "idle",
-			prompt: vi.fn(),
+			prompt: vi.fn().mockResolvedValue(undefined),
 			reset: mockReset,
 			error: null,
-		} as any);
+			warmup: vi.fn(),
+			initialized: true,
+		} as unknown as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 		const clearButton = screen.getByLabelText("Limpiar");

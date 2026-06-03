@@ -30,7 +30,7 @@ function loadCollectionsFromStorage(): UserCollections {
 			const data = JSON.parse(stored);
 			// Migration: ensure all projects have the deployments array
 			if (data.projects) {
-				data.projects = data.projects.map((p: any) => ({
+				data.projects = (data.projects as Project[]).map((p) => ({
 					...p,
 					repos: p.repos || [],
 					deployments: p.deployments || []

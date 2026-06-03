@@ -13,7 +13,7 @@ Antes de cualquier cambio:
 
 ### 0. Higiene y Refactorización
 - **Código muerto**: Eliminar inmediatamente (no comentar) cualquier componente/ruta/utilidad sin referencias activas.
-- **Hooks hygiene**: Prohibido usar `useEffect` para sincronizar estados derivados o mutar el DOM. Usar `useRef` o event handlers. Prohibido acceder a `.current` de un Ref durante la fase de renderizado; encapsular lógica dependiente de Refs en `useCallback` o efectos para evitar inconsistencias en el renderizado de React. Para sincronizar estados de entrada con props (como en `QueryModal.tsx`), utilizar el patrón de verificación de valor previo durante el renderizado para evitar renders en cascada.
+- **Hooks hygiene**: Prohibido usar `useEffect` para sincronizar estados derivados o mutar el DOM. Usar `useRef` o event handlers. Prohibido acceder a `.current` de un Ref durante la fase de renderizado; encapsular lógica dependiente de Refs en `useCallback` o efectos para evitar inconsistencias en el renderizado de React. Para sincronizar estados de entrada con props (como en `AIChatModal.tsx` o `QueryModal.tsx`), utilizar el patrón de sincronización durante el renderizado (prevProp vs currentProp) para evitar renders en cascada y cumplir con `react-hooks/set-state-in-effect`.
 - **Tokens semánticos**: En componentes de estado/feedback, usar exclusivamente los tokens de `DESIGN.md`. Nunca colores hardcodeados como `text-zinc-500` o `bg-red-500`.
 
 ### 1. Operaciones por Repositorio
@@ -63,7 +63,7 @@ Ver `DESIGN.md` para tokens, patrones visuales y especificaciones de componentes
 - **FilterBar**: Utilizar `variant="tabs"` para navegación de colecciones en dashboards. El contenedor debe ser `bg-muted` con padding `p-1`. Incluir gestión de proyectos integrada (Crear/Editar/Eliminar) en los dashboards para reducir la fricción en la organización de repositorios.
 - **Industrial Resonance V2**: Uso de `tracking-tight` para nombres de elementos, `rounded-xl` para contenedores principales y `rounded-lg` para botones de acción.
 - **Shell Hardening & Input Validation**: Todo comando CLI (gh, docker, kubectl, curl) debe usar `runCommand` con un array de argumentos (`string[]`). Parámetros dinámicos deben validarse contra regex estrictos (K8s/Docker standards) antes de ser pasados a la capa de ejecución. Está prohibido el uso de `..` en parámetros de ruta. El backend está blindado para ejecutar comandos sin shell; está estrictamente prohibido el uso de `exec`, `execAsync` o `spawn(..., { shell: true })`.
-- **Type Hygiene**: Prohibido el uso de `any`. Usar interfaces explícitas o `unknown` con validación de tipos/aserciones seguras. Las funciones de utilidad deben estar estrictamente tipadas.
+- **Type Hygiene**: Prohibido el uso de `any`. Usar interfaces explícitas o `unknown` con validación de tipos/aserciones seguras. Las funciones de utilidad y los listeners de `CustomEvent` deben estar estrictamente tipados.
 - **WebMCP Type Safety**: Las herramientas registradas en `useWebMCP.ts` deben validar estrictamente sus entradas mediante type guards antes de su ejecución para garantizar integridad en la comunicación con el modelo.
 
 ### 10. Componente Table con Filtros Integrados

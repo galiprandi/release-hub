@@ -338,13 +338,16 @@ function AIChatIcon() {
   const [initialFile, setInitialFile] = useState<File | null>(null);
 
   useEffect(() => {
-    const handleOpenWithFile = (e: CustomEvent<{ file: File }>) => {
-      setInitialFile(e.detail.file);
-      setOpen(true);
+    const handleOpenWithFile = (e: Event) => {
+      const customEvent = e as CustomEvent<{ file: File }>;
+      if (customEvent.detail?.file) {
+        setInitialFile(customEvent.detail.file);
+        setOpen(true);
+      }
     };
 
-    window.addEventListener('open-ai-chat-with-file' as any, handleOpenWithFile as any);
-    return () => window.removeEventListener('open-ai-chat-with-file' as any, handleOpenWithFile as any);
+    window.addEventListener('open-ai-chat-with-file', handleOpenWithFile);
+    return () => window.removeEventListener('open-ai-chat-with-file', handleOpenWithFile);
   }, []);
 
   const handleClose = () => {

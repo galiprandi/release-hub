@@ -50,3 +50,10 @@
 **Estado**: Finalizado
 **Objetivo**: Elevar la precisión visual y consistencia del módulo Fetcher.
 **Impacto**: Mejora en la legibilidad técnica y sofisticación de la herramienta de testing de APIs, alineándola con los estándares de diseño globales de la plataforma.
+
+### 🗓️ 16 de Junio de 2026
+**Tarea**: Hardening de Middleware y Protección SSRF.
+**Branch**: `🐜-Vesper-refactor-security-middleware-hardening`
+**Estado**: Finalizado
+**Objetivo**: Endurecer los handlers del middleware de Vite y terminal para prevenir inyecciones y ataques SSRF.
+**Impacto**: Eliminación de superficies de ataque en la capa de comunicación backend-frontend, garantizando que el acceso a recursos internos y la ejecución de comandos sean inexpugnables.

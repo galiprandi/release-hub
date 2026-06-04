@@ -128,6 +128,60 @@ describe('Security Hardening', () => {
     })
   })
 
+  describe('Internal SSRF Protection', () => {
+    const isInternal = (hostname: string) => {
+      const lower = hostname.toLowerCase();
+      if (lower === 'localhost' || lower === '127.0.0.1' || lower === '::1' || lower === '0.0.0.0') return true;
+      if (lower.endsWith('.local') || lower.endsWith('.internal')) return true;
+      if (lower === '169.254.169.254' || lower === 'metadata.google.internal' || lower === 'instance-data') return true;
+      const parts = hostname.split('.').map(Number);
+      if (parts.length === 4 && !parts.some(isNaN)) {
+        if (parts[0] === 10) return true;
+        if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true;
+        if (parts[0] === 192 && parts[1] === 168) return true;
+      }
+      return false;
+    };
+
+    it('should block loopback addresses', () => {
+      expect(isInternal('localhost')).toBe(true);
+      expect(isInternal('127.0.0.1')).toBe(true);
+      expect(isInternal('::1')).toBe(true);
+    });
+
+    it('should block private network addresses (RFC 1918)', () => {
+      expect(isInternal('10.0.0.1')).toBe(true);
+      expect(isInternal('172.16.0.1')).toBe(true);
+      expect(isInternal('172.31.255.255')).toBe(true);
+      expect(isInternal('192.168.1.1')).toBe(true);
+    });
+
+    it('should block cloud metadata addresses', () => {
+      expect(isInternal('169.254.169.254')).toBe(true);
+      expect(isInternal('metadata.google.internal')).toBe(true);
+    });
+
+    it('should allow public addresses', () => {
+      expect(isInternal('google.com')).toBe(false);
+      expect(isInternal('8.8.8.8')).toBe(false);
+      expect(isInternal('my-service.prod.company.com')).toBe(false);
+    });
+  })
+
+  describe('Flag Injection Protection', () => {
+    const k8sNameRegex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
+
+    it('should reject names starting with hyphens (flag injection)', () => {
+      expect(k8sNameRegex.test('--kubeconfig=/root/.kube/config')).toBe(false);
+      expect(k8sNameRegex.test('-n')).toBe(false);
+    });
+
+    it('should reject names with spaces or shell characters', () => {
+      expect(k8sNameRegex.test('pod-name; rm -rf /')).toBe(false);
+      expect(k8sNameRegex.test('pod name')).toBe(false);
+    });
+  })
+
   describe('Complex Command Pipelines', () => {
     it('should neutralize pipe injection in array-based commands', async () => {
       const spy = vi.spyOn(apiExec, 'post').mockResolvedValue({

@@ -1,26 +1,21 @@
-# 🐜 Carol: refactor(fetcher) resonance
+# 🐜 Vesper: refactor(security) middleware hardening
 
 ## Scope of Work
 
-Refining the Fetcher module to align with the **Industrial Resonance V2** design standard.
+Auditing and hardening the Vite middleware handlers to eliminate attack surfaces and implement SSRF protection.
 
 ### 🎯 Objectives
 
-1.  **Fetcher Dashboard (`/fetcher`)**:
-    *   Migrate legacy empty state to the centralized `EmptyState` component for better consistency.
-    *   Elevate `QueriesTable` with V2 table aesthetics:
-        *   `text-[10px]` metadata cells.
-        *   Group hover actions and vertical dividers.
-        *   Standardized semantic badges (20% opacity).
-2.  **Query Modal**:
-    *   Refine input section (Method/URL) for better visual flow.
-    *   Standardize internal tabs with `FilterBar` aesthetics.
-    *   Harmonize response metadata in the footer using semantic tokens.
-3.  **Consistency & Hygiene**:
-    *   Eliminate hardcoded status colors.
-    *   Ensure strict accessibility (aria-labels).
-    *   Update `DESIGN.md` and `CROMA.md`.
+1.  **Vite Middleware Hardening (`vite.config.ts`)**:
+    *   Implement strict validation for `k8sLogsStreamHandler`, `portForwardHandler`, and `portFreeHandler` parameters.
+    *   Enforce RFC 1123 standards for Kubernetes resources and strict regex for Docker/Contexts.
+2.  **SSRF Protection**:
+    *   Harden `healthProxyHandler` to reject requests to internal, loopback, and metadata IP addresses/hostnames.
+3.  **Security Testing**:
+    *   Expand `src/api/security.test.ts` with new attack vectors (flag injection, SSRF) to verify the hardening.
+4.  **Documentation**:
+    *   Update `DESIGN.md`, `AGENTS.md`, and `CROMA.md` with the new security protocols.
 
 ## Territory Block
 
-This PR blocks the Fetcher module for refinements.
+This PR blocks `vite.config.ts` and security-related API files for hardening.

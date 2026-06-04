@@ -47,6 +47,15 @@ const spawnAsync = (
 	});
 };
 
+// Security Validation Patterns
+const VALIDATION = {
+	k8sName: /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
+	k8sNamespace: /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/,
+	context: /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/,
+	dockerName: /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/,
+	resourceType: /^(pod|deployment|service|ingress)$/,
+};
+
 const activePortForwards = new Map<string, ReturnType<typeof spawn>>();
 
 /**
@@ -158,10 +167,35 @@ const healthProxyHandler: Connect.NextHandleFunction = async (req, res) => {
 		return;
 	}
 
-	const healthUrl = targetUrl.endsWith('/') ? `${targetUrl}health` : `${targetUrl}/health`;
-	console.log(`[health-proxy] Checking: ${healthUrl}`);
+	const isInternal = (hostname: string) => {
+		const lower = hostname.toLowerCase();
+		if (lower === 'localhost' || lower === '127.0.0.1' || lower === '::1' || lower === '0.0.0.0') return true;
+		if (lower.endsWith('.local') || lower.endsWith('.internal')) return true;
+
+		// Metadata / Cloud internal endpoints
+		if (lower === '169.254.169.254' || lower === 'metadata.google.internal' || lower === 'instance-data') return true;
+
+		// RFC 1918 Private Address Space
+		const parts = hostname.split('.').map(Number);
+		if (parts.length === 4 && !parts.some(isNaN)) {
+			if (parts[0] === 10) return true;
+			if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true;
+			if (parts[0] === 192 && parts[1] === 168) return true;
+		}
+		return false;
+	};
 
 	try {
+		const initialUrlObj = new URL(targetUrl);
+		if (isInternal(initialUrlObj.hostname)) {
+			res.statusCode = 403;
+			res.end(JSON.stringify({ error: 'Access to internal targets is forbidden' }));
+			return;
+		}
+
+		const healthUrl = targetUrl.endsWith('/') ? `${targetUrl}health` : `${targetUrl}/health`;
+		console.log(`[health-proxy] Checking: ${healthUrl}`);
+
 		const targetUrlObj = new URL(healthUrl);
 
 		const isHttps = targetUrlObj.protocol === 'https:';
@@ -326,9 +360,27 @@ const k8sLogsStreamHandler: Connect.NextHandleFunction = (req, res) => {
 	const namespace = url.searchParams.get("namespace");
 	const context = url.searchParams.get("context");
 
-	if (!name) {
+	if (!name || !VALIDATION.k8sName.test(name)) {
 		res.statusCode = 400;
-		res.end(JSON.stringify({ error: "Missing name parameter" }));
+		res.end(JSON.stringify({ error: "Invalid or missing name parameter" }));
+		return;
+	}
+
+	if (!VALIDATION.resourceType.test(resourceType)) {
+		res.statusCode = 400;
+		res.end(JSON.stringify({ error: "Invalid resourceType" }));
+		return;
+	}
+
+	if (namespace && !VALIDATION.k8sNamespace.test(namespace)) {
+		res.statusCode = 400;
+		res.end(JSON.stringify({ error: "Invalid namespace" }));
+		return;
+	}
+
+	if (context && !VALIDATION.context.test(context)) {
+		res.statusCode = 400;
+		res.end(JSON.stringify({ error: "Invalid context" }));
 		return;
 	}
 
@@ -498,6 +550,18 @@ const portFreeHandler: Connect.NextHandleFunction = async (req, res) => {
 	const startPort = parseInt(url.searchParams.get("startPort") || String(DEFAULT_START_PORT), 10);
 	const max = parseInt(url.searchParams.get("max") || String(DEFAULT_MAX_PORTS), 10);
 
+	if (isNaN(startPort) || startPort < 1024 || startPort > 65535) {
+		res.statusCode = 400;
+		res.end(JSON.stringify({ error: "Invalid startPort" }));
+		return;
+	}
+
+	if (isNaN(max) || max < 1 || max > 100) {
+		res.statusCode = 400;
+		res.end(JSON.stringify({ error: "Invalid max parameter" }));
+		return;
+	}
+
 	// Collect ports already used by active port-forwards
 	const activePorts = new Set(
 		Array.from(activePortForwards.values()).map(
@@ -554,11 +618,17 @@ const portForwardHandler: Connect.NextHandleFunction = async (req, res) => {
 			return;
 		}
 		const { deployment, namespace, context } = payload;
-		if (!deployment || !namespace) {
+		if (!deployment || !namespace || !VALIDATION.k8sName.test(deployment) || !VALIDATION.k8sNamespace.test(namespace)) {
 			res.statusCode = 400;
-			res.end(JSON.stringify({ error: "Missing deployment or namespace", success: false }));
+			res.end(JSON.stringify({ error: "Invalid or missing deployment/namespace", success: false }));
 			return;
 		}
+		if (context && !VALIDATION.context.test(context)) {
+			res.statusCode = 400;
+			res.end(JSON.stringify({ error: "Invalid context", success: false }));
+			return;
+		}
+
 		const key = `${context || ""}/${namespace}/${deployment}`;
 		const existing = activePortForwards.get(key);
 		if (existing) {
@@ -587,9 +657,14 @@ const portForwardHandler: Connect.NextHandleFunction = async (req, res) => {
 			return;
 		}
 		const { deployment, namespace, context } = payload;
-		if (!deployment || !namespace) {
+		if (!deployment || !namespace || !VALIDATION.k8sName.test(deployment) || !VALIDATION.k8sNamespace.test(namespace)) {
 			res.statusCode = 400;
-			res.end(JSON.stringify({ error: "Missing deployment or namespace", success: false }));
+			res.end(JSON.stringify({ error: "Invalid or missing deployment/namespace", success: false }));
+			return;
+		}
+		if (context && !VALIDATION.context.test(context)) {
+			res.statusCode = 400;
+			res.end(JSON.stringify({ error: "Invalid context", success: false }));
 			return;
 		}
 

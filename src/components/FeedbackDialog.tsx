@@ -37,14 +37,14 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 	const [showOriginalError, setShowOriginalError] = useState(false)
 	const [isGeneratingLocal, setIsGeneratingLocal] = useState(false)
 	const queryClient = useQueryClient()
-	
+
 	const { data, status, error: aiError, summarize, reset: resetAI } = useAISummarize({
 		type: "headline",
 		format: "plain-text",
 		length: "short",
 		outputLanguage: "es",
 		streaming: true,
-		warmup: true,
+		warmup: open,
 	})
 
 	const availability = useMemo(() => 

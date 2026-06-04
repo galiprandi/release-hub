@@ -20,14 +20,14 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 	const [isAiSummaryCollapsed, setIsAiSummaryCollapsed] = useState(false);
 	const queryClient = useQueryClient();
 	const [isGeneratingLocal, setIsGeneratingLocal] = useState(false);
-	
+
 	const { data, status, error: aiError, summarize, reset: resetAI } = useAISummarize({
 		type: "key-points",
 		format: "plain-text",
 		length: "medium",
 		outputLanguage: "es",
 		streaming: true,
-		warmup: true,
+		warmup: isOpen,
 	});
 
 	const availability = useMemo(() => 

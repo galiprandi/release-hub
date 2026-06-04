@@ -57,7 +57,7 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: Uni
 		length: 'medium',
 		outputLanguage: 'es',
 		streaming: true,
-		warmup: true,
+		warmup: isErrorModalOpen,
 	})
 
 	// AI summarization for error modal (single paragraph)
@@ -71,7 +71,7 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: Uni
 		length: 'short',
 		outputLanguage: 'es',
 		streaming: true,
-		warmup: true,
+		warmup: isErrorModalOpen,
 	})
 
 	const isGenerating = aiStatus === 'summarizing' || aiStatus === 'initializing' || aiStatus === 'downloading'

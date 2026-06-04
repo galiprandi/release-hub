@@ -121,6 +121,7 @@ focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus
 - **Badge de Método**: Mapeo semántico de métodos HTTP a opacidades (`bg-success/20 text-success` para GET, `bg-info/20 text-info` para POST, etc.) con fuente `text-[10px] font-bold uppercase tracking-wider`. Deben incluir `rounded-md` y `border` con opacidad (ej: `border-success/20`).
 - **Tabs Industriales**: Los selectores de pestañas en modales deben usar el estilo `bg-muted/40` con botones de estado `bg-background shadow-sm` para el elemento activo, similar a `FilterBar`.
 - **Magic Clipboard**: Detección automática de cURL en portapapeles para abrir `QueryModal` instantáneamente, maximizando el "Time to Value".
+- **Fetcher V2 Aesthetics**: Uso de `FilterBar` (variant="tabs") para selectores de Params/Headers/Body en el modal, integrando iconos descriptivos (`ListFilter`, `Braces`, `FileText`). El dashboard de Fetcher implementa metadatos en `text-[10px]` y divisores verticales en acciones de fila para una mayor densidad técnica.
 
 ## Layout V2 - Patrones y Guía de Uso
 

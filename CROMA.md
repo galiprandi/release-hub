@@ -50,3 +50,10 @@
 **Estado**: Finalizado
 **Objetivo**: Elevar la precisión visual y consistencia del módulo Fetcher.
 **Impacto**: Mejora en la legibilidad técnica y sofisticación de la herramienta de testing de APIs, alineándola con los estándares de diseño globales de la plataforma.
+
+### 🗓️ 18 de Junio de 2026
+**Tarea**: Evolución de Fetcher a Resonance V2.
+**Branch**: `🐜-Carol-refactor-fetcher-resonance`
+**Estado**: Finalizado
+**Objetivo**: Aplicar refinamientos de alta densidad en el Dashboard y Query Modal.
+**Impacto**: Consistencia absoluta con el estándar V2 mediante el uso de FilterBar en modales y tipografía técnica en metadatos de tabla.

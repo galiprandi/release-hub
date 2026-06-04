@@ -73,7 +73,8 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 			{ type: "audio" }
 		],
 		streaming: true,
-		warmup: false
+		warmup: true,
+		outputLanguage: "es"
 	});
 
 	// Reset chat when profile changes

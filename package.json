@@ -19,7 +19,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@galiprandi/react-tools": "^3.7.0",
+    "@galiprandi/react-tools": "^3.8.1",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-hover-card": "^1.1.15",
     "@radix-ui/react-tooltip": "^1.2.8",

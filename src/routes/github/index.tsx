@@ -224,7 +224,17 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 				]);
 				const commits = commitsRes.stdout.trim().split("\n")
 					.filter(line => line.startsWith("{"))
-					.map(line => JSON.parse(line));
+					.map(line => {
+						const parsed = JSON.parse(line);
+						// Extract subject and body from message
+						const [subject, ...bodyParts] = parsed.message.split('\n');
+						return {
+							...parsed,
+							subject: subject.trim(),
+							body: bodyParts.join('\n').trim(),
+							shortHash: parsed.hash.substring(0, 7)
+						} as Commit;
+					});
 
 				// Fetch latest tag
 				const tagsRes = await runCommand([
@@ -236,7 +246,7 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 				// Calculate pending
 				let pendingCount = 0;
 				if (latestTag && commits.length > 0) {
-					const prodIndex = (commits as any[]).findIndex((c) => c.hash === latestTag.commit);
+					const prodIndex = (commits as Commit[]).findIndex((c) => c.hash === latestTag.commit);
 					pendingCount = prodIndex === -1 ? commits.length : prodIndex;
 				}
 
@@ -245,7 +255,7 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 					pendingCount,
 					latestTag,
 					commits
-				};
+				} as RepoDetails;
 			},
 			...applyCachePolicy("git"),
 		}))
@@ -254,8 +264,9 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 	const reposWithPending = useMemo(() => {
 		const pendingSet = new Set<string>();
 		repoDetailsQueries.forEach(query => {
-			if (query.data && query.data.pendingCount > 0) {
-				pendingSet.add(query.data.fullName);
+			const data = query.data as RepoDetails | undefined;
+			if (data && data.pendingCount > 0) {
+				pendingSet.add(data.fullName);
 			}
 		});
 		return pendingSet;
@@ -325,7 +336,7 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 				/>
 			),
 		},
-	], [org, favorites, onToggleFavorite]);
+		], [org, favorites, onToggleFavorite, reposWithPending]);
 
 	const navigate = useNavigate({ from: "/github/" });
 	const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
@@ -353,11 +364,12 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0] as any;
+	})[0];
 
-	const commits = detailsQuery.data?.commits;
-	const latestTag = detailsQuery.data?.latestTag;
-	const pendingCount = detailsQuery.data?.pendingCount || 0;
+	const queryData = detailsQuery.data as RepoDetails | undefined;
+	const commits = queryData?.commits;
+	const latestTag = queryData?.latestTag;
+	const pendingCount = queryData?.pendingCount || 0;
 
 	const isLoading = detailsQuery.isLoading;
 
@@ -426,9 +438,10 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0] as any;
-	const latestTag = detailsQuery.data?.latestTag;
-	const commits = detailsQuery.data?.commits;
+	})[0];
+	const queryData = detailsQuery.data as RepoDetails | undefined;
+	const latestTag = queryData?.latestTag;
+	const commits = queryData?.commits;
 	const prodPipeline = usePipelineWithHealth({
 		product: repo.fullName,
 		commit: latestTag?.commit ?? "",
@@ -442,7 +455,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 
 	const tagCommitInfo = useMemo(() => {
 		if (!latestTag?.commit || !commits) return undefined;
-		const commit = (commits as any[]).find(c => c.hash === latestTag.commit);
+		const commit = (commits as Commit[]).find(c => c.hash === latestTag.commit);
 		if (!commit) return undefined;
 		return {
 			hash: commit.hash,
@@ -477,8 +490,9 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0] as any;
-	const latestCommit = detailsQuery.data?.commits?.[0];
+	})[0];
+	const queryData = detailsQuery.data as RepoDetails | undefined;
+	const latestCommit = queryData?.commits?.[0];
 	const stagingPipeline = usePipelineWithHealth({
 		product: repo.fullName,
 		commit: latestCommit?.hash ?? "",
@@ -523,8 +537,9 @@ function DateCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0] as any;
-	const commitDate = detailsQuery?.data?.commits?.[0]?.date;
+	})[0];
+	const queryData = detailsQuery.data as RepoDetails | undefined;
+	const commitDate = queryData?.commits?.[0]?.date;
 
 	if (detailsQuery.isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-24 animate-pulse" />;
@@ -596,8 +611,9 @@ function AuthorCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false // Using data from parent
 		}]
-	})[0] as any;
-	const commitAuthor = detailsQuery?.data?.commits?.[0]?.author;
+	})[0];
+	const queryData = detailsQuery.data as RepoDetails | undefined;
+	const commitAuthor = queryData?.commits?.[0]?.author;
 
 	if (detailsQuery.isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-32 animate-pulse" />;
@@ -622,8 +638,9 @@ function ActionsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; i
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0] as any;
-	const latestTag = detailsQuery.data?.latestTag;
+	})[0];
+	const queryData = detailsQuery.data as RepoDetails | undefined;
+	const latestTag = queryData?.latestTag;
 
 	return (
 		<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -655,6 +672,28 @@ function ActionsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; i
 	);
 }
 
+
+interface Commit {
+	hash: string;
+	shortHash: string;
+	author: string;
+	date: string;
+	message: string;
+	subject: string;
+	body: string;
+}
+
+interface Tag {
+	name: string;
+	commit: string;
+}
+
+interface RepoDetails {
+	fullName: string;
+	pendingCount: number;
+	latestTag: Tag | null;
+	commits: Commit[];
+}
 
 type RepoInfo = {
 	fullName: string;

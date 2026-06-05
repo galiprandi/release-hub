@@ -59,7 +59,11 @@ describe("AIChatModal", () => {
 			prompt: vi.fn(),
 			reset: vi.fn(),
 			error: null,
-		} as any);
+			progress: 0,
+			append: vi.fn(),
+			contextUsage: { totalTokens: 0, promptTokens: 0, completionTokens: 0 },
+			contextWindow: 0,
+		} as unknown as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 
@@ -78,7 +82,11 @@ describe("AIChatModal", () => {
 			prompt: vi.fn(),
 			reset: mockReset,
 			error: null,
-		} as any);
+			progress: 0,
+			append: vi.fn(),
+			contextUsage: { totalTokens: 0, promptTokens: 0, completionTokens: 0 },
+			contextWindow: 0,
+		} as unknown as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 
@@ -115,7 +123,11 @@ describe("AIChatModal", () => {
 			prompt: mockPrompt,
 			reset: vi.fn(),
 			error: null,
-		} as any);
+			progress: 0,
+			append: vi.fn(),
+			contextUsage: { totalTokens: 0, promptTokens: 0, completionTokens: 0 },
+			contextWindow: 0,
+		} as unknown as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 		const textarea = screen.getByPlaceholderText("Pregunta algo sobre ReleaseHub...");
@@ -138,7 +150,11 @@ describe("AIChatModal", () => {
 			prompt: vi.fn(),
 			reset: mockReset,
 			error: null,
-		} as any);
+			progress: 0,
+			append: vi.fn(),
+			contextUsage: { totalTokens: 0, promptTokens: 0, completionTokens: 0 },
+			contextWindow: 0,
+		} as unknown as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 		const clearButton = screen.getByLabelText("Limpiar");

@@ -57,3 +57,10 @@
 **Estado**: Finalizado
 **Objetivo**: Endurecer los handlers del middleware de Vite y terminal para prevenir inyecciones y ataques SSRF.
 **Impacto**: Eliminación de superficies de ataque en la capa de comunicación backend-frontend, garantizando que el acceso a recursos internos y la ejecución de comandos sean inexpugnables.
+
+### 🗓️ 18 de Junio de 2026
+**Tarea**: Evolución de Fetcher a Resonance V2.
+**Branch**: `🐜-Carol-refactor-fetcher-resonance`
+**Estado**: Finalizado
+**Objetivo**: Aplicar refinamientos de alta densidad en el Dashboard y Query Modal.
+**Impacto**: Consistencia absoluta con el estándar V2 mediante el uso de FilterBar en modales y tipografía técnica en metadatos de tabla.

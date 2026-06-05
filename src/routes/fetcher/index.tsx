@@ -156,7 +156,7 @@ function FetcherPage() {
 					value={curlInput}
 					onChange={(e) => setCurlInput(e.target.value)}
 					placeholder="Importar cURL... (curl -X GET...)"
-					className="w-80 px-3 py-1.5 text-sm border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono transition-shadow"
+					className="w-80 px-3 py-1.5 text-sm border border-border/60 bg-muted/40 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono transition-shadow"
 				/>
 			</div>
 			<ActionButton
@@ -164,7 +164,7 @@ function FetcherPage() {
 				onClick={handleSendCurl}
 				disabled={!isCurlValid}
 				size="md"
-				className="bg-primary text-primary-foreground hover:bg-primary/90"
+				className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
 			/>
 		</form>
 	);
@@ -315,7 +315,7 @@ function MethodCell({ query }: { query: QueryRecord }) {
 		DELETE: "bg-destructive/20 text-destructive border-destructive/20",
 	}
 
-	const style = methodStyles[parsed.method.toUpperCase()] || "bg-muted text-muted-foreground border-border/60"
+	const style = methodStyles[parsed.method.toUpperCase()] || "bg-muted/40 text-muted-foreground border-border/40"
 
 	return (
 		<span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${style}`}>
@@ -331,7 +331,7 @@ function UrlCell({ query }: { query: QueryRecord }) {
 	const fullPath = parsed.path.length > 80 ? `${parsed.path.slice(0, 80)}...` : parsed.path
 	return (
 		<div className="flex flex-col">
-			<span className="text-sm font-medium text-foreground truncate max-w-md">
+			<span className="text-sm font-medium tracking-tight text-foreground truncate max-w-md">
 				{parsed.domain}
 			</span>
 			<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 truncate max-w-md">

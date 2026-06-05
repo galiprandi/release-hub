@@ -1,8 +1,9 @@
 
-import { useState, type Dispatch, type SetStateAction } from 'react';
-import { Send, AlertTriangle, Plus } from 'lucide-react';
+import { useState, type Dispatch, type SetStateAction, useMemo } from 'react';
+import { Send, AlertTriangle, Plus, Braces, ListFilter, FileText } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
 import { JsonEditor } from '@/components/JsonEditor';
+import { FilterBar } from '@/components/shared/FilterBar';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 import { parseCurlCommand, minifyJSON } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
@@ -227,6 +228,17 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 		}
 	};
 
+	const requestFilters = useMemo(() => [
+		{ value: 'params', label: 'Params', icon: ListFilter },
+		{ value: 'headers', label: 'Headers', icon: Braces },
+		{ value: 'body', label: 'Body', icon: FileText },
+	], [])
+
+	const responseFilters = useMemo(() => [
+		{ value: 'headers', label: 'Headers', icon: Braces },
+		{ value: 'body', label: 'Body', icon: FileText },
+	], [])
+
 	return (
 		<BaseDialog
 			open={!!query?.curl}
@@ -237,11 +249,11 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 			}}
 			title={
 				<div className="flex items-center gap-3">
-					<Send className="w-5 h-5" />
-					<span>Enviar Query</span>
+					<Send className="w-5 h-5 text-primary" />
+					<span className="tracking-tight">Enviar Query</span>
 				</div>
 			}
-			description="Enviar query"
+			description="Configura y envía una petición HTTP"
 			maxWidth="max-w-6xl"
 			maxHeight="max-h-[90vh]"
 			className="min-h-[600px]"
@@ -249,8 +261,8 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 			<>
 				{/* URL and method controls */}
 				<div className="flex items-center gap-3 p-4 border-b bg-muted/10 flex-shrink-0">
-					<div className="flex-1 flex items-center gap-0.5 bg-background border border-input rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1 transition-all">
-						<div className="relative border-r border-input">
+					<div className="flex-1 flex items-center gap-0.5 bg-background border border-border/60 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1 transition-all">
+						<div className="relative border-r border-border/60">
 							<select
 								value={form.method}
 								onChange={(e) => {
@@ -271,7 +283,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 							</select>
 							<div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
 								<svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="19 9l-7 7-7-7" />
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
 								</svg>
 							</div>
 						</div>
@@ -302,7 +314,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 						onClick={handleExecute}
 						disabled={isExecuting}
 						showLabel
-						className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold uppercase tracking-tight flex-shrink-0"
+						className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg font-bold uppercase tracking-tight flex-shrink-0"
 					/>
 				</div>
 
@@ -310,44 +322,16 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 					{/* Main content grid */}
 					<div className="flex-1 grid grid-cols-2 overflow-hidden">
 						{/* Left side: Editable form */}
-						<div className="p-4 border-r flex flex-col">
+						<div className="p-4 border-r border-border/40 flex flex-col">
 							<div className="space-y-4 flex-1 flex flex-col">
-								{/* Request tabs */}
-								<div className="flex p-1 bg-muted/40 border border-border/60 rounded-lg gap-1 items-center flex-shrink-0">
-									<button
-										type="button"
-										onClick={() => setRequestTab('params')}
-										className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-											requestTab === 'params'
-												? 'bg-background shadow-sm text-foreground'
-												: 'text-muted-foreground hover:bg-accent'
-										}`}
-									>
-										Params
-									</button>
-									<button
-										type="button"
-										onClick={() => setRequestTab('headers')}
-										className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-											requestTab === 'headers'
-												? 'bg-background shadow-sm text-foreground'
-												: 'text-muted-foreground hover:bg-accent'
-										}`}
-									>
-										Headers
-									</button>
-									<button
-										type="button"
-										onClick={() => setRequestTab('body')}
-										className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-											requestTab === 'body'
-												? 'bg-background shadow-sm text-foreground'
-												: 'text-muted-foreground hover:bg-accent'
-										}`}
-									>
-										Body
-									</button>
-								</div>
+								{/* Request tabs using FilterBar */}
+								<FilterBar
+									label=""
+									variant="tabs"
+									filters={requestFilters}
+									activeFilter={requestTab}
+									onFilterChange={(val) => setRequestTab(val as any)}
+								/>
 
 								{/* Request content */}
 								<div className="flex-1 overflow-auto">
@@ -517,30 +501,15 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 						<div className="p-4 overflow-hidden flex flex-col">
 							{response ? (
 								<>
-									{/* Tabs - Using industrial resonance style from FilterBar */}
-									<div className="flex p-1 bg-muted/40 border border-border/60 rounded-lg gap-1 mb-3 items-center flex-shrink-0">
-										<button
-											type="button"
-											onClick={() => setActiveTab('headers')}
-											className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-												activeTab === 'headers'
-													? 'bg-background shadow-sm text-foreground'
-													: 'text-muted-foreground hover:bg-accent'
-											}`}
-										>
-											Headers
-										</button>
-										<button
-											type="button"
-											onClick={() => setActiveTab('body')}
-											className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-												activeTab === 'body'
-													? 'bg-background shadow-sm text-foreground'
-													: 'text-muted-foreground hover:bg-accent'
-											}`}
-										>
-											Body
-										</button>
+									{/* Tabs using FilterBar */}
+									<div className="mb-3">
+										<FilterBar
+											label=""
+											variant="tabs"
+											filters={responseFilters}
+											activeFilter={activeTab}
+											onFilterChange={(val) => setActiveTab(val as any)}
+										/>
 									</div>
 
 									{/* Response content */}
@@ -576,7 +545,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 
 					{/* Footer with timing info - spans full width */}
 					{response && (
-						<div className="px-4 py-3 border-t border-border/40 bg-muted/20 flex items-center justify-between flex-shrink-0">
+						<div className="px-4 py-2 border-t border-border/40 bg-muted/20 flex items-center justify-between flex-shrink-0">
 							<div className="flex items-center gap-3">
 								<span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${
 										response.status >= 200 && response.status < 300

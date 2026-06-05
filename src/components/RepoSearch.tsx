@@ -133,9 +133,9 @@ export function RepoSearch() {
             if (item.type === 'repo') {
               const [org, name] = item.fullName.split('/')
               navigate({
-                to: '/product/$org/$product',
-                params: { org, product: name },
-                search: { stage: 'staging', event: 'commit' },
+                to: '/github/$org/$repo',
+                params: { org, repo: name },
+                search: { view: 'commits' },
               })
             } else if (item.type === 'file' && item.htmlUrl) {
               handleOpenInNewTab(item.htmlUrl)

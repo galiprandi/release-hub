@@ -3,6 +3,7 @@ import { useState, useMemo, useCallback } from "react";
 import { z } from "zod";
 import { Loader2, Star, Building2, FolderOpen, FolderPlus, Search, GitPullRequestCreateArrow, Settings2 } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import { useQueries } from "@tanstack/react-query";
 import { CommitLink } from "@/components/CommitLink";
 import { TagLink } from "@/components/TagLink";
 import { PromoteDialog } from "@/components/PromoteDialog";
@@ -17,17 +18,19 @@ import { Table } from "@/components/ui/Table";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
-import { useGitCommits } from "@/hooks/useGitCommits";
-import { useGitTagsSimple } from "@/hooks/useGitTagsSimple";
 import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
 import { useHealthMonitor } from "@/hooks/useHealthMonitor";
+import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
+import { runCommand } from "@/api/exec";
 import { ProjectManagementDialog } from "@/components/ProjectManagementDialog";
 import { ProjectSelectionDialog } from "@/components/ProjectSelectionDialog";
 import { EmptyState } from "@/components/EmptyState";
 import DayJS from "@/lib/dayjs";
+import { getPipelineStatusInfo } from "@/utils/pipelineStatus";
 
 const dashboardSearchSchema = z.object({
 	tab: z.string().optional().catch("favorites"),
+	filter: z.string().optional(),
 });
 
 export const Route = createFileRoute("/github/")({
@@ -206,7 +209,61 @@ function Dashboard() {
 }
 
 function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps) {
+	const { filter: activeFilter } = useSearch({ from: "/github/" });
 	const sortedRepos = useMemo(() => [...repos].sort((a, b) => a.name.localeCompare(b.name)), [repos]);
+
+	// Fetch data for all repos to handle filtering at the table level
+	const repoDetailsQueries = useQueries({
+		queries: sortedRepos.map(repo => ({
+			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+			queryFn: async () => {
+				// Fetch commits
+				const commitsRes = await runCommand([
+					'gh', 'api', `repos/${repo.fullName}/commits?per_page=10`,
+					'--jq', '.[] | {hash: .sha, author: .commit.author.name, date: .commit.committer.date, message: .commit.message}'
+				]);
+				const commits = commitsRes.stdout.trim().split("\n")
+					.filter(line => line.startsWith("{"))
+					.map(line => JSON.parse(line));
+
+				// Fetch latest tag
+				const tagsRes = await runCommand([
+					'gh', 'api', `repos/${repo.fullName}/tags?per_page=1`,
+					'--jq', '.[0] | {name: .name, commit: .commit.sha}'
+				]);
+				const latestTag = tagsRes.stdout.trim().startsWith("{") ? JSON.parse(tagsRes.stdout) : null;
+
+				// Calculate pending
+				let pendingCount = 0;
+				if (latestTag && commits.length > 0) {
+					const prodIndex = (commits as any[]).findIndex((c) => c.hash === latestTag.commit);
+					pendingCount = prodIndex === -1 ? commits.length : prodIndex;
+				}
+
+				return {
+					fullName: repo.fullName,
+					pendingCount,
+					latestTag,
+					commits
+				};
+			},
+			...applyCachePolicy("git"),
+		}))
+	});
+
+	const reposWithPending = useMemo(() => {
+		const pendingSet = new Set<string>();
+		repoDetailsQueries.forEach(query => {
+			if (query.data && query.data.pendingCount > 0) {
+				pendingSet.add(query.data.fullName);
+			}
+		});
+		return pendingSet;
+	}, [repoDetailsQueries]);
+
+	const filters = useMemo(() => [
+		{ label: "Pendientes", columnId: "pending_filter", value: "true" }
+	], []);
 
 	const columns: ColumnDef<RepoInfo>[] = useMemo(() => [
 		{
@@ -218,6 +275,17 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 				</div>
 			),
 			cell: ({ row }) => <RepoNameCell repo={row.original} />,
+		},
+		{
+			id: "pending_filter",
+			accessorKey: "fullName",
+			header: "Pendientes",
+			enableHiding: true,
+			cell: () => null,
+			filterFn: (row, _columnId, filterValue) => {
+				if (!filterValue) return true;
+				return reposWithPending.has(row.original.fullName);
+			}
 		},
 		{
 			accessorKey: "tag",
@@ -259,35 +327,39 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		},
 	], [org, favorites, onToggleFavorite]);
 
-	return <Table columns={columns} data={sortedRepos} />;
+	const navigate = useNavigate({ from: "/github/" });
+	const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
+		navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, filter: filter?.value }) });
+	}, [navigate]);
+
+	return (
+		<Table
+			columns={columns}
+			data={sortedRepos}
+			filters={filters}
+			activeFilter={activeFilter ? { id: "pending_filter", value: activeFilter } : null}
+			onFilterChange={handleFilterChange}
+			filterLabel="Acción:"
+		/>
+	);
 }
 
 function RepoNameCell({ repo }: { repo: RepoInfo }) {
 	const [org, name] = repo.fullName.split("/");
 	const [isCommitsModalOpen, setIsCommitsModalOpen] = useState(false);
 
-	const { commits, isLoading: isLoadingCommits } = useGitCommits({
-		repo: repo.fullName,
-	});
-	const { latestTag, isLoading: isLoadingTags } = useGitTagsSimple({
-		repo: repo.fullName,
-	});
+	const detailsQuery = useQueries({
+		queries: [{
+			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+			enabled: false
+		}]
+	})[0] as any;
 
-	const prodPipeline = usePipelineWithHealth({
-		product: repo.fullName,
-		commit: latestTag?.commit ?? "",
-		tag: latestTag?.name ?? "",
-		enabled: !!latestTag?.commit && !!latestTag?.name,
-	});
+	const commits = detailsQuery.data?.commits;
+	const latestTag = detailsQuery.data?.latestTag;
+	const pendingCount = detailsQuery.data?.pendingCount || 0;
 
-	const pendingCount = useMemo(() => {
-		if (!commits || !prodPipeline.data?.git?.commit) return 0;
-		const prodCommitIndex = commits.findIndex(c => c.hash === prodPipeline.data!.git!.commit);
-		if (prodCommitIndex === -1) return commits.length;
-		return prodCommitIndex;
-	}, [commits, prodPipeline.data]);
-
-	const isLoading = isLoadingCommits || isLoadingTags;
+	const isLoading = detailsQuery.isLoading;
 
 	if (isLoading) {
 		return (
@@ -318,7 +390,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 								<button
 									type="button"
 									onClick={() => setIsCommitsModalOpen(true)}
-									className="inline-flex items-center gap-1 text-[10px] bg-warning/20 text-warning px-2 py-0.5 rounded-full border border-warning/20 font-bold cursor-pointer hover:bg-warning/30 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+									className="inline-flex items-center gap-1 text-[10px] bg-warning/20 text-warning px-2 py-0.5 rounded-full border border-warning/20 font-bold cursor-pointer hover:bg-warning/30 hover:border-warning/40 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 								>
 									<GitPullRequestCreateArrow className="w-2.5 h-2.5" />
 									<span>{pendingCount}</span>
@@ -340,7 +412,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 				isOpen={isCommitsModalOpen}
 				onClose={() => setIsCommitsModalOpen(false)}
 				commits={commits || []}
-				prodCommitHash={prodPipeline.data?.git?.commit || ""}
+				prodCommitHash={latestTag?.commit || ""}
 				prodTag={latestTag?.name}
 			/>
 		</>
@@ -349,29 +421,28 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 
 function TagCell({ repo }: { repo: RepoInfo }) {
 	const [org, name] = repo.fullName.split("/");
-	const { latestTag, isLoading: isLoadingTags } = useGitTagsSimple({
-		repo: repo.fullName,
-	});
-	const { commits } = useGitCommits({
-		repo: repo.fullName,
-	});
+	const detailsQuery = useQueries({
+		queries: [{
+			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+			enabled: false
+		}]
+	})[0] as any;
+	const latestTag = detailsQuery.data?.latestTag;
+	const commits = detailsQuery.data?.commits;
 	const prodPipeline = usePipelineWithHealth({
 		product: repo.fullName,
 		commit: latestTag?.commit ?? "",
 		tag: latestTag?.name ?? "",
 		enabled: !!latestTag?.commit && !!latestTag?.name,
 	});
-	const productionStatus = prodPipeline.data ? {
-		status: getDeployStatus(prodPipeline.data.events),
-		updatedAt: prodPipeline.data.updated_at,
-		failedStage: prodPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.label.es,
-		errorDetail: prodPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.markdown,
-	} : { status: undefined };
-	const isProdLoading = prodPipeline.isLoading;
+	const productionStatus = useMemo(() =>
+		getPipelineStatusInfo(prodPipeline.data?.events, prodPipeline.data?.updated_at),
+	[prodPipeline.data]);
+	const isProdLoading = prodPipeline.isLoading || detailsQuery.isLoading;
 
 	const tagCommitInfo = useMemo(() => {
 		if (!latestTag?.commit || !commits) return undefined;
-		const commit = commits.find(c => c.hash === latestTag.commit);
+		const commit = (commits as any[]).find(c => c.hash === latestTag.commit);
 		if (!commit) return undefined;
 		return {
 			hash: commit.hash,
@@ -382,7 +453,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 		};
 	}, [latestTag, commits]);
 
-	if (isLoadingTags) {
+	if (detailsQuery.isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
 	}
 
@@ -401,21 +472,22 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 
 function CommitCell({ repo }: { repo: RepoInfo }) {
 	const [org, name] = repo.fullName.split("/");
-	const { latestCommit, isLoading: isLoadingCommits } = useGitCommits({
-		repo: repo.fullName,
-	});
+	const detailsQuery = useQueries({
+		queries: [{
+			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+			enabled: false
+		}]
+	})[0] as any;
+	const latestCommit = detailsQuery.data?.commits?.[0];
 	const stagingPipeline = usePipelineWithHealth({
 		product: repo.fullName,
 		commit: latestCommit?.hash ?? "",
 		enabled: !!latestCommit?.hash,
 	});
-	const stagingStatus = stagingPipeline.data ? {
-		status: getDeployStatus(stagingPipeline.data.events),
-		updatedAt: stagingPipeline.data.updated_at,
-		failedStage: stagingPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.label.es,
-		errorDetail: stagingPipeline.data.events.find((e: { state: string }) => e.state === "FAILED")?.markdown,
-	} : { status: undefined };
-	const isStagingLoading = stagingPipeline.isLoading;
+	const stagingStatus = useMemo(() =>
+		getPipelineStatusInfo(stagingPipeline.data?.events, stagingPipeline.data?.updated_at),
+	[stagingPipeline.data]);
+	const isStagingLoading = stagingPipeline.isLoading || detailsQuery.isLoading;
 
 	const commitInfo = useMemo(() => {
 		if (!latestCommit) return undefined;
@@ -428,7 +500,7 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 		};
 	}, [latestCommit]);
 
-	if (isLoadingCommits) {
+	if (detailsQuery.isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
 	}
 
@@ -446,12 +518,15 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 }
 
 function DateCell({ repo }: { repo: RepoInfo }) {
-	const { latestCommit, isLoading: isLoadingCommits } = useGitCommits({
-		repo: repo.fullName,
-	});
-	const commitDate = latestCommit?.date;
+	const detailsQuery = useQueries({
+		queries: [{
+			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+			enabled: false
+		}]
+	})[0] as any;
+	const commitDate = detailsQuery?.data?.commits?.[0]?.date;
 
-	if (isLoadingCommits) {
+	if (detailsQuery.isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-24 animate-pulse" />;
 	}
 
@@ -483,10 +558,10 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 					>
 						<div className="flex items-center -space-x-1">
 							{unhealthyCount > 0 && (
-								<div className="w-2.5 h-2.5 rounded-full bg-destructive/20 border border-destructive shadow-sm" />
+								<div className="w-2.5 h-2.5 rounded-full bg-destructive/20 border border-destructive/20 shadow-sm" />
 							)}
 							{healthyCount > 0 && (
-								<div className="w-2.5 h-2.5 rounded-full bg-success/20 border border-success shadow-sm" />
+								<div className="w-2.5 h-2.5 rounded-full bg-success/20 border border-success/20 shadow-sm" />
 							)}
 							{pendingCount > 0 && (
 								<div className="w-2.5 h-2.5 rounded-full bg-muted/40 border border-border/40 shadow-sm" />
@@ -504,9 +579,9 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 					>
 						<div className="space-y-1">
 							<p className="font-bold border-b border-border/40 pb-1 mb-1">Estado de Salud</p>
-							{healthyCount > 0 && <p className="text-success flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-success" /> {healthyCount} OK</p>}
-							{unhealthyCount > 0 && <p className="text-destructive flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-destructive" /> {unhealthyCount} Error</p>}
-							{pendingCount > 0 && <p className="text-muted-foreground flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" /> {pendingCount} Pendiente</p>}
+							{healthyCount > 0 && <p className="text-success flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-success" /> {healthyCount} OK</p>}
+							{unhealthyCount > 0 && <p className="text-destructive flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-destructive" /> {unhealthyCount} Error</p>}
+							{pendingCount > 0 && <p className="text-muted-foreground flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" /> {pendingCount} Pendiente</p>}
 						</div>
 					</Tooltip.Content>
 				</Tooltip.Portal>
@@ -516,12 +591,15 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 }
 
 function AuthorCell({ repo }: { repo: RepoInfo }) {
-	const { latestCommit, isLoading: isLoadingCommits } = useGitCommits({
-		repo: repo.fullName,
-	});
-	const commitAuthor = latestCommit?.author;
+	const detailsQuery = useQueries({
+		queries: [{
+			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+			enabled: false // Using data from parent
+		}]
+	})[0] as any;
+	const commitAuthor = detailsQuery?.data?.commits?.[0]?.author;
 
-	if (isLoadingCommits) {
+	if (detailsQuery.isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-32 animate-pulse" />;
 	}
 
@@ -539,9 +617,13 @@ function AuthorCell({ repo }: { repo: RepoInfo }) {
 function ActionsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; isFavorite: boolean; onToggleFavorite: (product: string) => void }) {
 	const [org, name] = repo.fullName.split("/");
 	const [isProjectSelectionOpen, setIsProjectSelectionOpen] = useState(false);
-	const { latestTag } = useGitTagsSimple({
-		repo: repo.fullName,
-	});
+	const detailsQuery = useQueries({
+		queries: [{
+			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+			enabled: false
+		}]
+	})[0] as any;
+	const latestTag = detailsQuery.data?.latestTag;
 
 	return (
 		<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -573,34 +655,6 @@ function ActionsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; i
 	);
 }
 
-// Función helper para determinar el estado del deploy basado en subevents de deploy
-function getDeployStatus(events: { state: string; id: string; subevents?: { id: string; state: string }[] }[]) {
-	if (!events || events.length === 0) return undefined;
-
-	const lastEvent = events[events.length - 1];
-
-	// Si el último evento no es CD (Despliegue), usar su estado
-	if (lastEvent.id !== "CD") {
-		return lastEvent.state;
-	}
-
-	// Filtrar solo subevents de deploy (DEPLOY_*)
-	const deploySubevents = lastEvent.subevents?.filter((se: { id: string }) => se.id.startsWith("DEPLOY_")) || [];
-
-	if (deploySubevents.length === 0) {
-		return lastEvent.state;
-	}
-
-	// Determinar el estado basado en los subevents de deploy
-	const hasFailed = deploySubevents.some((se: { state: string }) => se.state === "FAILED");
-	const hasWarn = deploySubevents.some((se: { state: string }) => se.state === "WARN");
-	const allSuccess = deploySubevents.every((se: { state: string }) => se.state === "SUCCESS");
-
-	if (hasFailed) return "FAILED";
-	if (hasWarn) return "WARN";
-	if (allSuccess) return "SUCCESS";
-	return lastEvent.state;
-}
 
 type RepoInfo = {
 	fullName: string;

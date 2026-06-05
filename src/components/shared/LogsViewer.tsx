@@ -115,7 +115,6 @@ export function LogsViewer({
 		length: "medium",
 		outputLanguage: "es",
 		streaming: true,
-		warmup: asModal,
 	});
 
 	const availability =

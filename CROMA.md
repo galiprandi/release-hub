@@ -57,3 +57,8 @@
 **Estado**: Finalizado
 **Objetivo**: Erradicar la entropía técnica mediante la eliminación de código muerto, unificación de patrones de UI (IndustrialTabs) y endurecimiento de la accesibilidad y reactividad.
 **Impacto**: Sistema más ligero, consistente y accesible, eliminando renders innecesarios y garantizando un estándar de ingeniería de élite.
+**Tarea**: Evolución de Fetcher a Resonance V2.
+**Branch**: `🐜-Carol-refactor-fetcher-resonance`
+**Estado**: Finalizado
+**Objetivo**: Aplicar refinamientos de alta densidad en el Dashboard y Query Modal.
+**Impacto**: Consistencia absoluta con el estándar V2 mediante el uso de FilterBar en modales y tipografía técnica en metadatos de tabla.

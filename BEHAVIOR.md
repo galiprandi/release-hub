@@ -36,6 +36,10 @@
 - getDeployments throws for invalid namespace format
 
 ## Module: Security Hardening
+- should allow public addresses
+- should block cloud metadata addresses
+- should block loopback addresses
+- should block private network addresses (RFC 1918)
 - should handle single quotes within arguments correctly
 - should neutralize backtick injection in kubectl commands
 - should neutralize command substitution in curl commands
@@ -43,6 +47,8 @@
 - should neutralize redirection injection in array-based commands
 - should neutralize semicolon injection in docker commands
 - should reject argument injection and path traversal in repo parameter
+- should reject names starting with hyphens (flag injection)
+- should reject names with spaces or shell characters
 - should reject path traversal in action parameter
 - should throw error if command is not an array (runtime enforcement)
 - should validate Docker container names correctly

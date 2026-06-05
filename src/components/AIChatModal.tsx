@@ -215,7 +215,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 					<IndustrialTabs
 						options={AI_PROFILES.map(p => ({ id: p.id, label: p.label }))}
 						activeId={activeProfileId}
-						onChange={(id) => setActiveProfileId(id as any)}
+						onChange={(id) => setActiveProfileId(id as typeof activeProfileId)}
 						className="bg-muted/40 p-1"
 					/>
 					<div className="w-px h-4 bg-border/40 mx-1" />

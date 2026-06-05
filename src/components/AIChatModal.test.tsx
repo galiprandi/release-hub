@@ -56,10 +56,10 @@ describe("AIChatModal", () => {
 		vi.mocked(useAIPrompt).mockReturnValue({
 			data: "",
 			status: "idle",
-			prompt: vi.fn(),
+			prompt: vi.fn() as any,
 			reset: vi.fn(),
 			error: null,
-		} as any);
+		} as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 
@@ -75,10 +75,10 @@ describe("AIChatModal", () => {
 		vi.mocked(useAIPrompt).mockReturnValue({
 			data: "Thinking...",
 			status: "prompting",
-			prompt: vi.fn(),
+			prompt: vi.fn() as any,
 			reset: mockReset,
 			error: null,
-		} as any);
+		} as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 
@@ -112,10 +112,10 @@ describe("AIChatModal", () => {
 		vi.mocked(useAIPrompt).mockReturnValue({
 			data: "",
 			status: "idle",
-			prompt: mockPrompt,
+			prompt: mockPrompt as any,
 			reset: vi.fn(),
 			error: null,
-		} as any);
+		} as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 		const textarea = screen.getByPlaceholderText("Pregunta algo sobre ReleaseHub...");
@@ -135,10 +135,10 @@ describe("AIChatModal", () => {
 		vi.mocked(useAIPrompt).mockReturnValue({
 			data: "",
 			status: "idle",
-			prompt: vi.fn(),
+			prompt: vi.fn() as any,
 			reset: mockReset,
 			error: null,
-		} as any);
+		} as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 		const clearButton = screen.getByLabelText("Limpiar");

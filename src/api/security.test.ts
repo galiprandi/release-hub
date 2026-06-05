@@ -81,10 +81,20 @@ describe('Security Hardening', () => {
     })
   })
 
-  describe('Vite Middleware Hardening (Path Traversal)', () => {
+  describe('Vite Middleware Hardening (Path Traversal & Execution)', () => {
     // Note: These tests simulate the logic in vite.config.ts since we can't easily test the Vite server in vitest
     const validateAction = (action: string) => /^[a-zA-Z0-9-]+$/.test(action)
     const validateRepo = (repo: string) => /^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(repo) && !repo.includes('..')
+    const SAFE_COMMANDS = ["gh", "kubectl", "docker", "curl", "lsof", "node", "ls"];
+    const validateCommand = (cmd: string) => SAFE_COMMANDS.includes(cmd);
+
+    it('should reject unauthorized commands', () => {
+      expect(validateCommand('rm')).toBe(false);
+      expect(validateCommand('sh')).toBe(false);
+      expect(validateCommand('bash')).toBe(false);
+      expect(validateCommand('kubectl')).toBe(true);
+      expect(validateCommand('gh')).toBe(true);
+    });
 
     it('should reject path traversal in action parameter', () => {
       expect(validateAction('../etc/passwd')).toBe(false)
@@ -131,9 +141,26 @@ describe('Security Hardening', () => {
   describe('Internal SSRF Protection', () => {
     const isInternal = (hostname: string) => {
       const lower = hostname.toLowerCase();
-      if (lower === 'localhost' || lower === '127.0.0.1' || lower === '::1' || lower === '0.0.0.0') return true;
+      if (
+        lower === "localhost" ||
+        lower === "127.0.0.1" ||
+        lower === "::1" ||
+        lower === "0.0.0.0" ||
+        lower === "::" ||
+        lower === "0:0:0:0:0:0:0:1" ||
+        lower === "0:0:0:0:0:0:0:0"
+      )
+        return true;
+
+      if (lower.startsWith("::ffff:127.")) return true;
       if (lower.endsWith('.local') || lower.endsWith('.internal')) return true;
-      if (lower === '169.254.169.254' || lower === 'metadata.google.internal' || lower === 'instance-data') return true;
+      if (
+        lower === '169.254.169.254' ||
+        lower === 'metadata.google.internal' ||
+        lower === 'instance-data' ||
+        lower === 'metadata'
+      ) return true;
+
       const parts = hostname.split('.').map(Number);
       if (parts.length === 4 && !parts.some(isNaN)) {
         if (parts[0] === 10) return true;
@@ -147,6 +174,9 @@ describe('Security Hardening', () => {
       expect(isInternal('localhost')).toBe(true);
       expect(isInternal('127.0.0.1')).toBe(true);
       expect(isInternal('::1')).toBe(true);
+      expect(isInternal('::')).toBe(true);
+      expect(isInternal('0:0:0:0:0:0:0:1')).toBe(true);
+      expect(isInternal('::ffff:127.0.0.1')).toBe(true);
     });
 
     it('should block private network addresses (RFC 1918)', () => {

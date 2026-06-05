@@ -330,6 +330,7 @@ export const queryKeys = {
 		user: (): readonly ["git", "user"] => ["git", "user"],
 		commits: (repo: string): readonly ["git", "commits", string] => ["git", "commits", repo],
 		tags: (repo: string, limit?: number): readonly ["git", "tags", string, number | undefined] => ["git", "tags", repo, limit],
+		dashboardDetails: (repo: string): readonly ["git", "dashboard-details", string] => ["git", "dashboard-details", repo],
 		diff: (repo: string, base: string, head: string): readonly ["git", "diff", string, string, string] =>
 			["git", "diff", repo, base, head],
 	},

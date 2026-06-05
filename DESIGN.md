@@ -27,6 +27,7 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 - **Acciones de Fila**: Botones iconográficos con `hover:bg-accent` y colores semánticos. Deben implementar el anillo de foco estándar del sistema.
 - **Feedback de Carga/Acceso**: Implementar `StatusCard` como componente estándar para todos los estados de carga, error y "offline".
 - **Table (Resonancia Industrial)**: Bordes sutiles `border-border/60` y encabezados con `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60` para una estética técnica de alta densidad.
+- **Table Actionability**: Los dashboards deben incluir filtros de acción (ej: "Acción: Pendientes") para reducir el "Time to Value" en tareas de promoción y despliegue.
 
 ## Kubernetes UI Pattern (Resonancia Industrial)
 

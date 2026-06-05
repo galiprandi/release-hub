@@ -266,6 +266,15 @@ Antes de crear componentes nuevos, verificar si extienden:
 
 Componente reutilizable para botones de acción iconográficos con tooltip integrado. Estándar para todas las acciones de fila en tablas (Docker, K8s, repos, fetcher, etc.).
 
+### IndustrialTabs
+
+Componente unificado para selectores de pestañas siguiendo el estándar **Industrial Resonance V2**.
+
+- **Geometría**: Contenedor `rounded-lg` con padding `p-1`. Items activos con `rounded-md`.
+- **Color**: Fondo del contenedor `bg-muted/40` con borde `border-border/60`. Item activo con `bg-background shadow-sm ring-1 ring-border/20`.
+- **Tipografía**: `text-[10px] font-bold uppercase tracking-wider`.
+- **Accesibilidad**: Implementa `aria-pressed` para comunicar el estado activo a tecnologías de asistencia.
+
 ### ProjectSelectionDialog
 
 Componente para la gestión rápida de asignación de repositorios a proyectos desde el dashboard. Utiliza `BaseDialog` y permite el toggle de pertenencia a colecciones existentes.

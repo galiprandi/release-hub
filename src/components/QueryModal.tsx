@@ -5,6 +5,7 @@ import { BaseDialog } from '@/components/ui/BaseDialog';
 import { JsonEditor } from '@/components/JsonEditor';
 import { FilterBar } from '@/components/shared/FilterBar';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
+import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
 import { parseCurlCommand, minifyJSON } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 import { executeCurlCommand } from '@/api/curl';
@@ -265,6 +266,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 						<div className="relative border-r border-border/60">
 							<select
 								value={form.method}
+								aria-label="Método HTTP"
 								onChange={(e) => {
 									const newMethod = e.target.value;
 									setForm(prev => ({ ...prev, method: newMethod }));
@@ -324,13 +326,16 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 						{/* Left side: Editable form */}
 						<div className="p-4 border-r border-border/40 flex flex-col">
 							<div className="space-y-4 flex-1 flex flex-col">
-								{/* Request tabs using FilterBar */}
-								<FilterBar
-									label=""
-									variant="tabs"
-									filters={requestFilters}
-									activeFilter={requestTab}
-									onFilterChange={(val) => setRequestTab(val as any)}
+								{/* Request tabs */}
+								<IndustrialTabs
+									options={[
+										{ id: 'params', label: 'Params' },
+										{ id: 'headers', label: 'Headers' },
+										{ id: 'body', label: 'Body' },
+									]}
+									activeId={requestTab}
+									onChange={(id) => setRequestTab(id as any)}
+									className="flex-shrink-0"
 								/>
 
 								{/* Request content */}
@@ -501,16 +506,16 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 						<div className="p-4 overflow-hidden flex flex-col">
 							{response ? (
 								<>
-									{/* Tabs using FilterBar */}
-									<div className="mb-3">
-										<FilterBar
-											label=""
-											variant="tabs"
-											filters={responseFilters}
-											activeFilter={activeTab}
-											onFilterChange={(val) => setActiveTab(val as any)}
-										/>
-									</div>
+									{/* Tabs - Using industrial resonance style from FilterBar */}
+									<IndustrialTabs
+										options={[
+											{ id: 'headers', label: 'Headers' },
+											{ id: 'body', label: 'Body' },
+										]}
+										activeId={activeTab}
+										onChange={(id) => setActiveTab(id as any)}
+										className="mb-3 flex-shrink-0"
+									/>
 
 									{/* Response content */}
 									<div className="flex-1 overflow-auto">

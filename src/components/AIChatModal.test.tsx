@@ -100,7 +100,7 @@ describe("AIChatModal", () => {
 		expect(screen.getByText("hello.png")).toBeInTheDocument();
 		expect(screen.getByAltText("Preview")).toBeInTheDocument();
 
-		const removeButton = screen.getByRole("button", { name: "" }); // The X icon button in preview
+		const removeButton = screen.getByLabelText("Cerrar previsualización");
 		fireEvent.click(removeButton);
 
 		expect(screen.queryByText("hello.png")).not.toBeInTheDocument();

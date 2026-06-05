@@ -4,6 +4,7 @@ import { Send, AlertTriangle, Plus } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
 import { JsonEditor } from '@/components/JsonEditor';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
+import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
 import { parseCurlCommand, minifyJSON } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 import { executeCurlCommand } from '@/api/curl';
@@ -253,6 +254,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 						<div className="relative border-r border-input">
 							<select
 								value={form.method}
+								aria-label="Método HTTP"
 								onChange={(e) => {
 									const newMethod = e.target.value;
 									setForm(prev => ({ ...prev, method: newMethod }));
@@ -313,41 +315,16 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 						<div className="p-4 border-r flex flex-col">
 							<div className="space-y-4 flex-1 flex flex-col">
 								{/* Request tabs */}
-								<div className="flex p-1 bg-muted/40 border border-border/60 rounded-lg gap-1 items-center flex-shrink-0">
-									<button
-										type="button"
-										onClick={() => setRequestTab('params')}
-										className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-											requestTab === 'params'
-												? 'bg-background shadow-sm text-foreground'
-												: 'text-muted-foreground hover:bg-accent'
-										}`}
-									>
-										Params
-									</button>
-									<button
-										type="button"
-										onClick={() => setRequestTab('headers')}
-										className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-											requestTab === 'headers'
-												? 'bg-background shadow-sm text-foreground'
-												: 'text-muted-foreground hover:bg-accent'
-										}`}
-									>
-										Headers
-									</button>
-									<button
-										type="button"
-										onClick={() => setRequestTab('body')}
-										className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-											requestTab === 'body'
-												? 'bg-background shadow-sm text-foreground'
-												: 'text-muted-foreground hover:bg-accent'
-										}`}
-									>
-										Body
-									</button>
-								</div>
+								<IndustrialTabs
+									options={[
+										{ id: 'params', label: 'Params' },
+										{ id: 'headers', label: 'Headers' },
+										{ id: 'body', label: 'Body' },
+									]}
+									activeId={requestTab}
+									onChange={(id) => setRequestTab(id as any)}
+									className="flex-shrink-0"
+								/>
 
 								{/* Request content */}
 								<div className="flex-1 overflow-auto">
@@ -518,30 +495,15 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 							{response ? (
 								<>
 									{/* Tabs - Using industrial resonance style from FilterBar */}
-									<div className="flex p-1 bg-muted/40 border border-border/60 rounded-lg gap-1 mb-3 items-center flex-shrink-0">
-										<button
-											type="button"
-											onClick={() => setActiveTab('headers')}
-											className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-												activeTab === 'headers'
-													? 'bg-background shadow-sm text-foreground'
-													: 'text-muted-foreground hover:bg-accent'
-											}`}
-										>
-											Headers
-										</button>
-										<button
-											type="button"
-											onClick={() => setActiveTab('body')}
-											className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-												activeTab === 'body'
-													? 'bg-background shadow-sm text-foreground'
-													: 'text-muted-foreground hover:bg-accent'
-											}`}
-										>
-											Body
-										</button>
-									</div>
+									<IndustrialTabs
+										options={[
+											{ id: 'headers', label: 'Headers' },
+											{ id: 'body', label: 'Body' },
+										]}
+										activeId={activeTab}
+										onChange={(id) => setActiveTab(id as any)}
+										className="mb-3 flex-shrink-0"
+									/>
 
 									{/* Response content */}
 									<div className="flex-1 overflow-auto">

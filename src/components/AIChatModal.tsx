@@ -4,6 +4,7 @@ import { useAIPrompt, type AIPromptMessage } from "@galiprandi/react-tools";
 import { Streamdown } from "streamdown";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { ActionButton } from "@/components/ui/ActionButton";
+import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
 
 interface AIChatModalProps {
 	isOpen: boolean;
@@ -39,13 +40,20 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
 	// Handle initial file injection
-	useEffect(() => {
-		if (isOpen && initialFile) {
+	const [prevInitialFile, setPrevInitialFile] = useState<File | null | undefined>(undefined);
+	if (isOpen && initialFile !== prevInitialFile) {
+		if (initialFile) {
 			setAttachedFile(initialFile);
 			if (initialFile.type.startsWith("image/")) {
 				const url = URL.createObjectURL(initialFile);
 				setPreviewUrl(url);
 			}
+		}
+		setPrevInitialFile(initialFile);
+	}
+
+	useEffect(() => {
+		if (isOpen && initialFile) {
 			// Focus input after a short delay
 			setTimeout(() => inputRef.current?.focus(), 200);
 		}
@@ -78,13 +86,16 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 	});
 
 	// Reset chat when profile changes
-	useEffect(() => {
+	const [prevProfileId, setPrevProfileId] = useState(activeProfileId);
+	if (activeProfileId !== prevProfileId) {
 		setMessages([
 			{ role: "assistant", content: `Cambiado a perfil: **${activeProfile.label}**. ¿En qué puedo ayudarte?` }
 		]);
 		setAttachedFile(null);
+		if (previewUrl) URL.revokeObjectURL(previewUrl);
 		setPreviewUrl(null);
-	}, [activeProfileId, activeProfile.label]);
+		setPrevProfileId(activeProfileId);
+	}
 
 	// Handle streaming data updates
 	const lastProcessedDataRef = useRef<string | null>(null);
@@ -202,21 +213,12 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 			className="h-[80vh]"
 			headerExtra={
 				<div className="flex items-center gap-2 mr-2">
-					<div className="flex items-center bg-muted/40 p-1 rounded-lg border border-border/40">
-						{AI_PROFILES.map((profile) => (
-							<button
-								key={profile.id}
-								onClick={() => setActiveProfileId(profile.id)}
-								className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${
-									activeProfileId === profile.id
-										? "bg-background text-ai shadow-sm ring-1 ring-border/20"
-										: "text-muted-foreground/60 hover:text-foreground"
-								}`}
-							>
-								{profile.label}
-							</button>
-						))}
-					</div>
+					<IndustrialTabs
+						options={AI_PROFILES.map(p => ({ id: p.id, label: p.label }))}
+						activeId={activeProfileId}
+						onChange={(id) => setActiveProfileId(id as any)}
+						className="bg-muted/40 p-1"
+					/>
 					<div className="w-px h-4 bg-border/40 mx-1" />
 					<ActionButton
 						action={{ icon: Trash2, label: "Limpiar", color: "default" }}
@@ -296,6 +298,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							</div>
 							<button
 								onClick={removeFile}
+								aria-label="Cerrar previsualización"
 								className="p-1 hover:bg-destructive/10 hover:text-destructive rounded-full transition-colors"
 							>
 								<X className="w-4 h-4" />

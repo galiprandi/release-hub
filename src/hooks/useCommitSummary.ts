@@ -24,7 +24,6 @@ export function useCommitSummary(options: UseCommitSummaryOptions = {}) {
 		length: "medium",
 		outputLanguage: "en",
 		streaming: true,
-		warmup: false,
 	})
 
 	const availability = useMemo(() => 

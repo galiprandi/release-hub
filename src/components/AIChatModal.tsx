@@ -73,7 +73,6 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 			{ type: "audio" }
 		],
 		streaming: true,
-		warmup: isOpen,
 		outputLanguage: "es"
 	});
 

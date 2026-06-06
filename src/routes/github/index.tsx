@@ -127,7 +127,7 @@ function Dashboard() {
 							action={{ icon: Settings2, label: "Gestionar Proyectos", color: "default" }}
 							onClick={handleManageProjects}
 							size="md"
-							className="bg-muted/40 hover:bg-muted/60"
+							className="bg-muted/20 hover:bg-muted/30"
 						/>
 					}
 				/>
@@ -174,7 +174,7 @@ function Dashboard() {
 										<button
 											type="button"
 											onClick={handleManageProjects}
-											className="inline-flex items-center gap-2 px-6 py-2.5 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all text-xs font-bold uppercase tracking-wider border border-border/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+											className="inline-flex items-center gap-2 px-6 py-2.5 bg-muted/20 text-foreground rounded-lg hover:bg-muted/30 transition-all text-xs font-bold uppercase tracking-wider border border-border/20 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 										>
 											<Settings2 className="w-4 h-4" />
 											Gestionar Proyecto
@@ -217,38 +217,78 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		queries: sortedRepos.map(repo => ({
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			queryFn: async () => {
-				// Fetch commits
-				const commitsRes = await runCommand([
-					'gh', 'api', `repos/${repo.fullName}/commits?per_page=10`,
-					'--jq', '.[] | {hash: .sha, author: .commit.author.name, date: .commit.committer.date, message: .commit.message}'
+				const query = `
+					query($owner: String!, $name: String!) {
+						repository(owner: $owner, name: $name) {
+							pullRequests(states: OPEN) {
+								totalCount
+							}
+							refs(refPrefix: "refs/tags/", last: 1) {
+								nodes {
+									name
+									target {
+										oid
+										... on Tag {
+											target {
+												oid
+											}
+										}
+									}
+								}
+							}
+							defaultBranchRef {
+								target {
+									... on Commit {
+										history(first: 10) {
+											nodes {
+												oid
+												message
+												committedDate
+												author {
+													name
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				`;
+
+				const gqlRes = await runCommand([
+					'gh', 'api', 'graphql',
+					'-f', `query=${query}`,
+					'-f', `owner=${repo.org}`,
+					'-f', `name=${repo.name}`
 				]);
-				const commits = commitsRes.stdout.trim().split("\n")
-					.filter(line => line.startsWith("{"))
-					.map(line => {
-						const parsed = JSON.parse(line);
-						// Extract subject and body from message
-						const [subject, ...bodyParts] = parsed.message.split('\n');
-						return {
-							...parsed,
-							subject: subject.trim(),
-							body: bodyParts.join('\n').trim(),
-							shortHash: parsed.hash.substring(0, 7)
-						} as Commit;
-					});
 
-				// Fetch latest tag
-				const tagsRes = await runCommand([
-					'gh', 'api', `repos/${repo.fullName}/tags?per_page=1`,
-					'--jq', '.[0] | {name: .name, commit: .commit.sha}'
-				]);
-				const latestTag = tagsRes.stdout.trim().startsWith("{") ? JSON.parse(tagsRes.stdout) : null;
+				const data = JSON.parse(gqlRes.stdout).data.repository;
+				if (!data) throw new Error("Repository not found");
 
-				// Fetch PRs count
-				const prsRes = await runCommand(['gh', 'pr', 'list', '--repo', repo.fullName, '--state', 'open', '--json', 'number']);
-				const prs = JSON.parse(prsRes.stdout);
-				const prCount = Array.isArray(prs) ? prs.length : 0;
+				const rawCommits = data.defaultBranchRef?.target?.history?.nodes || [];
+				const commits: Commit[] = rawCommits.map((c: any) => {
+					const [subject, ...bodyParts] = c.message.split('\n');
+					return {
+						hash: c.oid,
+						shortHash: c.oid.substring(0, 7),
+						author: c.author.name,
+						date: c.committedDate,
+						message: c.message,
+						subject: subject.trim(),
+						body: bodyParts.join('\n').trim(),
+					};
+				});
 
-				// Fetch Actions summary
+				const rawTag = data.refs.nodes[0];
+				const latestTag: Tag | null = rawTag ? {
+					name: rawTag.name,
+					commit: rawTag.target.target?.oid || rawTag.target.oid
+				} : null;
+
+				const prCount = data.pullRequests.totalCount;
+
+				// Actions summary still via REST as it's more reliable/direct for workflow runs
 				const actionsRes = await runCommand([
 					'gh', 'api', `repos/${repo.fullName}/actions/runs?per_page=5`,
 					'--jq', '.workflow_runs[] | {status, conclusion}',
@@ -261,7 +301,7 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 				// Calculate pending
 				let pendingCount = 0;
 				if (latestTag && commits.length > 0) {
-					const prodIndex = (commits as Commit[]).findIndex((c) => c.hash === latestTag.commit);
+					const prodIndex = commits.findIndex((c) => c.hash === latestTag.commit);
 					pendingCount = prodIndex === -1 ? commits.length : prodIndex;
 				}
 
@@ -337,12 +377,18 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		{
 			id: "prs",
 			header: "PRs",
-			cell: ({ row }) => <PRsCell repo={row.original} />,
+			cell: ({ row }) => {
+				const details = repoDetailsQueries.find(q => q.data?.fullName === row.original.fullName)?.data;
+				return <PRsCell repo={row.original} details={details} />;
+			},
 		},
 		{
 			id: "actions_status",
-			header: "Actions",
-			cell: ({ row }) => <ActionsStatusCell repo={row.original} />,
+			header: "Workflows",
+			cell: ({ row }) => {
+				const details = repoDetailsQueries.find(q => q.data?.fullName === row.original.fullName)?.data;
+				return <ActionsStatusCell repo={row.original} details={details} />;
+			},
 		},
 		{
 			accessorKey: "updatedAt",
@@ -357,7 +403,7 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		{
 			id: "operations",
 			accessorKey: "actions",
-			header: () => <div className="text-right">Operaciones</div>,
+			header: () => <div className="text-right">Operations</div>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<OperationsCell
@@ -661,16 +707,10 @@ function AuthorCell({ repo }: { repo: RepoInfo }) {
 	) : null;
 }
 
-function PRsCell({ repo }: { repo: RepoInfo }) {
-	const detailsQuery = useQueries({
-		queries: [{
-			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-			enabled: false
-		}]
-	})[0] as any;
-	const prCount = detailsQuery.data?.prCount || 0;
+function PRsCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
+	const prCount = details?.prCount || 0;
 
-	if (detailsQuery.isLoading) {
+	if (!details) {
 		return <div className="h-4 bg-muted/20 rounded w-8 animate-pulse" />;
 	}
 
@@ -706,16 +746,10 @@ function PRsCell({ repo }: { repo: RepoInfo }) {
 	);
 }
 
-function ActionsStatusCell({ repo }: { repo: RepoInfo }) {
-	const detailsQuery = useQueries({
-		queries: [{
-			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-			enabled: false
-		}]
-	})[0] as any;
-	const actions = detailsQuery.data?.actions;
+function ActionsStatusCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
+	const actions = details?.actions;
 
-	if (detailsQuery.isLoading) {
+	if (!details) {
 		return <div className="h-4 bg-muted/20 rounded w-12 animate-pulse" />;
 	}
 
@@ -788,7 +822,7 @@ function OperationsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo
 			<FreezeDialog repo={repo.fullName} iconOnly={true} />
 			<ForceRedeployDialog repo={repo.fullName} iconOnly={true} />
 			<PromoteDialog repo={repo.fullName} latestTag={latestTag?.name} iconOnly={true} />
-			<div className="w-px h-4 bg-border/40 mx-0.5" />
+			<div className="w-px h-4 bg-border/20 mx-0.5" />
 			<ActionButton
 				action={ACTION_DEFINITIONS.manageProjects}
 				onClick={() => setIsProjectSelectionOpen(true)}
@@ -834,6 +868,12 @@ interface RepoDetails {
 	pendingCount: number;
 	latestTag: Tag | null;
 	commits: Commit[];
+	prCount: number;
+	actions: {
+		total: number;
+		running: number;
+		failed: number;
+	};
 }
 
 type RepoInfo = {

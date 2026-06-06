@@ -187,7 +187,7 @@ export function RepoSearch() {
             ? 'Buscar archivo: file:AGENTS.md'
             : `Búsqueda en ${summaryData?.total || 0} repositorios... (Cmd+K)`}
           aria-label="Búsqueda de repositorios"
-          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/40 border border-border/40 rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
+          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/20 border border-border/20 rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -212,7 +212,7 @@ export function RepoSearch() {
 
       {/* Dropdown Results */}
       {isOpen && (
-        <div className={`absolute top-full left-0 mt-2 ${searchWidth} bg-popover text-popover-foreground border rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100`}>
+        <div className={`absolute top-full left-0 mt-2 ${searchWidth} bg-popover text-popover-foreground border border-border/20 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100`}>
           {isLoading ? (
             <div className="p-4 text-center text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
@@ -245,7 +245,7 @@ export function RepoSearch() {
                       role="option"
                       aria-selected={isSelected}
                       id={`repo-option-${index}`}
-                      className={`group p-3 border-b last:border-b-0 transition-colors ${
+                      className={`group p-3 border-b border-border/20 last:border-b-0 transition-colors ${
                         isSelected ? 'bg-muted' : 'hover:bg-muted/50'
                       }`}
                     >
@@ -294,7 +294,7 @@ export function RepoSearch() {
                     role="option"
                     aria-selected={isSelected}
                     id={`repo-option-${index}`}
-                    className={`group p-3 border-b last:border-b-0 transition-colors ${
+                    className={`group p-3 border-b border-border/20 last:border-b-0 transition-colors ${
                       isSelected ? 'bg-muted' : 'hover:bg-muted/50'
                     }`}
                   >
@@ -348,19 +348,19 @@ export function RepoSearch() {
           )}
 
           {/* Footer hint */}
-          <div className="px-3 py-2 bg-muted/30 border-t text-[10px] text-muted-foreground flex items-center justify-between">
+          <div className="px-3 py-2 bg-muted/30 border-t border-border/20 text-[10px] text-muted-foreground flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">↑↓</kbd> Navegar
+              <span className="flex items-center gap-1 font-bold uppercase tracking-wider">
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/20 shadow-sm font-sans">↑↓</kbd> Navegar
               </span>
-              <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">↵</kbd> Seleccionar
+              <span className="flex items-center gap-1 font-bold uppercase tracking-wider">
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/20 shadow-sm font-sans">↵</kbd> Seleccionar
               </span>
-              <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">Esc</kbd> Cerrar
+              <span className="flex items-center gap-1 font-bold uppercase tracking-wider">
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/20 shadow-sm font-sans">Esc</kbd> Cerrar
               </span>
             </div>
-            <span>
+            <span className="font-bold uppercase tracking-wider">
               {isFileMode && results.length > 0 && results[0]?.type === 'file'
                 ? `${results.length} archivos`
                 : `${results.length} resultados`}

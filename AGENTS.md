@@ -15,6 +15,8 @@
 - **Build**: `node --run build` obligatorio antes de PR/Commit.
 - **Tests**: Archivos `.test.ts[x]` junto al código que prueban.
 - **Pipeline**: PROHIBIDO modificar lógica de pipeline (Seki/Pulsar) sin consentimiento.
+- **Docker Resonance**: Terminal modals must use high-density headers with primary/10 icon backgrounds and double-line metadata (Type/Name).
+
 # ReleaseHub - Reglas de Desarrollo
 
 ## Política de Iteración

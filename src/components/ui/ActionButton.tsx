@@ -64,7 +64,7 @@ export function ActionButton({
 						aria-label={ariaLabel}
 					>
 						{loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <action.icon className="w-4 h-4" />}
-						{showLabel && <span className="text-xs font-medium">{action.label}</span>}
+						{showLabel && <span className="text-[10px] font-bold uppercase tracking-wider">{action.label}</span>}
 					</button>
 				</Tooltip.Trigger>
 				<Tooltip.Portal>

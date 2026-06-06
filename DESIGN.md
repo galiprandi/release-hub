@@ -12,6 +12,7 @@
 
 ## Component Patterns
 - **Table**: `bg-muted/40` headers, technical metadata, vertical dividers in action groups.
+- **Docker Terminal**: High-density headers with `bg-primary/10` icons, double-line titles, and `bg-zinc-950` terminal background.
 - **FilterBar (variant='tabs')**: `bg-muted` container, `bg-background` active item, `p-1`.
 - **StatusCard**: Standard for loading/error/offline states.
 - **ActionButton**: Iconographic with integrated tooltip.

@@ -1,15 +1,15 @@
-# 🐜 Uma: Refactor GitHub Dashboard Resonance
+# 🐜 Carol: Refactor Docker UI Resonance
 
 ## Scope
-- **Visibility Elevation**: Bring open Pull Requests and GitHub Actions status directly to the main repository dashboard.
-- **Resonance V2 Alignment**: Implement high-density technical metadata and semantic badges with 20% opacity.
-- **UX Refinement**: Rename generic "Actions" to "Operations" to clarify intent and avoid confusion with GitHub Actions.
-- **Architectural Integrity**: Leverage existing `useQueries` pattern for efficient multi-repo data fetching.
+- **Industrial Resonance V2 Alignment**: Elevate the Docker dashboard to the V2 standard with technical metadata and semantic badges.
+- **Component Standardization**: Replace manual buttons with `ActionButton` and integrate `EmptyState`.
+- **Terminal UX Elevation**: Implement high-density headers for Docker terminals with icon backgrounds and technical metadata.
+- **Visual Hygiene**: Refine table headers, status opacities (20%), and action group dividers.
 
 ## Modified Files
-- `src/routes/github/index.tsx`: Core dashboard logic and UI.
-- `src/components/RepoSearch.tsx`: UX/Resonance audit.
-- `src/components/ProjectSelectionDialog.tsx`: Resonance V2 compliance.
+- `src/components/ui/ActionButton.tsx`: Global typography refinement.
+- `src/routes/docker/index.tsx`: Dashboard layout and header actions.
+- `src/docker/componentes/ContainerList.tsx`: Table refinements, badges, and terminal modal.
 
 ## Verification Plan
 - [ ] Build integrity check (`node --run build`).

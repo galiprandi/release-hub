@@ -81,6 +81,7 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 
 	// TanStack Table's useReactTable returns functions that cannot be memoized safely
 	// This is a known limitation and the warning can be safely ignored
+	// eslint-disable-next-line react-hooks/incompatible-library
 	const table = useReactTable(tableOptions)
 
 	const handleFilterClick = (filter: TableFilter<TData>) => {

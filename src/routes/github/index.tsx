@@ -667,8 +667,9 @@ function PRsCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0] as any;
-	const prCount = detailsQuery.data?.prCount || 0;
+	})[0];
+	const queryData = detailsQuery.data as RepoDetails | undefined;
+	const prCount = queryData?.prCount || 0;
 
 	if (detailsQuery.isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-8 animate-pulse" />;
@@ -712,8 +713,9 @@ function ActionsStatusCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0] as any;
-	const actions = detailsQuery.data?.actions;
+	})[0];
+	const queryData = detailsQuery.data as RepoDetails | undefined;
+	const actions = queryData?.actions;
 
 	if (detailsQuery.isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-12 animate-pulse" />;
@@ -834,6 +836,12 @@ interface RepoDetails {
 	pendingCount: number;
 	latestTag: Tag | null;
 	commits: Commit[];
+	prCount: number;
+	actions: {
+		total: number;
+		running: number;
+		failed: number;
+	};
 }
 
 type RepoInfo = {

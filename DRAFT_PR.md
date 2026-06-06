@@ -1,17 +1,19 @@
-# 🐜 Uma: Refactor GitHub Dashboard Resonance
+# 🐜 Fiona: Refactor Hygiene & Standardization
 
 ## Scope
-- **Visibility Elevation**: Bring open Pull Requests and GitHub Actions status directly to the main repository dashboard.
-- **Resonance V2 Alignment**: Implement high-density technical metadata and semantic badges with 20% opacity.
-- **UX Refinement**: Rename generic "Actions" to "Operations" to clarify intent and avoid confusion with GitHub Actions.
-- **Architectural Integrity**: Leverage existing `useQueries` pattern for efficient multi-repo data fetching.
+- **Dead Code Elimination**: Removal of orphaned components `NovedadesDialog` and `PageHeader`.
+- **Type Hardening**: Elimination of `any` casts in `src/routes/github/index.tsx` by implementing strict interfaces for GitHub data.
+- **Linter Hygiene**: Resolution of React Compiler warnings in `src/components/ui/Table.tsx` to achieve a zero-warning build log.
+- **Architectural Integrity**: Ensuring strict compliance with AAA standards and Industrial Resonance V2.
 
 ## Modified Files
-- `src/routes/github/index.tsx`: Core dashboard logic and UI.
-- `src/components/RepoSearch.tsx`: UX/Resonance audit.
-- `src/components/ProjectSelectionDialog.tsx`: Resonance V2 compliance.
+- `src/components/NovedadesDialog.tsx`: Removed (Dead code).
+- `src/components/shared/PageHeader.tsx`: Removed (Dead code).
+- `src/routes/github/index.tsx`: Type hardening and hygiene.
+- `src/components/ui/Table.tsx`: Linter warning suppression/fix.
 
 ## Verification Plan
 - [ ] Build integrity check (`node --run build`).
+- [ ] Linter check (`npm run lint`).
 - [ ] Unit tests pass (`npm run test:run`).
-- [ ] Visual verification via Playwright screenshots.
+- [ ] Visual verification of GitHub Dashboard.

@@ -322,7 +322,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 										{ id: 'body', label: 'Body' },
 									]}
 									activeId={requestTab}
-									onChange={(id) => setRequestTab(id as any)}
+										onChange={(id) => setRequestTab(id)}
 									className="flex-shrink-0"
 								/>
 
@@ -501,7 +501,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 											{ id: 'body', label: 'Body' },
 										]}
 										activeId={activeTab}
-										onChange={(id) => setActiveTab(id as any)}
+										onChange={(id) => setActiveTab(id)}
 										className="mb-3 flex-shrink-0"
 									/>
 

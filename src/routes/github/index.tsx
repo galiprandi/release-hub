@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useRouterState, useSearch, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo, useCallback } from "react";
 import { z } from "zod";
-import { Loader2, Star, Building2, FolderOpen, FolderPlus, Search, GitPullRequestCreateArrow, Settings2 } from "lucide-react";
+import { Loader2, Star, Building2, FolderOpen, FolderPlus, Search, GitPullRequestCreateArrow, Settings2, GitPullRequest, Play } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { useQueries } from "@tanstack/react-query";
 import { CommitLink } from "@/components/CommitLink";
@@ -233,6 +233,21 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 				]);
 				const latestTag = tagsRes.stdout.trim().startsWith("{") ? JSON.parse(tagsRes.stdout) : null;
 
+				// Fetch PRs count
+				const prsRes = await runCommand(['gh', 'pr', 'list', '--repo', repo.fullName, '--state', 'open', '--json', 'number']);
+				const prs = JSON.parse(prsRes.stdout);
+				const prCount = Array.isArray(prs) ? prs.length : 0;
+
+				// Fetch Actions summary
+				const actionsRes = await runCommand([
+					'gh', 'api', `repos/${repo.fullName}/actions/runs?per_page=5`,
+					'--jq', '.workflow_runs[] | {status, conclusion}',
+				]);
+				const actionLines = actionsRes.stdout.trim().split("\n").filter(line => line.startsWith("{"));
+				const runs = actionLines.map(line => {
+					try { return JSON.parse(line); } catch { return null; }
+				}).filter(Boolean) as { status: string; conclusion: string | null }[];
+
 				// Calculate pending
 				let pendingCount = 0;
 				if (latestTag && commits.length > 0) {
@@ -244,7 +259,13 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 					fullName: repo.fullName,
 					pendingCount,
 					latestTag,
-					commits
+					commits,
+					prCount,
+					actions: {
+						total: runs.length,
+						running: runs.filter((r) => r.status === "in_progress").length,
+						failed: runs.filter((r) => r.conclusion === "failure").length,
+					}
 				};
 			},
 			...applyCachePolicy("git"),
@@ -303,6 +324,16 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 			cell: ({ row }) => <HealthCell repo={row.original} />,
 		},
 		{
+			id: "prs",
+			header: "PRs",
+			cell: ({ row }) => <PRsCell repo={row.original} />,
+		},
+		{
+			id: "actions_status",
+			header: "Actions",
+			cell: ({ row }) => <ActionsStatusCell repo={row.original} />,
+		},
+		{
 			accessorKey: "updatedAt",
 			header: "Actividad",
 			cell: ({ row }) => <DateCell repo={row.original} />,
@@ -313,12 +344,12 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 			cell: ({ row }) => <AuthorCell repo={row.original} />,
 		},
 		{
-			id: "actions",
+			id: "operations",
 			accessorKey: "actions",
-			header: () => <div className="text-right">Acciones</div>,
+			header: () => <div className="text-right">Operaciones</div>,
 			enableSorting: false,
 			cell: ({ row }) => (
-				<ActionsCell
+				<OperationsCell
 					repo={row.original}
 					isFavorite={favorites.includes(row.original.fullName)}
 					onToggleFavorite={onToggleFavorite}
@@ -614,7 +645,117 @@ function AuthorCell({ repo }: { repo: RepoInfo }) {
 	) : null;
 }
 
-function ActionsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; isFavorite: boolean; onToggleFavorite: (product: string) => void }) {
+function PRsCell({ repo }: { repo: RepoInfo }) {
+	const detailsQuery = useQueries({
+		queries: [{
+			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+			enabled: false
+		}]
+	})[0] as any;
+	const prCount = detailsQuery.data?.prCount || 0;
+
+	if (detailsQuery.isLoading) {
+		return <div className="h-4 bg-muted/20 rounded w-8 animate-pulse" />;
+	}
+
+	if (prCount === 0) return null;
+
+	const [org, name] = repo.fullName.split("/");
+
+	return (
+		<Tooltip.Provider>
+			<Tooltip.Root>
+				<Tooltip.Trigger asChild>
+					<a
+						href={`https://github.com/${org}/${name}/pulls`}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="inline-flex items-center gap-1.5 px-2 py-1 bg-primary/20 text-primary border border-primary/20 rounded-lg hover:bg-primary/30 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						aria-label={`${prCount} pull requests abiertos`}
+					>
+						<GitPullRequest className="w-3 h-3" />
+						<span className="text-[10px] font-bold uppercase tracking-wider">{prCount}</span>
+					</a>
+				</Tooltip.Trigger>
+				<Tooltip.Portal>
+					<Tooltip.Content
+						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs z-50"
+						sideOffset={5}
+					>
+						{prCount} pull request{prCount !== 1 ? 's' : ''} abierto{prCount !== 1 ? 's' : ''}
+					</Tooltip.Content>
+				</Tooltip.Portal>
+			</Tooltip.Root>
+		</Tooltip.Provider>
+	);
+}
+
+function ActionsStatusCell({ repo }: { repo: RepoInfo }) {
+	const detailsQuery = useQueries({
+		queries: [{
+			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+			enabled: false
+		}]
+	})[0] as any;
+	const actions = detailsQuery.data?.actions;
+
+	if (detailsQuery.isLoading) {
+		return <div className="h-4 bg-muted/20 rounded w-12 animate-pulse" />;
+	}
+
+	if (!actions || actions.total === 0) return null;
+
+	const [org, name] = repo.fullName.split("/");
+	const hasFailure = actions.failed > 0;
+	const isRunning = actions.running > 0;
+
+	return (
+		<Tooltip.Provider>
+			<Tooltip.Root>
+				<Tooltip.Trigger asChild>
+					<a
+						href={`https://github.com/${org}/${name}/actions`}
+						target="_blank"
+						rel="noopener noreferrer"
+						className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 border ${
+							hasFailure
+								? "bg-destructive/20 text-destructive border-destructive/20 hover:bg-destructive/30"
+								: isRunning
+								? "bg-warning/20 text-warning border-warning/20 hover:bg-warning/30"
+								: "bg-success/20 text-success border-success/20 hover:bg-success/30"
+						}`}
+						aria-label={`Estado de GitHub Actions: ${hasFailure ? 'Fallido' : isRunning ? 'En progreso' : 'Exitoso'}`}
+					>
+						<Play className={`w-3 h-3 ${isRunning ? 'animate-pulse' : ''}`} />
+						<span className="text-[10px] font-bold uppercase tracking-wider">
+							{hasFailure ? "Error" : isRunning ? "Running" : "Success"}
+						</span>
+					</a>
+				</Tooltip.Trigger>
+				<Tooltip.Portal>
+					<Tooltip.Content
+						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs z-50"
+						sideOffset={5}
+					>
+						<div className="space-y-1">
+							<p className="font-bold border-b border-border/40 pb-1 mb-1">Últimos 5 runs</p>
+							{actions.failed > 0 && <p className="text-destructive flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-destructive" /> {actions.failed} Fallidos</p>}
+							{actions.running > 0 && <p className="text-warning flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" /> {actions.running} En curso</p>}
+							{actions.total - actions.failed - actions.running > 0 && (
+								<p className="text-success flex items-center gap-1.5">
+									<span className="w-1.5 h-1.5 rounded-full bg-success" />
+									{actions.total - actions.failed - actions.running} Exitosos
+								</p>
+							)}
+						</div>
+					</Tooltip.Content>
+				</Tooltip.Portal>
+			</Tooltip.Root>
+		</Tooltip.Provider>
+	);
+}
+
+function OperationsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; isFavorite: boolean; onToggleFavorite: (product: string) => void }) {
 	const [org, name] = repo.fullName.split("/");
 	const [isProjectSelectionOpen, setIsProjectSelectionOpen] = useState(false);
 	const detailsQuery = useQueries({

@@ -65,7 +65,7 @@ export function ProjectSelectionDialog({ isOpen, onOpenChange, repoFullName }: P
 				<div className="pt-2 border-t border-border/40 flex justify-end">
 					<button
 						onClick={() => onOpenChange(false)}
-						className="px-6 py-2 text-xs font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all"
+						className="px-6 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 					>
 						Cerrar
 					</button>

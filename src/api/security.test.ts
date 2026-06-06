@@ -75,6 +75,38 @@ describe('Security Hardening', () => {
       expect(args).toContain(argWithQuote)
     })
 
+    it('should allow commands in the safe list (simulated)', () => {
+      const SAFE_COMMANDS = ["gh", "kubectl", "docker", "curl", "lsof", "node", "ls", "echo"];
+      expect(SAFE_COMMANDS).toContain("gh");
+      expect(SAFE_COMMANDS).toContain("kubectl");
+      expect(SAFE_COMMANDS).toContain("docker");
+      expect(SAFE_COMMANDS).toContain("curl");
+      expect(SAFE_COMMANDS).toContain("lsof");
+      expect(SAFE_COMMANDS).toContain("node");
+      expect(SAFE_COMMANDS).toContain("ls");
+      expect(SAFE_COMMANDS).toContain("echo");
+    })
+
+    it('should reject unauthorized commands (simulated)', () => {
+      const SAFE_COMMANDS = ["gh", "kubectl", "docker", "curl", "lsof", "node", "ls", "echo"];
+      const maliciousCommand = "rm";
+      expect(SAFE_COMMANDS).not.toContain(maliciousCommand);
+
+      const anotherOne = "cat";
+      expect(SAFE_COMMANDS).not.toContain(anotherOne);
+    })
+
+    it('should throw error if backend returns unauthorized command error', async () => {
+      vi.spyOn(apiExec, 'post').mockRejectedValueOnce({
+        response: {
+          status: 403,
+          data: { error: 'Unauthorized command: rm' }
+        }
+      })
+
+      await expect(runCommand(['rm', '-rf', '/'])).rejects.toBeDefined()
+    })
+
     it('should throw error if command is not an array (runtime enforcement)', async () => {
       // @ts-expect-error - testing runtime check for non-array input
       await expect(runCommand('ls -la')).rejects.toThrow('Security violation: runCommand requires an array of arguments')

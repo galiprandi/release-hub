@@ -10,6 +10,7 @@
 - **15/06**: Refinamiento estético Fetcher V2 (`🐜-Carol-refactor-fetcher-resonance`).
 - **18/06**: Auditoría Higiene Técnica (AAA Standard) (`🐜-Fiona-refactor-hygiene-standardization`).
 - **20/06**: Evolución Dashboard GitHub: PRs & Actions via GraphQL (`🐜-Uma-refactor-github-dashboard-resonance`).
+- **21/06**: Auditoría de Ciberseguridad & Endurecimiento CLI (`🐜-Vesper-refactor-security-audit-hardening`).
 ## 🐜 Registro de Intervenciones
 
 ### 🗓️ 30 de Mayo de 2026
@@ -86,3 +87,10 @@
 **Estado**: Finalizado
 **Objetivo**: Aplicar refinamientos de alta densidad en el Dashboard y Query Modal.
 **Impacto**: Consistencia absoluta con el estándar V2 mediante el uso de FilterBar en modales y tipografía técnica en metadatos de tabla.
+
+### 🗓️ 21 de Junio de 2026
+**Tarea**: Auditoría de Ciberseguridad & Endurecimiento CLI.
+**Branch**: `🐜-Vesper-refactor-security-audit-hardening`
+**Estado**: Finalizado
+**Objetivo**: Minimizar la superficie de ataque mediante un allow-list de comandos y sanitización estricta de inputs dinámicos en llamadas CLI.
+**Impacto**: Sistema blindado contra inyección de argumentos y ejecución de comandos no autorizados, con higiene de tipos en celdas críticas del dashboard.

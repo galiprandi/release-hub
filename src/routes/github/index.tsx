@@ -22,6 +22,7 @@ import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
 import { useHealthMonitor } from "@/hooks/useHealthMonitor";
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
 import { runCommand } from "@/api/exec";
+import { sanitizeRepo } from "@/lib/utils";
 import { ProjectManagementDialog } from "@/components/ProjectManagementDialog";
 import { ProjectSelectionDialog } from "@/components/ProjectSelectionDialog";
 import { EmptyState } from "@/components/EmptyState";
@@ -217,9 +218,10 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		queries: sortedRepos.map(repo => ({
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			queryFn: async () => {
+				const sanitizedRepo = sanitizeRepo(repo.fullName);
 				// Fetch commits
 				const commitsRes = await runCommand([
-					'gh', 'api', `repos/${repo.fullName}/commits?per_page=10`,
+					'gh', 'api', `repos/${sanitizedRepo}/commits?per_page=10`,
 					'--jq', '.[] | {hash: .sha, author: .commit.author.name, date: .commit.committer.date, message: .commit.message}'
 				]);
 				const commits = commitsRes.stdout.trim().split("\n")
@@ -238,19 +240,19 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 
 				// Fetch latest tag
 				const tagsRes = await runCommand([
-					'gh', 'api', `repos/${repo.fullName}/tags?per_page=1`,
+					'gh', 'api', `repos/${sanitizedRepo}/tags?per_page=1`,
 					'--jq', '.[0] | {name: .name, commit: .commit.sha}'
 				]);
 				const latestTag = tagsRes.stdout.trim().startsWith("{") ? JSON.parse(tagsRes.stdout) : null;
 
 				// Fetch PRs count
-				const prsRes = await runCommand(['gh', 'pr', 'list', '--repo', repo.fullName, '--state', 'open', '--json', 'number']);
+				const prsRes = await runCommand(['gh', 'pr', 'list', '--repo', sanitizedRepo, '--state', 'open', '--json', 'number']);
 				const prs = JSON.parse(prsRes.stdout);
 				const prCount = Array.isArray(prs) ? prs.length : 0;
 
 				// Fetch Actions summary
 				const actionsRes = await runCommand([
-					'gh', 'api', `repos/${repo.fullName}/actions/runs?per_page=5`,
+					'gh', 'api', `repos/${sanitizedRepo}/actions/runs?per_page=5`,
 					'--jq', '.workflow_runs[] | {status, conclusion}',
 				]);
 				const actionLines = actionsRes.stdout.trim().split("\n").filter(line => line.startsWith("{"));
@@ -667,8 +669,9 @@ function PRsCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0] as any;
-	const prCount = detailsQuery.data?.prCount || 0;
+	})[0];
+	const queryData = detailsQuery.data as RepoDetails | undefined;
+	const prCount = queryData?.prCount || 0;
 
 	if (detailsQuery.isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-8 animate-pulse" />;
@@ -712,8 +715,9 @@ function ActionsStatusCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0] as any;
-	const actions = detailsQuery.data?.actions;
+	})[0];
+	const queryData = detailsQuery.data as RepoDetails | undefined;
+	const actions = queryData?.actions;
 
 	if (detailsQuery.isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-12 animate-pulse" />;
@@ -834,6 +838,12 @@ interface RepoDetails {
 	pendingCount: number;
 	latestTag: Tag | null;
 	commits: Commit[];
+	prCount: number;
+	actions: {
+		total: number;
+		running: number;
+		failed: number;
+	};
 }
 
 type RepoInfo = {

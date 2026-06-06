@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { runCommand } from "../api/exec";
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
+import { sanitizeRepo } from "@/lib/utils";
 
 interface PrStatus {
 	status: "open" | "closed" | "merged";
@@ -23,7 +24,11 @@ export function usePrStatus(
 	return useQuery({
 		queryKey: queryKeys.pr.status(repo, Number(prNumber)),
 		queryFn: async () => {
-			const { stdout } = await runCommand(['gh', 'api', `repos/${repo}/pulls/${prNumber}`]);
+			const sanitizedRepo = sanitizeRepo(repo);
+			const sanitizedPrNumber = Number(prNumber);
+			if (isNaN(sanitizedPrNumber)) throw new Error('Invalid PR number');
+
+			const { stdout } = await runCommand(['gh', 'api', `repos/${sanitizedRepo}/pulls/${sanitizedPrNumber}`]);
 			const data = JSON.parse(stdout);
 
 			return {

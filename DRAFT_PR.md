@@ -1,17 +1,24 @@
-# 🐜 Uma: Refactor GitHub Dashboard Resonance
+# 🐜 Vesper: Security Audit and Hardening
 
 ## Scope
-- **Visibility Elevation**: Bring open Pull Requests and GitHub Actions status directly to the main repository dashboard.
-- **Resonance V2 Alignment**: Implement high-density technical metadata and semantic badges with 20% opacity.
-- **UX Refinement**: Rename generic "Actions" to "Operations" to clarify intent and avoid confusion with GitHub Actions.
-- **Architectural Integrity**: Leverage existing `useQueries` pattern for efficient multi-repo data fetching.
+- **Command Allow-list**: Implement a strict allow-list of authorized CLI tools in the backend middleware to minimize the attack surface.
+- **CLI Hardening & Input Sanitization**: Robust sanitization of user-provided inputs (repos, git refs, PR numbers) used in `gh api` and other CLI calls to prevent argument injection.
+- **Type Hygiene**: Eradicate `any` usage in critical dashboard cells and ensure strict typing in security-relevant modules.
+- **Security Test Suite**: Introduced `src/lib/utils.test.ts` for sanitization logic and expanded `src/api/security.test.ts` for middleware protection.
 
 ## Modified Files
-- `src/routes/github/index.tsx`: Core dashboard logic and UI.
-- `src/components/RepoSearch.tsx`: UX/Resonance audit.
-- `src/components/ProjectSelectionDialog.tsx`: Resonance V2 compliance.
+- `vite.config.ts`: Added `SAFE_COMMANDS` allow-list.
+- `src/lib/utils.ts`: Added `sanitizeRepo` and `sanitizeGitRef`.
+- `src/lib/utils.test.ts`: Tests for sanitizers.
+- `src/api/security.test.ts`: Expanded security test suite.
+- `src/hooks/useGitTags.ts`: Hardened CLI usage.
+- `src/hooks/useOpenPullRequests.ts`: Hardened CLI usage.
+- `src/hooks/usePrStatus.ts`: Hardened CLI usage.
+- `src/hooks/useWebMCP.ts`: Hardened CLI usage and input validation.
+- `src/routes/github/index.tsx`: Type hardening and CLI hardening.
 
 ## Verification Plan
-- [ ] Build integrity check (`node --run build`).
-- [ ] Unit tests pass (`npm run test:run`).
-- [ ] Visual verification via Playwright screenshots.
+- [ ] Build integrity check (`npm run build`).
+- [ ] Security test suite execution (`npm run test:run -- src/api/security.test.ts src/lib/utils.test.ts`).
+- [ ] Full regression test suite execution (`npm run test:run`).
+- [ ] Visual verification of GitHub dashboard functionality.

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { runCommand } from '@/api/exec'
 import axios from 'axios'
+import { sanitizeRepo, sanitizeGitRef } from '@/lib/utils'
 
 /**
  * WebMCP API Types (Proposed Standard)
@@ -115,12 +116,13 @@ export function useWebMCP() {
       },
       execute: async ({ repo }: { repo: string }) => {
         if (typeof repo !== 'string') throw new Error('Repo must be a string');
+        const sanitizedRepo = sanitizeRepo(repo);
         try {
           // Get latest commit
           const commitResult = await runCommand([
             'gh',
             'api',
-            `repos/${repo}/commits?per_page=5`,
+            `repos/${sanitizedRepo}/commits?per_page=5`,
             '--jq',
             '[.[] | {hash: .sha, author: .commit.author.name, message: .commit.message, date: .commit.author.date}]',
           ])
@@ -130,7 +132,7 @@ export function useWebMCP() {
           const tagResult = await runCommand([
             'gh',
             'api',
-            `repos/${repo}/tags?per_page=1`,
+            `repos/${sanitizedRepo}/tags?per_page=1`,
             '--jq',
             '.[0] | {name: .name, commit: .commit.sha}',
           ])
@@ -166,6 +168,9 @@ export function useWebMCP() {
         if (typeof repo !== 'string' || typeof tagName !== 'string') {
           throw new Error('Repo and tagName must be strings');
         }
+        const sanitizedRepo = sanitizeRepo(repo);
+        const sanitizedTagName = sanitizeGitRef(tagName);
+
         try {
           // Verify authentication and get token
           const tokenResult = await runCommand(['gh', 'auth', 'token'])
@@ -173,12 +178,12 @@ export function useWebMCP() {
           if (!token) throw new Error('GitHub CLI token not found')
 
           // Get latest commit on main
-          const latestCommitResult = await runCommand(['gh', 'api', `repos/${repo}/commits/main`, '--jq', '.sha'])
-          const targetCommit = latestCommitResult.stdout.trim()
+          const latestCommitResult = await runCommand(['gh', 'api', `repos/${sanitizedRepo}/commits/main`, '--jq', '.sha'])
+          const targetCommit = sanitizeGitRef(latestCommitResult.stdout.trim());
 
           // Create Git Tag Object
           const tagResponse = await axios.post(
-            `https://api.github.com/repos/${repo}/git/tags`,
+            `https://api.github.com/repos/${sanitizedRepo}/git/tags`,
             {
               tag: tagName,
               message: tagMessage || `Release ${tagName}`,
@@ -195,9 +200,9 @@ export function useWebMCP() {
 
           // Create Ref
           await axios.post(
-            `https://api.github.com/repos/${repo}/git/refs`,
+            `https://api.github.com/repos/${sanitizedRepo}/git/refs`,
             {
-              ref: `refs/tags/${tagName}`,
+              ref: `refs/tags/${sanitizedTagName}`,
               sha: tagResponse.data.sha,
             },
             {

@@ -56,6 +56,8 @@ const VALIDATION = {
 	resourceType: /^(pod|deployment|service|ingress)$/,
 };
 
+const SAFE_COMMANDS = ["gh", "kubectl", "docker", "curl", "lsof", "node", "ls", "echo"];
+
 const activePortForwards = new Map<string, ReturnType<typeof spawn>>();
 
 /**
@@ -112,6 +114,14 @@ const execHandler: Connect.NextHandleFunction = async (req, res) => {
 	if (!Array.isArray(args) || args.length === 0) {
 		res.statusCode = 400;
 		res.end(JSON.stringify({ error: "Missing or invalid args" }));
+		return;
+	}
+
+	const command = args[0];
+	if (!SAFE_COMMANDS.includes(command)) {
+		console.error(`SECURITY ALERT: Unauthorized command blocked: ${command}`);
+		res.statusCode = 403;
+		res.end(JSON.stringify({ error: `Unauthorized command: ${command}` }));
 		return;
 	}
 

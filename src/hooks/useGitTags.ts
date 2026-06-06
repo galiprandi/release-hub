@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { runCommand } from "@/api/exec";
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
+import { sanitizeRepo, sanitizeGitRef } from "@/lib/utils";
 
 export interface GitTag {
 	name: string;
@@ -37,11 +38,13 @@ export function useGitTags({
 		queryFn: async ({ pageParam = 0 }) => {
 			const page = pageParam as number;
 			const perPage = 10;
+			const sanitizedRepo = sanitizeRepo(repo);
+
 			// First get the tags list with pagination
 			const tagsResponse = await runCommand([
 				'gh',
 				'api',
-				`repos/${repo}/tags?per_page=${perPage}&page=${page + 1}`,
+				`repos/${sanitizedRepo}/tags?per_page=${perPage}&page=${page + 1}`,
 				'--jq',
 				'.[] | {name: .name, commit: .commit.sha, zipball_url: .zipball_url, tarball_url: .tarball_url}',
 			]);
@@ -65,11 +68,14 @@ export function useGitTags({
 			const tagsWithDetails = await Promise.all(
 				tags.map(async (tag: GitTagFromAPI) => {
 					try {
+						const sanitizedTagName = sanitizeGitRef(tag.name);
+						const sanitizedCommitSha = sanitizeGitRef(tag.commit);
+
 						// Get the tag reference to check if it's annotated
 						const refResponse = await runCommand([
 							'gh',
 							'api',
-							`repos/${repo}/git/refs/tags/${tag.name}`,
+							`repos/${sanitizedRepo}/git/refs/tags/${sanitizedTagName}`,
 							'--jq',
 							'.object.type',
 						]);
@@ -82,16 +88,16 @@ export function useGitTags({
 							const tagShaResponse = await runCommand([
 								'gh',
 								'api',
-								`repos/${repo}/git/refs/tags/${tag.name}`,
+								`repos/${sanitizedRepo}/git/refs/tags/${sanitizedTagName}`,
 								'--jq',
 								'.object.sha',
 							]);
-							const tagSha = tagShaResponse.stdout.trim();
+							const tagSha = sanitizeGitRef(tagShaResponse.stdout.trim());
 
 							const taggerResponse = await runCommand([
 								'gh',
 								'api',
-								`repos/${repo}/git/tags/${tagSha}`,
+								`repos/${sanitizedRepo}/git/tags/${tagSha}`,
 								'--jq',
 								'.tagger.date',
 							]);
@@ -102,7 +108,7 @@ export function useGitTags({
 						const commitResponse = await runCommand([
 							'gh',
 							'api',
-							`repos/${repo}/commits/${tag.commit}`,
+							`repos/${sanitizedRepo}/commits/${sanitizedCommitSha}`,
 							'--jq',
 							'{message: .message, author: {name: .commit.author.name, email: .commit.author.email, date: .commit.author.date}}',
 						]);
@@ -116,10 +122,11 @@ export function useGitTags({
 					} catch {
 						// Fallback if details fail, get commit date
 						try {
+							const sanitizedCommitSha = sanitizeGitRef(tag.commit);
 							const commitResponse = await runCommand([
 								'gh',
 								'api',
-								`repos/${repo}/commits/${tag.commit}`,
+								`repos/${sanitizedRepo}/commits/${sanitizedCommitSha}`,
 								'--jq',
 								'{date: .commit.committer.date, message: .message, author: {name: .commit.author.name, email: .commit.author.email, date: .commit.author.date}}',
 							]);

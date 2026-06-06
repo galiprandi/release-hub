@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 
 test('verify industrial resonance v2', async ({ page }) => {
   await page.goto('http://localhost:5173/kubernetes');

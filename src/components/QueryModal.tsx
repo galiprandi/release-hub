@@ -1,9 +1,8 @@
 
-import { useState, type Dispatch, type SetStateAction, useMemo } from 'react';
-import { Send, AlertTriangle, Plus, Braces, ListFilter, FileText } from 'lucide-react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
+import { Send, AlertTriangle, Plus } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
 import { JsonEditor } from '@/components/JsonEditor';
-import { FilterBar } from '@/components/shared/FilterBar';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
 import { parseCurlCommand, minifyJSON } from '@/utils/curlParser';
@@ -229,17 +228,6 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 		}
 	};
 
-	const requestFilters = useMemo(() => [
-		{ value: 'params', label: 'Params', icon: ListFilter },
-		{ value: 'headers', label: 'Headers', icon: Braces },
-		{ value: 'body', label: 'Body', icon: FileText },
-	], [])
-
-	const responseFilters = useMemo(() => [
-		{ value: 'headers', label: 'Headers', icon: Braces },
-		{ value: 'body', label: 'Body', icon: FileText },
-	], [])
-
 	return (
 		<BaseDialog
 			open={!!query?.curl}
@@ -334,7 +322,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 										{ id: 'body', label: 'Body' },
 									]}
 									activeId={requestTab}
-									onChange={(id) => setRequestTab(id as any)}
+										onChange={(id) => setRequestTab(id)}
 									className="flex-shrink-0"
 								/>
 
@@ -513,7 +501,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 											{ id: 'body', label: 'Body' },
 										]}
 										activeId={activeTab}
-										onChange={(id) => setActiveTab(id as any)}
+										onChange={(id) => setActiveTab(id)}
 										className="mb-3 flex-shrink-0"
 									/>
 

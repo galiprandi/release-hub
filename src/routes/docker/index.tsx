@@ -8,6 +8,7 @@ import { StatusCard } from '@/components/ui/StatusCard';
 import { getContainers } from '@/api/docker';
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys';
 import { PageLayout } from '../../layouts/PageLayout';
+import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 
 export const Route = createFileRoute('/docker/')({
   component: DockerManagerPage,
@@ -69,21 +70,28 @@ function DockerManagerPage() {
   };
 
   const headerActions = (
-    <button
-      type="button"
+    <ActionButton
+      key="refresh-action"
+      action={ACTION_DEFINITIONS.refresh}
       onClick={handleRefresh}
-      className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider border border-border/60 text-muted-foreground rounded-lg bg-background hover:bg-accent hover:text-accent-foreground transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-    >
-      <RefreshCw className="w-3.5 h-3.5" />
-      Recargar
-    </button>
+      showLabel
+      className="px-4 py-2 border border-border/60 rounded-lg bg-background shadow-sm"
+    />
   );
 
   return (
     <PageLayout
-      header={{ title: "Docker" }}
+      header={{
+        title: "Docker",
+        search: {
+          searchQuery,
+          searchFn: () => {}, // Placeholder as it's not implemented yet in the component state but required by layout
+          searchShortcuts: ['CMD+K'],
+          placeholder: "Buscar contenedores...",
+          renderResult: () => null
+        }
+      }}
       actions={[headerActions]}
-      refreshFn={handleRefresh}
     >
       <div className="space-y-6">
       {/* Contenido */}

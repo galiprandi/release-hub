@@ -23,11 +23,12 @@ ReleaseHub utiliza una paleta semántica basada en variables de CSS para soporta
 
 ## Docker UI Pattern (Resonancia Industrial)
 
-- **Badges de Estado**: Usar `bg-success/20 text-success` para estados activos y `bg-muted text-muted-foreground` para estados inactivos o detenidos. Aplicar `font-bold uppercase tracking-wider text-[10px] rounded-md` para mayor legibilidad y consistencia.
-- **Acciones de Fila**: Botones iconográficos con `hover:bg-accent` y colores semánticos. Deben implementar el anillo de foco estándar del sistema.
+- **Badges de Estado**: Usar `bg-success/20 text-success border-success/20` para estados activos, `bg-destructive/20 text-destructive border-destructive/20` para estados finalizados (exited) y `bg-muted/40 text-muted-foreground border-border/40` para estados inactivos o detenidos. Aplicar `font-bold uppercase tracking-wider text-[10px] rounded-md` para mayor legibilidad y consistencia.
+- **Acciones de Fila**: Botones iconográficos con `hover:bg-accent` y colores semánticos. Deben implementar el anillo de foco estándar del sistema. Uso obligatorio de `ActionButton` para consistencia.
 - **Feedback de Carga/Acceso**: Implementar `StatusCard` como componente estándar para todos los estados de carga, error y "offline".
 - **Table (Resonancia Industrial)**: Bordes sutiles `border-border/60` y encabezados con `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60` para una estética técnica de alta densidad.
 - **Table Actionability**: Los dashboards deben incluir filtros de acción (ej: "Acción: Pendientes") para reducir el "Time to Value" en tareas de promoción y despliegue.
+- **Terminal & Logs**: Las terminales de contenedores deben usar un fondo `bg-zinc-950` y cabeceras con iconografía de marca (`bg-primary/10`) y tipografía técnica de doble línea.
 
 ## Kubernetes UI Pattern (Resonancia Industrial)
 

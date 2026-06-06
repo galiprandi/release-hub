@@ -1,7 +1,7 @@
 import { useState, forwardRef, useImperativeHandle, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { ExternalLink, Terminal as TerminalIcon } from "lucide-react"
+import { Terminal as TerminalIcon } from "lucide-react"
 import { getContainers, getContainerLogs, startContainer, restartContainer, stopContainer, type ContainerInfo } from "@/api/docker"
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys"
 import { LogsViewer } from "@/components/shared/LogsViewer"
@@ -140,15 +140,20 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 						open={true}
 						onOpenChange={(open) => !open && setIsTerminalModalOpen(false)}
 						title={
-							<div className="flex items-center gap-2">
-								<TerminalIcon className="w-4 h-4 text-primary" />
-								<span>Terminal: {selectedContainer.name}</span>
+							<div className="flex items-center gap-2.5">
+								<div className="p-1.5 rounded-lg bg-primary/10">
+									<TerminalIcon className="w-4 h-4 text-primary" />
+								</div>
+								<div className="flex flex-col">
+									<span className="text-xs font-bold uppercase tracking-wider">Terminal</span>
+									<span className="text-[10px] font-medium text-muted-foreground uppercase tracking-tight">{selectedContainer.name}</span>
+								</div>
 							</div>
 						}
 						maxWidth="max-w-6xl"
-						className="w-[90vw] h-[80vh] !p-0"
+						className="w-[90vw] h-[80vh] !p-0 overflow-hidden"
 					>
-						<div className="flex-1 min-h-0 bg-black rounded-b-lg overflow-hidden">
+						<div className="flex-1 min-h-0 bg-zinc-950 rounded-b-xl overflow-hidden">
 							<Terminal
 								type="docker"
 								name={selectedContainer.name}
@@ -256,16 +261,19 @@ function ContainerNameCell({ container }: { container: ContainerInfo }) {
 
 function StatusCell({ container }: { container: ContainerInfo }) {
 	const running = isRunning(container.status)
+	const exited = container.status.toLowerCase().includes('exited')
 
 	return (
 		<span
 			className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-wider uppercase ${
 				running
 					? 'bg-success/20 text-success border-success/20 shadow-sm'
-					: 'bg-muted/40 text-muted-foreground border-border/40'
+					: exited
+						? 'bg-destructive/20 text-destructive border-destructive/20'
+						: 'bg-muted/40 text-muted-foreground border-border/40'
 			}`}
 		>
-			{running ? 'Ejecutando' : 'Detenido'}
+			{running ? 'Ejecutando' : exited ? 'Finalizado' : 'Detenido'}
 		</span>
 	)
 }
@@ -276,7 +284,7 @@ function StartedCell({ container }: { container: ContainerInfo }) {
 		return runningFor
 	}
 
-	return <span className="text-xs font-medium text-muted-foreground tracking-tight">{parseRunningTime(container.runningFor)}</span>
+	return <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{parseRunningTime(container.runningFor)}</span>
 }
 
 function PortsCell({ container }: { container: ContainerInfo }) {
@@ -332,7 +340,7 @@ function PortsCell({ container }: { container: ContainerInfo }) {
 			<select
 				value={selectedPort}
 				onChange={(e) => setSelectedPort(e.target.value)}
-				className="text-[10px] font-bold uppercase tracking-wider border border-border/40 rounded-lg px-2 py-1 bg-muted/40 hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 cursor-pointer"
+				className="text-[10px] h-7 font-bold uppercase tracking-wider border border-border/40 rounded-lg px-2 py-0 bg-muted/40 hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 cursor-pointer"
 				aria-label="Seleccionar puerto"
 			>
 				{externalPorts.map((port, index) => (
@@ -341,16 +349,13 @@ function PortsCell({ container }: { container: ContainerInfo }) {
 					</option>
 				))}
 			</select>
-			<button
-				type="button"
+			<ActionButton
+				action={ACTION_DEFINITIONS.openPort}
 				onClick={() => handlePortClick(selectedPort)}
-				className="p-1.5 text-primary/60 hover:text-primary hover:bg-primary/10 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 disabled:opacity-30"
-				title={`Abrir puerto ${selectedPort}`}
-				aria-label={`Abrir puerto ${selectedPort}`}
 				disabled={!selectedPort}
-			>
-				<ExternalLink className="w-3.5 h-3.5" />
-			</button>
+				size="sm"
+				className="rounded-lg"
+			/>
 		</div>
 	)
 }

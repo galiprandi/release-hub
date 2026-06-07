@@ -5,6 +5,7 @@ import { useHealthMonitor } from '@/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
 import { Table } from '@/components/ui/Table';
 import { EmptyState } from '@/components/EmptyState';
+import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PageLayout } from '../../layouts/PageLayout';
 import DayJS from '@/lib/dayjs';
@@ -15,6 +16,9 @@ export const Route = createFileRoute('/health/')({
   validateSearch: (search: Record<string, unknown>) => {
     return {
       environment: typeof search.environment === 'string' ? search.environment : undefined,
+      sortBy: (['default', 'errors', 'recent'].includes(search.sortBy as string)
+        ? search.sortBy
+        : undefined) as 'default' | 'errors' | 'recent' | undefined,
     };
   },
 });
@@ -32,7 +36,7 @@ function InfoBanner() {
       >
         <div className="flex items-center gap-2">
           <Activity className="w-5 h-5 text-info" />
-          <span className="font-bold tracking-tight text-info uppercase text-xs">Cómo funciona</span>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-info">Cómo funciona</span>
         </div>
         <ChevronDown className={`w-5 h-5 text-info transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
       </button>
@@ -377,7 +381,14 @@ function HealthMonitorPage() {
   const navigate = useNavigate();
   const search = useSearch({ from: '/health/' });
 
-  const [sortBy, setSortBy] = useState<'default' | 'errors' | 'recent'>('default');
+  const sortBy = (search.sortBy as 'default' | 'errors' | 'recent') || 'default';
+
+  const handleSortChange = useCallback((newSort: string) => {
+    navigate({
+      to: '.',
+      search: (prev: Record<string, unknown>) => ({ ...prev, sortBy: newSort }),
+    });
+  }, [navigate]);
 
   // Derivar filtro activo de query params
   const activeFilter = useMemo(() => {
@@ -494,16 +505,17 @@ function HealthMonitorPage() {
       {/* Ordenamiento */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Ordenar por</span>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'default' | 'errors' | 'recent')}
-            className={`bg-muted/40 border border-border/60 rounded-lg px-3 py-1.5 text-xs font-bold uppercase tracking-tight text-foreground transition-all hover:bg-muted/60 ${FOCUS_RING}`}
-          >
-            <option value="default">Nombre (A-Z)</option>
-            <option value="errors">Errores Críticos</option>
-            <option value="recent">Recientes</option>
-          </select>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Ordenar por:</span>
+          <IndustrialTabs
+            options={[
+              { id: 'default', label: 'Nombre' },
+              { id: 'errors', label: 'Errores' },
+              { id: 'recent', label: 'Recientes' },
+            ]}
+            activeId={sortBy}
+            onChange={handleSortChange}
+            className="w-72"
+          />
         </div>
       </div>
 

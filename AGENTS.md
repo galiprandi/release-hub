@@ -30,6 +30,7 @@
 
 - **Tokens**: Solo de `DESIGN.md`. Nunca hardcodeados (`text-zinc-500`, `bg-red-500`).
 - **Foco**: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1`.
+- **Navigation**: Prefer `IndustrialTabs` over `select` for sorting/filtering. State must be synced with search params.
 - **Type Hygiene**: Prohibido `any`. Interfaces explícitas o `unknown` + validación.
 - **Mutaciones**: Optimistic update + revalidación selectiva. Nunca `window.location.reload()`.
 - **Resiliencia**: Si CLI falla (`kubectl`, `docker`), redirigir a `<module>/setup`.

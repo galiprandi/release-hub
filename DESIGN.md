@@ -13,7 +13,7 @@
 - **FilterBar (tabs)**: `bg-muted` container, `bg-background` active item, `p-1`.
 - **StatusCard**: Loading/error/offline states.
 - **ActionButton**: Iconographic with tooltip.
-- **IndustrialTabs**: Unified selector for modals and panels.
+- **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering.
 - **Docker Terminal**: `bg-primary/10` icons, double-line titles, `bg-zinc-950` background.
 - **BaseDialog**: Modal consistency.
 

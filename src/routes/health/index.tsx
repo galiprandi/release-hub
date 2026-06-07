@@ -29,7 +29,7 @@ function InfoBanner() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="bg-info/10 border border-info/20 rounded-xl overflow-hidden transition-all duration-200">
+    <div className="bg-info/20 border border-info/20 rounded-xl overflow-hidden transition-all duration-200">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-info/20 transition-colors ${FOCUS_RING}`}
@@ -110,13 +110,13 @@ function ProductSection({
           <Link
             to="/github/$org/$repo"
             params={{ org, repo: productName }}
-            className={`font-medium tracking-tight text-foreground hover:text-primary transition-colors ${FOCUS_RING} rounded-md px-1 -ml-1`}
+            className={`font-medium tracking-tighter text-foreground hover:text-primary transition-colors ${FOCUS_RING} rounded-md px-1 -ml-1`}
           >
             {productName}
           </Link>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">({services.length} servicios)</span>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">({services.length} servicios)</span>
         </div>
-        <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-2">
           {(() => {
             const healthy = endpoints.filter((ep) => ep.isHealthy === true).length;
             const unhealthy = endpoints.filter((ep) => ep.isHealthy === false).length;
@@ -124,19 +124,19 @@ function ProductSection({
             return (
               <>
                 {healthy > 0 && (
-                  <span className="flex items-center gap-1.5 text-success">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-success/20 border border-success/20 text-[10px] font-bold uppercase tracking-wider text-success">
                     <div className="w-1.5 h-1.5 rounded-full bg-success" />
                     {healthy} OK
                   </span>
                 )}
                 {pending > 0 && (
-                  <span className="flex items-center gap-1.5 text-muted-foreground">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-muted/20 border border-border/20 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
                     {pending} Pendiente
                   </span>
                 )}
                 {unhealthy > 0 && (
-                  <span className="flex items-center gap-1.5 text-destructive">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-destructive/20 border border-destructive/20 text-[10px] font-bold uppercase tracking-wider text-destructive">
                     <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
                     {unhealthy} Error
                   </span>
@@ -260,9 +260,9 @@ function EndpointsTable({
 }
 
 function StatusCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
-  if (endpoint.isHealthy === null) return <Circle className="w-4 h-4 text-muted-foreground/40" />
-  if (endpoint.isHealthy === true) return <CheckCircle2 className="w-4 h-4 text-success" />
-  return <XCircle className="w-4 h-4 text-destructive" />
+  if (endpoint.isHealthy === null) return <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
+  if (endpoint.isHealthy === true) return <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+  return <div className="w-1.5 h-1.5 rounded-full bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.4)]" />
 }
 
 function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
@@ -283,16 +283,16 @@ function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMo
 function ResponseTimeCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
   if (endpoint.responseTime !== undefined) {
     return (
-      <span className={`text-xs font-medium ${endpoint.isHealthy ? 'text-success' : 'text-destructive'}`}>
+      <span className={`text-[10px] font-bold uppercase tracking-wider ${endpoint.isHealthy ? 'text-success' : 'text-destructive'}`}>
         {endpoint.responseTime}ms
       </span>
     )
   }
-  return <span className="text-muted-foreground">-</span>
+  return <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">-</span>
 }
 
 function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
-  if (!endpoint.error) return <span className="text-muted-foreground">-</span>
+  if (!endpoint.error) return <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">-</span>
 
   const errorMessage = (() => {
     if (endpoint.details) {
@@ -309,19 +309,44 @@ function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>
   const truncatedMessage = errorMessage.length > 50 ? `${errorMessage.slice(0, 50)}...` : errorMessage
 
   return (
-    <span className="text-xs text-destructive font-medium" title={errorMessage}>
+    <span className="text-[10px] font-bold uppercase tracking-wider text-destructive" title={errorMessage}>
       {truncatedMessage}
     </span>
   )
 }
 
 function LastCheckedCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
-  return <span className="text-xs text-muted-foreground/60">{DayJS(endpoint.lastChecked).fromNow()}</span>
+  return (
+    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+      {DayJS(endpoint.lastChecked).fromNow()}
+    </span>
+  )
 }
 
 function UrlCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
-  const truncatedUrl = endpoint.url.length > 60 ? `${endpoint.url.slice(0, 60)}...` : endpoint.url
-  return <span className="flex-1 text-xs text-muted-foreground/70 font-mono" title={endpoint.url}>{truncatedUrl}</span>
+  let domain = '';
+  let path = endpoint.url;
+
+  try {
+    const url = new URL(endpoint.url);
+    domain = url.hostname;
+    path = url.pathname + url.search;
+  } catch {
+    // Fallback for invalid URLs
+  }
+
+  return (
+    <div className="flex flex-col gap-0.5" title={endpoint.url}>
+      {domain && (
+        <span className="text-[10px] font-medium text-muted-foreground/60 leading-none truncate max-w-[250px]">
+          {domain}
+        </span>
+      )}
+      <span className="text-xs font-mono text-foreground leading-none truncate max-w-[250px]">
+        {path}
+      </span>
+    </div>
+  )
 }
 
 function ActionsCell({
@@ -497,7 +522,16 @@ function HealthMonitorPage() {
 
   return (
     <PageLayout 
-      header={{ title: "Health Monitor" }}
+      header={{
+        title: (
+          <div className="flex items-center gap-2">
+            <span>Health Monitor</span>
+            {isChecking && (
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" title="Revalidando..." />
+            )}
+          </div>
+        )
+      }}
       actions={[headerActions]}
       refreshFn={checkAllEndpoints}
     >

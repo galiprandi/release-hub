@@ -164,6 +164,35 @@
 - renders offline state correctly
 - renders warn state with retry button
 
+## Module: LogsViewer
+- calls onResourceChange when resource is selected
+- copies logs to clipboard
+- enables auto-scroll when clicking play button
+- filters logs by level
+- highlights search term and calculates match count
+- renders as modal when asModal is true
+- renders logs correctly
+- shows empty message when no logs
+- toggles auto-scroll
+- toggles expand/collapse full screen option in modal mode
+
+## Module: logUtils
+- should detect JSON start with {
+- should detect kafka-client levels
+- should detect new logs by various patterns
+- should detect various bracket patterns
+- should group multi-line logs correctly
+- should handle empty input
+- should handle logs starting with ANSI codes
+- should handle regex special characters in filter
+- should highlight filter terms
+- should highlight log levels with appropriate colors
+- should highlight timestamps at the beginning of the line
+- should remove ANSI escape codes from text
+- should return null/undefined if line is empty
+- should return the same text if no ANSI codes are present
+- should strip ANSI codes before highlighting
+
 ## Module: Pipeline Adapters
 - should handle errors gracefully
 - should handle invalid JSON in settings gracefully
@@ -203,32 +232,3 @@
 - renders timeline with events
 - shows different states with different styling
 - shows tooltip on hover
-
-## Module: LogsViewer
-- calls onResourceChange when resource is selected
-- copies logs to clipboard
-- enables auto-scroll when clicking play button
-- filters logs by level
-- highlights search term and calculates match count
-- renders as modal when asModal is true
-- renders logs correctly
-- shows empty message when no logs
-- toggles auto-scroll
-- toggles expand/collapse full screen option in modal mode
-
-## Module: logUtils
-- should detect JSON start with {
-- should detect kafka-client levels
-- should detect new logs by various patterns
-- should detect various bracket patterns
-- should group multi-line logs correctly
-- should handle empty input
-- should handle logs starting with ANSI codes
-- should handle regex special characters in filter
-- should highlight filter terms
-- should highlight log levels with appropriate colors
-- should highlight timestamps at the beginning of the line
-- should remove ANSI escape codes from text
-- should return null/undefined if line is empty
-- should return the same text if no ANSI codes are present
-- should strip ANSI codes before highlighting

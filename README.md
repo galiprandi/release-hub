@@ -5,7 +5,7 @@ Cache-first operations platform. CI/CD, GitHub, K8s, Docker, Health — from the
 ## Stack
 - **Frontend**: React + TanStack Router + TanStack Query + Tailwind
 - **Backend**: Vite middleware + hardened shell (`spawn`, `shell: false`)
-- **Auth**: Dynamic `gh auth token` + Seki API token from localStorage
+- **Auth**: Dynamic `gh auth token`
 - **Architecture**: Iceberg + Viewport Reactivity (ADR-001). Identity / Snapshot / Stream with LS persistence and TTL.
 
 ## Quick Start

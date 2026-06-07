@@ -707,15 +707,8 @@ function AuthorCell({ repo }: { repo: RepoInfo }) {
 	) : null;
 }
 
-function PRsCell({ repo }: { repo: RepoInfo }) {
-	const detailsQuery = useQueries({
-		queries: [{
-			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-			enabled: false
-		}]
-	})[0];
-	const queryData = detailsQuery.data as RepoDetails | undefined;
-	const prCount = queryData?.prCount || 0;
+function PRsCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
+	const prCount = details?.prCount || 0;
 
 	if (!details) {
 		return <div className="h-4 bg-muted/20 rounded w-8 animate-pulse" />;
@@ -753,15 +746,8 @@ function PRsCell({ repo }: { repo: RepoInfo }) {
 	);
 }
 
-function ActionsStatusCell({ repo }: { repo: RepoInfo }) {
-	const detailsQuery = useQueries({
-		queries: [{
-			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-			enabled: false
-		}]
-	})[0];
-	const queryData = detailsQuery.data as RepoDetails | undefined;
-	const actions = queryData?.actions;
+function ActionsStatusCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
+	const actions = details?.actions;
 
 	if (!details) {
 		return <div className="h-4 bg-muted/20 rounded w-12 animate-pulse" />;

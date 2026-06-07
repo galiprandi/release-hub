@@ -23,7 +23,7 @@ export function ProjectSelectionDialog({ isOpen, onOpenChange, repoFullName }: P
 			<div className="space-y-4">
 				<div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
 					{projects.length === 0 ? (
-						<div className="text-center py-8 bg-muted/10 rounded-xl border border-dashed border-border/60">
+						<div className="text-center py-8 bg-muted/10 rounded-xl border border-dashed border-border/20">
 							<p className="text-sm text-muted-foreground">No tienes proyectos creados.</p>
 						</div>
 					) : (
@@ -36,7 +36,7 @@ export function ProjectSelectionDialog({ isOpen, onOpenChange, repoFullName }: P
 									className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-left group ${
 										isInProject
 											? "bg-primary/5 border-primary/20 hover:bg-primary/10"
-											: "bg-muted/10 border-border/40 hover:bg-muted/20"
+											: "bg-muted/10 border-border/20 hover:bg-muted/20"
 									}`}
 								>
 									<div className="flex-1 min-w-0">
@@ -62,10 +62,10 @@ export function ProjectSelectionDialog({ isOpen, onOpenChange, repoFullName }: P
 					)}
 				</div>
 
-				<div className="pt-2 border-t border-border/40 flex justify-end">
+				<div className="pt-2 border-t border-border/20 flex justify-end">
 					<button
 						onClick={() => onOpenChange(false)}
-						className="px-6 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						className="px-6 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted/20 text-foreground rounded-lg hover:bg-muted/30 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 					>
 						Cerrar
 					</button>

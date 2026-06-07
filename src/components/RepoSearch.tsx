@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { Search, Loader2, GitBranch, X, FileCode } from 'lucide-react'
 import { useRepoSearch } from '@/hooks/useRepoSearch'
 import { useFileSearch, isFileSearchQuery } from '@/hooks/useFileSearch'
@@ -6,6 +6,7 @@ import { useUserCollections } from '@/hooks/useUserCollections'
 import { useUserReposSummary } from '@/hooks/useUserReposSummary'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton'
+import { useClickOutside, useKeyboardShortcut } from '@/hooks/useKeyboardShortcuts'
 
 interface UnifiedResult {
   id: string
@@ -90,58 +91,48 @@ export function RepoSearch() {
   }
 
   // Close when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false)
-      }
-    }
+  useClickOutside(containerRef, useCallback(() => setIsOpen(false), []), isOpen)
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  // Keyboard shortcuts
+  useKeyboardShortcut('k', useCallback((e) => {
+    e.preventDefault()
+    setIsOpen(true)
+    inputRef.current?.focus()
+  }, []), { mod: true })
 
-  // Keyboard shortcut: Cmd/Ctrl + K to open and keyboard navigation
+  useKeyboardShortcut('Escape', useCallback(() => {
+    setIsOpen(false)
+    setSelectedIndex(-1)
+  }, []), { enabled: isOpen })
+
+  // Keyboard navigation
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
-      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-        event.preventDefault()
-        setIsOpen(true)
-        inputRef.current?.focus()
-      }
-      if (event.key === 'Escape') {
-        setIsOpen(false)
-        setSelectedIndex(-1)
-      }
+      if (!isOpen || results.length === 0) return
 
-      if (isOpen && results.length > 0) {
-        if (event.key === 'ArrowDown') {
-          event.preventDefault()
-          setSelectedIndex((prev) => (prev < results.length - 1 ? prev + 1 : prev))
-        }
-        if (event.key === 'ArrowUp') {
-          event.preventDefault()
-          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev))
-        }
-        if (event.key === 'Enter' && selectedIndex >= 0) {
-          event.preventDefault()
-          const item = results[selectedIndex]
-          if (item) {
-            if (item.type === 'repo') {
-              const [org, name] = item.fullName.split('/')
-              navigate({
-                to: '/github/$org/$repo',
-                params: { org, repo: name },
-                search: { view: 'commits' },
-              })
-            } else if (item.type === 'file' && item.htmlUrl) {
-              handleOpenInNewTab(item.htmlUrl)
-            }
-            handleSelect()
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        setSelectedIndex((prev) => (prev < results.length - 1 ? prev + 1 : prev))
+      }
+      if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev))
+      }
+      if (event.key === 'Enter' && selectedIndex >= 0) {
+        event.preventDefault()
+        const item = results[selectedIndex]
+        if (item) {
+          if (item.type === 'repo') {
+            const [org, name] = item.fullName.split('/')
+            navigate({
+              to: '/github/$org/$repo',
+              params: { org, repo: name },
+              search: { view: 'commits' },
+            })
+          } else if (item.type === 'file' && item.htmlUrl) {
+            handleOpenInNewTab(item.htmlUrl)
           }
+          handleSelect()
         }
       }
     }

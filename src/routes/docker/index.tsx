@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, useSearch, useRouterState } from '@tansta
 import { useRef, useState, useMemo, useCallback, useEffect } from 'react';
 import { useDockerAccess } from '@/hooks/useDockerAccess';
 import { useQuery } from '@tanstack/react-query';
-import { ContainerList, type ContainerListRef } from '@/docker/componentes/ContainerList';
+import { ContainerList, type ContainerListRef } from '@/docker/components/ContainerList';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { getContainers } from '@/api/docker';
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys';

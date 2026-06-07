@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import { FolderPlus, FolderOpen, X, Check, ChevronDown, Plus } from "lucide-react";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { BaseDialog } from "@/components/ui/BaseDialog";
+import { useClickOutside, useKeyboardShortcut } from "@/hooks/useKeyboardShortcuts";
 
 export function ProjectSelector({ repo }: { repo: string }) {
 	const { projects, createProject, addRepoToProject, removeRepoFromProject, isRepoInProject, getProjectsForRepo } = useUserCollections();
@@ -11,15 +12,8 @@ export function ProjectSelector({ repo }: { repo: string }) {
 	const [newDesc, setNewDesc] = useState("");
 	const containerRef = useRef<HTMLDivElement>(null);
 
-	useEffect(() => {
-		const handleClick = (e: MouseEvent) => { if (containerRef.current && !containerRef.current.contains(e.target as Node)) setIsOpen(false); };
-		const handleEsc = (e: KeyboardEvent) => { if (e.key === "Escape") setIsOpen(false); };
-		if (isOpen) {
-			document.addEventListener("mousedown", handleClick);
-			document.addEventListener("keydown", handleEsc);
-		}
-		return () => { document.removeEventListener("mousedown", handleClick); document.removeEventListener("keydown", handleEsc); };
-	}, [isOpen]);
+	useClickOutside(containerRef, useCallback(() => setIsOpen(false), []), isOpen);
+	useKeyboardShortcut("Escape", useCallback(() => setIsOpen(false), []), { enabled: isOpen });
 
 	const repoProjects = getProjectsForRepo(repo);
 	const hasProjects = repoProjects.length > 0;

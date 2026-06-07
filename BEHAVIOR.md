@@ -193,6 +193,24 @@
 - renders offline state correctly
 - renders warn state with retry button
 
+## Module: PipelineCard
+- applies custom className
+- does not show running indicator when isRunning is false
+- has different styling for commits vs tags
+- renders children when provided
+- renders meta parts correctly
+- renders tag ref type for tags
+- renders with basic props
+- shows running indicator when isRunning is true
+
+## Module: SimpleTimeline
+- displays duration in tooltip for completed events
+- limits display to first 6 events
+- renders empty timeline with no events
+- renders timeline with events
+- shows different states with different styling
+- shows tooltip on hover
+
 ## Module: Pipeline Adapters
 - should handle errors gracefully
 - should handle invalid JSON in settings gracefully
@@ -214,21 +232,3 @@
 - should return null for short refs or API errors
 - should return null for tag data without commit
 - should transform events and subevents correctly
-
-## Module: PipelineCard
-- applies custom className
-- does not show running indicator when isRunning is false
-- has different styling for commits vs tags
-- renders children when provided
-- renders meta parts correctly
-- renders tag ref type for tags
-- renders with basic props
-- shows running indicator when isRunning is true
-
-## Module: SimpleTimeline
-- displays duration in tooltip for completed events
-- limits display to first 6 events
-- renders empty timeline with no events
-- renders timeline with events
-- shows different states with different styling
-- shows tooltip on hover

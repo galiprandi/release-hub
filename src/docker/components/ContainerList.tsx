@@ -1,7 +1,7 @@
 import { useState, forwardRef, useImperativeHandle, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { ExternalLink, Terminal as TerminalIcon } from "lucide-react"
+import { Terminal as TerminalIcon } from "lucide-react"
 import { getContainers, getContainerLogs, startContainer, restartContainer, stopContainer, type ContainerInfo } from "@/api/docker"
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys"
 import { LogsViewer } from "@/components/shared/LogsViewer"

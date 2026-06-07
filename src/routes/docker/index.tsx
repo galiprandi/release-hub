@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate, useSearch, useRouterState } from '@tanstack/react-router';
 import { useRef, useState, useMemo, useCallback, useEffect } from 'react';
-import { RefreshCw } from 'lucide-react';
 import { useDockerAccess } from '@/hooks/useDockerAccess';
 import { useQuery } from '@tanstack/react-query';
 import { ContainerList, type ContainerListRef } from '@/docker/componentes/ContainerList';
@@ -8,6 +7,7 @@ import { StatusCard } from '@/components/ui/StatusCard';
 import { getContainers } from '@/api/docker';
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys';
 import { PageLayout } from '../../layouts/PageLayout';
+import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 
 export const Route = createFileRoute('/docker/')({
   component: DockerManagerPage,
@@ -69,21 +69,18 @@ function DockerManagerPage() {
   };
 
   const headerActions = (
-    <button
-      type="button"
+    <ActionButton
+      action={ACTION_DEFINITIONS.refresh}
       onClick={handleRefresh}
-      className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider border border-border/60 text-muted-foreground rounded-lg bg-background hover:bg-accent hover:text-accent-foreground transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-    >
-      <RefreshCw className="w-3.5 h-3.5" />
-      Recargar
-    </button>
+      showLabel={true}
+      className="bg-background border border-border/60 shadow-sm px-4 py-2 rounded-lg"
+    />
   );
 
   return (
     <PageLayout
       header={{ title: "Docker" }}
       actions={[headerActions]}
-      refreshFn={handleRefresh}
     >
       <div className="space-y-6">
       {/* Contenido */}

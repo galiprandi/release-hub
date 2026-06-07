@@ -9,6 +9,8 @@ import { Terminal } from "@/components/shared/Terminal"
 import { BaseDialog } from "@/components/ui/BaseDialog"
 import { StatusCard } from "@/components/ui/StatusCard"
 import { Table } from "@/components/ui/Table"
+import { EmptyState } from "@/components/EmptyState"
+import { Boxes } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
 
@@ -98,9 +100,10 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 
 	if (!Array.isArray(sortedContainers) || sortedContainers.length === 0) {
 		return (
-			<StatusCard
-				type="offline"
-				message={searchQuery ? "No se encontraron contenedores que coincidan con la búsqueda." : "No hay contenedores disponibles."}
+			<EmptyState
+				icon={<Boxes className="w-12 h-12 text-muted-foreground/20" />}
+				label={searchQuery ? "No se encontraron resultados" : "No hay contenedores"}
+				caption={searchQuery ? `No hay contenedores que coincidan con "${searchQuery}"` : "No se detectaron contenedores en este entorno."}
 			/>
 		)
 	}
@@ -140,15 +143,20 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 						open={true}
 						onOpenChange={(open) => !open && setIsTerminalModalOpen(false)}
 						title={
-							<div className="flex items-center gap-2">
-								<TerminalIcon className="w-4 h-4 text-primary" />
-								<span>Terminal: {selectedContainer.name}</span>
+							<div className="flex items-center gap-3">
+								<div className="p-2 rounded-lg bg-primary/10">
+									<TerminalIcon className="w-4 h-4 text-primary" />
+								</div>
+								<div className="flex flex-col">
+									<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 leading-none mb-1">Terminal</span>
+									<span className="text-sm font-semibold tracking-tight leading-none">{selectedContainer.name}</span>
+								</div>
 							</div>
 						}
 						maxWidth="max-w-6xl"
-						className="w-[90vw] h-[80vh] !p-0"
+						className="w-[90vw] h-[80vh] !p-0 overflow-hidden"
 					>
-						<div className="flex-1 min-h-0 bg-black rounded-b-lg overflow-hidden">
+						<div className="flex-1 min-h-0 bg-zinc-950 overflow-hidden">
 							<Terminal
 								type="docker"
 								name={selectedContainer.name}
@@ -255,17 +263,24 @@ function ContainerNameCell({ container }: { container: ContainerInfo }) {
 }
 
 function StatusCell({ container }: { container: ContainerInfo }) {
-	const running = isRunning(container.status)
+	const status = container.status.toLowerCase()
+	const running = status.startsWith('up')
+	const exited = status.includes('exited')
+
+	let colorClass = 'bg-muted/20 text-muted-foreground border-border/20'
+	let label = 'Detenido'
+
+	if (running) {
+		colorClass = 'bg-success/20 text-success border-success/20'
+		label = 'Ejecutando'
+	} else if (exited) {
+		colorClass = 'bg-destructive/20 text-destructive border-destructive/20'
+		label = 'Finalizado'
+	}
 
 	return (
-		<span
-			className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-wider uppercase ${
-				running
-					? 'bg-success/20 text-success border-success/20 shadow-sm'
-					: 'bg-muted/40 text-muted-foreground border-border/40'
-			}`}
-		>
-			{running ? 'Ejecutando' : 'Detenido'}
+		<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-wider uppercase ${colorClass}`}>
+			{label}
 		</span>
 	)
 }
@@ -341,16 +356,12 @@ function PortsCell({ container }: { container: ContainerInfo }) {
 					</option>
 				))}
 			</select>
-			<button
-				type="button"
+			<ActionButton
+				action={ACTION_DEFINITIONS.openPort}
 				onClick={() => handlePortClick(selectedPort)}
-				className="p-1.5 text-primary/60 hover:text-primary hover:bg-primary/10 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 disabled:opacity-30"
-				title={`Abrir puerto ${selectedPort}`}
-				aria-label={`Abrir puerto ${selectedPort}`}
 				disabled={!selectedPort}
-			>
-				<ExternalLink className="w-3.5 h-3.5" />
-			</button>
+				tooltipSide="top"
+			/>
 		</div>
 	)
 }
@@ -374,30 +385,37 @@ function ActionsCell({
 
 	return (
 		<div className="flex items-center justify-end gap-1.5">
-			<ActionButton
-				action={ACTION_DEFINITIONS.viewLogs}
-				onClick={() => onViewLogs(container)}
-			/>
-			<ActionButton
-				action={ACTION_DEFINITIONS.openTerminal}
-				onClick={() => onOpenTerminal(container)}
-				disabled={!running}
-			/>
-			<ActionButton
-				action={ACTION_DEFINITIONS.startContainer}
-				onClick={() => onStart(container.id)}
-				disabled={running}
-			/>
-			<ActionButton
-				action={ACTION_DEFINITIONS.restartContainer}
-				onClick={() => onRestart(container.id)}
-				disabled={!running}
-			/>
-			<ActionButton
-				action={ACTION_DEFINITIONS.stopContainer}
-				onClick={() => onStop(container.id)}
-				disabled={!running}
-			/>
+			<div className="flex items-center gap-1">
+				<ActionButton
+					action={ACTION_DEFINITIONS.viewLogs}
+					onClick={() => onViewLogs(container)}
+				/>
+				<ActionButton
+					action={ACTION_DEFINITIONS.openTerminal}
+					onClick={() => onOpenTerminal(container)}
+					disabled={!running}
+				/>
+			</div>
+
+			<div className="w-px h-4 bg-border/40 mx-1" aria-hidden="true" />
+
+			<div className="flex items-center gap-1">
+				<ActionButton
+					action={ACTION_DEFINITIONS.startContainer}
+					onClick={() => onStart(container.id)}
+					disabled={running}
+				/>
+				<ActionButton
+					action={ACTION_DEFINITIONS.restartContainer}
+					onClick={() => onRestart(container.id)}
+					disabled={!running}
+				/>
+				<ActionButton
+					action={ACTION_DEFINITIONS.stopContainer}
+					onClick={() => onStop(container.id)}
+					disabled={!running}
+				/>
+			</div>
 		</div>
 	)
 }

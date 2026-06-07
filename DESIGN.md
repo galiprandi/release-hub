@@ -7,12 +7,13 @@
 - **Standard Cells**:
   - **Health**: Semantic dots (OK/Error/Pending).
   - **PRs**: Primary badge with count + link.
-  - **Actions**: Status-colored badge (Success/Error/Running) + pulse.
-  - **Operations**: Generic repository management column.
+  - **Workflows**: Status-colored badge (Success/Error/Running) + pulse for GitHub Actions.
+  - **Operations**: Generic repository management column with high-density actions.
 
 ## Component Patterns
 - **Table**: `bg-muted/40` headers, technical metadata, vertical dividers in action groups.
 - **Docker Terminal**: High-density headers with `bg-primary/10` icons, double-line titles, and `bg-zinc-950` terminal background.
+- **Table**: `bg-muted/40` headers, technical metadata, vertical dividers in action groups. Use 20% opacity (`/20`) for technical badges and borders.
 - **FilterBar (variant='tabs')**: `bg-muted` container, `bg-background` active item, `p-1`.
 - **StatusCard**: Standard for loading/error/offline states.
 - **ActionButton**: Iconographic with integrated tooltip.

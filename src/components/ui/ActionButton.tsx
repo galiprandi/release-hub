@@ -25,11 +25,11 @@ export interface ActionButtonProps {
 
 const colorClasses: Record<ActionColor, string> = {
 	default: "text-muted-foreground hover:text-foreground hover:bg-accent",
-	success: "text-success hover:bg-success/10",
-	destructive: "text-destructive hover:bg-destructive/10",
-	primary: "text-primary hover:bg-primary/10",
-	warning: "text-warning hover:bg-warning/10",
-	info: "text-info hover:bg-info/10",
+	success: "text-success hover:bg-success/20",
+	destructive: "text-destructive hover:bg-destructive/20",
+	primary: "text-primary hover:bg-primary/20",
+	warning: "text-warning hover:bg-warning/20",
+	info: "text-info hover:bg-info/20",
 }
 
 const sizeClasses = {

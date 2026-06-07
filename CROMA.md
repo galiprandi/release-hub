@@ -11,7 +11,8 @@
 - **18/06**: Auditoría Higiene Técnica (AAA Standard) (`🐜-Fiona-refactor-hygiene-standardization`).
 - **20/06**: Evolución Dashboard GitHub: PRs & Actions via GraphQL (`🐜-Uma-refactor-github-dashboard-resonance`).
 - **22/06**: Refinamiento estético Docker Resonance V2 (`🐜-Carol-refactor-docker-resonance`).
-
+- **21/06**: Auditoría Higiene Técnica & Hardening de Tipos (`🐜-Fiona-refactor-hygiene-standardization-resonance`).
+- **20/06**: Evolución Dashboard GitHub: GraphQL Consolidation & Resonance V2 Refinement (`🐜-Uma-refactor-github-dashboard-resonance`).
 ## 🐜 Registro de Intervenciones
 
 ### 🗓️ 30 de Mayo de 2026
@@ -77,6 +78,13 @@
 **Objetivo**: Erradicar la entropía técnica mediante la eliminación de código muerto, unificación de patrones de UI (IndustrialTabs) y endurecimiento de la accesibilidad y reactividad.
 **Impacto**: Sistema más ligero, consistente y accesible, eliminando renders innecesarios y garantizando un estándar de ingeniería de élite.
 
+### 🗓️ 21 de Junio de 2026
+**Tarea**: Auditoría de Higiene Técnica y Hardening de Tipos.
+**Branch**: `🐜-Fiona-refactor-hygiene-standardization-resonance`
+**Estado**: Finalizado
+**Objetivo**: Erradicar el ruido técnico mediante la eliminación de componentes huérfanos (`NovedadesDialog`, `PageHeader`), hardening de tipos en el Dashboard de GitHub y resolución de advertencias del React Compiler.
+**Impacto**: Build inmaculado con cero advertencias, tipos estrictos para datos de GitHub y reducción de la superficie de mantenimiento eliminando código muerto.
+
 ### 🗓️ 20 de Junio de 2026
 **Tarea**: Endurecimiento de Higiene Técnica y Seguridad de Tipos.
 **Branch**: `🐜-Fiona-refactor-hygiene-and-type-safety`
@@ -95,3 +103,8 @@
 **Estado**: Finalizado
 **Objetivo**: Elevar la precisión visual del módulo Docker mediante la estandarización de ActionButton, EmptyState y terminales de alta densidad.
 **Impacto**: Interfaz técnica más cohesiva y profesional, siguiendo estrictamente el estándar Industrial Resonance V2.
+**Tarea**: Consolidación GraphQL y Refinamiento Resonance V2 en GitHub Dashboard.
+**Branch**: `🐜-Uma-refactor-github-dashboard-resonance`
+**Estado**: Finalizado
+**Objetivo**: Optimizar la carga de datos del dashboard mediante GraphQL y elevar la coherencia visual bajo el estándar Resonance V2.
+**Impacto**: Mejora drástica en la latitud de carga del dashboard, eliminación de colisiones semánticas ("Workflows" vs "Operations") y estandarización de opacidades al 20%.

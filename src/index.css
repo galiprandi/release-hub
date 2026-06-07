@@ -37,6 +37,17 @@
   --tag: oklch(0.55 0.2 300);
   --tag-foreground: oklch(0.986 0.004 108);
   --radius: 0.625rem;
+
+  /* Sugar High Syntax Highlighting - Light */
+  --sh-class: #2d5e9d;
+  --sh-identifier: #354150;
+  --sh-sign: #8996a3;
+  --sh-string: #007a7a;
+  --sh-keyword: #e45649;
+  --sh-comment: #a0ada0;
+  --sh-jsxliterals: #6266d1;
+  --sh-property: #c6104e;
+  --sh-entity: #6266d1;
 }
 
 .dark {
@@ -71,6 +82,17 @@
   --commit-foreground: oklch(0.986 0.004 108);
   --tag: oklch(0.5 0.18 300);
   --tag-foreground: oklch(0.986 0.004 108);
+
+  /* Sugar High Syntax Highlighting - Dark */
+  --sh-class: #79c0ff;
+  --sh-identifier: #d1d5da;
+  --sh-sign: #8b949e;
+  --sh-string: #a5d6ff;
+  --sh-keyword: #ff7b72;
+  --sh-comment: #8b949e;
+  --sh-jsxliterals: #d2a8ff;
+  --sh-property: #79c0ff;
+  --sh-entity: #d2a8ff;
 }
 
 @theme inline {

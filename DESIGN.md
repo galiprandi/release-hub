@@ -56,3 +56,11 @@
 ## Layout V2
 - Sidebar fijo (50px). Sticky header with backdrop-blur.
 - Contenido `px-8`, `gap-6`.
+
+## Specific Module Standards
+
+### Health Monitor Resonance
+- **Status Dots**: `w-1.5 h-1.5 rounded-full` with semantic shadows for health states (OK/Error). OK includes `animate-pulse`.
+- **Product Header**: Stats use semantic badges at 20% opacity. Product names use `tracking-tighter`.
+- **Double-line URLs**: Table displays domain (muted, `text-[10px]`) and path (foreground, `font-mono text-xs`).
+- **Revalidation**: `bg-primary animate-pulse` dot in header during background checks.

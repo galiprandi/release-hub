@@ -13,3 +13,11 @@
   - [x] Hardening de tipos en `validateSearch` de Health Monitor.
   - [x] Eliminación de código muerto (ExternalLink en ContainerList.tsx).
 - **Resultado**: Dashboard más intuitivo, persistente y alineado con Industrial Resonance V2. Zero-warning build logrado.
+
+## Historial de Carol
+
+### 2026-06-07: Refactor Kubernetes UI Resonance
+- **Rama**: `🐜-Carol-refactor-kubernetes-ui-resonance`
+- **Estado**: En progreso 🏗️
+- **Cambios**:
+  - [x] Fase 0: Territory Block.

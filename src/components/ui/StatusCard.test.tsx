@@ -65,8 +65,8 @@ describe("StatusCard", () => {
         const onRetry = vi.fn();
         render(<StatusCard type="error" message="Error" onRetry={onRetry} />);
         const retryButton = screen.getByRole("button", { name: /reintentar/i });
-        expect(retryButton).toHaveClass("hover:bg-destructive/20");
-        expect(retryButton).toHaveClass("transition-colors");
+        expect(retryButton).toHaveClass("hover:bg-destructive/30");
+        expect(retryButton).toHaveClass("transition-all");
     });
 
     it("applies focus ring classes to buttons", () => {

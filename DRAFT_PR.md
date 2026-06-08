@@ -1,21 +1,24 @@
-# PR Draft: Refactor Health and Fetcher Resonance
+# PR Draft: Refactor Kubernetes UI Resonance
 
 ## Objective
-Evolve the Health Monitor and Fetcher dashboards to adhere to **Industrial Resonance V2** standards, reducing friction and maximizing user value through consistent UI patterns and improved state synchronization.
+Refine the Kubernetes dashboard to align with **Industrial Resonance V2** standards. This includes improving the hierarchy, typography, and state management (integrating 'Proyectos' view and persisting tabs via search params).
 
 ## Scope
-- **Health Monitor**:
-  - Migrate sorting state to search parameters for URL persistence.
-  - Replace select dropdown with `IndustrialTabs`.
-  - Standardize typography and status indicators.
-- **Fetcher**:
-  - Refine input styling.
-  - Standardize action buttons with semantic tokens and proper opacity.
+- **Route (Kubernetes)**:
+  - Implement search params for 'tab' (Favoritos/Proyectos).
+  - Integrate `IndustrialTabs` for high-density navigation.
+- **Deployment List**:
+  - Support Project-based grouping.
+  - Refine status badges with semantic tokens and 20% opacity.
+  - Standardize headers and technical metadata typography.
+- **Hygiene**:
+  - Ensure ARIA compliance.
+  - Standardize ActionButtons.
 
 ## Technical Details
-- Using TanStack Router for state synchronization.
-- Implementing `IndustrialTabs` for high-density navigation.
-- Adhering to `DESIGN.md` tokens.
+- TanStack Router for state synchronization.
+- Industrial Resonance V2 design tokens.
+- Playwright verification.
 
 ## Bitacora (CROMA.md)
 - [x] Phase 0: Territory Block.

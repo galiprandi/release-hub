@@ -46,6 +46,7 @@ interface PageLayoutProps {
       onSelectResult?: (item: unknown) => void;
     };
     searchComponent?: ReactNode;
+    extra?: ReactNode;
   };
   actions?: ReactNode[];
   refreshFn?: () => void;
@@ -170,6 +171,7 @@ export function PageLayout({
             </nav>
 
             <div className="flex items-center gap-3">
+              {header?.extra}
               {header?.searchComponent ? (
                 header.searchComponent
               ) : header?.search && (

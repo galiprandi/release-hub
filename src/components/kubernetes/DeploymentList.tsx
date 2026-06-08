@@ -378,28 +378,28 @@ function DeploymentsTable({
 		{
 			id: "namespace",
 			accessorKey: "namespace",
-			header: "Espacio de nombres",
-			cell: ({ row }) => row.original.namespace,
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Espacio de nombres</span>,
+			cell: ({ row }) => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{row.original.namespace}</span>,
 			filterFn: 'equalsString',
 		},
 		{
 			accessorKey: "status",
-			header: "Estado",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Estado</span>,
 			cell: ({ row }) => <StatusCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			accessorKey: "age",
-			header: "Antigüedad",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Antigüedad</span>,
 			cell: ({ row }) => <AgeCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			accessorKey: "images",
-			header: "Imágenes",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Imágenes</span>,
 			cell: ({ row }) => <ImagesCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			id: "portForward",
-			header: "Port Forward",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Port Forward</span>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<PortForwardCell
@@ -411,7 +411,7 @@ function DeploymentsTable({
 		{
 			id: "actions",
 			accessorKey: "actions",
-			header: "Acciones",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Acciones</span>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<ActionsCell
@@ -474,7 +474,7 @@ function AgeCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoad
 	if (isLoading) {
 		return <div className="h-4 bg-muted rounded w-10" />
 	}
-	return <span className="text-xs font-medium text-muted-foreground tracking-tight">{deployment.age}</span>
+	return <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{deployment.age}</span>
 }
 
 function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
@@ -493,7 +493,7 @@ function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isL
 	return (
 		<div className="flex flex-col gap-0.5">
 			{shortImages.map((img, i) => (
-				<span key={i} className="text-xs text-muted-foreground font-mono truncate max-w-[180px]" title={deployment.images[i]}>
+				<span key={i} className="text-[10px] font-mono text-muted-foreground/60 truncate max-w-[180px]" title={deployment.images[i]}>
 					{img}
 				</span>
 			))}

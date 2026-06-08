@@ -64,3 +64,9 @@
 - **Product Header**: Stats use semantic badges at 20% opacity. Product names use `tracking-tighter`.
 - **Double-line URLs**: Table displays domain (muted, `text-[10px]`) and path (foreground, `font-mono text-xs`).
 - **Revalidation**: `bg-primary animate-pulse` dot in header during background checks.
+
+### Kubernetes UI Resonance
+- **Collection Tabs**: Uses `IndustrialTabs` to switch between 'Favoritos' and 'Proyectos'. State is synced via `tab` search parameter.
+- **Table High-Density**: Headers use `bg-muted/40` and standard V2 typography (`text-[10px] font-bold uppercase tracking-wider`).
+- **Status Indicators**: Deployments use `rounded-md` badges with 20% opacity backgrounds and borders (e.g., `bg-success/20 border-success/20`).
+- **Metadata Styling**: Age and Images use `text-[10px]` with technical metadata formatting.

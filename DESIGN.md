@@ -56,6 +56,7 @@
 ## Layout V2
 - Sidebar fijo (50px). Sticky header with backdrop-blur.
 - Contenido `px-8`, `gap-6`.
+- **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente.
 
 ## Specific Module Standards
 

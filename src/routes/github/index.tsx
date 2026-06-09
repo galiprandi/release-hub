@@ -12,7 +12,7 @@ import { FreezeDialog } from "@/components/FreezeDialog";
 import { CommitsModal } from "@/components/CommitsModal";
 import { PageLayout } from "@/layouts/PageLayout";
 import { RepoSearch } from "@/components/RepoSearch";
-import { FilterBar } from "@/components/shared/FilterBar";
+import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
 import { Table } from "@/components/ui/Table";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -107,6 +107,16 @@ function Dashboard() {
 				title: "Repositorios",
 				searchComponent: <RepoSearch />
 			}}
+			actions={[
+				<ActionButton
+					key="manage-projects"
+					action={{ icon: Settings2, label: "Proyectos", color: "default" }}
+					onClick={handleManageProjects}
+					size="md"
+					className="bg-muted/20 hover:bg-muted/30"
+					showLabel
+				/>
+			]}
 			isLoading={isLoadingRepos}
 			footer={summaryData ? {
 				show: true,
@@ -116,21 +126,17 @@ function Dashboard() {
 		>
 			<div className="space-y-6">
 				{/* Tabs & Management */}
-				<FilterBar
-					filters={tabs}
-					activeFilter={activeTab}
-					onFilterChange={(value) => navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab: value }) })}
-					variant="tabs"
-					label="Colecciones:"
-					rightContent={
-						<ActionButton
-							action={{ icon: Settings2, label: "Gestionar Proyectos", color: "default" }}
-							onClick={handleManageProjects}
-							size="md"
-							className="bg-muted/20 hover:bg-muted/30"
+				<div className="flex items-center gap-4">
+					<div className="flex items-center gap-2">
+						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Colecciones:</span>
+						<IndustrialTabs
+							options={tabs.map(t => ({ id: t.value, label: t.label }))}
+							activeId={activeTab}
+							onChange={(value) => navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab: value }) })}
+							className="w-[450px]"
 						/>
-					}
-				/>
+					</div>
+				</div>
 
 				{/* Content */}
 				{isEmpty ? (
@@ -351,7 +357,7 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		{
 			id: "pending_filter",
 			accessorKey: "fullName",
-			header: "Pendientes",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Pendientes</span>,
 			enableHiding: true,
 			cell: () => null,
 			filterFn: (row, _columnId, filterValue) => {
@@ -361,22 +367,22 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		},
 		{
 			accessorKey: "tag",
-			header: "Producción",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Producción</span>,
 			cell: ({ row }) => <TagCell repo={row.original} />,
 		},
 		{
 			accessorKey: "commit",
-			header: "Staging",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Staging</span>,
 			cell: ({ row }) => <CommitCell repo={row.original} />,
 		},
 		{
 			id: "health",
-			header: "Salud",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Salud</span>,
 			cell: ({ row }) => <HealthCell repo={row.original} />,
 		},
 		{
 			id: "prs",
-			header: "PRs",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">PRs</span>,
 			cell: ({ row }) => {
 				const details = repoDetailsQueries.find(q => q.data?.fullName === row.original.fullName)?.data;
 				return <PRsCell repo={row.original} details={details} />;
@@ -384,7 +390,7 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		},
 		{
 			id: "actions_status",
-			header: "Workflows",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Workflows</span>,
 			cell: ({ row }) => {
 				const details = repoDetailsQueries.find(q => q.data?.fullName === row.original.fullName)?.data;
 				return <ActionsStatusCell repo={row.original} details={details} />;
@@ -392,18 +398,18 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		},
 		{
 			accessorKey: "updatedAt",
-			header: "Actividad",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Actividad</span>,
 			cell: ({ row }) => <DateCell repo={row.original} />,
 		},
 		{
 			accessorKey: "author",
-			header: "Autor",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Autor</span>,
 			cell: ({ row }) => <AuthorCell repo={row.original} />,
 		},
 		{
 			id: "operations",
 			accessorKey: "actions",
-			header: () => <div className="text-right">Operations</div>,
+			header: () => <div className="text-right text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Operations</div>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<OperationsCell
@@ -646,20 +652,20 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 					<Link
 						to="/health"
 						search={{ environment: unhealthyCount > 0 ? 'unhealthy' : undefined }}
-						className="flex items-center gap-1.5 hover:bg-muted/40 p-1 rounded-md transition-colors"
+						className="flex items-center gap-1.5 hover:bg-muted/40 p-1 rounded-md transition-colors group/health"
 					>
 						<div className="flex items-center -space-x-1">
 							{unhealthyCount > 0 && (
-								<div className="w-2.5 h-2.5 rounded-full bg-destructive/20 border border-destructive/20 shadow-sm" />
+								<div className="w-1.5 h-1.5 rounded-full bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.4)] border border-destructive/20" />
 							)}
 							{healthyCount > 0 && (
-								<div className="w-2.5 h-2.5 rounded-full bg-success/20 border border-success/20 shadow-sm" />
+								<div className="w-1.5 h-1.5 rounded-full bg-success shadow-[0_0_8px_rgba(34,197,94,0.4)] border border-success/20" />
 							)}
 							{pendingCount > 0 && (
-								<div className="w-2.5 h-2.5 rounded-full bg-muted/40 border border-border/40 shadow-sm" />
+								<div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 border border-border/40" />
 							)}
 						</div>
-						<span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
+						<span className="text-[10px] font-bold text-muted-foreground/60 group-hover/health:text-foreground uppercase tracking-wider transition-colors">
 							{endpoints.length} serv.
 						</span>
 					</Link>
@@ -670,10 +676,10 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 						sideOffset={5}
 					>
 						<div className="space-y-1">
-							<p className="font-bold border-b border-border/40 pb-1 mb-1">Estado de Salud</p>
-							{healthyCount > 0 && <p className="text-success flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-success" /> {healthyCount} OK</p>}
-							{unhealthyCount > 0 && <p className="text-destructive flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-destructive" /> {unhealthyCount} Error</p>}
-							{pendingCount > 0 && <p className="text-muted-foreground flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" /> {pendingCount} Pendiente</p>}
+							<p className="text-[10px] font-bold uppercase tracking-wider border-b border-border/40 pb-1 mb-1">Estado de Salud</p>
+							{healthyCount > 0 && <p className="text-success flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider"><span className="w-1.5 h-1.5 rounded-full bg-success" /> {healthyCount} OK</p>}
+							{unhealthyCount > 0 && <p className="text-destructive flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider"><span className="w-1.5 h-1.5 rounded-full bg-destructive" /> {unhealthyCount} Error</p>}
+							{pendingCount > 0 && <p className="text-muted-foreground flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider"><span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" /> {pendingCount} Pendiente</p>}
 						</div>
 					</Tooltip.Content>
 				</Tooltip.Portal>
@@ -726,7 +732,7 @@ function PRsCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
 						href={`https://github.com/${org}/${name}/pulls`}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="inline-flex items-center gap-1.5 px-2 py-1 bg-primary/20 text-primary border border-primary/20 rounded-lg hover:bg-primary/30 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						className="inline-flex items-center gap-1.5 px-2 py-1 bg-primary/20 text-primary border border-primary/20 rounded-md hover:bg-primary/30 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 						aria-label={`${prCount} pull requests abiertos`}
 					>
 						<GitPullRequest className="w-3 h-3" />
@@ -767,7 +773,7 @@ function ActionsStatusCell({ repo, details }: { repo: RepoInfo; details?: RepoDe
 						href={`https://github.com/${org}/${name}/actions`}
 						target="_blank"
 						rel="noopener noreferrer"
-						className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 border ${
+						className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 border ${
 							hasFailure
 								? "bg-destructive/20 text-destructive border-destructive/20 hover:bg-destructive/30"
 								: isRunning

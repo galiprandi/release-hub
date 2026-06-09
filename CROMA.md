@@ -2,6 +2,15 @@
 
 ## Historial de Misiones
 
+### 2026-06-07: Refactor GitHub Dashboard Resonance
+- **Rama**: `🐜-Uma-refactor-github-resonance`
+- **Estado**: En progreso 🏗️
+- **Cambios**:
+  - [x] Fase 0: Territory Block.
+  - [ ] Migración a IndustrialTabs (Navigation).
+  - [ ] Estandarización de ReposTable (Typography & Badges).
+  - [ ] Alineación de ActionButtons.
+
 ### 2026-06-07: Refactor Resonance V2 (Health & Fetcher)
 - **Rama**: `🐜-Uma-refactor-health-resonance`
 - **Estado**: Finalizado ✅

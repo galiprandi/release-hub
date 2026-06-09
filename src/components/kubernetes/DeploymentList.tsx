@@ -145,7 +145,7 @@ export const DeploymentList = ({
 							}
 							return null
 						})
-						.filter(Boolean) as DeploymentInfo[]
+						.filter(Boolean) as Array<DeploymentInfo & { context: string }>
 
 					return {
 						id: project.id,
@@ -389,7 +389,7 @@ function DeploymentsTable({
 	activeFilter,
 	onFilterChange,
 }: {
-	deployments: DeploymentInfo[]
+	deployments: Array<DeploymentInfo & { context: string }>
 	label: string
 	icon?: React.ReactNode
 	isLoading: boolean
@@ -418,7 +418,7 @@ function DeploymentsTable({
 		}))
 	}, [namespaces])
 
-	const columns: ColumnDef<DeploymentInfo & { context: string }>[] = useMemo(() => [
+	const columns: ColumnDef<DeploymentInfo & { context: string }, any>[] = useMemo(() => [
 		{
 			accessorKey: "name",
 			header: () => (
@@ -434,7 +434,7 @@ function DeploymentsTable({
 			accessorKey: "namespace",
 			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Namespace</span>,
 			cell: ({ row }) => <span className="text-xs font-mono text-muted-foreground">{row.original.namespace}</span>,
-			filterFn: 'equalsString',
+			filterFn: 'equalsString' as const,
 		},
 		{
 			accessorKey: "status",

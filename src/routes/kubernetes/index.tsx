@@ -34,14 +34,14 @@ function KubernetesPage() {
 	const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
 		navigate({
 			to: '.',
-			search: (prev) => ({ ...prev, namespace: filter?.value }),
+			search: (prev: Record<string, unknown>) => ({ ...prev, namespace: filter?.value }),
 		});
 	}, [navigate]);
 
 	const handleTabChange = useCallback((tab: 'favorites' | 'projects') => {
 		navigate({
 			to: '.',
-			search: (prev) => ({ ...prev, tab, namespace: undefined }),
+			search: (prev: Record<string, unknown>) => ({ ...prev, tab, namespace: undefined }),
 		});
 	}, [navigate]);
 

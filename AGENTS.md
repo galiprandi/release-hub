@@ -36,3 +36,4 @@
 - **Type Hygiene**: Prohibido `any`. Interfaces explícitas o `unknown` + validación.
 - **Mutaciones**: Optimistic update + revalidación selectiva. Nunca `window.location.reload()`.
 - **Resiliencia**: Si CLI falla (`kubectl`, `docker`), redirigir a `<module>/setup`.
+- **Hygiene**: Directorio de componentes debe ser siempre `components/`. Prohibido `componentes/`.

@@ -266,8 +266,13 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 				const data = JSON.parse(gqlRes.stdout).data.repository;
 				if (!data) throw new Error("Repository not found");
 
-				const rawCommits = data.defaultBranchRef?.target?.history?.nodes || [];
-				const commits: Commit[] = rawCommits.map((c: any) => {
+				const rawCommits = (data.defaultBranchRef?.target?.history?.nodes || []) as Array<{
+					oid: string;
+					message: string;
+					committedDate: string;
+					author: { name: string };
+				}>;
+				const commits: Commit[] = rawCommits.map((c) => {
 					const [subject, ...bodyParts] = c.message.split('\n');
 					return {
 						hash: c.oid,
@@ -413,6 +418,7 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 				/>
 			),
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		], [org, favorites, onToggleFavorite, reposWithPending]);
 
 	const navigate = useNavigate({ from: "/github/" });

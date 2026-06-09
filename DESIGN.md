@@ -7,6 +7,7 @@
 - **Standard Cells**: Health (semantic dots), PRs (primary badge), Workflows (status badge + pulse), Operations (high-density actions).
 - **Focus**: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1`.
 - **ARIA**: Explicit `aria-label` for icon buttons.
+- **Hygiene**: UI components must reside in `components/` directories.
 
 ## Component Patterns
 - **Table**: `bg-muted/40` headers, technical metadata, vertical dividers. Badges at `/20` opacity.

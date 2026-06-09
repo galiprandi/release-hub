@@ -1,24 +1,18 @@
-# PR Draft: Refactor Kubernetes UI Resonance
+# PR Draft: Hygiene & Technical Entropy Cleanup
 
 ## Objective
-Refine the Kubernetes dashboard to align with **Industrial Resonance V2** standards. This includes improving the hierarchy, typography, and state management (integrating 'Proyectos' view and persisting tabs via search params).
+Eradicate technical entropy, dead code, and non-standard directory naming to achieve AAA engineering standards and a zero-warning build.
 
 ## Scope
-- **Route (Kubernetes)**:
-  - Implement search params for 'tab' (Favoritos/Proyectos).
-  - Integrate `IndustrialTabs` for high-density navigation.
-- **Deployment List**:
-  - Support Project-based grouping.
-  - Refine status badges with semantic tokens and 20% opacity.
-  - Standardize headers and technical metadata typography.
-- **Hygiene**:
-  - Ensure ARIA compliance.
-  - Standardize ActionButtons.
+- **Directory Standardization**: Rename `src/docker/componentes` to `src/docker/components`.
+- **Dead Code Elimination**: Remove orphan hooks `useJqSetup.ts` and `useGitTagsSimple.ts`.
+- **Type Hygiene**: Replace `any` usages with strict interfaces or `unknown` where appropriate.
+- **Build Hygiene**: Resolve linter/build warnings to ensure a clean log.
 
 ## Technical Details
-- TanStack Router for state synchronization.
-- Industrial Resonance V2 design tokens.
-- Playwright verification.
+- Refactoring of directory structure and imports.
+- Explicit typing for API responses and event handlers.
+- Validation via `npm run test` and `npm run build`.
 
 ## Bitacora (CROMA.md)
 - [x] Phase 0: Territory Block.

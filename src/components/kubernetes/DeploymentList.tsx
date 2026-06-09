@@ -39,6 +39,10 @@ function saveDeploymentsToStorage(deployments: Record<string, DeploymentInfo>): 
 	}
 }
 
+interface DeploymentWithContext extends DeploymentInfo {
+	context: string
+}
+
 interface DeploymentListProps {
 	favorites?: string[]
 	projects?: Project[]
@@ -151,7 +155,7 @@ export const DeploymentList = ({
 						id: project.id,
 						label: project.name,
 						icon: <Folder className="w-4 h-4" />,
-						deployments
+					deployments: deployments as DeploymentWithContext[]
 					}
 				})
 		}
@@ -389,7 +393,7 @@ function DeploymentsTable({
 	activeFilter,
 	onFilterChange,
 }: {
-	deployments: DeploymentInfo[]
+	deployments: DeploymentWithContext[]
 	label: string
 	icon?: React.ReactNode
 	isLoading: boolean
@@ -418,7 +422,7 @@ function DeploymentsTable({
 		}))
 	}, [namespaces])
 
-	const columns: ColumnDef<DeploymentInfo & { context: string }>[] = useMemo(() => [
+	const columns: ColumnDef<DeploymentWithContext>[] = useMemo(() => [
 		{
 			accessorKey: "name",
 			header: () => (
@@ -495,7 +499,7 @@ function DeploymentsTable({
 	)
 }
 
-function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentInfo & { context: string }; isLoading: boolean }) {
+function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
 	if (isLoading) {
 		return (
 			<div className="flex items-center gap-2">
@@ -599,7 +603,7 @@ function ActionsCell({
 	)
 }
 
-function PortForwardCell({ deployment, context }: { deployment: DeploymentInfo & { context: string }; context: string }) {
+function PortForwardCell({ deployment, context }: { deployment: DeploymentInfo; context: string }) {
 	const { connect, disconnect, status, error, isActive, localPort } = usePortForward({
 		deployment: deployment.name,
 		namespace: deployment.namespace,

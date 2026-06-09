@@ -161,9 +161,9 @@ export function DeploymentSearch() {
             if (query.length >= 2) setIsOpen(true);
           }}
           onBlur={() => setIsEditable(false)}
-          placeholder={`Búsqueda de deployments... (Cmd+K)`}
+          placeholder={`Buscar despliegues... (Cmd+K)`}
           aria-label="Búsqueda de deployments"
-          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/40 rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
+          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/20 border border-border/10 rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all hover:bg-muted/30`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -216,24 +216,33 @@ export function DeploymentSearch() {
                     role="option"
                     aria-selected={isSelected}
                     id={`deployment-option-${index}`}
-                    className={`group p-3 border-b last:border-b-0 transition-colors ${
+                    className={`group p-3 border-b border-border/40 last:border-b-0 transition-colors ${
                       isSelected ? 'bg-muted' : 'hover:bg-muted/50'
                     }`}
                   >
                     <div className="flex items-start gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <Terminal className="w-4 h-4 text-primary" />
-                          <span className="font-medium text-sm truncate">
-                            {deployment.namespace}/{deployment.name}
+                          <Terminal className="w-3.5 h-3.5 text-primary/60" />
+                          <span className="font-bold tracking-tight text-sm truncate">
+                            {deployment.name}
                           </span>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {deployment.context}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Ready: {deployment.ready} • Up-to-date: {deployment.upToDate}
-                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{deployment.namespace}</span>
+                          <span className="w-1 h-1 rounded-full bg-border" />
+                          <span className="text-[10px] font-medium text-muted-foreground truncate">{deployment.context}</span>
+                        </div>
+                        <div className="flex items-center gap-3 mt-1.5">
+                          <div className="flex items-center gap-1.5">
+                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">Ready</span>
+                             <span className="text-[10px] font-mono font-medium">{deployment.ready}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">Up-to-date</span>
+                             <span className="text-[10px] font-mono font-medium">{deployment.upToDate}</span>
+                          </div>
+                        </div>
                       </div>
 
                       {/* Actions */}
@@ -257,19 +266,19 @@ export function DeploymentSearch() {
           )}
 
           {/* Footer hint */}
-          <div className="px-3 py-2 bg-muted/30 border-t text-[10px] text-muted-foreground flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">↑↓</kbd> Navegar
+          <div className="px-3 py-2 bg-muted/60 border-t border-border/60 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1.5">
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[9px]">↑↓</kbd> NAVEGAR
               </span>
-              <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">↵</kbd> Agregar
+              <span className="flex items-center gap-1.5">
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[9px]">↵</kbd> SELECCIONAR
               </span>
-              <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">Esc</kbd> Cerrar
+              <span className="flex items-center gap-1.5">
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[9px]">ESC</kbd> CERRAR
               </span>
             </div>
-            <span>{results.length} resultados</span>
+            <span className="opacity-60">{results.length} RESULTADOS</span>
           </div>
         </div>
       )}

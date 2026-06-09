@@ -41,20 +41,22 @@ export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps)
 	const Icon = style.icon;
 
 	return (
-		<div className={`bg-card border-2 ${style.borderClass} rounded-xl p-4 h-[82px] flex items-center justify-between`}>
-			<div className="flex items-center gap-2 text-sm overflow-hidden">
-				<Icon className={`w-4 h-4 shrink-0 ${style.iconClass} ${style.textClass}`} aria-hidden="true" />
-				<p className={`${style.textClass} font-medium truncate`}>{message}</p>
+		<div className={`bg-muted/10 border ${style.borderClass} rounded-xl p-4 h-[82px] flex items-center justify-between shadow-sm`}>
+			<div className="flex items-center gap-3 text-sm overflow-hidden">
+				<div className={`p-2 rounded-lg bg-background/50 border ${style.borderClass}`}>
+					<Icon className={`w-4 h-4 shrink-0 ${style.iconClass} ${style.textClass}`} aria-hidden="true" />
+				</div>
+				<p className={`${style.textClass} font-medium truncate tracking-tight`}>{message}</p>
 			</div>
 			<div className="flex items-center gap-2 shrink-0">
 				{onRetry && (
 					<button
 						type="button"
 						onClick={onRetry}
-						className={`text-xs px-2 py-1 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
-							type === 'error' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' :
-							type === 'warn' ? 'bg-warning/10 text-warning hover:bg-warning/20' :
-							'bg-muted text-muted-foreground hover:bg-accent'
+						className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 shadow-sm ${
+							type === 'error' ? 'bg-destructive/20 text-destructive hover:bg-destructive/30 border border-destructive/20' :
+							type === 'warn' ? 'bg-warning/20 text-warning hover:bg-warning/30 border border-warning/20' :
+							'bg-muted text-foreground hover:bg-accent border border-border/60'
 						}`}
 					>
 						Reintentar

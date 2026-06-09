@@ -3,6 +3,7 @@ import { Search, Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { DeploymentList } from "@/components/kubernetes/DeploymentList";
 import { DeploymentSearch } from "@/components/kubernetes/DeploymentSearch";
+import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
 import { applyCachePolicy } from "@/lib/queryKeys";
 import { PageLayout } from "@/layouts/PageLayout";
 import { useUserCollections } from "@/hooks/useUserCollections";
@@ -13,15 +14,17 @@ export const Route = createFileRoute("/kubernetes/")({
 	validateSearch: (search: Record<string, unknown>) => {
 		return {
 			namespace: typeof search.namespace === 'string' ? search.namespace : undefined,
+			tab: (search.tab === 'favorites' || search.tab === 'projects') ? search.tab : 'favorites',
 		};
 	},
 });
 
 function KubernetesPage() {
-	const { deploymentFavorites = [] } = useUserCollections();
+	const { deploymentFavorites = [], projects = [] } = useUserCollections();
 	const safeDeploymentFavorites = deploymentFavorites || [];
 	const navigate = useNavigate({ from: '/kubernetes' });
 	const search = useSearch({ from: '/kubernetes' });
+	const activeTab = search.tab as 'favorites' | 'projects';
 
 	// Derive active filter from query params - memoized to prevent re-renders
 	const activeFilter = useMemo(() => {
@@ -31,7 +34,14 @@ function KubernetesPage() {
 	const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
 		navigate({
 			to: '.',
-			search: filter ? { namespace: filter.value } : {},
+			search: (prev) => ({ ...prev, namespace: filter?.value }),
+		});
+	}, [navigate]);
+
+	const handleTabChange = useCallback((tab: 'favorites' | 'projects') => {
+		navigate({
+			to: '.',
+			search: (prev) => ({ ...prev, tab, namespace: undefined }),
 		});
 	}, [navigate]);
 
@@ -44,18 +54,35 @@ function KubernetesPage() {
 		...applyCachePolicy("kubectl"),
 	});
 
+	const hasContent = activeTab === 'favorites' ? safeDeploymentFavorites.length > 0 : projects.some(p => p.deployments.length > 0);
+
 	return (
 		<PageLayout
 			header={{
 				title: "Kubernetes",
-				searchComponent: isInstalled ? <DeploymentSearch /> : undefined
+				searchComponent: isInstalled ? (
+					<div className="flex items-center gap-4">
+						<IndustrialTabs
+							options={[
+								{ id: 'favorites', label: 'Favoritos' },
+								{ id: 'projects', label: 'Proyectos' },
+							]}
+							activeId={activeTab}
+							onChange={handleTabChange}
+							className="w-48"
+						/>
+						<DeploymentSearch />
+					</div>
+				) : undefined
 			}}
-			isLoading={isCheckingInstall && safeDeploymentFavorites.length === 0}
-			showEmptyState={safeDeploymentFavorites.length === 0}
+			isLoading={isCheckingInstall && !hasContent}
+			showEmptyState={!hasContent}
 			emptyState={{
 				icon: <Star className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />,
-				label: "Sin favoritos",
-				caption: "Agrega deployments a tus favoritos para verlos aquí y monitorear sus logs.",
+				label: activeTab === 'favorites' ? "Sin favoritos" : "Sin despliegues en proyectos",
+				caption: activeTab === 'favorites'
+					? "Agrega deployments a tus favoritos para verlos aquí y monitorear sus logs."
+					: "Organiza tus despliegues en proyectos para una mejor gestión.",
 				action: (
 					<button
 						type="button"
@@ -75,6 +102,8 @@ function KubernetesPage() {
 		>
 			<DeploymentList
 				favorites={safeDeploymentFavorites}
+				projects={projects}
+				activeTab={activeTab}
 				activeFilter={activeFilter}
 				onFilterChange={handleFilterChange}
 				isKubectlInstalled={isInstalled}

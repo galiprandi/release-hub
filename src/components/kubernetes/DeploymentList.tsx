@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery } from "@tanstack/react-query"
-import { Boxes, Terminal as TerminalIcon, Folder } from "lucide-react"
+import { Boxes, Terminal as TerminalIcon, Folder, Layout } from "lucide-react"
 import type { DeploymentInfo } from "@/api/kubectl"
 import { LogsViewer } from "@/components/shared/LogsViewer"
 import { Terminal } from "@/components/shared/Terminal"
@@ -326,29 +326,37 @@ export const DeploymentList = ({
 						open={true}
 						onOpenChange={(open) => !open && setIsTerminalModalOpen(false)}
 						title={
-							<div className="flex items-center gap-2">
-								<TerminalIcon className="w-4 h-4 text-primary" />
-								<span>Terminal: {selectedDeployment.name}</span>
+							<div className="flex items-center gap-3">
+								<div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+									<TerminalIcon className="w-4 h-4 text-primary" />
+								</div>
+								<div className="flex flex-col">
+									<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 leading-none mb-1">Terminal</span>
+									<span className="text-sm font-bold tracking-tight leading-none">{selectedDeployment.name}</span>
+								</div>
 							</div>
 						}
 						headerExtra={
 							deploymentPods && deploymentPods.length > 0 && (
-								<select
-									value={activePodName || ''}
-									onChange={(e) => setSelectedPodName(e.target.value || null)}
-									className="text-xs bg-muted border rounded px-2 py-1 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-									aria-label="Seleccionar pod"
-								>
-									{deploymentPods.map((pod) => (
-										<option key={pod.name} value={pod.name}>
-											{pod.name} ({pod.status})
-										</option>
-									))}
-								</select>
+								<div className="flex items-center gap-2 bg-muted/40 p-1 rounded-lg border border-border/60">
+									<Layout className="w-3.5 h-3.5 ml-1 text-muted-foreground/60" />
+									<select
+										value={activePodName || ''}
+										onChange={(e) => setSelectedPodName(e.target.value || null)}
+										className="text-[10px] font-bold uppercase tracking-wider bg-transparent border-none focus-visible:ring-0 focus-visible:outline-none cursor-pointer pr-8"
+										aria-label="Seleccionar pod"
+									>
+										{deploymentPods.map((pod) => (
+											<option key={pod.name} value={pod.name} className="bg-popover text-popover-foreground">
+												{pod.name.split('-').slice(-1)[0]} ({pod.status})
+											</option>
+										))}
+									</select>
+								</div>
 							)
 						}
 						maxWidth="max-w-6xl"
-						className="w-[90vw] h-[80vh] !p-0"
+						className="w-[90vw] h-[80vh] !p-0 overflow-hidden"
 					>
 						<div className="flex-1 min-h-0 bg-black rounded-b-lg overflow-hidden">
 							<Terminal
@@ -418,7 +426,7 @@ function DeploymentsTable({
 		}))
 	}, [namespaces])
 
-	const columns: ColumnDef<DeploymentInfo & { context: string }>[] = useMemo(() => [
+	const columns: ColumnDef<DeploymentInfo>[] = useMemo(() => [
 		{
 			accessorKey: "name",
 			header: () => (
@@ -427,13 +435,13 @@ function DeploymentsTable({
 					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{label}</span>
 				</div>
 			),
-			cell: ({ row }) => <DeploymentNameCell deployment={row.original} isLoading={isLoading} />,
+			cell: ({ row }) => <DeploymentNameCell deployment={row.original as DeploymentInfo & { context: string }} isLoading={isLoading} />,
 		},
 		{
 			id: "namespace",
 			accessorKey: "namespace",
 			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Namespace</span>,
-			cell: ({ row }) => <span className="text-xs font-mono text-muted-foreground">{row.original.namespace}</span>,
+			cell: ({ row }) => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{row.original.namespace}</span>,
 			filterFn: 'equalsString',
 		},
 		{
@@ -457,8 +465,8 @@ function DeploymentsTable({
 			enableSorting: false,
 			cell: ({ row }) => (
 				<PortForwardCell
-					deployment={row.original}
-					context={row.original.context}
+					deployment={row.original as DeploymentInfo & { context: string }}
+					context={(row.original as DeploymentInfo & { context: string }).context}
 				/>
 			),
 		},
@@ -470,7 +478,7 @@ function DeploymentsTable({
 			cell: ({ row }) => (
 				<ActionsCell
 					deployment={row.original}
-					context={row.original.context}
+					context={(row.original as DeploymentInfo & { context: string }).context}
 					onViewLogs={onViewLogs}
 					onOpenTerminal={onOpenTerminal}
 					onRemoveFavorite={onRemoveFavorite}
@@ -522,7 +530,7 @@ function StatusCell({ deployment, isLoading }: { deployment: DeploymentInfo; isL
 	const variant = variants[deployment.status] || variants.unknown
 
 	return (
-		<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-wider uppercase ${variant.className}`}>
+		<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-widest uppercase ${variant.className}`}>
 			{variant.label}
 		</span>
 	)
@@ -530,9 +538,9 @@ function StatusCell({ deployment, isLoading }: { deployment: DeploymentInfo; isL
 
 function AgeCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
 	if (isLoading) {
-		return <div className="h-4 bg-muted rounded w-10" />
+		return <div className="h-4 bg-muted rounded w-10 animate-pulse" />
 	}
-	return <span className="text-xs font-medium text-muted-foreground tracking-tight">{deployment.age}</span>
+	return <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{deployment.age}</span>
 }
 
 function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
@@ -545,13 +553,13 @@ function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isL
 	}, [deployment.images])
 
 	if (isLoading) {
-		return <div className="h-4 bg-muted rounded w-24" />
+		return <div className="h-4 bg-muted rounded w-24 animate-pulse" />
 	}
 
 	return (
-		<div className="flex flex-col gap-0.5">
+		<div className="flex flex-col gap-1">
 			{shortImages.map((img, i) => (
-				<span key={i} className="text-xs text-muted-foreground font-mono truncate max-w-[180px]" title={deployment.images[i]}>
+				<span key={i} className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60 truncate max-w-[180px] bg-muted/20 px-1.5 py-0.5 rounded border border-border/10" title={deployment.images[i]}>
 					{img}
 				</span>
 			))}

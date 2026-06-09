@@ -38,23 +38,26 @@ export function DeploymentProjectSelectionDialog({
 								<button
 									key={project.id}
 									onClick={() => toggleDeploymentInProject(project.id, deploymentId)}
-									className={`flex items-center justify-between p-3 rounded-xl border transition-all text-left group ${
+									className={`flex items-center justify-between p-4 rounded-xl border transition-all text-left group relative overflow-hidden ${
 										isInProject
 											? "bg-primary/5 border-primary/30 ring-1 ring-primary/20"
 											: "bg-muted/10 border-border/40 hover:bg-muted/20"
 									}`}
 								>
-									<div className="flex-1 min-w-0">
-										<h4 className="text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+									<div className="flex-1 min-w-0 relative z-10">
+										<h4 className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
 											{project.name}
 											{isInProject && <Check className="w-3 h-3 text-primary" />}
 										</h4>
 										{project.description && (
-											<p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">
+											<p className="text-[10px] text-muted-foreground/60 mt-1 line-clamp-1 italic">
 												{project.description}
 											</p>
 										)}
 									</div>
+									{isInProject && (
+										<div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8 blur-2xl" />
+									)}
 								</button>
 							);
 						})

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { Search, Star } from "lucide-react";
+import { Search, Boxes } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { DeploymentList } from "@/components/kubernetes/DeploymentList";
 import { DeploymentSearch } from "@/components/kubernetes/DeploymentSearch";
@@ -34,14 +34,14 @@ function KubernetesPage() {
 	const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
 		navigate({
 			to: '.',
-			search: (prev) => ({ ...prev, namespace: filter?.value }),
+			search: (prev: Record<string, unknown>) => ({ ...prev, namespace: filter?.value }),
 		});
 	}, [navigate]);
 
 	const handleTabChange = useCallback((tab: 'favorites' | 'projects') => {
 		navigate({
 			to: '.',
-			search: (prev) => ({ ...prev, tab, namespace: undefined }),
+			search: (prev: Record<string, unknown>) => ({ ...prev, tab, namespace: undefined }),
 		});
 	}, [navigate]);
 
@@ -78,21 +78,22 @@ function KubernetesPage() {
 			isLoading={isCheckingInstall && !hasContent}
 			showEmptyState={!hasContent}
 			emptyState={{
-				icon: <Star className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />,
+				icon: <Boxes className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />,
 				label: activeTab === 'favorites' ? "Sin favoritos" : "Sin despliegues en proyectos",
 				caption: activeTab === 'favorites'
 					? "Agrega deployments a tus favoritos para verlos aquí y monitorear sus logs."
-					: "Organiza tus despliegues en proyectos para una mejor gestión.",
+					: "Organiza tus despliegues en proyectos para una mejor gestión centralizada.",
 				action: (
 					<button
 						type="button"
 						onClick={() => {
-							const input = document.querySelector('input[placeholder*="Búsqueda de deployments"]') as HTMLInputElement;
+							const input = document.querySelector('input[name="search-deployments"]') as HTMLInputElement;
 							if (input) {
 								input.focus();
+								input.click(); // Trigger editable state for DeploymentSearch
 							}
 						}}
-						className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-bold uppercase tracking-wider shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 					>
 						<Search className="w-4 h-4" />
 						Buscar Deployments

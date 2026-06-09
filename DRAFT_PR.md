@@ -5,15 +5,18 @@ Refine the Kubernetes dashboard to align with **Industrial Resonance V2** standa
 
 ## Scope
 - **Route (Kubernetes)**:
-  - Implement search params for 'tab' (Favoritos/Proyectos).
-  - Integrate `IndustrialTabs` for high-density navigation.
+  - [x] Refine header layout and `IndustrialTabs` integration.
+  - [x] Elevate Empty State with Resonance V2 standards.
 - **Deployment List**:
-  - Support Project-based grouping.
-  - Refine status badges with semantic tokens and 20% opacity.
-  - Standardize headers and technical metadata typography.
+  - [x] Refine status badges with semantic tokens and 20% opacity.
+  - [x] Standardize headers and technical metadata typography.
+  - [x] Refactor Terminal modal header for high-density consistency.
+- **Components**:
+  - [x] Polish `DeploymentSearch` results and footer.
+  - [x] Refine `DeploymentProjectSelectionDialog` cards.
 - **Hygiene**:
-  - Ensure ARIA compliance.
-  - Standardize ActionButtons.
+  - [x] Ensure ARIA compliance.
+  - [x] Zero-warning build log.
 
 ## Technical Details
 - TanStack Router for state synchronization.
@@ -22,3 +25,7 @@ Refine the Kubernetes dashboard to align with **Industrial Resonance V2** standa
 
 ## Bitacora (CROMA.md)
 - [x] Phase 0: Territory Block.
+- [x] Phase 1: Route & Empty State refinement.
+- [x] Phase 2: DeploymentList high-density polish.
+- [x] Phase 3: Search & Dialogs refinement.
+- [x] Phase 4: Verification & Documentation.

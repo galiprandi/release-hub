@@ -230,17 +230,17 @@ export function DeploymentSearch() {
                         </div>
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{deployment.namespace}</span>
-                          <span className="w-1 h-1 rounded-full bg-border" />
-                          <span className="text-[10px] font-medium text-muted-foreground truncate">{deployment.context}</span>
+                          <div className="w-px h-3 bg-border/40 mx-0.5" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 truncate">{deployment.context}</span>
                         </div>
-                        <div className="flex items-center gap-3 mt-1.5">
+                        <div className="flex items-center gap-4 mt-2">
                           <div className="flex items-center gap-1.5">
-                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">Ready</span>
-                             <span className="text-[10px] font-mono font-medium">{deployment.ready}</span>
+                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/30">Ready</span>
+                             <span className="text-[10px] font-bold tracking-tight">{deployment.ready}</span>
                           </div>
                           <div className="flex items-center gap-1.5">
-                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">Up-to-date</span>
-                             <span className="text-[10px] font-mono font-medium">{deployment.upToDate}</span>
+                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/30">Sync</span>
+                             <span className="text-[10px] font-bold tracking-tight">{deployment.upToDate}</span>
                           </div>
                         </div>
                       </div>
@@ -266,7 +266,7 @@ export function DeploymentSearch() {
           )}
 
           {/* Footer hint */}
-          <div className="px-3 py-2 bg-muted/60 border-t border-border/60 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80 flex items-center justify-between">
+          <div className="px-3 py-2 bg-muted/60 border-t border-border/60 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1.5">
                 <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[9px]">↑↓</kbd> NAVEGAR
@@ -278,7 +278,7 @@ export function DeploymentSearch() {
                 <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[9px]">ESC</kbd> CERRAR
               </span>
             </div>
-            <span className="opacity-60">{results.length} RESULTADOS</span>
+            <span className="opacity-60 tabular-nums font-mono">{results.length} RESULTADOS</span>
           </div>
         </div>
       )}

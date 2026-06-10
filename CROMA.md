@@ -14,6 +14,11 @@
   - [x] Eliminación de código muerto (ExternalLink en ContainerList.tsx).
 - **Resultado**: Dashboard más intuitivo, persistente y alineado con Industrial Resonance V2. Zero-warning build logrado.
 
+### 2026-06-08: Security Hardening & Type Hygiene
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-hardening-and-type-hygiene`
+- **Estado**: En progreso (Draft)
+- **Objetivo**: Blindar el middleware contra SSRF avanzado y RCE mediante allow-lists, y erradicar la entropía de tipos en modales críticos.
 ## Historial de Carol
 
 ### 2026-06-07: Refactor Kubernetes UI Resonance

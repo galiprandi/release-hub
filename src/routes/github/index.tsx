@@ -285,7 +285,13 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 					};
 				});
 
-				const rawTag = data.refs.nodes[0];
+				const rawTag = data.refs.nodes[0] as {
+					name: string;
+					target: {
+						oid: string;
+						target?: { oid: string };
+					};
+				} | undefined;
 				const latestTag: Tag | null = rawTag ? {
 					name: rawTag.name,
 					commit: rawTag.target.target?.oid || rawTag.target.oid

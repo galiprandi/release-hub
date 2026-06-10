@@ -58,6 +58,23 @@ const VALIDATION = {
 
 const activePortForwards = new Map<string, ReturnType<typeof spawn>>();
 
+const SAFE_COMMANDS = [
+	"gh",
+	"kubectl",
+	"docker",
+	"curl",
+	"lsof",
+	"node",
+	"ls",
+	"echo",
+	"jq",
+	"helm",
+	"powershell.exe",
+	"zsh",
+	"bash",
+	"sh"
+];
+
 /**
  * Handler for /local/exec endpoint - works in both dev and preview
  *
@@ -115,6 +132,13 @@ const execHandler: Connect.NextHandleFunction = async (req, res) => {
 		return;
 	}
 
+	const command = args[0];
+	if (!SAFE_COMMANDS.includes(command)) {
+		res.statusCode = 403;
+		res.end(JSON.stringify({ error: `Command "${command}" is not in the allow-list`, success: false }));
+		return;
+	}
+
 	// NOTE: Do NOT add a shell-metacharacter regex here.
 	// With spawn(shell: false) these chars are harmless literal text.
 	// A previous regex /[;&|><]/ broke all gh api --jq commands.
@@ -168,14 +192,30 @@ const healthProxyHandler: Connect.NextHandleFunction = async (req, res) => {
 	}
 
 	const isInternal = (hostname: string) => {
-		const lower = hostname.toLowerCase();
-		if (lower === 'localhost' || lower === '127.0.0.1' || lower === '::1' || lower === '0.0.0.0') return true;
+		const lower = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+		// Loopback and local
+		if (
+			lower === 'localhost' ||
+			lower === '127.0.0.1' ||
+			lower === '::1' ||
+			lower === '0.0.0.0' ||
+			lower === '::' ||
+			lower === '0:0:0:0:0:0:0:1' ||
+			lower === '0:0:0:0:0:0:0:0' ||
+			lower === '::ffff:127.0.0.1'
+		) return true;
+
 		if (lower.endsWith('.local') || lower.endsWith('.internal')) return true;
 
 		// Metadata / Cloud internal endpoints
-		if (lower === '169.254.169.254' || lower === 'metadata.google.internal' || lower === 'instance-data') return true;
+		if (
+			lower === '169.254.169.254' ||
+			lower === 'metadata.google.internal' ||
+			lower === 'instance-data' ||
+			lower === 'fd00::' // IPv6 Local Unicast
+		) return true;
 
-		// RFC 1918 Private Address Space
+		// RFC 1918 Private Address Space (IPv4)
 		const parts = hostname.split('.').map(Number);
 		if (parts.length === 4 && !parts.some(isNaN)) {
 			if (parts[0] === 10) return true;

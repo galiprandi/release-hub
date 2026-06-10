@@ -6,7 +6,10 @@ export const useAIPrompt = vi.fn(() => ({
   prompt: vi.fn(),
   reset: vi.fn(),
   error: null,
-  progress: null
+  progress: null,
+  append: vi.fn(),
+  contextUsage: 0,
+  contextWindow: 0
 }));
 
 export const useAISummarize = vi.fn(() => ({

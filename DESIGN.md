@@ -11,7 +11,6 @@
 
 ## Component Patterns
 - **Table**: `bg-muted/40` headers, technical metadata, vertical dividers. Badges at `/20` opacity.
-- **FilterBar (tabs)**: `bg-muted` container, `bg-background` active item, `p-1`.
 - **StatusCard**: Loading/error/offline states.
 - **ActionButton**: Iconographic with tooltip.
 - **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering.

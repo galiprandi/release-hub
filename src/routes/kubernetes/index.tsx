@@ -9,6 +9,11 @@ import { PageLayout } from "@/layouts/PageLayout";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useMemo, useCallback } from "react";
 
+interface KubernetesSearch {
+	namespace?: string;
+	tab: 'favorites' | 'projects';
+}
+
 export const Route = createFileRoute("/kubernetes/")({
 	component: KubernetesPage,
 	validateSearch: (search: Record<string, unknown>) => {
@@ -34,14 +39,14 @@ function KubernetesPage() {
 	const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
 		navigate({
 			to: '.',
-			search: (prev) => ({ ...prev, namespace: filter?.value }),
+			search: (prev: KubernetesSearch) => ({ ...prev, namespace: filter?.value }),
 		});
 	}, [navigate]);
 
 	const handleTabChange = useCallback((tab: 'favorites' | 'projects') => {
 		navigate({
 			to: '.',
-			search: (prev) => ({ ...prev, tab, namespace: undefined }),
+			search: (prev: KubernetesSearch) => ({ ...prev, tab, namespace: undefined }),
 		});
 	}, [navigate]);
 

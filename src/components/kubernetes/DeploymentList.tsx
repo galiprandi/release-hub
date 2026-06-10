@@ -17,6 +17,8 @@ import { usePortForward } from "@/hooks/usePortForward"
 import { usePortFree } from "@/hooks/usePortFree"
 import { DEFAULT_START_PORT } from "@/config/portForward"
 
+type DeploymentWithContext = DeploymentInfo & { context: string }
+
 const STORAGE_KEY = "kubernetes-deployments-metadata"
 
 function loadDeploymentsFromStorage(): Record<string, DeploymentInfo> {
@@ -130,7 +132,7 @@ export const DeploymentList = ({
 				id: context,
 				label: context,
 				icon: <Boxes className="w-4 h-4" />,
-				deployments: deployments.map(d => ({ ...d, context }))
+				deployments: deployments.map(d => ({ ...d, context })) as DeploymentWithContext[]
 			}))
 		} else {
 			return projects
@@ -145,7 +147,7 @@ export const DeploymentList = ({
 							}
 							return null
 						})
-						.filter(Boolean) as DeploymentInfo[]
+						.filter(Boolean) as DeploymentWithContext[]
 
 					return {
 						id: project.id,
@@ -286,7 +288,7 @@ export const DeploymentList = ({
 								onViewLogs={handleViewLogs}
 								onOpenTerminal={handleOpenTerminal}
 								onRemoveFavorite={(deployment) => {
-									const context = (deployment as DeploymentInfo & { context: string }).context
+									const context = deployment.context
 									if (!context) return
 									const deploymentId = `${context}/${deployment.namespace}/${deployment.name}`
 									toggleDeploymentFavorite(deploymentId)
@@ -389,20 +391,20 @@ function DeploymentsTable({
 	activeFilter,
 	onFilterChange,
 }: {
-	deployments: DeploymentInfo[]
+	deployments: DeploymentWithContext[]
 	label: string
 	icon?: React.ReactNode
 	isLoading: boolean
 	onViewLogs: (deployment: DeploymentInfo, context: string) => void
 	onOpenTerminal: (deployment: DeploymentInfo, context: string) => void
-	onRemoveFavorite: (deployment: DeploymentInfo) => void
+	onRemoveFavorite: (deployment: DeploymentWithContext) => void
 	onManageProjects: (deployment: DeploymentInfo, context: string) => void
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
 	const sortedDeployments = useMemo(() => {
 		return [...deployments].sort((a, b) => a.name.localeCompare(b.name))
-	}, [deployments])
+	}, [deployments]) as DeploymentWithContext[]
 
 	// Get unique namespaces for filters
 	const namespaces = useMemo(() => {
@@ -418,7 +420,7 @@ function DeploymentsTable({
 		}))
 	}, [namespaces])
 
-	const columns: ColumnDef<DeploymentInfo & { context: string }>[] = useMemo(() => [
+	const columns: ColumnDef<DeploymentWithContext, unknown>[] = useMemo(() => [
 		{
 			accessorKey: "name",
 			header: () => (
@@ -495,7 +497,7 @@ function DeploymentsTable({
 	)
 }
 
-function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentInfo & { context: string }; isLoading: boolean }) {
+function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentWithContext; isLoading: boolean }) {
 	if (isLoading) {
 		return (
 			<div className="flex items-center gap-2">
@@ -567,11 +569,11 @@ function ActionsCell({
 	onRemoveFavorite,
 	onManageProjects,
 }: {
-	deployment: DeploymentInfo
+	deployment: DeploymentWithContext
 	context: string
 	onViewLogs: (deployment: DeploymentInfo, context: string) => void
 	onOpenTerminal: (deployment: DeploymentInfo, context: string) => void
-	onRemoveFavorite: (deployment: DeploymentInfo) => void
+	onRemoveFavorite: (deployment: DeploymentWithContext) => void
 	onManageProjects: (deployment: DeploymentInfo, context: string) => void
 }) {
 	return (
@@ -599,7 +601,7 @@ function ActionsCell({
 	)
 }
 
-function PortForwardCell({ deployment, context }: { deployment: DeploymentInfo & { context: string }; context: string }) {
+function PortForwardCell({ deployment, context }: { deployment: DeploymentWithContext; context: string }) {
 	const { connect, disconnect, status, error, isActive, localPort } = usePortForward({
 		deployment: deployment.name,
 		namespace: deployment.namespace,

@@ -1,21 +1,24 @@
-# PR Draft: Security Hardening and Type Hygiene 🐜
+# PR Draft: Technical Hygiene & Type Standardization 🐜
 
 ## Scope
-This PR aims to enhance the security posture of ReleaseHub and improve code quality through strict typing.
+This PR focuses on eliminating technical entropy and standardizing the codebase according to Industrial Resonance V2.
 
-### Security Hardening
-- **Command Allow-listing**: Implementing a `SAFE_COMMANDS` allow-list in `vite.config.ts` for the `/local/exec` endpoint to prevent execution of unauthorized binaries.
-- **SSRF Protection Enhancement**: Strengthening `healthProxyHandler` in `vite.config.ts` to block advanced SSRF vectors including IPv6 and IPv4-mapped IPv6 loopback/metadata addresses.
-- **Test Coverage**: Expanding `src/api/security.test.ts` to validate these new protections.
+### 1. Build Restoration (Type Hardening)
+- Fixing broken build due to outdated `useAIPrompt` hook signature in mocks and tests.
+- Synchronizing `@galiprandi/react-tools` mocks with the actual library interfaces.
 
-### Type Hygiene
-- **Eliminating `any`**: Replacing unsafe `any` type casts in critical components like `QueryModal.tsx` and `AIChatModal.tsx` with proper literal types or interfaces.
-- **Adapter Tests**: Improving type safety in `src/pipeline-core/adapters/pulsarAdapter.test.ts`.
+### 2. Dead Code Elimination
+- Migrating `FilterBar` usages to `IndustrialTabs` in the GitHub dashboard.
+- Removing `src/components/shared/FilterBar.tsx` as it is now an orphaned component.
 
-## Impact
-- Reduced attack surface for RCE and SSRF.
-- Improved system resilience and maintainability through better type safety.
-- Compliance with AAA standard hygiene and Industrial Resonance V2.
+### 3. AAA Standard Compliance
+- Ensuring a zero-warning build log.
+- Hardening types in critical AI components.
+
+## Verification
+- `npm run build` validation.
+- Vitest unit tests for AI components.
+- Playwright E2E verification for the GitHub dashboard.
 
 ---
-*Status: Work in Progress*
+*Status: In Progress (Phase 1)*

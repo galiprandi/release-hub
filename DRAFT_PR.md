@@ -1,24 +1,17 @@
-# PR Draft: Refactor Kubernetes UI Resonance
+# PR Draft: Refactor Hygiene and Entropy Cleanup
 
-## Objective
-Refine the Kubernetes dashboard to align with **Industrial Resonance V2** standards. This includes improving the hierarchy, typography, and state management (integrating 'Proyectos' view and persisting tabs via search params).
+## Objetivo
+Auditoría y limpieza quirúrgica del repositorio para eliminar entropía técnica, corregir errores de build y asegurar el cumplimiento de los estándares AAA de la organización.
 
-## Scope
-- **Route (Kubernetes)**:
-  - Implement search params for 'tab' (Favoritos/Proyectos).
-  - Integrate `IndustrialTabs` for high-density navigation.
-- **Deployment List**:
-  - Support Project-based grouping.
-  - Refine status badges with semantic tokens and 20% opacity.
-  - Standardize headers and technical metadata typography.
-- **Hygiene**:
-  - Ensure ARIA compliance.
-  - Standardize ActionButtons.
+## Cambios Propuestos
+- [x] **Relocalización de Componentes**: Mover `ContainerList.tsx` de `componentes` a `components` para seguir la convención.
+- [x] **Eliminación de Código Muerto**: Borrar `useJqSetup.ts` y `useGitTagsSimple.ts`.
+- [ ] **Build Hygiene**: Corrección de advertencias en `src/routes/health/index.tsx`.
+- [ ] **Linter & Type Hardening**: Resolver problemas de `any` y dependencias de hooks en `src/routes/github/index.tsx`.
+- [ ] **Verificación**: Asegurar un build de cero advertencias y validar UI con Playwright.
 
-## Technical Details
-- TanStack Router for state synchronization.
-- Industrial Resonance V2 design tokens.
-- Playwright verification.
-
-## Bitacora (CROMA.md)
-- [x] Phase 0: Territory Block.
+## Verificación
+- [ ] `npm run build` sin advertencias.
+- [ ] `npm run lint` exitoso.
+- [ ] Tests unitarios pasando.
+- [ ] Screenshots de Docker y Health Dashboards.

@@ -125,22 +125,22 @@ function CommitsTable({
 	const columns: ColumnDef<GitCommit>[] = [
 		{
 			accessorKey: "hash",
-			header: "Hash",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Hash</span>,
 			cell: ({ row }) => <CommitLink hash={row.original.hash} org={org} repo={repo} showStatus={showStatus} />,
 		},
 		{
 			accessorKey: "date",
-			header: "Fecha",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Fecha</span>,
 			cell: ({ row }) => <DisplayInfo value={row.original.date} type="dates" className="font-mono text-[13px]" />,
 		},
 		{
 			accessorKey: "author",
-			header: "Autor",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Autor</span>,
 			cell: ({ row }) => <DisplayInfo value={row.original.author} type="author" maxChar={30} className="font-medium" />,
 		},
 		{
 			accessorKey: "message",
-			header: "Mensaje",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Mensaje</span>,
 			cell: ({ row }) => (
 				<span className="text-muted-foreground">
 					<DisplayInfo value={row.original.message} type="message" maxChar={60} hideIcon />
@@ -166,17 +166,17 @@ function TagsTable({
 	const columns: ColumnDef<GitTag>[] = [
 		{
 			accessorKey: "name",
-			header: "Tag",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Tag</span>,
 			cell: ({ row }) => <TagLink tagName={row.original.name} org={org} repo={repo} showStatus={showStatus} />,
 		},
 		{
 			accessorKey: "date",
-			header: "Fecha",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Fecha</span>,
 			cell: ({ row }) => <DisplayInfo value={row.original.date} type="dates" className="font-mono text-[13px]" />,
 		},
 		{
 			accessorKey: "author",
-			header: "Autor",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Autor</span>,
 			cell: ({ row }) => <DisplayInfo value={row.original.author.name} type="author" maxChar={50} className="font-medium" />,
 		},
 	]

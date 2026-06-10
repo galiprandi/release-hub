@@ -1,21 +1,20 @@
-# PR Draft: Security Hardening and Type Hygiene 🐜
+# PR Draft: UI/UX Industrial Resonance V2 Refinement 🐜
 
 ## Scope
-This PR aims to enhance the security posture of ReleaseHub and improve code quality through strict typing.
+This PR focuses on refining and elevating the UI/UX across multiple modules to achieve full consistency with the **Industrial Resonance V2** standard.
 
-### Security Hardening
-- **Command Allow-listing**: Implementing a `SAFE_COMMANDS` allow-list in `vite.config.ts` for the `/local/exec` endpoint to prevent execution of unauthorized binaries.
-- **SSRF Protection Enhancement**: Strengthening `healthProxyHandler` in `vite.config.ts` to block advanced SSRF vectors including IPv6 and IPv4-mapped IPv6 loopback/metadata addresses.
-- **Test Coverage**: Expanding `src/api/security.test.ts` to validate these new protections.
-
-### Type Hygiene
-- **Eliminating `any`**: Replacing unsafe `any` type casts in critical components like `QueryModal.tsx` and `AIChatModal.tsx` with proper literal types or interfaces.
-- **Adapter Tests**: Improving type safety in `src/pipeline-core/adapters/pulsarAdapter.test.ts`.
+### Key Refinements
+- **Unified Navigation**: Replacing legacy `FilterBar` tab variants with the standardized `IndustrialTabs` component in GitHub and other modules.
+- **Docker Dashboard**: Elevating the container list with high-density status filtering using `IndustrialTabs`.
+- **GitHub Dashboard**: Refining the collections view and table density.
+- **Novedades Page**: Redesigning the novedades view to match the technical aesthetic of the rest of the application.
+- **Type Hygiene**: Eliminating remaining `any` casts in UI components.
+- **Visual Consistency**: Ensuring all table headers, badges, and action buttons strictly follow the semantic token and opacity standards defined in `DESIGN.md`.
 
 ## Impact
-- Reduced attack surface for RCE and SSRF.
-- Improved system resilience and maintainability through better type safety.
-- Compliance with AAA standard hygiene and Industrial Resonance V2.
+- Increased visual harmony across the entire platform.
+- Improved usability through consistent navigation patterns.
+- Zero-warning build log maintained.
 
 ---
 *Status: Work in Progress*

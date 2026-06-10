@@ -12,7 +12,7 @@ import { FreezeDialog } from "@/components/FreezeDialog";
 import { CommitsModal } from "@/components/CommitsModal";
 import { PageLayout } from "@/layouts/PageLayout";
 import { RepoSearch } from "@/components/RepoSearch";
-import { FilterBar } from "@/components/shared/FilterBar";
+import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
 import { Table } from "@/components/ui/Table";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -116,21 +116,36 @@ function Dashboard() {
 		>
 			<div className="space-y-6">
 				{/* Tabs & Management */}
-				<FilterBar
-					filters={tabs}
-					activeFilter={activeTab}
-					onFilterChange={(value) => navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab: value }) })}
-					variant="tabs"
-					label="Colecciones:"
-					rightContent={
-						<ActionButton
-							action={{ icon: Settings2, label: "Gestionar Proyectos", color: "default" }}
-							onClick={handleManageProjects}
-							size="md"
-							className="bg-muted/20 hover:bg-muted/30"
+				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+					<div className="flex items-center gap-4">
+						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Colecciones:</span>
+						<IndustrialTabs
+							options={tabs.map(t => ({
+								id: t.value,
+								label: (
+									<div className="flex items-center gap-2">
+										<t.icon className="w-3.5 h-3.5" />
+										<span>{t.label}</span>
+										{t.count > 0 && (
+											<span className="bg-muted-foreground/20 px-1.5 py-0.5 rounded-full text-[9px]">
+												{t.count}
+											</span>
+										)}
+									</div>
+								)
+							}))}
+							activeId={activeTab}
+							onChange={(value) => navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab: value }) })}
+							className="min-w-[300px]"
 						/>
-					}
-				/>
+					</div>
+					<ActionButton
+						action={{ icon: Settings2, label: "Gestionar Proyectos", color: "default" }}
+						onClick={handleManageProjects}
+						size="md"
+						className="bg-muted/20 hover:bg-muted/30"
+					/>
+				</div>
 
 				{/* Content */}
 				{isEmpty ? (
@@ -362,7 +377,7 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		{
 			id: "pending_filter",
 			accessorKey: "fullName",
-			header: "Pendientes",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Pendientes</span>,
 			enableHiding: true,
 			cell: () => null,
 			filterFn: (row, _columnId, filterValue) => {
@@ -372,22 +387,22 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		},
 		{
 			accessorKey: "tag",
-			header: "Producción",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Producción</span>,
 			cell: ({ row }) => <TagCell repo={row.original} />,
 		},
 		{
 			accessorKey: "commit",
-			header: "Staging",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Staging</span>,
 			cell: ({ row }) => <CommitCell repo={row.original} />,
 		},
 		{
 			id: "health",
-			header: "Salud",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Salud</span>,
 			cell: ({ row }) => <HealthCell repo={row.original} />,
 		},
 		{
 			id: "prs",
-			header: "PRs",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">PRs</span>,
 			cell: ({ row }) => {
 				const details = repoDetailsQueries.find(q => q.data?.fullName === row.original.fullName)?.data;
 				return <PRsCell repo={row.original} details={details} />;
@@ -395,7 +410,7 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		},
 		{
 			id: "actions_status",
-			header: "Workflows",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Workflows</span>,
 			cell: ({ row }) => {
 				const details = repoDetailsQueries.find(q => q.data?.fullName === row.original.fullName)?.data;
 				return <ActionsStatusCell repo={row.original} details={details} />;
@@ -403,18 +418,18 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		},
 		{
 			accessorKey: "updatedAt",
-			header: "Actividad",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Actividad</span>,
 			cell: ({ row }) => <DateCell repo={row.original} />,
 		},
 		{
 			accessorKey: "author",
-			header: "Autor",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Autor</span>,
 			cell: ({ row }) => <AuthorCell repo={row.original} />,
 		},
 		{
 			id: "operations",
 			accessorKey: "actions",
-			header: () => <div className="text-right">Operations</div>,
+			header: () => <div className="text-right text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Operations</div>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<OperationsCell

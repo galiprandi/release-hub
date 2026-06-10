@@ -8,6 +8,7 @@ import { getContainers } from '@/api/docker';
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys';
 import { PageLayout } from '../../layouts/PageLayout';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
+import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
 
 export const Route = createFileRoute('/docker/')({
   component: DockerManagerPage,
@@ -83,6 +84,22 @@ function DockerManagerPage() {
       actions={[headerActions]}
     >
       <div className="space-y-6">
+      {/* Filtros */}
+      <div className="flex items-center gap-4">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Estado:</span>
+        <IndustrialTabs
+          options={[
+            { id: 'all', label: <div className="flex items-center gap-2"><span>Todos</span><span className="bg-muted-foreground/20 px-1.5 py-0.5 rounded-full text-[9px]">{filterCounts.all}</span></div> },
+            { id: 'running', label: <div className="flex items-center gap-2"><span>Ejecutando</span><span className="bg-muted-foreground/20 px-1.5 py-0.5 rounded-full text-[9px]">{filterCounts.running}</span></div> },
+            { id: 'stopped', label: <div className="flex items-center gap-2"><span>Detenido</span><span className="bg-muted-foreground/20 px-1.5 py-0.5 rounded-full text-[9px]">{filterCounts.stopped}</span></div> },
+            { id: 'exited', label: <div className="flex items-center gap-2"><span>Finalizado</span><span className="bg-muted-foreground/20 px-1.5 py-0.5 rounded-full text-[9px]">{filterCounts.exited}</span></div> },
+          ]}
+          activeId={search.status || 'running'}
+          onChange={(id) => handleFilterChange({ id: 'status', value: id })}
+          className="w-[450px]"
+        />
+      </div>
+
       {/* Contenido */}
       {checkingAccess ? (
         <StatusCard type="loading" message="Verificando acceso a Docker..." />
@@ -90,7 +107,6 @@ function DockerManagerPage() {
         <ContainerList
           ref={containerListRef}
           searchQuery={searchQuery}
-          filterCounts={filterCounts}
           activeFilter={activeFilter}
           onFilterChange={handleFilterChange}
         />

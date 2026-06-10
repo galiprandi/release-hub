@@ -239,7 +239,7 @@ function QueriesTable({
 	const columns: ColumnDef<QueryRecord>[] = useMemo(() => [
 		{
 			accessorKey: "url",
-			header: "URL",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">URL</span>,
 			cell: ({ row }) => <UrlCell query={row.original} />,
 		},
 		{
@@ -248,30 +248,30 @@ function QueriesTable({
 				const parsed = parseCurlForDisplay(row.curl);
 				return parsed?.method || '';
 			},
-			header: "Método",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Método</span>,
 			cell: ({ row }) => <MethodCell query={row.original} />,
 			filterFn: 'equalsString',
 		},
 		{
 			accessorKey: "updatedAt",
-			header: "Enviado",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Enviado</span>,
 			cell: ({ row }) => <SentCell query={row.original} />,
 		},
 		{
 			accessorKey: "responseTime",
-			header: "Tiempo",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Tiempo</span>,
 			cell: ({ row }) => <ResponseTimeCell query={row.original} />,
 		},
 		{
 			id: "status",
 			accessorFn: (row) => row.response?.status || null,
-			header: "Status",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Status</span>,
 			cell: ({ row }) => <StatusCell query={row.original} />,
 		},
 		{
 			id: "actions",
 			accessorKey: "actions",
-			header: "Acciones",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Acciones</span>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<ActionsCell

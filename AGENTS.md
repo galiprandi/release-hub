@@ -31,7 +31,7 @@
 - **Tokens**: Solo de `DESIGN.md`. Nunca hardcodeados (`text-zinc-500`, `bg-red-500`).
 - **Health Monitor**: Status dots (`w-1.5 h-1.5`), semantic badges (/20 opacity), double-line URLs.
 - **Foco**: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1`.
-- **Navigation**: Prefer `IndustrialTabs` over `select` for sorting/filtering. State must be synced with search params.
+- **Navigation**: Mandatory use of `IndustrialTabs` over native `select` or legacy `FilterBar` for all primary view/filter switches. State must be synced with search params.
 - **Type Hygiene**: Prohibido `any`. Interfaces explícitas o `unknown` + validación. Casts de tipo en handlers deben usar `id as typeof stateVariable`.
 - **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Use localized status labels (Saludable, Procesando, etc.).
 - **Type Hygiene**: Prohibido `any`. Interfaces explícitas o `unknown` + validación.

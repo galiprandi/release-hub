@@ -188,40 +188,40 @@ function EndpointsTable({
     },
     {
       accessorKey: "service",
-      header: "Ruta",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Ruta</span>,
       cell: ({ row }) => <span className="font-medium tracking-tight text-foreground">{row.original.service || '/'}</span>,
     },
     {
       id: "environment",
       accessorFn: (row) => row.environment,
-      header: "Ambiente",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Ambiente</span>,
       cell: ({ row }) => <EnvironmentCell endpoint={row.original} />,
       filterFn: 'equalsString',
     },
     {
       accessorKey: "lastChecked",
-      header: "Verificado",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Verificado</span>,
       cell: ({ row }) => <LastCheckedCell endpoint={row.original} />,
     },
     {
       accessorKey: "responseTime",
-      header: "Tiempo",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Tiempo</span>,
       cell: ({ row }) => <ResponseTimeCell endpoint={row.original} />,
     },
     {
       accessorKey: "url",
-      header: "URL",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">URL</span>,
       cell: ({ row }) => <UrlCell endpoint={row.original} />,
     },
     {
       accessorKey: "error",
-      header: "Error",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Error</span>,
       cell: ({ row }) => <ErrorCell endpoint={row.original} />,
     },
     {
       id: "actions",
       accessorKey: "actions",
-      header: "Acciones",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Acciones</span>,
       enableSorting: false,
       cell: ({ row }) => (
         <ActionsCell

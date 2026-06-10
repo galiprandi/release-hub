@@ -14,7 +14,7 @@
 - **FilterBar (tabs)**: `bg-muted` container, `bg-background` active item, `p-1`.
 - **StatusCard**: Loading/error/offline states.
 - **ActionButton**: Iconographic with tooltip.
-- **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering.
+- **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering. Mandatory for all primary navigation switches.
 - **Docker Terminal**: `bg-primary/10` icons, double-line titles, `bg-zinc-950` background.
 - **BaseDialog**: Modal consistency.
 
@@ -57,6 +57,7 @@
 ## Layout V2
 - Sidebar fijo (50px). Sticky header with backdrop-blur.
 - Contenido `px-8`, `gap-6`.
+- **Novedades**: High-density header with `Newspaper` icon, content wrapped in `bg-muted/10` containers with industrial typography.
 - **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente.
 
 ## Specific Module Standards

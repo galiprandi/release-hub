@@ -20,12 +20,11 @@ export interface ContainerListRef {
 
 interface ContainerListProps {
 	searchQuery?: string
-	filterCounts?: { all: number; running: number; stopped: number; exited: number }
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }
 
-export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({ searchQuery = '', filterCounts, activeFilter, onFilterChange }, ref) => {
+export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({ searchQuery = '', activeFilter, onFilterChange }, ref) => {
 	const queryClient = useQueryClient()
 	const [selectedContainer, setSelectedContainer] = useState<ContainerInfo | null>(null)
 	const [isLogsModalOpen, setIsLogsModalOpen] = useState(false)
@@ -117,7 +116,6 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 				onStop={handleStop}
 				onViewLogs={handleViewLogs}
 				onOpenTerminal={handleOpenTerminal}
-				filterCounts={filterCounts}
 				activeFilter={activeFilter}
 				onFilterChange={onFilterChange}
 			/>
@@ -178,7 +176,6 @@ function ContainersTable({
 	onStop,
 	onViewLogs,
 	onOpenTerminal,
-	filterCounts,
 	activeFilter,
 	onFilterChange,
 }: {
@@ -188,7 +185,6 @@ function ContainersTable({
 	onStop: (containerId: string) => void
 	onViewLogs: (container: ContainerInfo) => void
 	onOpenTerminal: (container: ContainerInfo) => void
-	filterCounts?: { all: number; running: number; stopped: number; exited: number }
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
@@ -238,20 +234,10 @@ function ContainersTable({
 		},
 	], [onStart, onRestart, onStop, onViewLogs, onOpenTerminal])
 
-	const filters = useMemo(() => {
-		if (!filterCounts) return []
-		return [
-			{ label: 'Ejecutando', columnId: 'status' as const, value: 'running', count: filterCounts.running },
-			{ label: 'Detenido', columnId: 'status' as const, value: 'stopped', count: filterCounts.stopped },
-			{ label: 'Finalizado', columnId: 'status' as const, value: 'exited', count: filterCounts.exited },
-		]
-	}, [filterCounts])
-
 	return (
 		<Table
 			columns={columns}
 			data={containers}
-			filters={filters}
 			activeFilter={activeFilter}
 			onFilterChange={onFilterChange}
 		/>

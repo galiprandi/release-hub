@@ -192,36 +192,43 @@ const healthProxyHandler: Connect.NextHandleFunction = async (req, res) => {
 	}
 
 	const isInternal = (hostname: string) => {
-		const lower = hostname.toLowerCase().replace(/^\[|\]$/g, '');
-		// Loopback and local
-		if (
-			lower === 'localhost' ||
-			lower === '127.0.0.1' ||
-			lower === '::1' ||
-			lower === '0.0.0.0' ||
-			lower === '::' ||
-			lower === '0:0:0:0:0:0:0:1' ||
-			lower === '0:0:0:0:0:0:0:0' ||
-			lower === '::ffff:127.0.0.1'
-		) return true;
+		let addr = hostname.toLowerCase().replace(/^\[|\]$/g, '');
 
-		if (lower.endsWith('.local') || lower.endsWith('.internal')) return true;
-
-		// Metadata / Cloud internal endpoints
-		if (
-			lower === '169.254.169.254' ||
-			lower === 'metadata.google.internal' ||
-			lower === 'instance-data' ||
-			lower === 'fd00::' // IPv6 Local Unicast
-		) return true;
-
-		// RFC 1918 Private Address Space (IPv4)
-		const parts = hostname.split('.').map(Number);
-		if (parts.length === 4 && !parts.some(isNaN)) {
-			if (parts[0] === 10) return true;
-			if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true;
-			if (parts[0] === 192 && parts[1] === 168) return true;
+		// Normalize IPv4-mapped IPv6 (e.g. ::ffff:127.0.0.1)
+		if (addr.startsWith('::ffff:')) {
+			addr = addr.slice(7);
 		}
+
+		if (addr === 'localhost' || addr === '::1' || addr === '::' || addr === '0.0.0.0') return true;
+		if (addr.endsWith('.local') || addr.endsWith('.internal')) return true;
+
+		// IPv4 Check
+		const parts = addr.split('.').map(Number);
+		if (parts.length === 4 && !parts.some(isNaN)) {
+			const [p0, p1] = parts;
+			// Loopback (127.0.0.0/8)
+			if (p0 === 127) return true;
+			// RFC 1918 Private Space
+			if (p0 === 10) return true;
+			if (p0 === 172 && p1 >= 16 && p1 <= 31) return true;
+			if (p0 === 192 && p1 === 168) return true;
+			// Link-Local (169.254.0.0/16)
+			if (p0 === 169 && p1 === 254) return true;
+			// Shared Address Space / CGNAT (100.64.0.0/10)
+			if (p0 === 100 && p1 >= 64 && p1 <= 127) return true;
+		}
+
+		// IPv6 Check (simple prefix checks)
+		if (addr.includes(':')) {
+			// Link-local (fe80::/10)
+			if (addr.startsWith('fe8') || addr.startsWith('fe9') || addr.startsWith('fea') || addr.startsWith('feb')) return true;
+			// Unique Local (fc00::/7) -> fc00::/8 and fd00::/8
+			if (addr.startsWith('fc') || addr.startsWith('fd')) return true;
+		}
+
+		// Cloud Metadata
+		if (addr === 'metadata.google.internal' || addr === 'instance-data') return true;
+
 		return false;
 	};
 

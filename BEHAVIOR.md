@@ -36,6 +36,7 @@
 - getDeployments throws for invalid namespace format
 
 ## Module: Security Hardening
+- should allow commands in the safe list
 - should allow public addresses
 - should block cloud metadata addresses
 - should block loopback addresses
@@ -46,6 +47,7 @@
 - should neutralize pipe injection in array-based commands
 - should neutralize redirection injection in array-based commands
 - should neutralize semicolon injection in docker commands
+- should not contain dangerous commands
 - should reject argument injection and path traversal in repo parameter
 - should reject names starting with hyphens (flag injection)
 - should reject names with spaces or shell characters

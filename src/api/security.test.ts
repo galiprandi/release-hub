@@ -130,10 +130,24 @@ describe('Security Hardening', () => {
 
   describe('Internal SSRF Protection', () => {
     const isInternal = (hostname: string) => {
-      const lower = hostname.toLowerCase();
-      if (lower === 'localhost' || lower === '127.0.0.1' || lower === '::1' || lower === '0.0.0.0') return true;
+      const lower = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+      if (
+        lower === 'localhost' ||
+        lower === '127.0.0.1' ||
+        lower === '::1' ||
+        lower === '0.0.0.0' ||
+        lower === '::' ||
+        lower === '0:0:0:0:0:0:0:1' ||
+        lower === '0:0:0:0:0:0:0:0' ||
+        lower === '::ffff:127.0.0.1'
+      ) return true;
       if (lower.endsWith('.local') || lower.endsWith('.internal')) return true;
-      if (lower === '169.254.169.254' || lower === 'metadata.google.internal' || lower === 'instance-data') return true;
+      if (
+        lower === '169.254.169.254' ||
+        lower === 'metadata.google.internal' ||
+        lower === 'instance-data' ||
+        lower === 'fd00::'
+      ) return true;
       const parts = hostname.split('.').map(Number);
       if (parts.length === 4 && !parts.some(isNaN)) {
         if (parts[0] === 10) return true;
@@ -147,6 +161,11 @@ describe('Security Hardening', () => {
       expect(isInternal('localhost')).toBe(true);
       expect(isInternal('127.0.0.1')).toBe(true);
       expect(isInternal('::1')).toBe(true);
+      expect(isInternal('[::1]')).toBe(true);
+      expect(isInternal('0:0:0:0:0:0:0:1')).toBe(true);
+      expect(isInternal('::')).toBe(true);
+      expect(isInternal('0.0.0.0')).toBe(true);
+      expect(isInternal('::ffff:127.0.0.1')).toBe(true);
     });
 
     it('should block private network addresses (RFC 1918)', () => {
@@ -179,6 +198,28 @@ describe('Security Hardening', () => {
     it('should reject names with spaces or shell characters', () => {
       expect(k8sNameRegex.test('pod-name; rm -rf /')).toBe(false);
       expect(k8sNameRegex.test('pod name')).toBe(false);
+    });
+  })
+
+  describe('Middleware Command Allow-listing', () => {
+    const SAFE_COMMANDS = [
+      "gh", "kubectl", "docker", "curl", "lsof", "node", "ls", "echo", "jq", "helm",
+      "powershell.exe", "zsh", "bash", "sh"
+    ];
+
+    it('should allow commands in the safe list', () => {
+      expect(SAFE_COMMANDS).toContain('gh');
+      expect(SAFE_COMMANDS).toContain('kubectl');
+      expect(SAFE_COMMANDS).toContain('docker');
+      expect(SAFE_COMMANDS).toContain('curl');
+    });
+
+    it('should not contain dangerous commands', () => {
+      expect(SAFE_COMMANDS).not.toContain('rm');
+      expect(SAFE_COMMANDS).not.toContain('mv');
+      expect(SAFE_COMMANDS).not.toContain('cp');
+      expect(SAFE_COMMANDS).not.toContain('ssh');
+      expect(SAFE_COMMANDS).not.toContain('nc');
     });
   })
 

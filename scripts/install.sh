@@ -35,8 +35,8 @@ npm run build
 # 5. Setup Permissions
 chmod +x scripts/start.sh
 
-# 6. Create Symbolic Link
-echo "🔗 Setting up global command '$BINARY_NAME'..."
+# 6. Add alias to shell config
+echo "🔗 Setting up command '$BINARY_NAME' via alias..."
 
 # Create a small launcher that handles the directory switching
 mkdir -p "$INSTALL_DIR/bin"
@@ -46,50 +46,28 @@ cd "$INSTALL_DIR" && ./scripts/start.sh "\$@"
 EOF
 chmod +x "$INSTALL_DIR/bin/$BINARY_NAME"
 
-# Try to link to /usr/local/bin (without sudo to avoid credential prompts)
-DEST="/usr/local/bin/$BINARY_NAME"
-if [ -w "/usr/local/bin" ]; then
-    ln -sf "$INSTALL_DIR/bin/$BINARY_NAME" "$DEST"
-    echo "✅ Success! Link created at $DEST"
-else
-    # Try to use ~/.local/bin (usually in PATH without sudo)
-    LOCAL_BIN="$HOME/.local/bin"
-    mkdir -p "$LOCAL_BIN"
-    if [ -w "$LOCAL_BIN" ]; then
-        ln -sf "$INSTALL_DIR/bin/$BINARY_NAME" "$LOCAL_BIN/$BINARY_NAME"
-        echo "✅ Success! Link created at $LOCAL_BIN/$BINARY_NAME"
-        # Check if ~/.local/bin is in PATH
-        if [[ ":$PATH:" != *":$LOCAL_BIN:"* ]]; then
-            echo "⚠️  $LOCAL_BIN is not in your PATH. Please add this to your shell config:"
-            echo "export PATH=\"\$HOME/.local/bin:\$PATH\""
-        fi
-    else
-        # Fallback: add alias to shell config
-        SHELL_CONFIG=""
-        if [ -n "$ZSH_VERSION" ]; then
-            SHELL_CONFIG="$HOME/.zshrc"
-        elif [ -n "$BASH_VERSION" ]; then
-            SHELL_CONFIG="$HOME/.bashrc"
-        else
-            SHELL_CONFIG="$HOME/.profile"
-        fi
-
-        if [ -f "$SHELL_CONFIG" ]; then
-            ALIAS_LINE="alias $BINARY_NAME=\"$INSTALL_DIR/bin/$BINARY_NAME\""
-            if ! grep -q "$ALIAS_LINE" "$SHELL_CONFIG" 2>/dev/null; then
-                echo "" >> "$SHELL_CONFIG"
-                echo "# ReleaseHub" >> "$SHELL_CONFIG"
-                echo "$ALIAS_LINE" >> "$SHELL_CONFIG"
-                echo "✅ Alias added to $SHELL_CONFIG"
-                echo "🔄 Please run 'source $SHELL_CONFIG' or restart your terminal to use '$BINARY_NAME'"
-            else
-                echo "✅ Alias already exists in $SHELL_CONFIG"
-            fi
-        else
-            echo "⚠️  Could not find shell config. Please add this manually:"
-            echo "alias $BINARY_NAME=\"$INSTALL_DIR/bin/$BINARY_NAME\""
-        fi
+SHELL_CONFIG=""
+for f in "$HOME/.zshrc" "$HOME/.bashrc" "$HOME/.profile"; do
+    if [ -f "$f" ]; then
+        SHELL_CONFIG="$f"
+        break
     fi
+done
+
+if [ -f "$SHELL_CONFIG" ]; then
+    ALIAS_LINE="alias $BINARY_NAME=\"$INSTALL_DIR/bin/$BINARY_NAME\""
+    if ! grep -q "$ALIAS_LINE" "$SHELL_CONFIG" 2>/dev/null; then
+        echo "" >> "$SHELL_CONFIG"
+        echo "# ReleaseHub" >> "$SHELL_CONFIG"
+        echo "$ALIAS_LINE" >> "$SHELL_CONFIG"
+        echo "✅ Alias added to $SHELL_CONFIG"
+        echo "🔄 Please run 'source $SHELL_CONFIG' or restart your terminal to use '$BINARY_NAME'"
+    else
+        echo "✅ Alias already exists in $SHELL_CONFIG"
+    fi
+else
+    echo "⚠️  Could not find shell config. Please add this manually:"
+    echo "alias $BINARY_NAME=\"$INSTALL_DIR/bin/$BINARY_NAME\""
 fi
 
 echo ""

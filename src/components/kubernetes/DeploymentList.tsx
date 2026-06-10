@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery } from "@tanstack/react-query"
-import { Boxes, Terminal as TerminalIcon } from "lucide-react"
+import { Boxes, Terminal as TerminalIcon, Folder } from "lucide-react"
 import type { DeploymentInfo } from "@/api/kubectl"
 import { LogsViewer } from "@/components/shared/LogsViewer"
 import { Terminal } from "@/components/shared/Terminal"
@@ -9,13 +9,15 @@ import { BaseDialog } from "@/components/ui/BaseDialog"
 import { StatusCard } from "@/components/ui/StatusCard"
 import { Table } from "@/components/ui/Table"
 import type { ColumnDef } from "@tanstack/react-table"
-import { useUserCollections } from "@/hooks/useUserCollections"
+import { useUserCollections, type Project } from "@/hooks/useUserCollections"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
 import { DeploymentProjectSelectionDialog } from "./DeploymentProjectSelectionDialog"
 import { PortForwardControl } from "@/components/ui/PortForwardControl"
 import { usePortForward } from "@/hooks/usePortForward"
 import { usePortFree } from "@/hooks/usePortFree"
 import { DEFAULT_START_PORT } from "@/config/portForward"
+
+type DeploymentWithContext = DeploymentInfo & { context: string }
 
 const STORAGE_KEY = "kubernetes-deployments-metadata"
 
@@ -41,12 +43,21 @@ function saveDeploymentsToStorage(deployments: Record<string, DeploymentInfo>): 
 
 interface DeploymentListProps {
 	favorites?: string[]
+	projects?: Project[]
+	activeTab?: 'favorites' | 'projects'
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
 	isKubectlInstalled?: boolean
 }
 
-export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKubectlInstalled }: DeploymentListProps) => {
+export const DeploymentList = ({
+	favorites,
+	projects = [],
+	activeTab = 'favorites',
+	activeFilter,
+	onFilterChange,
+	isKubectlInstalled
+}: DeploymentListProps) => {
 	const [selectedDeployment, setSelectedDeployment] = useState<DeploymentInfo | null>(null)
 	const [selectedContext, setSelectedContext] = useState<string | null>(null)
 	const [isLogsModalOpen, setIsLogsModalOpen] = useState(false)
@@ -55,31 +66,38 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 	const [cachedDeployments, setCachedDeployments] = useState<Record<string, DeploymentInfo>>(loadDeploymentsFromStorage())
 	const { toggleDeploymentFavorite } = useUserCollections()
 
-	// Parse favorite IDs to get deployment info
-	const favoriteDeployments = useMemo(() => {
-		if (!favorites || favorites.length === 0) return []
-		return favorites.map(favId => {
-			const [context, namespace, name] = favId.split('/')
-			return { context, namespace, name }
+	// All unique deployment IDs from favorites and projects
+	const allDeploymentIds = useMemo(() => {
+		const ids = new Set(favorites || [])
+		projects.forEach(p => {
+			p.deployments?.forEach((id: string) => ids.add(id))
 		})
-	}, [favorites])
+		return Array.from(ids)
+	}, [favorites, projects])
 
-	// Trigger fetch for all favorites in parallel and update localStorage
+	// Parse deployment IDs to get deployment info
+	const allDeploymentsMeta = useMemo(() => {
+		return allDeploymentIds.map(id => {
+			const [context, namespace, name] = id.split('/')
+			return { id, context, namespace, name }
+		})
+	}, [allDeploymentIds])
+
+	// Trigger fetch for all deployments in parallel and update localStorage
 	const { isLoading } = useQuery({
-		queryKey: ['kubectl', 'favorites-deployments', favorites],
+		queryKey: ['kubectl', 'all-deployments-metadata', allDeploymentIds],
 		queryFn: async () => {
-			if (!favorites || favorites.length === 0 || isKubectlInstalled !== true) return []
+			if (allDeploymentIds.length === 0 || isKubectlInstalled !== true) return []
 
 			const { getDeployment } = await import('@/api/kubectl')
 			const updatedMetadata = { ...cachedDeployments }
 
 			await Promise.all(
-				favoriteDeployments.map(async ({ context, namespace, name }) => {
-					const deploymentId = `${context}/${namespace}/${name}`
+				allDeploymentsMeta.map(async ({ context, namespace, name, id }) => {
 					try {
 						const deployment = await getDeployment(name, namespace, context)
 						if (deployment) {
-							updatedMetadata[deploymentId] = deployment
+							updatedMetadata[id] = deployment
 						}
 					} catch {
 						// Silenciar errores de deployments que no existen
@@ -93,34 +111,65 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 
 			return []
 		},
-		enabled: isKubectlInstalled === true && favorites && favorites.length > 0,
+		enabled: isKubectlInstalled === true && allDeploymentIds.length > 0,
 		refetchOnWindowFocus: false,
 		retry: 0,
 	})
 
-	// Get cached deployments from localStorage (instant display)
-	const displayDeployments = useMemo(() => {
-		if (!favorites || favorites.length === 0) return []
+	// Get grouped deployments for display based on active tab
+	const groupedContent = useMemo(() => {
+		if (activeTab === 'favorites') {
+			const groups: Record<string, DeploymentInfo[]> = {}
+			favorites?.forEach(favId => {
+				const cached = cachedDeployments[favId]
+				if (cached) {
+					const [context] = favId.split('/')
+					if (!groups[context]) groups[context] = []
+					groups[context].push(cached)
+				}
+			})
+			return Object.entries(groups).map(([context, deployments]) => ({
+				id: context,
+				label: context,
+				icon: <Boxes className="w-4 h-4" />,
+				deployments: deployments.map(d => ({ ...d, context })) as DeploymentWithContext[]
+			}))
+		} else {
+			return projects
+				.filter(p => p.deployments && p.deployments.length > 0)
+				.map(project => {
+					const deployments = project.deployments
+						.map((id: string) => {
+							const cached = cachedDeployments[id]
+							if (cached) {
+								const [context] = id.split('/')
+								return { ...cached, context }
+							}
+							return null
+						})
+						.filter(Boolean) as DeploymentWithContext[]
 
-		return favorites.map(favId => {
-			const cached = cachedDeployments[favId]
+					return {
+						id: project.id,
+						label: project.name,
+						icon: <Folder className="w-4 h-4" />,
+						deployments
+					}
+				})
+		}
+	}, [activeTab, favorites, projects, cachedDeployments])
+
+	// For LogsViewer selector, we need all accessible deployments
+	const allResolvedDeployments = useMemo(() => {
+		return allDeploymentIds.map(id => {
+			const cached = cachedDeployments[id]
 			if (cached) {
-				const [context] = favId.split('/')
+				const [context] = id.split('/')
 				return { context, deployment: cached }
 			}
 			return null
 		}).filter(Boolean) as Array<{ context: string; deployment: DeploymentInfo }>
-	}, [favorites, cachedDeployments])
-
-	// Group by context for display
-	const groupedDeployments = useMemo(() => {
-		const groups: Record<string, DeploymentInfo[]> = {}
-		displayDeployments.forEach(({ context, deployment }) => {
-			if (!groups[context]) groups[context] = []
-			groups[context].push(deployment)
-		})
-		return Object.entries(groups).map(([context, deployments]) => ({ context, deployments }))
-	}, [displayDeployments])
+	}, [allDeploymentIds, cachedDeployments])
 
 	// Fetch function for logs with cursor support
 	const fetchFn = async (cursor?: number) => {
@@ -131,27 +180,25 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 
 	// Build resources list for LogsViewer select
 	const resources = useMemo(() => {
-		if (!displayDeployments) return []
-		return displayDeployments.map(({ context, deployment }) => ({
+		return allResolvedDeployments.map(({ context, deployment }) => ({
 			id: `${context}/${deployment.namespace}/${deployment.name}`,
 			name: deployment.name,
 			type: 'deployment' as const,
 			context,
 			namespace: deployment.namespace,
 		}))
-	}, [displayDeployments])
+	}, [allResolvedDeployments])
 
 	const selectedResourceId = selectedDeployment ? `${selectedContext || ''}/${selectedDeployment.namespace}/${selectedDeployment.name}` : undefined
 
 	const handleResourceChange = (resourceId: string) => {
 		const resource = resources.find(r => r.id === resourceId)
 		if (resource) {
-			const deployment = displayDeployments
+			const resolved = allResolvedDeployments
 				?.find(d => d.context === resource.context && d.deployment.name === resource.name)
-				?.deployment
-			if (deployment) {
-				setSelectedDeployment(deployment)
-				setSelectedContext(resource.context)
+			if (resolved) {
+				setSelectedDeployment(resolved.deployment)
+				setSelectedContext(resolved.context)
 			}
 		}
 	}
@@ -198,8 +245,12 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 		: null
 	const activePodName = selectedPodName || defaultPod?.name || null
 
-	// Si no hay favoritos, no renderizar nada (el padre maneja el empty state)
-	if (!favorites || favorites.length === 0) {
+	// Si no hay contenido, no renderizar nada (el padre maneja el empty state)
+	const hasContent = activeTab === 'favorites'
+		? (favorites && favorites.length > 0)
+		: projects.some(p => p.deployments && p.deployments.length > 0)
+
+	if (!hasContent) {
 		return null
 	}
 
@@ -214,29 +265,32 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 	}
 
 	// Si no hay datos cacheados ni live después de cargar
-	if (!isLoading && (!displayDeployments || displayDeployments.length === 0)) {
+	if (!isLoading && groupedContent.length === 0) {
 		return (
 			<StatusCard
 				type="offline"
-				message="No hay deployments favoritos disponibles."
+				message={activeTab === 'favorites' ? "No hay deployments favoritos disponibles." : "No hay despliegues en tus proyectos."}
 			/>
 		)
 	}
 
 	return (
 		<>
-			{groupedDeployments.length > 0 && (
+			{groupedContent.length > 0 && (
 				<div className="space-y-12">
-					{groupedDeployments.map(({ context: ctx, deployments }) => (
-						<div key={ctx} className="space-y-3">
+					{groupedContent.map(({ id, label, icon, deployments }) => (
+						<div key={id} className="space-y-3">
 							<DeploymentsTable
 								deployments={deployments}
-								context={ctx}
+								label={label}
+								icon={icon}
 								isLoading={isLoading}
 								onViewLogs={handleViewLogs}
 								onOpenTerminal={handleOpenTerminal}
 								onRemoveFavorite={(deployment) => {
-									const deploymentId = `${ctx}/${deployment.namespace}/${deployment.name}`
+									const context = deployment.context
+									if (!context) return
+									const deploymentId = `${context}/${deployment.namespace}/${deployment.name}`
 									toggleDeploymentFavorite(deploymentId)
 									// Limpiar cache del deployment removido de localStorage
 									const updated = { ...cachedDeployments }
@@ -327,7 +381,8 @@ export const DeploymentList = ({ favorites, activeFilter, onFilterChange, isKube
 
 function DeploymentsTable({
 	deployments,
-	context,
+	label,
+	icon,
 	isLoading,
 	onViewLogs,
 	onOpenTerminal,
@@ -336,19 +391,20 @@ function DeploymentsTable({
 	activeFilter,
 	onFilterChange,
 }: {
-	deployments: DeploymentInfo[]
-	context: string
+	deployments: DeploymentWithContext[]
+	label: string
+	icon?: React.ReactNode
 	isLoading: boolean
 	onViewLogs: (deployment: DeploymentInfo, context: string) => void
 	onOpenTerminal: (deployment: DeploymentInfo, context: string) => void
-	onRemoveFavorite: (deployment: DeploymentInfo) => void
+	onRemoveFavorite: (deployment: DeploymentWithContext) => void
 	onManageProjects: (deployment: DeploymentInfo, context: string) => void
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
 	const sortedDeployments = useMemo(() => {
 		return [...deployments].sort((a, b) => a.name.localeCompare(b.name))
-	}, [deployments])
+	}, [deployments]) as DeploymentWithContext[]
 
 	// Get unique namespaces for filters
 	const namespaces = useMemo(() => {
@@ -364,13 +420,13 @@ function DeploymentsTable({
 		}))
 	}, [namespaces])
 
-	const columns: ColumnDef<DeploymentInfo & { context: string }>[] = useMemo(() => [
+	const columns: ColumnDef<DeploymentWithContext, unknown>[] = useMemo(() => [
 		{
 			accessorKey: "name",
 			header: () => (
 				<div className="flex items-center gap-2">
-					<Boxes className="w-4 h-4 text-primary/40" />
-					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{context}</span>
+					{icon && <span className="text-primary/40">{icon}</span>}
+					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{label}</span>
 				</div>
 			),
 			cell: ({ row }) => <DeploymentNameCell deployment={row.original} isLoading={isLoading} />,
@@ -378,45 +434,45 @@ function DeploymentsTable({
 		{
 			id: "namespace",
 			accessorKey: "namespace",
-			header: "Espacio de nombres",
-			cell: ({ row }) => row.original.namespace,
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Namespace</span>,
+			cell: ({ row }) => <span className="text-xs font-mono text-muted-foreground">{row.original.namespace}</span>,
 			filterFn: 'equalsString',
 		},
 		{
 			accessorKey: "status",
-			header: "Estado",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Estado</span>,
 			cell: ({ row }) => <StatusCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			accessorKey: "age",
-			header: "Antigüedad",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Age</span>,
 			cell: ({ row }) => <AgeCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			accessorKey: "images",
-			header: "Imágenes",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Imágenes</span>,
 			cell: ({ row }) => <ImagesCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			id: "portForward",
-			header: "Port Forward",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Port Forward</span>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<PortForwardCell
 					deployment={row.original}
-					context={context}
+					context={row.original.context}
 				/>
 			),
 		},
 		{
 			id: "actions",
 			accessorKey: "actions",
-			header: "Acciones",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 text-right block w-full">Acciones</span>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<ActionsCell
 					deployment={row.original}
-					context={context}
+					context={row.original.context}
 					onViewLogs={onViewLogs}
 					onOpenTerminal={onOpenTerminal}
 					onRemoveFavorite={onRemoveFavorite}
@@ -424,14 +480,16 @@ function DeploymentsTable({
 				/>
 			),
 		},
-	], [context, isLoading, onViewLogs, onOpenTerminal, onRemoveFavorite, onManageProjects])
+	], [label, icon, isLoading, onViewLogs, onOpenTerminal, onRemoveFavorite, onManageProjects])
 
-	const dataWithContext = useMemo(() => sortedDeployments.map(d => ({ ...d, context })), [sortedDeployments, context])
+	// Ensure each deployment has its context correctly assigned in the data mapping
+	// This might require passing the context-to-deployment map if we want to be sure
+	// For now, groupedContent already provides deployments that belong to that label (which is ctx in favorites)
 
 	return (
 		<Table
 			columns={columns}
-			data={dataWithContext}
+			data={sortedDeployments}
 			filters={filters}
 			activeFilter={activeFilter}
 			onFilterChange={onFilterChange}
@@ -439,7 +497,7 @@ function DeploymentsTable({
 	)
 }
 
-function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentInfo & { context: string }; isLoading: boolean }) {
+function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentWithContext; isLoading: boolean }) {
 	if (isLoading) {
 		return (
 			<div className="flex items-center gap-2">
@@ -456,16 +514,18 @@ function StatusCell({ deployment, isLoading }: { deployment: DeploymentInfo; isL
 		return <div className="h-6 bg-muted/40 rounded w-16 animate-pulse" />
 	}
 
-	const variants: Record<string, string> = {
-		healthy: 'bg-success/20 text-success border-success/20',
-		progressing: 'bg-info/20 text-info border-info/20',
-		degraded: 'bg-destructive/20 text-destructive border-destructive/20',
-		unknown: 'bg-muted/40 text-muted-foreground border-border/40',
+	const variants: Record<string, { className: string; label: string }> = {
+		healthy: { className: 'bg-success/20 text-success border-success/20', label: 'Saludable' },
+		progressing: { className: 'bg-info/20 text-info border-info/20', label: 'Procesando' },
+		degraded: { className: 'bg-destructive/20 text-destructive border-destructive/20', label: 'Degradado' },
+		unknown: { className: 'bg-muted/40 text-muted-foreground border-border/40', label: 'Desconocido' },
 	}
 
+	const variant = variants[deployment.status] || variants.unknown
+
 	return (
-		<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-wider uppercase ${variants[deployment.status] || variants.unknown}`}>
-			{deployment.status}
+		<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-wider uppercase ${variant.className}`}>
+			{variant.label}
 		</span>
 	)
 }
@@ -509,11 +569,11 @@ function ActionsCell({
 	onRemoveFavorite,
 	onManageProjects,
 }: {
-	deployment: DeploymentInfo
+	deployment: DeploymentWithContext
 	context: string
 	onViewLogs: (deployment: DeploymentInfo, context: string) => void
 	onOpenTerminal: (deployment: DeploymentInfo, context: string) => void
-	onRemoveFavorite: (deployment: DeploymentInfo) => void
+	onRemoveFavorite: (deployment: DeploymentWithContext) => void
 	onManageProjects: (deployment: DeploymentInfo, context: string) => void
 }) {
 	return (
@@ -541,7 +601,7 @@ function ActionsCell({
 	)
 }
 
-function PortForwardCell({ deployment, context }: { deployment: DeploymentInfo & { context: string }; context: string }) {
+function PortForwardCell({ deployment, context }: { deployment: DeploymentWithContext; context: string }) {
 	const { connect, disconnect, status, error, isActive, localPort } = usePortForward({
 		deployment: deployment.name,
 		namespace: deployment.namespace,

@@ -13,7 +13,7 @@
 - **FilterBar (tabs)**: `bg-muted` container, `bg-background` active item, `p-1`.
 - **StatusCard**: Loading/error/offline states.
 - **ActionButton**: Iconographic with tooltip.
-- **IndustrialTabs**: Unified selector for modals and panels.
+- **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering.
 - **Docker Terminal**: `bg-primary/10` icons, double-line titles, `bg-zinc-950` background.
 - **BaseDialog**: Modal consistency.
 
@@ -56,3 +56,18 @@
 ## Layout V2
 - Sidebar fijo (50px). Sticky header with backdrop-blur.
 - Contenido `px-8`, `gap-6`.
+- **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente.
+
+## Specific Module Standards
+
+### Health Monitor Resonance
+- **Status Dots**: `w-1.5 h-1.5 rounded-full` with semantic shadows for health states (OK/Error). OK includes `animate-pulse`.
+- **Product Header**: Stats use semantic badges at 20% opacity. Product names use `tracking-tighter`.
+- **Double-line URLs**: Table displays domain (muted, `text-[10px]`) and path (foreground, `font-mono text-xs`).
+- **Revalidation**: `bg-primary animate-pulse` dot in header during background checks.
+
+### Kubernetes UI Resonance
+- **Dashboard Navigation**: Uses `IndustrialTabs` for switching between 'Favoritos' and 'Proyectos'. State is persisted via `tab` search parameter.
+- **Grouping**: Favorites are grouped by `context` (Boxes icon). Projects are grouped by `project.id` (Folder icon).
+- **Deployment Status**: Badges use semantic tokens (success/info/destructive/muted) with 20% opacity and `rounded-md`. Labels are localized (Saludable, Procesando, Degradado, Desconocido).
+- **Search UI**: High-density dropdown with technical metadata (Namespace, Context, Ready/Up-to-date counts) and keyboard-centric navigation hints.

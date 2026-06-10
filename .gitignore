@@ -27,3 +27,4 @@ coverage
 .context
 playwright-report
 test-results
+verification/

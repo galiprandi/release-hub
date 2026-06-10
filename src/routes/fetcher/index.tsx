@@ -403,7 +403,7 @@ function ActionsCell({
 				action={ACTION_DEFINITIONS.send}
 				onClick={() => onOpenModal(query)}
 				size="sm"
-				className="text-success hover:bg-success/10"
+				className="text-success hover:bg-success/20"
 			/>
 			<div className="w-px h-4 bg-border/40 mx-0.5" />
 			<ActionButton

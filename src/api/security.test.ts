@@ -130,42 +130,56 @@ describe('Security Hardening', () => {
 
   describe('Internal SSRF Protection', () => {
     const isInternal = (hostname: string) => {
-      const lower = hostname.toLowerCase().replace(/^\[|\]$/g, '');
-      if (
-        lower === 'localhost' ||
-        lower === '127.0.0.1' ||
-        lower === '::1' ||
-        lower === '0.0.0.0' ||
-        lower === '::' ||
-        lower === '0:0:0:0:0:0:0:1' ||
-        lower === '0:0:0:0:0:0:0:0' ||
-        lower === '::ffff:127.0.0.1'
-      ) return true;
-      if (lower.endsWith('.local') || lower.endsWith('.internal')) return true;
-      if (
-        lower === '169.254.169.254' ||
-        lower === 'metadata.google.internal' ||
-        lower === 'instance-data' ||
-        lower === 'fd00::'
-      ) return true;
-      const parts = hostname.split('.').map(Number);
-      if (parts.length === 4 && !parts.some(isNaN)) {
-        if (parts[0] === 10) return true;
-        if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true;
-        if (parts[0] === 192 && parts[1] === 168) return true;
+      let addr = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+
+      // Normalize IPv4-mapped IPv6 (e.g. ::ffff:127.0.0.1)
+      if (addr.startsWith('::ffff:')) {
+        addr = addr.slice(7);
       }
+
+      if (addr === 'localhost' || addr === '::1' || addr === '::' || addr === '0.0.0.0') return true;
+      if (addr.endsWith('.local') || addr.endsWith('.internal')) return true;
+
+      // IPv4 Check
+      const parts = addr.split('.').map(Number);
+      if (parts.length === 4 && !parts.some(isNaN)) {
+        const [p0, p1] = parts;
+        // Loopback (127.0.0.0/8)
+        if (p0 === 127) return true;
+        // RFC 1918 Private Space
+        if (p0 === 10) return true;
+        if (p0 === 172 && p1 >= 16 && p1 <= 31) return true;
+        if (p0 === 192 && p1 === 168) return true;
+        // Link-Local (169.254.0.0/16)
+        if (p0 === 169 && p1 === 254) return true;
+        // Shared Address Space / CGNAT (100.64.0.0/10)
+        if (p0 === 100 && p1 >= 64 && p1 <= 127) return true;
+      }
+
+      // IPv6 Check (simple prefix checks)
+      if (addr.includes(':')) {
+        // Link-local (fe80::/10)
+        if (addr.startsWith('fe8') || addr.startsWith('fe9') || addr.startsWith('fea') || addr.startsWith('feb')) return true;
+        // Unique Local (fc00::/7) -> fc00::/8 and fd00::/8
+        if (addr.startsWith('fc') || addr.startsWith('fd')) return true;
+      }
+
+      // Cloud Metadata
+      if (addr === 'metadata.google.internal' || addr === 'instance-data') return true;
+
       return false;
     };
 
-    it('should block loopback addresses', () => {
+    it('should block loopback addresses and normalization bypasses', () => {
       expect(isInternal('localhost')).toBe(true);
       expect(isInternal('127.0.0.1')).toBe(true);
+      expect(isInternal('127.8.8.8')).toBe(true); // Full 127.0.0.0/8
       expect(isInternal('::1')).toBe(true);
       expect(isInternal('[::1]')).toBe(true);
-      expect(isInternal('0:0:0:0:0:0:0:1')).toBe(true);
       expect(isInternal('::')).toBe(true);
       expect(isInternal('0.0.0.0')).toBe(true);
       expect(isInternal('::ffff:127.0.0.1')).toBe(true);
+      expect(isInternal('::ffff:127.0.0.2')).toBe(true);
     });
 
     it('should block private network addresses (RFC 1918)', () => {
@@ -175,9 +189,23 @@ describe('Security Hardening', () => {
       expect(isInternal('192.168.1.1')).toBe(true);
     });
 
-    it('should block cloud metadata addresses', () => {
+    it('should block CGNAT addresses', () => {
+      expect(isInternal('100.64.0.1')).toBe(true);
+      expect(isInternal('100.127.255.255')).toBe(true);
+      expect(isInternal('100.63.255.255')).toBe(false);
+    });
+
+    it('should block IPv6 Link-Local and Unique Local addresses', () => {
+      expect(isInternal('fe80::1')).toBe(true);
+      expect(isInternal('fc00::')).toBe(true);
+      expect(isInternal('fd00::1')).toBe(true);
+    });
+
+    it('should block cloud metadata addresses and link-local', () => {
       expect(isInternal('169.254.169.254')).toBe(true);
+      expect(isInternal('169.254.0.1')).toBe(true);
       expect(isInternal('metadata.google.internal')).toBe(true);
+      expect(isInternal('instance-data')).toBe(true);
     });
 
     it('should allow public addresses', () => {

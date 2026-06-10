@@ -10,9 +10,9 @@ vi.mock("@galiprandi/react-tools", () => ({
 		prompt: vi.fn(),
 		reset: vi.fn(),
 		error: null,
-		progress: 0,
+		progress: null,
 		append: vi.fn(),
-		contextUsage: { totalTokens: 0, promptTokens: 0, completionTokens: 0 },
+		contextUsage: 0,
 		contextWindow: 0,
 	})),
 }));
@@ -63,9 +63,9 @@ describe("AIChatModal", () => {
 			prompt: vi.fn(),
 			reset: vi.fn(),
 			error: null,
-			progress: 0,
+			progress: null,
 			append: vi.fn(),
-			contextUsage: { totalTokens: 0, promptTokens: 0, completionTokens: 0 },
+			contextUsage: 0,
 			contextWindow: 0,
 		});
 
@@ -86,9 +86,9 @@ describe("AIChatModal", () => {
 			prompt: vi.fn(),
 			reset: mockReset,
 			error: null,
-			progress: 0,
+			progress: null,
 			append: vi.fn(),
-			contextUsage: { totalTokens: 0, promptTokens: 0, completionTokens: 0 },
+			contextUsage: 0,
 			contextWindow: 0,
 		});
 
@@ -127,9 +127,9 @@ describe("AIChatModal", () => {
 			prompt: mockPrompt,
 			reset: vi.fn(),
 			error: null,
-			progress: 0,
+			progress: null,
 			append: vi.fn(),
-			contextUsage: { totalTokens: 0, promptTokens: 0, completionTokens: 0 },
+			contextUsage: 0,
 			contextWindow: 0,
 		});
 
@@ -154,9 +154,9 @@ describe("AIChatModal", () => {
 			prompt: vi.fn(),
 			reset: mockReset,
 			error: null,
-			progress: 0,
+			progress: null,
 			append: vi.fn(),
-			contextUsage: { totalTokens: 0, promptTokens: 0, completionTokens: 0 },
+			contextUsage: 0,
 			contextWindow: 0,
 		});
 

@@ -213,9 +213,9 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 			headerExtra={
 				<div className="flex items-center gap-2 mr-2">
 					<IndustrialTabs
-						options={AI_PROFILES.map(p => ({ id: p.id as typeof activeProfileId, label: p.label }))}
+						options={AI_PROFILES.map(p => ({ id: p.id, label: p.label }))}
 						activeId={activeProfileId}
-						onChange={(id) => setActiveProfileId(id as typeof activeProfileId)}
+						onChange={setActiveProfileId}
 						className="bg-muted/40 p-1"
 					/>
 					<div className="w-px h-4 bg-border/40 mx-1" />

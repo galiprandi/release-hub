@@ -17,8 +17,15 @@
 ### 2026-06-08: Security Hardening & Type Hygiene
 - **Agente**: Vesper 🐜
 - **Rama**: `🐜-Vesper-refactor-security-hardening-and-type-hygiene`
-- **Estado**: En progreso (Draft)
-- **Objetivo**: Blindar el middleware contra SSRF avanzado y RCE mediante allow-lists, y erradicar la entropía de tipos en modales críticos.
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Endurecimiento de protección SSRF en `vite.config.ts` (127.0.0.0/8, 169.254.0.0/16, CGNAT, IPv6).
+  - [x] Normalización de IPv4-mapped IPv6 para prevenir bypasses.
+  - [x] Erradicación de `any` y casts manuales en `QueryModal.tsx` y `AIChatModal.tsx`.
+  - [x] Sincronización de tipos en mocks de tests (`pulsarAdapter.test.ts`, `AIChatModal.test.tsx`).
+  - [x] Actualización de `DESIGN.md` y `AGENTS.md` con estándares de hardening.
+  - [x] Zero-warning build logrado.
+- **Resultado**: Superficie de ataque reducida significativamente y entropía técnica eliminada en componentes críticos.
 ## Historial de Carol
 
 ### 2026-06-07: Refactor Kubernetes UI Resonance

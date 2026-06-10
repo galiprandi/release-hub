@@ -72,7 +72,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 
 	const [isExecuting, setIsExecuting] = useState(false);
 	const [activeTab, setActiveTab] = useState<'body' | 'headers'>('body');
-	const [requestTab, setRequestTab] = useState<'params' | 'headers' | 'body'>(() =>
+	const [requestTab, setRequestTab] = useState<'params' | 'headers' | 'body'>(
 		form.method === 'GET' ? 'params' : 'body'
 	);
 	const [headersExpanded, setHeadersExpanded] = useState(false);
@@ -322,7 +322,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 										{ id: 'body', label: 'Body' },
 									]}
 									activeId={requestTab}
-										onChange={(id) => setRequestTab(id as typeof requestTab)}
+									onChange={setRequestTab}
 									className="flex-shrink-0"
 								/>
 
@@ -501,7 +501,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 											{ id: 'body', label: 'Body' },
 										]}
 										activeId={activeTab}
-										onChange={(id) => setActiveTab(id as typeof activeTab)}
+										onChange={setActiveTab}
 										className="mb-3 flex-shrink-0"
 									/>
 

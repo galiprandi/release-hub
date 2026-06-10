@@ -12,7 +12,7 @@ import { FreezeDialog } from "@/components/FreezeDialog";
 import { CommitsModal } from "@/components/CommitsModal";
 import { PageLayout } from "@/layouts/PageLayout";
 import { RepoSearch } from "@/components/RepoSearch";
-import { FilterBar } from "@/components/shared/FilterBar";
+import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
 import { Table } from "@/components/ui/Table";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -116,21 +116,35 @@ function Dashboard() {
 		>
 			<div className="space-y-6">
 				{/* Tabs & Management */}
-				<FilterBar
-					filters={tabs}
-					activeFilter={activeTab}
-					onFilterChange={(value) => navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab: value }) })}
-					variant="tabs"
-					label="Colecciones:"
-					rightContent={
-						<ActionButton
-							action={{ icon: Settings2, label: "Gestionar Proyectos", color: "default" }}
-							onClick={handleManageProjects}
-							size="md"
-							className="bg-muted/20 hover:bg-muted/30"
+				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+					<div className="flex items-center gap-2">
+						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Colecciones:</span>
+						<IndustrialTabs
+							options={tabs.map(t => ({
+								id: t.value,
+								label: (
+									<div className="flex items-center gap-1.5">
+										{t.icon && <t.icon className="w-3 h-3" />}
+										<span>{t.label}</span>
+										{t.count !== undefined && t.count > 0 && (
+											<span className="ml-1 px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-[9px]">
+												{t.count}
+											</span>
+										)}
+									</div>
+								)
+							}))}
+							activeId={activeTab}
+							onChange={(id) => navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab: id as string }) })}
 						/>
-					}
-				/>
+					</div>
+					<ActionButton
+						action={{ icon: Settings2, label: "Gestionar Proyectos", color: "default" }}
+						onClick={handleManageProjects}
+						size="md"
+						className="bg-muted/20 hover:bg-muted/30"
+					/>
+				</div>
 
 				{/* Content */}
 				{isEmpty ? (
@@ -427,19 +441,32 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 			], [org, favorites, onToggleFavorite, reposWithPending, repoDetailsQueries]);
 
 	const navigate = useNavigate({ from: "/github/" });
-	const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
-		navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, filter: filter?.value }) });
+	const handleFilterChange = useCallback((id: string) => {
+		const filterValue = id === "all" ? undefined : id;
+		navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, filter: filterValue }) });
 	}, [navigate]);
 
+	const tableTabs = useMemo(() => [
+		{ id: "all", label: "Todos" },
+		...filters.map(f => ({ id: f.value, label: f.label }))
+	], [filters]);
+
 	return (
-		<Table
-			columns={columns}
-			data={sortedRepos}
-			filters={filters}
-			activeFilter={activeFilter ? { id: "pending_filter", value: activeFilter } : null}
-			onFilterChange={handleFilterChange}
-			filterLabel="Acción:"
-		/>
+		<div className="space-y-4">
+			<div className="flex items-center gap-2 px-1">
+				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Filtrar:</span>
+				<IndustrialTabs
+					options={tableTabs}
+					activeId={activeFilter || "all"}
+					onChange={handleFilterChange}
+				/>
+			</div>
+			<Table
+				columns={columns}
+				data={sortedRepos}
+				activeFilter={activeFilter ? { id: "pending_filter", value: activeFilter } : null}
+			/>
+		</div>
 	);
 }
 

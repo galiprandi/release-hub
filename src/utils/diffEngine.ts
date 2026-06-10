@@ -1,11 +1,11 @@
 import { parseCurlCommand } from './curlParser';
 import { decodeJWT } from '@/hooks/useToken';
 
-export type DiffMode = 'json' | 'jwt' | 'curl' | 'text';
+export type DiffMode = 'json' | 'jwt' | 'curl' | 'text' | 'javascript' | 'typescript' | 'html' | 'css' | 'python';
 
 /**
  * Detects the content type from a string.
- * Priority: JWT > cURL > JSON > text
+ * Priority: JWT > cURL > JSON > JS > CSS > HTML > text
  */
 export function detectContentType(text: string): DiffMode {
 	if (!text || text.trim().length === 0) return 'text';
@@ -37,8 +37,25 @@ export function detectContentType(text: string): DiffMode {
 			JSON.parse(trimmed);
 			return 'json';
 		} catch {
-			// Not valid JSON, fallback to text
+			// Not valid JSON, continue checking
 		}
+	}
+
+	// Simple heuristic for other languages
+	if (trimmed.includes('def ') || (trimmed.includes('import ') && !trimmed.includes('const ') && !trimmed.includes('from "') && !trimmed.includes("from '")) || trimmed.includes('print(')) {
+		return 'python';
+	}
+
+	if (trimmed.includes('import ') || trimmed.includes('const ') || trimmed.includes('function ')) {
+		return 'javascript';
+	}
+
+	if (trimmed.startsWith('<') && trimmed.includes('>')) {
+		return 'html';
+	}
+
+	if (trimmed.includes('{') && trimmed.includes('}') && (trimmed.includes(': ') || trimmed.includes(';'))) {
+		return 'css';
 	}
 
 	// Default to text

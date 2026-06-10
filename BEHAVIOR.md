@@ -122,6 +122,14 @@
 - should support minimal pipeline data
 
 ## Module: diffEngine
+- should default to text
+- should detect CSS
+- should detect HTML
+- should detect JSON
+- should detect JWT
+- should detect JavaScript
+- should detect Python
+- should detect cURL
 - should handle arrays
 - should identify additions
 - should identify changed lines (as removal and addition)

@@ -1,5 +1,5 @@
 import type { DiffMode } from '@/utils/diffEngine';
-import { LayoutGrid, Fingerprint, Terminal, FileText, type LucideIcon } from 'lucide-react';
+import { Fingerprint, Terminal, FileText, Code2, FileJson, FileCode, Hash, Type, type LucideIcon } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface DiffControlsProps {
@@ -9,14 +9,19 @@ interface DiffControlsProps {
 
 export function DiffControls({ mode, onModeChange }: DiffControlsProps) {
 	const modes: { id: DiffMode; label: string; icon: LucideIcon }[] = [
-		{ id: 'json', label: 'JSON Mode', icon: LayoutGrid },
-		{ id: 'jwt', label: 'JWT Mode', icon: Fingerprint },
-		{ id: 'curl', label: 'cURL Mode', icon: Terminal },
-		{ id: 'text', label: 'Logs/Text', icon: FileText },
+		{ id: 'json', label: 'JSON', icon: FileJson },
+		{ id: 'jwt', label: 'JWT', icon: Fingerprint },
+		{ id: 'curl', label: 'cURL', icon: Terminal },
+		{ id: 'javascript', label: 'JS', icon: FileCode },
+		{ id: 'typescript', label: 'TS', icon: Type },
+		{ id: 'html', label: 'HTML', icon: Code2 },
+		{ id: 'css', label: 'CSS', icon: Hash },
+		{ id: 'python', label: 'PY', icon: FileCode },
+		{ id: 'text', label: 'Text', icon: FileText },
 	];
 
 	return (
-		<div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border/60 shadow-sm">
+		<div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border/60 shadow-sm overflow-x-auto max-w-[80vw] no-scrollbar">
 			{modes.map((m) => (
 				<button
 					key={m.id}

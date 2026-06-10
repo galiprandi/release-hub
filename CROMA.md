@@ -19,3 +19,10 @@
 - **Rama**: `🐜-Vesper-refactor-security-hardening-and-type-hygiene`
 - **Estado**: En progreso (Draft)
 - **Objetivo**: Blindar el middleware contra SSRF avanzado y RCE mediante allow-lists, y erradicar la entropía de tipos en modales críticos.
+## Historial de Carol
+
+### 2026-06-07: Refactor Kubernetes UI Resonance
+- **Rama**: `🐜-Carol-refactor-kubernetes-ui-resonance`
+- **Estado**: En progreso 🏗️
+- **Cambios**:
+  - [x] Fase 0: Territory Block.

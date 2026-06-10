@@ -336,7 +336,7 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 	const reposWithPending = useMemo(() => {
 		const pendingSet = new Set<string>();
 		repoDetailsQueries.forEach(query => {
-			const data = query.data as RepoDetails | undefined;
+			const data = query.data;
 			if (data && data.pendingCount > 0) {
 				pendingSet.add(data.fullName);
 			}
@@ -424,7 +424,7 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 				/>
 			),
 		},
-		], [org, favorites, onToggleFavorite, reposWithPending]);
+			], [org, favorites, onToggleFavorite, reposWithPending, repoDetailsQueries]);
 
 	const navigate = useNavigate({ from: "/github/" });
 	const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {

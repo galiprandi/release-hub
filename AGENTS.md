@@ -33,5 +33,8 @@
 - **Foco**: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1`.
 - **Navigation**: Prefer `IndustrialTabs` over `select` for sorting/filtering. State must be synced with search params.
 - **Type Hygiene**: Prohibido `any`. Interfaces explícitas o `unknown` + validación. Casts de tipo en handlers deben usar `id as typeof stateVariable`.
+- **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Use localized status labels (Saludable, Procesando, etc.).
+- **Type Hygiene**: Prohibido `any`. Interfaces explícitas o `unknown` + validación.
 - **Mutaciones**: Optimistic update + revalidación selectiva. Nunca `window.location.reload()`.
 - **Resiliencia**: Si CLI falla (`kubectl`, `docker`), redirigir a `<module>/setup`.
+- **Estructura**: Los componentes de módulo viven siempre en `src/<modulo>/components/`. Prohibido usar `componentes/`.

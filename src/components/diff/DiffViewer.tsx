@@ -5,6 +5,7 @@ import { decodeJWT } from '@/hooks/useToken';
 import { DiffPanel } from './DiffPanel';
 import { clsx } from 'clsx';
 import { GitCompare, Maximize2, Minimize2, Clock, Filter } from 'lucide-react';
+import { highlight } from 'sugar-high';
 
 interface DiffViewerProps {
 	mode: DiffMode;
@@ -189,7 +190,7 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
 							{diff
 								.filter(line => !showOnlyDiffs || hasDiff(line))
 								.map((line, idx) => (
-									<DiffLineRow key={idx} line={line} />
+									<DiffLineRow key={idx} line={line} mode={mode} />
 								))}
 						</div>
 					)}
@@ -208,7 +209,25 @@ function hasDiff(line: DiffLine): boolean {
 	);
 }
 
-function DiffLineRow({ line }: { line: DiffLine }) {
+function DiffLineRow({ line, mode }: { line: DiffLine; mode: DiffMode }) {
+	const highlightedLeft = useMemo(() => {
+		if (!line.left?.value || mode === 'text') return line.left?.value || ' ';
+		try {
+			return highlight(line.left.value);
+		} catch {
+			return line.left.value;
+		}
+	}, [line.left?.value, mode]);
+
+	const highlightedRight = useMemo(() => {
+		if (!line.right?.value || mode === 'text') return line.right?.value || ' ';
+		try {
+			return highlight(line.right.value);
+		} catch {
+			return line.right.value;
+		}
+	}, [line.right?.value, mode]);
+
 	return (
 		<div className="flex w-full group">
 			{/* Left side */}
@@ -224,9 +243,16 @@ function DiffLineRow({ line }: { line: DiffLine }) {
 				<span className="w-4 shrink-0 flex justify-center select-none font-bold">
 					{line.left?.type === 'removed' ? '-' : line.left?.type === 'changed' ? '!' : ''}
 				</span>
-				<span className="whitespace-pre break-all px-1">
-					{line.left?.value || ' '}
-				</span>
+				{mode !== 'text' && line.left?.value ? (
+					<span
+						className="whitespace-pre break-all px-1"
+						dangerouslySetInnerHTML={{ __html: highlightedLeft }}
+					/>
+				) : (
+					<span className="whitespace-pre break-all px-1">
+						{line.left?.value || ' '}
+					</span>
+				)}
 			</div>
 
 			{/* Right side */}
@@ -242,9 +268,16 @@ function DiffLineRow({ line }: { line: DiffLine }) {
 				<span className="w-4 shrink-0 flex justify-center select-none font-bold">
 					{line.right?.type === 'added' ? '+' : line.right?.type === 'changed' ? '!' : ''}
 				</span>
-				<span className="whitespace-pre break-all px-1">
-					{line.right?.value || ' '}
-				</span>
+				{mode !== 'text' && line.right?.value ? (
+					<span
+						className="whitespace-pre break-all px-1"
+						dangerouslySetInnerHTML={{ __html: highlightedRight }}
+					/>
+				) : (
+					<span className="whitespace-pre break-all px-1">
+						{line.right?.value || ' '}
+					</span>
+				)}
 			</div>
 		</div>
 	);

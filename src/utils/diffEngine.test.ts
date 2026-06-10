@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeJson, computeDiff } from './diffEngine';
+import { normalizeJson, computeDiff, detectContentType } from './diffEngine';
 
 describe('diffEngine', () => {
 	describe('normalizeJson', () => {
@@ -13,6 +13,47 @@ describe('diffEngine', () => {
 			const input = JSON.stringify([{ b: 2, a: 1 }]);
 			const output = normalizeJson(input);
 			expect(output).toBe(JSON.stringify([{ a: 1, b: 2 }], null, 2));
+		});
+	});
+
+	describe('detectContentType', () => {
+		it('should detect JSON', () => {
+			expect(detectContentType('{"a": 1}')).toBe('json');
+			expect(detectContentType('[1, 2, 3]')).toBe('json');
+		});
+
+		it('should detect cURL', () => {
+			expect(detectContentType('curl -X GET http://example.com')).toBe('curl');
+		});
+
+		it('should detect JWT', () => {
+			// Mock JWT (header.payload.signature)
+			const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+			const payload = btoa(JSON.stringify({ sub: '1234567890', name: 'John Doe', iat: 1516239022 }));
+			const signature = 'SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+			expect(detectContentType(`${header}.${payload}.${signature}`)).toBe('jwt');
+		});
+
+		it('should detect JavaScript', () => {
+			expect(detectContentType('import React from "react"')).toBe('javascript');
+			expect(detectContentType('const a = 1;')).toBe('javascript');
+			expect(detectContentType('function test() {}')).toBe('javascript');
+		});
+
+		it('should detect HTML', () => {
+			expect(detectContentType('<div>Hello</div>')).toBe('html');
+		});
+
+		it('should detect CSS', () => {
+			expect(detectContentType('.test { color: red; }')).toBe('css');
+		});
+
+		it('should detect Python', () => {
+			expect(detectContentType('def my_func():\n    print("hello")')).toBe('python');
+		});
+
+		it('should default to text', () => {
+			expect(detectContentType('just some random text')).toBe('text');
 		});
 	});
 

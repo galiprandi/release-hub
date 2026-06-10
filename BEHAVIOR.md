@@ -38,8 +38,10 @@
 ## Module: Security Hardening
 - should allow commands in the safe list
 - should allow public addresses
-- should block cloud metadata addresses
-- should block loopback addresses
+- should block CGNAT addresses
+- should block IPv6 Link-Local and Unique Local addresses
+- should block cloud metadata addresses and link-local
+- should block loopback addresses and normalization bypasses
 - should block private network addresses (RFC 1918)
 - should handle single quotes within arguments correctly
 - should neutralize backtick injection in kubectl commands

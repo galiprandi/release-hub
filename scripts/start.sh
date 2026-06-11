@@ -26,19 +26,14 @@ else
         if ! git rev-parse @{u} &>/dev/null; then
             git branch --set-upstream-to=origin/main main &>/dev/null || true
         fi
-        # Fetch with longer timeout to avoid failures
-        if git fetch origin main &>/dev/null; then
-            LOCAL=$(git rev-parse HEAD)
-            REMOTE=$(git rev-parse @{u} 2>/dev/null || git rev-parse origin/main)
-            if [ "$LOCAL" != "$REMOTE" ]; then
-                echo "✨ New version detected. Updating $APP_NAME..."
-                git reset --hard origin/main
-                npm install
-                npm run build
-                echo "✅ Update complete!"
-            fi
+        # Pull latest changes
+        if git pull &>/dev/null; then
+            echo "✨ Latest changes pulled successfully."
+            npm install
+            npm run build
+            echo "✅ Update complete!"
         else
-            echo "⚠️  Could not check for updates (offline or network issue)."
+            echo "⚠️  Could not pull updates (offline or network issue)."
         fi
     fi
 

@@ -10,8 +10,21 @@ import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
-import { DEFAULT_START_PORT, DEFAULT_MAX_PORTS } from "./src/config/portForward";
+import {
+	DEFAULT_START_PORT,
+	DEFAULT_MAX_PORTS,
+} from "./src/config/portForward";
 import { setupTerminalMiddleware } from "./src/config/terminalMiddleware";
+
+// Get short git commit hash
+let gitShortHash = "unknown";
+try {
+	gitShortHash = execSync("git rev-parse --short HEAD", {
+		encoding: "utf-8",
+	}).trim();
+} catch {
+	// Fallback if not in git repo
+}
 
 /**
  * Execute a command using spawn without a shell.
@@ -20,7 +33,12 @@ import { setupTerminalMiddleware } from "./src/config/terminalMiddleware";
 const spawnAsync = (
 	args: string[],
 	stdin?: string,
-): Promise<{ stdout: string; stderr: string; success: boolean; error?: string }> => {
+): Promise<{
+	stdout: string;
+	stderr: string;
+	success: boolean;
+	error?: string;
+}> => {
 	return new Promise((resolve) => {
 		const [cmd, ...cmdArgs] = args;
 		const child = spawn(cmd, cmdArgs, { shell: false });
@@ -76,7 +94,7 @@ const SAFE_COMMANDS = [
 	"powershell.exe",
 	"zsh",
 	"bash",
-	"sh"
+	"sh",
 ];
 
 /**
@@ -139,7 +157,12 @@ const execHandler: Connect.NextHandleFunction = async (req, res) => {
 	const command = args[0];
 	if (!SAFE_COMMANDS.includes(command)) {
 		res.statusCode = 403;
-		res.end(JSON.stringify({ error: `Command "${command}" is not in the allow-list`, success: false }));
+		res.end(
+			JSON.stringify({
+				error: `Command "${command}" is not in the allow-list`,
+				success: false,
+			}),
+		);
 		return;
 	}
 
@@ -180,34 +203,40 @@ const execHandler: Connect.NextHandleFunction = async (req, res) => {
 
 // Handler for /health-proxy endpoint - proxy health checks to avoid CORS
 const healthProxyHandler: Connect.NextHandleFunction = async (req, res) => {
-	if (req.method !== 'GET') {
+	if (req.method !== "GET") {
 		res.statusCode = 405;
-		res.end('Method not allowed');
+		res.end("Method not allowed");
 		return;
 	}
 
-	const url = new URL(req.url || '', `http://localhost`);
-	const targetUrl = url.searchParams.get('url');
+	const url = new URL(req.url || "", `http://localhost`);
+	const targetUrl = url.searchParams.get("url");
 
 	if (!targetUrl) {
 		res.statusCode = 400;
-		res.end(JSON.stringify({ error: 'Missing url parameter' }));
+		res.end(JSON.stringify({ error: "Missing url parameter" }));
 		return;
 	}
 
 	const isInternal = (hostname: string) => {
-		let addr = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+		let addr = hostname.toLowerCase().replace(/^\[|\]$/g, "");
 
 		// Normalize IPv4-mapped IPv6 (e.g. ::ffff:127.0.0.1)
-		if (addr.startsWith('::ffff:')) {
+		if (addr.startsWith("::ffff:")) {
 			addr = addr.slice(7);
 		}
 
-		if (addr === 'localhost' || addr === '::1' || addr === '::' || addr === '0.0.0.0') return true;
-		if (addr.endsWith('.local') || addr.endsWith('.internal')) return true;
+		if (
+			addr === "localhost" ||
+			addr === "::1" ||
+			addr === "::" ||
+			addr === "0.0.0.0"
+		)
+			return true;
+		if (addr.endsWith(".local") || addr.endsWith(".internal")) return true;
 
 		// IPv4 Check
-		const parts = addr.split('.').map(Number);
+		const parts = addr.split(".").map(Number);
 		if (parts.length === 4 && !parts.some(isNaN)) {
 			const [p0, p1] = parts;
 			// Loopback (127.0.0.0/8)
@@ -223,15 +252,22 @@ const healthProxyHandler: Connect.NextHandleFunction = async (req, res) => {
 		}
 
 		// IPv6 Check (simple prefix checks)
-		if (addr.includes(':')) {
+		if (addr.includes(":")) {
 			// Link-local (fe80::/10)
-			if (addr.startsWith('fe8') || addr.startsWith('fe9') || addr.startsWith('fea') || addr.startsWith('feb')) return true;
+			if (
+				addr.startsWith("fe8") ||
+				addr.startsWith("fe9") ||
+				addr.startsWith("fea") ||
+				addr.startsWith("feb")
+			)
+				return true;
 			// Unique Local (fc00::/7) -> fc00::/8 and fd00::/8
-			if (addr.startsWith('fc') || addr.startsWith('fd')) return true;
+			if (addr.startsWith("fc") || addr.startsWith("fd")) return true;
 		}
 
 		// Cloud Metadata
-		if (addr === 'metadata.google.internal' || addr === 'instance-data') return true;
+		if (addr === "metadata.google.internal" || addr === "instance-data")
+			return true;
 
 		return false;
 	};
@@ -243,7 +279,9 @@ const healthProxyHandler: Connect.NextHandleFunction = async (req, res) => {
 		// Initial hostname check
 		if (isInternal(originalHostname)) {
 			res.statusCode = 403;
-			res.end(JSON.stringify({ error: 'Access to internal targets is forbidden' }));
+			res.end(
+				JSON.stringify({ error: "Access to internal targets is forbidden" }),
+			);
 			return;
 		}
 
@@ -255,88 +293,109 @@ const healthProxyHandler: Connect.NextHandleFunction = async (req, res) => {
 
 			if (isInternal(resolvedIp)) {
 				res.statusCode = 403;
-				res.end(JSON.stringify({ error: 'Resolved IP is internal and forbidden' }));
+				res.end(
+					JSON.stringify({ error: "Resolved IP is internal and forbidden" }),
+				);
 				return;
 			}
 		} catch (dnsError) {
-			console.error(`[health-proxy] DNS resolution failed for ${originalHostname}:`, dnsError);
+			console.error(
+				`[health-proxy] DNS resolution failed for ${originalHostname}:`,
+				dnsError,
+			);
 			res.statusCode = 502;
-			res.end(JSON.stringify({ error: `DNS resolution failed: ${originalHostname}` }));
+			res.end(
+				JSON.stringify({ error: `DNS resolution failed: ${originalHostname}` }),
+			);
 			return;
 		}
 
-		const healthUrl = targetUrl.endsWith('/') ? `${targetUrl}health` : `${targetUrl}/health`;
-		console.log(`[health-proxy] Checking: ${healthUrl} (Resolved: ${resolvedIp})`);
+		const healthUrl = targetUrl.endsWith("/")
+			? `${targetUrl}health`
+			: `${targetUrl}/health`;
+		console.log(
+			`[health-proxy] Checking: ${healthUrl} (Resolved: ${resolvedIp})`,
+		);
 
 		const targetUrlObj = new URL(healthUrl);
 
-		const isHttps = targetUrlObj.protocol === 'https:';
+		const isHttps = targetUrlObj.protocol === "https:";
 		const port = targetUrlObj.port || (isHttps ? 443 : 80);
 		const options = {
 			hostname: resolvedIp, // Use resolved IP to prevent DNS Rebinding
 			port,
 			path: targetUrlObj.pathname + targetUrlObj.search,
-			method: 'GET',
+			method: "GET",
 			rejectUnauthorized: false, // Ignore SSL certificate errors
 			servername: originalHostname, // CRITICAL: Required for SNI and certificate validation when hostname is an IP
 			timeout: 5000,
 			headers: {
-				'Accept': 'application/json',
-				'Host': originalHostname, // Pass original hostname for virtual hosting
+				Accept: "application/json",
+				Host: originalHostname, // Pass original hostname for virtual hosting
 			},
 		};
 
 		const proxyReq = (isHttps ? https : http).request(options, (proxyRes) => {
-			let data = '';
-			proxyRes.on('data', (chunk) => {
+			let data = "";
+			proxyRes.on("data", (chunk) => {
 				data += chunk;
 			});
-			proxyRes.on('end', () => {
-				console.log(`[health-proxy] Success: ${healthUrl} -> ${proxyRes.statusCode}`);
-				res.setHeader('Content-Type', 'application/json');
+			proxyRes.on("end", () => {
+				console.log(
+					`[health-proxy] Success: ${healthUrl} -> ${proxyRes.statusCode}`,
+				);
+				res.setHeader("Content-Type", "application/json");
 				res.statusCode = proxyRes.statusCode || 200;
-				res.end(JSON.stringify({
-					status: proxyRes.statusCode,
-					statusText: proxyRes.statusMessage,
-					data: data,
-					headers: proxyRes.headers,
-				}));
+				res.end(
+					JSON.stringify({
+						status: proxyRes.statusCode,
+						statusText: proxyRes.statusMessage,
+						data: data,
+						headers: proxyRes.headers,
+					}),
+				);
 			});
 		});
 
-		proxyReq.on('error', (error) => {
+		proxyReq.on("error", (error) => {
 			console.error(`[health-proxy] Error: ${healthUrl} ->`, error.message);
-			res.setHeader('Content-Type', 'application/json');
+			res.setHeader("Content-Type", "application/json");
 			res.statusCode = 502;
-			res.end(JSON.stringify({
-				error: error.message,
-				targetUrl: targetUrl,
-				type: error.name,
-			}));
+			res.end(
+				JSON.stringify({
+					error: error.message,
+					targetUrl: targetUrl,
+					type: error.name,
+				}),
+			);
 		});
 
-		proxyReq.on('timeout', () => {
+		proxyReq.on("timeout", () => {
 			console.error(`[health-proxy] Timeout: ${healthUrl}`);
 			proxyReq.destroy();
-			res.setHeader('Content-Type', 'application/json');
+			res.setHeader("Content-Type", "application/json");
 			res.statusCode = 504;
-			res.end(JSON.stringify({
-				error: 'Timeout',
-				targetUrl: targetUrl,
-				type: 'TimeoutError',
-			}));
+			res.end(
+				JSON.stringify({
+					error: "Timeout",
+					targetUrl: targetUrl,
+					type: "TimeoutError",
+				}),
+			);
 		});
 
 		proxyReq.end();
 	} catch (error) {
 		console.error(`[health-proxy] Error: ${targetUrl} ->`, error);
-		res.setHeader('Content-Type', 'application/json');
+		res.setHeader("Content-Type", "application/json");
 		res.statusCode = 502;
-		res.end(JSON.stringify({
-			error: error instanceof Error ? error.message : 'Health check failed',
-			targetUrl: targetUrl,
-			type: error instanceof Error ? error.name : 'Unknown',
-		}));
+		res.end(
+			JSON.stringify({
+				error: error instanceof Error ? error.message : "Health check failed",
+				targetUrl: targetUrl,
+				type: error instanceof Error ? error.name : "Unknown",
+			}),
+		);
 	}
 };
 
@@ -377,7 +436,7 @@ const scriptHandler: Connect.NextHandleFunction = async (req, res) => {
 
 	// Repo should follow org/repo pattern (alphanumeric, hyphen, underscore, dot, slash)
 	// Explicitly disallow .. and ensure it doesn't start with a hyphen to prevent flag injection
-	if (!/^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(repo) || repo.includes('..')) {
+	if (!/^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(repo) || repo.includes("..")) {
 		res.statusCode = 400;
 		res.end(JSON.stringify({ error: "Invalid repo name", success: false }));
 		return;
@@ -393,7 +452,9 @@ const scriptHandler: Connect.NextHandleFunction = async (req, res) => {
 		if (!success) throw new Error(error || "Script failed");
 
 		// Extract PR URL from output
-		const prUrlMatch = stdout.match(/https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/\d+/);
+		const prUrlMatch = stdout.match(
+			/https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/\d+/,
+		);
 		const prUrl = prUrlMatch ? prUrlMatch[0] : null;
 
 		res.setHeader("Content-Type", "application/json");
@@ -409,7 +470,8 @@ const scriptHandler: Connect.NextHandleFunction = async (req, res) => {
 		res.statusCode = 500;
 		res.end(
 			JSON.stringify({
-				error: error instanceof Error ? error.message : "Script execution failed",
+				error:
+					error instanceof Error ? error.message : "Script execution failed",
 				stderr:
 					error instanceof Error && "stderr" in error
 						? (error as { stderr: string }).stderr
@@ -464,151 +526,208 @@ const k8sLogsStreamHandler: Connect.NextHandleFunction = (req, res) => {
 	res.setHeader("Connection", "keep-alive");
 	res.setHeader("Access-Control-Allow-Origin", "*");
 
-	console.log(`[k8s-logs-stream] Starting: ${resourceType}/${name} in namespace: ${namespace || 'default'}`);
+	console.log(
+		`[k8s-logs-stream] Starting: ${resourceType}/${name} in namespace: ${namespace || "default"}`,
+	);
 
 	// Build kubectl logs command with -f (follow)
 	if (resourceType === "deployment") {
 		// For deployments, we need to get the selector first
-		const args = ["kubectl", "get", "deployment", name, "-o", "jsonpath={.spec.selector.matchLabels}"];
+		const args = [
+			"kubectl",
+			"get",
+			"deployment",
+			name,
+			"-o",
+			"jsonpath={.spec.selector.matchLabels}",
+		];
 		if (namespace) args.push("-n", namespace);
 		if (context) args.push("--context", context);
 
 		spawnAsync(args).then(({ stdout, success, error }) => {
 			if (!success) {
-				res.write(`data: ${JSON.stringify({ error: error || "Failed to get deployment selector" })}\n\n`);
+				res.write(
+					`data: ${JSON.stringify({ error: error || "Failed to get deployment selector" })}\n\n`,
+				);
 				res.end();
 				return;
 			}
 
 			const selector = stdout.trim();
 			if (!selector) {
-				res.write(`data: ${JSON.stringify({ error: "No selector found for deployment" })}\n\n`);
+				res.write(
+					`data: ${JSON.stringify({ error: "No selector found for deployment" })}\n\n`,
+				);
 				res.end();
 				return;
 			}
 
 			try {
 				const labels = JSON.parse(selector);
-				const labelSelector = Object.entries(labels).map(([k, v]) => `${k}=${v}`).join(',');
+				const labelSelector = Object.entries(labels)
+					.map(([k, v]) => `${k}=${v}`)
+					.join(",");
 
 				// First check if there are pods with this selector
-				const checkArgs = ["kubectl", "get", "pods", "-l", labelSelector, "-o", "jsonpath={.items}"];
+				const checkArgs = [
+					"kubectl",
+					"get",
+					"pods",
+					"-l",
+					labelSelector,
+					"-o",
+					"jsonpath={.items}",
+				];
 				if (namespace) checkArgs.push("-n", namespace);
 				if (context) checkArgs.push("--context", context);
 
-				spawnAsync(checkArgs).then(({ stdout: checkStdout, success: checkSuccess, error: checkError }) => {
-					if (!checkSuccess) {
-						res.write(`data: ${JSON.stringify({ error: checkError || "Failed to check pods" })}\n\n`);
-						res.end();
-						return;
-					}
+				spawnAsync(checkArgs).then(
+					({
+						stdout: checkStdout,
+						success: checkSuccess,
+						error: checkError,
+					}) => {
+						if (!checkSuccess) {
+							res.write(
+								`data: ${JSON.stringify({ error: checkError || "Failed to check pods" })}\n\n`,
+							);
+							res.end();
+							return;
+						}
 
-					const podsJson = checkStdout.trim();
-					if (!podsJson || podsJson === "null" || podsJson === "[]") {
-						res.write(`data: ${JSON.stringify({ error: "No pods found for this deployment" })}\n\n`);
-						res.end();
-						return;
-					}
+						const podsJson = checkStdout.trim();
+						if (!podsJson || podsJson === "null" || podsJson === "[]") {
+							res.write(
+								`data: ${JSON.stringify({ error: "No pods found for this deployment" })}\n\n`,
+							);
+							res.end();
+							return;
+						}
 
-					// Pods exist, proceed with logs
-					const logsArgs = ["kubectl", "logs", "-l", labelSelector, "-f", "--tail=100"];
-					if (namespace) logsArgs.push("-n", namespace);
-					if (context) logsArgs.push("--context", context);
+						// Pods exist, proceed with logs
+						const logsArgs = [
+							"kubectl",
+							"logs",
+							"-l",
+							labelSelector,
+							"-f",
+							"--tail=100",
+						];
+						if (namespace) logsArgs.push("-n", namespace);
+						if (context) logsArgs.push("--context", context);
 
-					const logsProcess = spawn(logsArgs[0], logsArgs.slice(1), { shell: false });
-
-					logsProcess.stdout.on("data", (data) => {
-						const lines = data.toString().split("\n").filter(Boolean);
-						lines.forEach((line: string) => {
-							res.write(`data: ${line}\n\n`);
+						const logsProcess = spawn(logsArgs[0], logsArgs.slice(1), {
+							shell: false,
 						});
-					});
 
-					logsProcess.stderr.on("data", (data) => {
-						const lines = data.toString().split("\n").filter(Boolean);
-						lines.forEach((line: string) => {
-							res.write(`data: ${line}\n\n`);
+						logsProcess.stdout.on("data", (data) => {
+							const lines = data.toString().split("\n").filter(Boolean);
+							lines.forEach((line: string) => {
+								res.write(`data: ${line}\n\n`);
+							});
 						});
-					});
 
-					logsProcess.on("error", (err) => {
-						console.error(`[k8s-logs-stream] Error:`, err);
-						res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
-						res.end();
-					});
+						logsProcess.stderr.on("data", (data) => {
+							const lines = data.toString().split("\n").filter(Boolean);
+							lines.forEach((line: string) => {
+								res.write(`data: ${line}\n\n`);
+							});
+						});
 
-					logsProcess.on("close", (code) => {
-						console.log(`[k8s-logs-stream] Closed with code: ${code}`);
-						res.end();
-					});
+						logsProcess.on("error", (err) => {
+							console.error(`[k8s-logs-stream] Error:`, err);
+							res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+							res.end();
+						});
 
-					req.on("close", () => {
-						console.log(`[k8s-logs-stream] Client disconnected`);
-						logsProcess.kill();
-					});
-				});
+						logsProcess.on("close", (code) => {
+							console.log(`[k8s-logs-stream] Closed with code: ${code}`);
+							res.end();
+						});
+
+						req.on("close", () => {
+							console.log(`[k8s-logs-stream] Client disconnected`);
+							logsProcess.kill();
+						});
+					},
+				);
 			} catch {
-				res.write(`data: ${JSON.stringify({ error: "Failed to parse selector" })}\n\n`);
+				res.write(
+					`data: ${JSON.stringify({ error: "Failed to parse selector" })}\n\n`,
+				);
 				res.end();
 			}
 		});
 	} else {
 		// For pods
 		// First check if pod exists
-		const checkArgs = ["kubectl", "get", "pod", name, "-o", "jsonpath={.metadata.name}"];
+		const checkArgs = [
+			"kubectl",
+			"get",
+			"pod",
+			name,
+			"-o",
+			"jsonpath={.metadata.name}",
+		];
 		if (namespace) checkArgs.push("-n", namespace);
 		if (context) checkArgs.push("--context", context);
 
-		spawnAsync(checkArgs).then(({ stdout: checkStdout, success: checkSuccess, error: checkError }) => {
-			if (!checkSuccess) {
-				res.write(`data: ${JSON.stringify({ error: checkError || "Pod not found" })}\n\n`);
-				res.end();
-				return;
-			}
+		spawnAsync(checkArgs).then(
+			({ stdout: checkStdout, success: checkSuccess, error: checkError }) => {
+				if (!checkSuccess) {
+					res.write(
+						`data: ${JSON.stringify({ error: checkError || "Pod not found" })}\n\n`,
+					);
+					res.end();
+					return;
+				}
 
-			const podName = checkStdout.trim();
-			if (!podName) {
-				res.write(`data: ${JSON.stringify({ error: "Pod not found" })}\n\n`);
-				res.end();
-				return;
-			}
+				const podName = checkStdout.trim();
+				if (!podName) {
+					res.write(`data: ${JSON.stringify({ error: "Pod not found" })}\n\n`);
+					res.end();
+					return;
+				}
 
-			const logsArgs = ["kubectl", "logs", name, "-f", "--tail=100"];
-			if (namespace) logsArgs.push("-n", namespace);
-			if (context) logsArgs.push("--context", context);
+				const logsArgs = ["kubectl", "logs", name, "-f", "--tail=100"];
+				if (namespace) logsArgs.push("-n", namespace);
+				if (context) logsArgs.push("--context", context);
 
-			const logsProcess = spawn(logsArgs[0], logsArgs.slice(1), { shell: false });
-
-			logsProcess.stdout.on("data", (data) => {
-				const lines = data.toString().split("\n").filter(Boolean);
-				lines.forEach((line: string) => {
-					res.write(`data: ${line}\n\n`);
+				const logsProcess = spawn(logsArgs[0], logsArgs.slice(1), {
+					shell: false,
 				});
-			});
 
-			logsProcess.stderr.on("data", (data) => {
-				const lines = data.toString().split("\n").filter(Boolean);
-				lines.forEach((line: string) => {
-					res.write(`data: ${line}\n\n`);
+				logsProcess.stdout.on("data", (data) => {
+					const lines = data.toString().split("\n").filter(Boolean);
+					lines.forEach((line: string) => {
+						res.write(`data: ${line}\n\n`);
+					});
 				});
-			});
 
-			logsProcess.on("error", (err) => {
-				console.error(`[k8s-logs-stream] Error:`, err);
-				res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
-				res.end();
-			});
+				logsProcess.stderr.on("data", (data) => {
+					const lines = data.toString().split("\n").filter(Boolean);
+					lines.forEach((line: string) => {
+						res.write(`data: ${line}\n\n`);
+					});
+				});
 
-			logsProcess.on("close", (code) => {
-				console.log(`[k8s-logs-stream] Closed with code: ${code}`);
-				res.end();
-			});
+				logsProcess.on("error", (err) => {
+					console.error(`[k8s-logs-stream] Error:`, err);
+					res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+					res.end();
+				});
 
-			req.on("close", () => {
-				console.log(`[k8s-logs-stream] Client disconnected`);
-				logsProcess.kill();
-			});
-		});
+				logsProcess.on("close", (code) => {
+					console.log(`[k8s-logs-stream] Closed with code: ${code}`);
+					res.end();
+				});
+
+				req.on("close", () => {
+					console.log(`[k8s-logs-stream] Client disconnected`);
+					logsProcess.kill();
+				});
+			},
+		);
 	}
 };
 
@@ -621,16 +740,22 @@ const portFreeHandler: Connect.NextHandleFunction = async (req, res) => {
 	}
 
 	const url = new URL(req.url || "", `http://localhost`);
-	const startPort = parseInt(url.searchParams.get("startPort") || String(DEFAULT_START_PORT), 10);
-	const max = parseInt(url.searchParams.get("max") || String(DEFAULT_MAX_PORTS), 10);
+	const startPort = parseInt(
+		url.searchParams.get("startPort") || String(DEFAULT_START_PORT),
+		10,
+	);
+	const max = parseInt(
+		url.searchParams.get("max") || String(DEFAULT_MAX_PORTS),
+		10,
+	);
 
-	if (isNaN(startPort) || startPort < 1024 || startPort > 65535) {
+	if (Number.isNaN(startPort) || startPort < 1024 || startPort > 65535) {
 		res.statusCode = 400;
 		res.end(JSON.stringify({ error: "Invalid startPort" }));
 		return;
 	}
 
-	if (isNaN(max) || max < 1 || max > 100) {
+	if (Number.isNaN(max) || max < 1 || max > 100) {
 		res.statusCode = 400;
 		res.end(JSON.stringify({ error: "Invalid max parameter" }));
 		return;
@@ -638,9 +763,13 @@ const portFreeHandler: Connect.NextHandleFunction = async (req, res) => {
 
 	// Collect ports already used by active port-forwards
 	const activePorts = new Set(
-		Array.from(activePortForwards.values()).map(
-			(proc) => (proc as unknown as { _pfMeta?: { localPort: number } })._pfMeta?.localPort
-		).filter((p): p is number => p != null)
+		Array.from(activePortForwards.values())
+			.map(
+				(proc) =>
+					(proc as unknown as { _pfMeta?: { localPort: number } })._pfMeta
+						?.localPort,
+			)
+			.filter((p): p is number => p != null),
 	);
 
 	let port: number | null = null;
@@ -660,16 +789,28 @@ const portFreeHandler: Connect.NextHandleFunction = async (req, res) => {
 // Handler for /local/port-forward endpoint - manage kubectl port-forward processes
 const portForwardHandler: Connect.NextHandleFunction = async (req, res) => {
 	if (req.method === "GET") {
-		const forwards = Array.from(activePortForwards.entries()).map(([key, proc]) => {
-			const [context, namespace, deployment] = key.split("/");
-			return {
-				context,
-				namespace,
-				deployment,
-				localPort: (proc as unknown as { _pfMeta?: { localPort: number; remotePort: number } })._pfMeta?.localPort || 0,
-				remotePort: (proc as unknown as { _pfMeta?: { localPort: number; remotePort: number } })._pfMeta?.remotePort || 0,
-			};
-		});
+		const forwards = Array.from(activePortForwards.entries()).map(
+			([key, proc]) => {
+				const [context, namespace, deployment] = key.split("/");
+				return {
+					context,
+					namespace,
+					deployment,
+					localPort:
+						(
+							proc as unknown as {
+								_pfMeta?: { localPort: number; remotePort: number };
+							}
+						)._pfMeta?.localPort || 0,
+					remotePort:
+						(
+							proc as unknown as {
+								_pfMeta?: { localPort: number; remotePort: number };
+							}
+						)._pfMeta?.remotePort || 0,
+				};
+			},
+		);
 		res.setHeader("Content-Type", "application/json");
 		res.end(JSON.stringify({ portForwards: forwards }));
 		return;
@@ -683,7 +824,8 @@ const portForwardHandler: Connect.NextHandleFunction = async (req, res) => {
 			});
 			req.on("end", resolve);
 		});
-		let payload: { deployment?: string; namespace?: string; context?: string } = {};
+		let payload: { deployment?: string; namespace?: string; context?: string } =
+			{};
 		try {
 			payload = JSON.parse(body);
 		} catch {
@@ -692,9 +834,19 @@ const portForwardHandler: Connect.NextHandleFunction = async (req, res) => {
 			return;
 		}
 		const { deployment, namespace, context } = payload;
-		if (!deployment || !namespace || !VALIDATION.k8sName.test(deployment) || !VALIDATION.k8sNamespace.test(namespace)) {
+		if (
+			!deployment ||
+			!namespace ||
+			!VALIDATION.k8sName.test(deployment) ||
+			!VALIDATION.k8sNamespace.test(namespace)
+		) {
 			res.statusCode = 400;
-			res.end(JSON.stringify({ error: "Invalid or missing deployment/namespace", success: false }));
+			res.end(
+				JSON.stringify({
+					error: "Invalid or missing deployment/namespace",
+					success: false,
+				}),
+			);
 			return;
 		}
 		if (context && !VALIDATION.context.test(context)) {
@@ -722,7 +874,13 @@ const portForwardHandler: Connect.NextHandleFunction = async (req, res) => {
 			});
 			req.on("end", resolve);
 		});
-		let payload: { deployment?: string; namespace?: string; context?: string; localPort?: number; remotePort?: number } = {};
+		let payload: {
+			deployment?: string;
+			namespace?: string;
+			context?: string;
+			localPort?: number;
+			remotePort?: number;
+		} = {};
 		try {
 			payload = JSON.parse(body);
 		} catch {
@@ -731,9 +889,19 @@ const portForwardHandler: Connect.NextHandleFunction = async (req, res) => {
 			return;
 		}
 		const { deployment, namespace, context } = payload;
-		if (!deployment || !namespace || !VALIDATION.k8sName.test(deployment) || !VALIDATION.k8sNamespace.test(namespace)) {
+		if (
+			!deployment ||
+			!namespace ||
+			!VALIDATION.k8sName.test(deployment) ||
+			!VALIDATION.k8sNamespace.test(namespace)
+		) {
 			res.statusCode = 400;
-			res.end(JSON.stringify({ error: "Invalid or missing deployment/namespace", success: false }));
+			res.end(
+				JSON.stringify({
+					error: "Invalid or missing deployment/namespace",
+					success: false,
+				}),
+			);
 			return;
 		}
 		if (context && !VALIDATION.context.test(context)) {
@@ -747,7 +915,12 @@ const portForwardHandler: Connect.NextHandleFunction = async (req, res) => {
 		const remotePort = Number(payload.remotePort);
 		if (!localPort || !remotePort) {
 			res.statusCode = 400;
-			res.end(JSON.stringify({ error: "Missing localPort or remotePort", success: false }));
+			res.end(
+				JSON.stringify({
+					error: "Missing localPort or remotePort",
+					success: false,
+				}),
+			);
 			return;
 		}
 
@@ -757,18 +930,30 @@ const portForwardHandler: Connect.NextHandleFunction = async (req, res) => {
 			activePortForwards.delete(key);
 		}
 
-		const args = ["kubectl", "port-forward", `deployment/${deployment}`, `${localPort}:${remotePort}`, "-n", namespace];
+		const args = [
+			"kubectl",
+			"port-forward",
+			`deployment/${deployment}`,
+			`${localPort}:${remotePort}`,
+			"-n",
+			namespace,
+		];
 		if (context) args.push(`--context=${context}`);
 
 		console.log(`[port-forward] Starting: ${args.join(" ")}`);
 		const proc = spawn(args[0], args.slice(1), { shell: false });
 
-		(proc as unknown as { _pfMeta: { localPort: number; remotePort: number } })._pfMeta = { localPort, remotePort };
+		(
+			proc as unknown as { _pfMeta: { localPort: number; remotePort: number } }
+		)._pfMeta = { localPort, remotePort };
 
 		let stderrBuffer = "";
 		proc.stderr.on("data", (data) => {
 			stderrBuffer += data.toString();
-			console.error(`[port-forward] stderr for ${key}:`, data.toString().trim());
+			console.error(
+				`[port-forward] stderr for ${key}:`,
+				data.toString().trim(),
+			);
 		});
 
 		proc.on("error", (err) => {
@@ -793,13 +978,17 @@ const portForwardHandler: Connect.NextHandleFunction = async (req, res) => {
 			}, 200);
 		});
 
-		if (proc.killed || stderrBuffer.toLowerCase().includes("error") || stderrBuffer.toLowerCase().includes("forbidden")) {
+		if (
+			proc.killed ||
+			stderrBuffer.toLowerCase().includes("error") ||
+			stderrBuffer.toLowerCase().includes("forbidden")
+		) {
 			proc.kill();
 			activePortForwards.delete(key);
 			const rawError = stderrBuffer.trim();
 			const errorMsg = rawError.toLowerCase().includes("forbidden")
 				? "Prohibido"
-				: (rawError || "Port-forward failed");
+				: rawError || "Port-forward failed";
 			res.setHeader("Content-Type", "application/json");
 			res.statusCode = 200;
 			res.end(JSON.stringify({ error: errorMsg, success: false }));
@@ -817,6 +1006,9 @@ const portForwardHandler: Connect.NextHandleFunction = async (req, res) => {
 
 // https://vite.dev/config/
 export default defineConfig({
+	define: {
+		"import.meta.env.VITE_GIT_COMMIT_HASH": JSON.stringify(gitShortHash),
+	},
 	plugins: [
 		tanstackRouter(),
 		react({
@@ -873,7 +1065,10 @@ export default defineConfig({
 						return "react";
 					}
 					// TanStack ecosystem
-					if (id.includes("@tanstack/react-query") || id.includes("@tanstack/react-router")) {
+					if (
+						id.includes("@tanstack/react-query") ||
+						id.includes("@tanstack/react-router")
+					) {
 						return "tanstack";
 					}
 					// UI components

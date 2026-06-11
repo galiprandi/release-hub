@@ -1,7 +1,26 @@
-import { createFileRoute, Link, Outlet, useRouterState, useSearch, useNavigate } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	Outlet,
+	useRouterState,
+	useSearch,
+	useNavigate,
+} from "@tanstack/react-router";
 import { useState, useMemo, useCallback } from "react";
 import { z } from "zod";
-import { Loader2, Star, Building2, FolderOpen, FolderPlus, Search, GitPullRequestCreateArrow, Settings2, GitPullRequest, Play } from "lucide-react";
+import {
+	Loader2,
+	Star,
+	Building2,
+	FolderOpen,
+	FolderPlus,
+	Search,
+	GitPullRequestCreateArrow,
+	Settings2,
+	GitPullRequest,
+	Play,
+	Github,
+} from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { useQueries } from "@tanstack/react-query";
 import { CommitLink } from "@/components/CommitLink";
@@ -42,21 +61,31 @@ function Dashboard() {
 	const { tab: activeTab = "favorites" } = useSearch({ from: "/github/" });
 	const navigate = useNavigate({ from: "/github/" });
 	const { favorites, projects, toggleFavorite } = useUserCollections();
-	const { isLoading: isLoadingRepos, data: summaryData } = useUserReposSummary();
+	const { isLoading: isLoadingRepos, data: summaryData } =
+		useUserReposSummary();
 	const { location } = useRouterState();
 	const isIndexRoute = location.pathname === "/github";
 	const [isManageProjectsOpen, setIsManageProjectsOpen] = useState(false);
 
-	const tabs = useMemo(() => [
-		{ value: "favorites", label: "Favoritos", icon: Star, count: favorites.length, description: "Tus repositorios marcados con estrella" },
-		...projects.map(p => ({
-			value: p.id,
-			label: p.name,
-			icon: FolderOpen,
-			count: p.repos.length,
-			description: p.description || `Colección ${p.name}`
-		})),
-	], [favorites.length, projects]);
+	const tabs = useMemo(
+		() => [
+			{
+				value: "favorites",
+				label: "Favoritos",
+				icon: Star,
+				count: favorites.length,
+				description: "Tus repositorios marcados con estrella",
+			},
+			...projects.map((p) => ({
+				value: p.id,
+				label: p.name,
+				icon: FolderOpen,
+				count: p.repos.length,
+				description: p.description || `Colección ${p.name}`,
+			})),
+		],
+		[favorites.length, projects],
+	);
 
 	// Determine repos to show based on active tab
 	const displayRepos = useMemo(() => {
@@ -83,14 +112,20 @@ function Dashboard() {
 
 	// Group repos by organization
 	const groupedRepos = useMemo(() => {
-		return displayRepos.reduce((acc, repo) => {
-			if (!acc[repo.org]) acc[repo.org] = [];
-			acc[repo.org].push(repo);
-			return acc;
-		}, {} as Record<string, RepoInfo[]>);
+		return displayRepos.reduce(
+			(acc, repo) => {
+				if (!acc[repo.org]) acc[repo.org] = [];
+				acc[repo.org].push(repo);
+				return acc;
+			},
+			{} as Record<string, RepoInfo[]>,
+		);
 	}, [displayRepos]);
 
-	const sortedOrgs = useMemo(() => Object.keys(groupedRepos).sort(), [groupedRepos]);
+	const sortedOrgs = useMemo(
+		() => Object.keys(groupedRepos).sort(),
+		[groupedRepos],
+	);
 	const isEmpty = displayRepos.length === 0;
 
 	const handleManageProjects = useCallback(() => {
@@ -105,22 +140,38 @@ function Dashboard() {
 		<PageLayout
 			header={{
 				title: "Repositorios",
-				searchComponent: <RepoSearch />
+				searchComponent: <RepoSearch />,
 			}}
 			isLoading={isLoadingRepos}
-			footer={summaryData ? {
-				show: true,
-				left: `${summaryData.total} repos accesibles (${summaryData.orgs.length} orgs + ${summaryData.personal} personales)`,
-				right: "ReleaseHub Open Source"
-			} : undefined}
+			footer={
+				summaryData
+					? {
+							show: true,
+							left: `${summaryData.total} repos accesibles (${summaryData.orgs.length} orgs + ${summaryData.personal} personales)`,
+							right: (
+								<a
+									href="https://github.com/galiprandi/release-hub"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex items-center gap-1.5 hover:text-foreground transition-colors"
+								>
+									<Github className="w-3.5 h-3.5" />
+									ReleaseHub
+								</a>
+							),
+						}
+					: undefined
+			}
 		>
 			<div className="space-y-6">
 				{/* Tabs & Management */}
 				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
 					<div className="flex items-center gap-2">
-						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Colecciones:</span>
+						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+							Colecciones:
+						</span>
 						<IndustrialTabs
-							options={tabs.map(t => ({
+							options={tabs.map((t) => ({
 								id: t.value,
 								label: (
 									<div className="flex items-center gap-1.5">
@@ -132,14 +183,25 @@ function Dashboard() {
 											</span>
 										)}
 									</div>
-								)
+								),
 							}))}
 							activeId={activeTab}
-							onChange={(id) => navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab: id as string }) })}
+							onChange={(id) =>
+								navigate({
+									search: (prev: Record<string, unknown>) => ({
+										...prev,
+										tab: id as string,
+									}),
+								})
+							}
 						/>
 					</div>
 					<ActionButton
-						action={{ icon: Settings2, label: "Gestionar Proyectos", color: "default" }}
+						action={{
+							icon: Settings2,
+							label: "Gestionar Proyectos",
+							color: "default",
+						}}
 						onClick={handleManageProjects}
 						size="md"
 						className="bg-muted/20 hover:bg-muted/30"
@@ -149,18 +211,30 @@ function Dashboard() {
 				{/* Content */}
 				{isEmpty ? (
 					<EmptyState
-						icon={activeTab === "favorites" ? <Star className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" /> : <FolderPlus className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />}
-						label={activeTab === "favorites" ? "Sin favoritos" : "Proyecto vacío"}
-						caption={activeTab === "favorites"
-							? "Agrega repositorios a tus favoritos para verlos aquí y monitorear sus despliegues."
-							: "Este proyecto no tiene repositorios aún. Navega a un repositorio y agrégalo a este proyecto desde la vista de detalle."}
+						icon={
+							activeTab === "favorites" ? (
+								<Star className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />
+							) : (
+								<FolderPlus className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />
+							)
+						}
+						label={
+							activeTab === "favorites" ? "Sin favoritos" : "Proyecto vacío"
+						}
+						caption={
+							activeTab === "favorites"
+								? "Agrega repositorios a tus favoritos para verlos aquí y monitorear sus despliegues."
+								: "Este proyecto no tiene repositorios aún. Navega a un repositorio y agrégalo a este proyecto desde la vista de detalle."
+						}
 						action={
 							<div className="flex flex-col items-center gap-4">
 								{activeTab === "favorites" ? (
 									<button
 										type="button"
 										onClick={() => {
-											const input = document.querySelector('input[placeholder*="Búsqueda"]') as HTMLInputElement;
+											const input = document.querySelector(
+												'input[placeholder*="Búsqueda"]',
+											) as HTMLInputElement;
 											if (input) {
 												input.focus();
 											}
@@ -175,7 +249,9 @@ function Dashboard() {
 										<button
 											type="button"
 											onClick={() => {
-												const input = document.querySelector('input[placeholder*="Búsqueda"]') as HTMLInputElement;
+												const input = document.querySelector(
+													'input[placeholder*="Búsqueda"]',
+												) as HTMLInputElement;
 												if (input) {
 													input.focus();
 												}
@@ -222,13 +298,21 @@ function Dashboard() {
 	);
 }
 
-function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps) {
+function ReposTable({
+	org,
+	repos,
+	favorites,
+	onToggleFavorite,
+}: ReposTableProps) {
 	const { filter: activeFilter } = useSearch({ from: "/github/" });
-	const sortedRepos = useMemo(() => [...repos].sort((a, b) => a.name.localeCompare(b.name)), [repos]);
+	const sortedRepos = useMemo(
+		() => [...repos].sort((a, b) => a.name.localeCompare(b.name)),
+		[repos],
+	);
 
 	// Fetch data for all repos to handle filtering at the table level
 	const repoDetailsQueries = useQueries({
-		queries: sortedRepos.map(repo => ({
+		queries: sortedRepos.map((repo) => ({
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			queryFn: async () => {
 				const query = `
@@ -271,23 +355,29 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 				`;
 
 				const gqlRes = await runCommand([
-					'gh', 'api', 'graphql',
-					'-f', `query=${query}`,
-					'-f', `owner=${repo.org}`,
-					'-f', `name=${repo.name}`
+					"gh",
+					"api",
+					"graphql",
+					"-f",
+					`query=${query}`,
+					"-f",
+					`owner=${repo.org}`,
+					"-f",
+					`name=${repo.name}`,
 				]);
 
 				const data = JSON.parse(gqlRes.stdout).data.repository;
 				if (!data) throw new Error("Repository not found");
 
-				const rawCommits = (data.defaultBranchRef?.target?.history?.nodes || []) as Array<{
+				const rawCommits = (data.defaultBranchRef?.target?.history?.nodes ||
+					[]) as Array<{
 					oid: string;
 					message: string;
 					committedDate: string;
 					author: { name: string };
 				}>;
 				const commits: Commit[] = rawCommits.map((c) => {
-					const [subject, ...bodyParts] = c.message.split('\n');
+					const [subject, ...bodyParts] = c.message.split("\n");
 					return {
 						hash: c.oid,
 						shortHash: c.oid.substring(0, 7),
@@ -295,38 +385,56 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 						date: c.committedDate,
 						message: c.message,
 						subject: subject.trim(),
-						body: bodyParts.join('\n').trim(),
+						body: bodyParts.join("\n").trim(),
 					};
 				});
 
-				const rawTag = data.refs.nodes[0] as {
-					name: string;
-					target: {
-						oid: string;
-						target?: { oid: string };
-					};
-				} | undefined;
-				const latestTag: Tag | null = rawTag ? {
-					name: rawTag.name,
-					commit: rawTag.target.target?.oid || rawTag.target.oid
-				} : null;
+				const rawTag = data.refs.nodes[0] as
+					| {
+							name: string;
+							target: {
+								oid: string;
+								target?: { oid: string };
+							};
+					  }
+					| undefined;
+				const latestTag: Tag | null = rawTag
+					? {
+							name: rawTag.name,
+							commit: rawTag.target.target?.oid || rawTag.target.oid,
+						}
+					: null;
 
 				const prCount = data.pullRequests.totalCount;
 
 				// Actions summary still via REST as it's more reliable/direct for workflow runs
 				const actionsRes = await runCommand([
-					'gh', 'api', `repos/${repo.fullName}/actions/runs?per_page=5`,
-					'--jq', '.workflow_runs[] | {status, conclusion}',
+					"gh",
+					"api",
+					`repos/${repo.fullName}/actions/runs?per_page=5`,
+					"--jq",
+					".workflow_runs[] | {status, conclusion}",
 				]);
-				const actionLines = actionsRes.stdout.trim().split("\n").filter(line => line.startsWith("{"));
-				const runs = actionLines.map(line => {
-					try { return JSON.parse(line); } catch { return null; }
-				}).filter(Boolean) as { status: string; conclusion: string | null }[];
+				const actionLines = actionsRes.stdout
+					.trim()
+					.split("\n")
+					.filter((line) => line.startsWith("{"));
+				const runs = actionLines
+					.map((line) => {
+						try {
+							return JSON.parse(line);
+						} catch {
+							return null;
+						}
+					})
+					.filter(Boolean) as { status: string; conclusion: string | null }[];
 
 				// Calculate pending
 				let pendingCount = 0;
 				if (latestTag && commits.length > 0) {
-					const prodIndex = commits.findIndex((c) => c.hash === latestTag.commit);
+					const prodIndex = commits.findIndex(
+						(c) => c.hash === latestTag.commit,
+					);
 					pendingCount = prodIndex === -1 ? commits.length : prodIndex;
 				}
 
@@ -340,16 +448,16 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 						total: runs.length,
 						running: runs.filter((r) => r.status === "in_progress").length,
 						failed: runs.filter((r) => r.conclusion === "failure").length,
-					}
+					},
 				};
 			},
 			...applyCachePolicy("git"),
-		}))
+		})),
 	});
 
 	const reposWithPending = useMemo(() => {
 		const pendingSet = new Set<string>();
-		repoDetailsQueries.forEach(query => {
+		repoDetailsQueries.forEach((query) => {
 			const data = query.data;
 			if (data && data.pendingCount > 0) {
 				pendingSet.add(data.fullName);
@@ -358,103 +466,126 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 		return pendingSet;
 	}, [repoDetailsQueries]);
 
-	const filters = useMemo(() => [
-		{ label: "Pendientes", columnId: "pending_filter", value: "true" }
-	], []);
+	const filters = useMemo(
+		() => [{ label: "Pendientes", columnId: "pending_filter", value: "true" }],
+		[],
+	);
 
-	const columns: ColumnDef<RepoInfo>[] = useMemo(() => [
-		{
-			accessorKey: "name",
-			header: () => (
-				<div className="flex items-center gap-2.5">
-					<Building2 className="w-3.5 h-3.5 text-primary/40" />
-					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{org}</span>
-				</div>
-			),
-			cell: ({ row }) => <RepoNameCell repo={row.original} />,
-		},
-		{
-			id: "pending_filter",
-			accessorKey: "fullName",
-			header: "Pendientes",
-			enableHiding: true,
-			cell: () => null,
-			filterFn: (row, _columnId, filterValue) => {
-				if (!filterValue) return true;
-				return reposWithPending.has(row.original.fullName);
-			}
-		},
-		{
-			accessorKey: "tag",
-			header: "Producción",
-			cell: ({ row }) => <TagCell repo={row.original} />,
-		},
-		{
-			accessorKey: "commit",
-			header: "Staging",
-			cell: ({ row }) => <CommitCell repo={row.original} />,
-		},
-		{
-			id: "health",
-			header: "Salud",
-			cell: ({ row }) => <HealthCell repo={row.original} />,
-		},
-		{
-			id: "prs",
-			header: "PRs",
-			cell: ({ row }) => {
-				const details = repoDetailsQueries.find(q => q.data?.fullName === row.original.fullName)?.data;
-				return <PRsCell repo={row.original} details={details} />;
+	const columns: ColumnDef<RepoInfo>[] = useMemo(
+		() => [
+			{
+				accessorKey: "name",
+				header: () => (
+					<div className="flex items-center gap-2.5">
+						<Building2 className="w-3.5 h-3.5 text-primary/40" />
+						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+							{org}
+						</span>
+					</div>
+				),
+				cell: ({ row }) => <RepoNameCell repo={row.original} />,
 			},
-		},
-		{
-			id: "actions_status",
-			header: "Workflows",
-			cell: ({ row }) => {
-				const details = repoDetailsQueries.find(q => q.data?.fullName === row.original.fullName)?.data;
-				return <ActionsStatusCell repo={row.original} details={details} />;
+			{
+				id: "pending_filter",
+				accessorKey: "fullName",
+				header: "Pendientes",
+				enableHiding: true,
+				cell: () => null,
+				filterFn: (row, _columnId, filterValue) => {
+					if (!filterValue) return true;
+					return reposWithPending.has(row.original.fullName);
+				},
 			},
-		},
-		{
-			accessorKey: "updatedAt",
-			header: "Actividad",
-			cell: ({ row }) => <DateCell repo={row.original} />,
-		},
-		{
-			accessorKey: "author",
-			header: "Autor",
-			cell: ({ row }) => <AuthorCell repo={row.original} />,
-		},
-		{
-			id: "operations",
-			accessorKey: "actions",
-			header: () => <div className="text-right">Operations</div>,
-			enableSorting: false,
-			cell: ({ row }) => (
-				<OperationsCell
-					repo={row.original}
-					isFavorite={favorites.includes(row.original.fullName)}
-					onToggleFavorite={onToggleFavorite}
-				/>
-			),
-		},
-			], [org, favorites, onToggleFavorite, reposWithPending, repoDetailsQueries]);
+			{
+				accessorKey: "tag",
+				header: "Producción",
+				cell: ({ row }) => <TagCell repo={row.original} />,
+			},
+			{
+				accessorKey: "commit",
+				header: "Staging",
+				cell: ({ row }) => <CommitCell repo={row.original} />,
+			},
+			{
+				id: "health",
+				header: "Salud",
+				cell: ({ row }) => <HealthCell repo={row.original} />,
+			},
+			{
+				id: "prs",
+				header: "PRs",
+				cell: ({ row }) => {
+					const details = repoDetailsQueries.find(
+						(q) => q.data?.fullName === row.original.fullName,
+					)?.data;
+					return <PRsCell repo={row.original} details={details} />;
+				},
+			},
+			{
+				id: "actions_status",
+				header: "Workflows",
+				cell: ({ row }) => {
+					const details = repoDetailsQueries.find(
+						(q) => q.data?.fullName === row.original.fullName,
+					)?.data;
+					return <ActionsStatusCell repo={row.original} details={details} />;
+				},
+			},
+			{
+				accessorKey: "updatedAt",
+				header: "Actividad",
+				cell: ({ row }) => <DateCell repo={row.original} />,
+			},
+			{
+				accessorKey: "author",
+				header: "Autor",
+				cell: ({ row }) => <AuthorCell repo={row.original} />,
+			},
+			{
+				id: "operations",
+				accessorKey: "actions",
+				header: () => <div className="text-right">Operations</div>,
+				enableSorting: false,
+				cell: ({ row }) => (
+					<OperationsCell
+						repo={row.original}
+						isFavorite={favorites.includes(row.original.fullName)}
+						onToggleFavorite={onToggleFavorite}
+					/>
+				),
+			},
+		],
+		[org, favorites, onToggleFavorite, reposWithPending, repoDetailsQueries],
+	);
 
 	const navigate = useNavigate({ from: "/github/" });
-	const handleFilterChange = useCallback((id: string) => {
-		const filterValue = id === "all" ? undefined : id;
-		navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, filter: filterValue }) });
-	}, [navigate]);
+	const handleFilterChange = useCallback(
+		(id: string) => {
+			const filterValue = id === "all" ? undefined : id;
+			navigate({
+				search: (prev: Record<string, unknown>) => ({
+					...prev,
+					filter: filterValue,
+				}),
+			});
+		},
+		[navigate],
+	);
 
-	const tableTabs = useMemo(() => [
-		{ id: "all", label: "Todos" },
-		...filters.map(f => ({ id: f.value, label: f.label }))
-	], [filters]);
+	const tableTabs = useMemo(
+		() => [
+			{ id: "all", label: "Todos" },
+			...filters.map((f) => ({ id: f.value, label: f.label })),
+		],
+		[filters],
+	);
 
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center gap-2 px-1">
-				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Filtrar:</span>
+				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					Filtrar:
+				</span>
 				<IndustrialTabs
 					options={tableTabs}
 					activeId={activeFilter || "all"}
@@ -464,7 +595,9 @@ function ReposTable({ org, repos, favorites, onToggleFavorite }: ReposTableProps
 			<Table
 				columns={columns}
 				data={sortedRepos}
-				activeFilter={activeFilter ? { id: "pending_filter", value: activeFilter } : null}
+				activeFilter={
+					activeFilter ? { id: "pending_filter", value: activeFilter } : null
+				}
 			/>
 		</div>
 	);
@@ -475,11 +608,13 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 	const [isCommitsModalOpen, setIsCommitsModalOpen] = useState(false);
 
 	const detailsQuery = useQueries({
-		queries: [{
-			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-			enabled: false
-		}]
-	})[0] as { data: RepoDetails | undefined, isLoading: boolean };
+		queries: [
+			{
+				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+				enabled: false,
+			},
+		],
+	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
 
 	const queryData = detailsQuery.data;
 	const commits = queryData?.commits;
@@ -528,7 +663,8 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 									className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs z-50"
 									sideOffset={5}
 								>
-									{pendingCount} commit{pendingCount !== 1 ? 's' : ''} pendientes de promoción a producción
+									{pendingCount} commit{pendingCount !== 1 ? "s" : ""}{" "}
+									pendientes de promoción a producción
 								</Tooltip.Content>
 							</Tooltip.Portal>
 						</Tooltip.Root>
@@ -549,11 +685,13 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 function TagCell({ repo }: { repo: RepoInfo }) {
 	const [org, name] = repo.fullName.split("/");
 	const detailsQuery = useQueries({
-		queries: [{
-			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-			enabled: false
-		}]
-	})[0] as { data: RepoDetails | undefined, isLoading: boolean };
+		queries: [
+			{
+				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+				enabled: false,
+			},
+		],
+	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
 	const queryData = detailsQuery.data;
 	const latestTag = queryData?.latestTag;
 	const commits = queryData?.commits;
@@ -563,14 +701,21 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 		tag: latestTag?.name ?? "",
 		enabled: !!latestTag?.commit && !!latestTag?.name,
 	});
-	const productionStatus = useMemo(() =>
-		getPipelineStatusInfo(prodPipeline.data?.events, prodPipeline.data?.updated_at),
-	[prodPipeline.data]);
+	const productionStatus = useMemo(
+		() =>
+			getPipelineStatusInfo(
+				prodPipeline.data?.events,
+				prodPipeline.data?.updated_at,
+			),
+		[prodPipeline.data],
+	);
 	const isProdLoading = prodPipeline.isLoading || detailsQuery.isLoading;
 
 	const tagCommitInfo = useMemo(() => {
 		if (!latestTag?.commit || !commits) return undefined;
-		const commit = (commits as Commit[]).find(c => c.hash === latestTag.commit);
+		const commit = (commits as Commit[]).find(
+			(c) => c.hash === latestTag.commit,
+		);
 		if (!commit) return undefined;
 		return {
 			hash: commit.hash,
@@ -595,17 +740,23 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 			commitInfo={tagCommitInfo}
 			navigateToRepo={true}
 		/>
-	) : <span className="text-muted-foreground/40 text-xs font-medium italic">Sin tags</span>;
+	) : (
+		<span className="text-muted-foreground/40 text-xs font-medium italic">
+			Sin tags
+		</span>
+	);
 }
 
 function CommitCell({ repo }: { repo: RepoInfo }) {
 	const [org, name] = repo.fullName.split("/");
 	const detailsQuery = useQueries({
-		queries: [{
-			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-			enabled: false
-		}]
-	})[0] as { data: RepoDetails | undefined, isLoading: boolean };
+		queries: [
+			{
+				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+				enabled: false,
+			},
+		],
+	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
 	const queryData = detailsQuery.data;
 	const latestCommit = queryData?.commits?.[0];
 	const stagingPipeline = usePipelineWithHealth({
@@ -613,9 +764,14 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 		commit: latestCommit?.hash ?? "",
 		enabled: !!latestCommit?.hash,
 	});
-	const stagingStatus = useMemo(() =>
-		getPipelineStatusInfo(stagingPipeline.data?.events, stagingPipeline.data?.updated_at),
-	[stagingPipeline.data]);
+	const stagingStatus = useMemo(
+		() =>
+			getPipelineStatusInfo(
+				stagingPipeline.data?.events,
+				stagingPipeline.data?.updated_at,
+			),
+		[stagingPipeline.data],
+	);
 	const isStagingLoading = stagingPipeline.isLoading || detailsQuery.isLoading;
 
 	const commitInfo = useMemo(() => {
@@ -643,16 +799,22 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 			commitInfo={commitInfo}
 			navigateToRepo={true}
 		/>
-	) : <span className="text-muted-foreground/40 text-xs font-medium italic">Sin commits</span>;
+	) : (
+		<span className="text-muted-foreground/40 text-xs font-medium italic">
+			Sin commits
+		</span>
+	);
 }
 
 function DateCell({ repo }: { repo: RepoInfo }) {
 	const detailsQuery = useQueries({
-		queries: [{
-			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-			enabled: false
-		}]
-	})[0] as { data: RepoDetails | undefined, isLoading: boolean };
+		queries: [
+			{
+				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+				enabled: false,
+			},
+		],
+	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
 	const queryData = detailsQuery.data;
 	const commitDate = queryData?.commits?.[0]?.date;
 
@@ -673,9 +835,9 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 
 	if (endpoints.length === 0) return null;
 
-	const healthyCount = endpoints.filter(e => e.isHealthy === true).length;
-	const unhealthyCount = endpoints.filter(e => e.isHealthy === false).length;
-	const pendingCount = endpoints.filter(e => e.isHealthy === null).length;
+	const healthyCount = endpoints.filter((e) => e.isHealthy === true).length;
+	const unhealthyCount = endpoints.filter((e) => e.isHealthy === false).length;
+	const pendingCount = endpoints.filter((e) => e.isHealthy === null).length;
 
 	return (
 		<Tooltip.Provider>
@@ -683,7 +845,9 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 				<Tooltip.Trigger asChild>
 					<Link
 						to="/health"
-						search={{ environment: unhealthyCount > 0 ? 'unhealthy' : undefined }}
+						search={{
+							environment: unhealthyCount > 0 ? "unhealthy" : undefined,
+						}}
 						className="flex items-center gap-1.5 hover:bg-muted/40 p-1 rounded-md transition-colors"
 					>
 						<div className="flex items-center -space-x-1">
@@ -708,10 +872,27 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 						sideOffset={5}
 					>
 						<div className="space-y-1">
-							<p className="font-bold border-b border-border/40 pb-1 mb-1">Estado de Salud</p>
-							{healthyCount > 0 && <p className="text-success flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-success" /> {healthyCount} OK</p>}
-							{unhealthyCount > 0 && <p className="text-destructive flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-destructive" /> {unhealthyCount} Error</p>}
-							{pendingCount > 0 && <p className="text-muted-foreground flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" /> {pendingCount} Pendiente</p>}
+							<p className="font-bold border-b border-border/40 pb-1 mb-1">
+								Estado de Salud
+							</p>
+							{healthyCount > 0 && (
+								<p className="text-success flex items-center gap-1.5">
+									<span className="w-1.5 h-1.5 rounded-full bg-success" />{" "}
+									{healthyCount} OK
+								</p>
+							)}
+							{unhealthyCount > 0 && (
+								<p className="text-destructive flex items-center gap-1.5">
+									<span className="w-1.5 h-1.5 rounded-full bg-destructive" />{" "}
+									{unhealthyCount} Error
+								</p>
+							)}
+							{pendingCount > 0 && (
+								<p className="text-muted-foreground flex items-center gap-1.5">
+									<span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />{" "}
+									{pendingCount} Pendiente
+								</p>
+							)}
 						</div>
 					</Tooltip.Content>
 				</Tooltip.Portal>
@@ -722,11 +903,13 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 
 function AuthorCell({ repo }: { repo: RepoInfo }) {
 	const detailsQuery = useQueries({
-		queries: [{
-			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-			enabled: false // Using data from parent
-		}]
-	})[0] as { data: RepoDetails | undefined, isLoading: boolean };
+		queries: [
+			{
+				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+				enabled: false, // Using data from parent
+			},
+		],
+	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
 	const queryData = detailsQuery.data;
 	const commitAuthor = queryData?.commits?.[0]?.author;
 
@@ -734,12 +917,16 @@ function AuthorCell({ repo }: { repo: RepoInfo }) {
 		return <div className="h-4 bg-muted/20 rounded w-32 animate-pulse" />;
 	}
 
-	const truncatedAuthor = commitAuthor && commitAuthor.length > 25
-		? commitAuthor.slice(0, 25) + "..."
-		: commitAuthor;
+	const truncatedAuthor =
+		commitAuthor && commitAuthor.length > 25
+			? commitAuthor.slice(0, 25) + "..."
+			: commitAuthor;
 
 	return truncatedAuthor ? (
-		<span className="text-xs text-muted-foreground/80 font-medium" title={commitAuthor}>
+		<span
+			className="text-xs text-muted-foreground/80 font-medium"
+			title={commitAuthor}
+		>
 			{truncatedAuthor}
 		</span>
 	) : null;
@@ -768,7 +955,9 @@ function PRsCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
 						aria-label={`${prCount} pull requests abiertos`}
 					>
 						<GitPullRequest className="w-3 h-3" />
-						<span className="text-[10px] font-bold uppercase tracking-wider">{prCount}</span>
+						<span className="text-[10px] font-bold uppercase tracking-wider">
+							{prCount}
+						</span>
 					</a>
 				</Tooltip.Trigger>
 				<Tooltip.Portal>
@@ -776,7 +965,8 @@ function PRsCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
 						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs z-50"
 						sideOffset={5}
 					>
-						{prCount} pull request{prCount !== 1 ? 's' : ''} abierto{prCount !== 1 ? 's' : ''}
+						{prCount} pull request{prCount !== 1 ? "s" : ""} abierto
+						{prCount !== 1 ? "s" : ""}
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -784,7 +974,13 @@ function PRsCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
 	);
 }
 
-function ActionsStatusCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
+function ActionsStatusCell({
+	repo,
+	details,
+}: {
+	repo: RepoInfo;
+	details?: RepoDetails;
+}) {
 	const actions = details?.actions;
 
 	if (!details) {
@@ -809,12 +1005,12 @@ function ActionsStatusCell({ repo, details }: { repo: RepoInfo; details?: RepoDe
 							hasFailure
 								? "bg-destructive/20 text-destructive border-destructive/20 hover:bg-destructive/30"
 								: isRunning
-								? "bg-warning/20 text-warning border-warning/20 hover:bg-warning/30"
-								: "bg-success/20 text-success border-success/20 hover:bg-success/30"
+									? "bg-warning/20 text-warning border-warning/20 hover:bg-warning/30"
+									: "bg-success/20 text-success border-success/20 hover:bg-success/30"
 						}`}
-						aria-label={`Estado de GitHub Actions: ${hasFailure ? 'Fallido' : isRunning ? 'En progreso' : 'Exitoso'}`}
+						aria-label={`Estado de GitHub Actions: ${hasFailure ? "Fallido" : isRunning ? "En progreso" : "Exitoso"}`}
 					>
-						<Play className={`w-3 h-3 ${isRunning ? 'animate-pulse' : ''}`} />
+						<Play className={`w-3 h-3 ${isRunning ? "animate-pulse" : ""}`} />
 						<span className="text-[10px] font-bold uppercase tracking-wider">
 							{hasFailure ? "Error" : isRunning ? "Running" : "Success"}
 						</span>
@@ -826,9 +1022,21 @@ function ActionsStatusCell({ repo, details }: { repo: RepoInfo; details?: RepoDe
 						sideOffset={5}
 					>
 						<div className="space-y-1">
-							<p className="font-bold border-b border-border/40 pb-1 mb-1">Últimos 5 runs</p>
-							{actions.failed > 0 && <p className="text-destructive flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-destructive" /> {actions.failed} Fallidos</p>}
-							{actions.running > 0 && <p className="text-warning flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" /> {actions.running} En curso</p>}
+							<p className="font-bold border-b border-border/40 pb-1 mb-1">
+								Últimos 5 runs
+							</p>
+							{actions.failed > 0 && (
+								<p className="text-destructive flex items-center gap-1.5">
+									<span className="w-1.5 h-1.5 rounded-full bg-destructive" />{" "}
+									{actions.failed} Fallidos
+								</p>
+							)}
+							{actions.running > 0 && (
+								<p className="text-warning flex items-center gap-1.5">
+									<span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />{" "}
+									{actions.running} En curso
+								</p>
+							)}
 							{actions.total - actions.failed - actions.running > 0 && (
 								<p className="text-success flex items-center gap-1.5">
 									<span className="w-1.5 h-1.5 rounded-full bg-success" />
@@ -843,15 +1051,25 @@ function ActionsStatusCell({ repo, details }: { repo: RepoInfo; details?: RepoDe
 	);
 }
 
-function OperationsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo; isFavorite: boolean; onToggleFavorite: (product: string) => void }) {
+function OperationsCell({
+	repo,
+	isFavorite,
+	onToggleFavorite,
+}: {
+	repo: RepoInfo;
+	isFavorite: boolean;
+	onToggleFavorite: (product: string) => void;
+}) {
 	const [org, name] = repo.fullName.split("/");
 	const [isProjectSelectionOpen, setIsProjectSelectionOpen] = useState(false);
 	const detailsQuery = useQueries({
-		queries: [{
-			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-			enabled: false
-		}]
-	})[0] as { data: RepoDetails | undefined, isLoading: boolean };
+		queries: [
+			{
+				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
+				enabled: false,
+			},
+		],
+	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
 	const queryData = detailsQuery.data;
 	const latestTag = queryData?.latestTag;
 
@@ -859,7 +1077,11 @@ function OperationsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo
 		<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
 			<FreezeDialog repo={repo.fullName} iconOnly={true} />
 			<ForceRedeployDialog repo={repo.fullName} iconOnly={true} />
-			<PromoteDialog repo={repo.fullName} latestTag={latestTag?.name} iconOnly={true} />
+			<PromoteDialog
+				repo={repo.fullName}
+				latestTag={latestTag?.name}
+				iconOnly={true}
+			/>
 			<div className="w-px h-4 bg-border/20 mx-0.5" />
 			<ActionButton
 				action={ACTION_DEFINITIONS.manageProjects}
@@ -868,11 +1090,17 @@ function OperationsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo
 			/>
 			<ActionButton
 				action={ACTION_DEFINITIONS.openGitHub}
-				onClick={() => window.open(`https://github.com/${org}/${name}`, '_blank')}
+				onClick={() =>
+					window.open(`https://github.com/${org}/${name}`, "_blank")
+				}
 				size="sm"
 			/>
 			<ActionButton
-				action={isFavorite ? ACTION_DEFINITIONS.removeFavorite : ACTION_DEFINITIONS.addFavorite}
+				action={
+					isFavorite
+						? ACTION_DEFINITIONS.removeFavorite
+						: ACTION_DEFINITIONS.addFavorite
+				}
 				onClick={() => onToggleFavorite(repo.fullName)}
 				size="sm"
 			/>
@@ -884,7 +1112,6 @@ function OperationsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo
 		</div>
 	);
 }
-
 
 interface Commit {
 	hash: string;

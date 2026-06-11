@@ -479,9 +479,9 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0];
+	})[0] as { data: RepoDetails | undefined, isLoading: boolean };
 
-	const queryData = detailsQuery.data as RepoDetails | undefined;
+	const queryData = detailsQuery.data;
 	const commits = queryData?.commits;
 	const latestTag = queryData?.latestTag;
 	const pendingCount = queryData?.pendingCount || 0;
@@ -553,8 +553,8 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0];
-	const queryData = detailsQuery.data as RepoDetails | undefined;
+	})[0] as { data: RepoDetails | undefined, isLoading: boolean };
+	const queryData = detailsQuery.data;
 	const latestTag = queryData?.latestTag;
 	const commits = queryData?.commits;
 	const prodPipeline = usePipelineWithHealth({
@@ -605,8 +605,8 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0];
-	const queryData = detailsQuery.data as RepoDetails | undefined;
+	})[0] as { data: RepoDetails | undefined, isLoading: boolean };
+	const queryData = detailsQuery.data;
 	const latestCommit = queryData?.commits?.[0];
 	const stagingPipeline = usePipelineWithHealth({
 		product: repo.fullName,
@@ -652,8 +652,8 @@ function DateCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0];
-	const queryData = detailsQuery.data as RepoDetails | undefined;
+	})[0] as { data: RepoDetails | undefined, isLoading: boolean };
+	const queryData = detailsQuery.data;
 	const commitDate = queryData?.commits?.[0]?.date;
 
 	if (detailsQuery.isLoading) {
@@ -726,8 +726,8 @@ function AuthorCell({ repo }: { repo: RepoInfo }) {
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false // Using data from parent
 		}]
-	})[0];
-	const queryData = detailsQuery.data as RepoDetails | undefined;
+	})[0] as { data: RepoDetails | undefined, isLoading: boolean };
+	const queryData = detailsQuery.data;
 	const commitAuthor = queryData?.commits?.[0]?.author;
 
 	if (detailsQuery.isLoading) {
@@ -851,8 +851,8 @@ function OperationsCell({ repo, isFavorite, onToggleFavorite }: { repo: RepoInfo
 			queryKey: queryKeys.git.dashboardDetails(repo.fullName),
 			enabled: false
 		}]
-	})[0];
-	const queryData = detailsQuery.data as RepoDetails | undefined;
+	})[0] as { data: RepoDetails | undefined, isLoading: boolean };
+	const queryData = detailsQuery.data;
 	const latestTag = queryData?.latestTag;
 
 	return (

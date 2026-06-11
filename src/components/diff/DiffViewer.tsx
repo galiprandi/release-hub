@@ -210,23 +210,25 @@ function hasDiff(line: DiffLine): boolean {
 }
 
 function DiffLineRow({ line, mode }: { line: DiffLine; mode: DiffMode }) {
+	const leftValue = line.left?.value;
 	const highlightedLeft = useMemo(() => {
-		if (!line.left?.value || mode === 'text') return line.left?.value || ' ';
+		if (!leftValue || mode === 'text') return leftValue || ' ';
 		try {
-			return highlight(line.left.value);
+			return highlight(leftValue);
 		} catch {
-			return line.left.value;
+			return leftValue;
 		}
-	}, [line.left?.value, mode]);
+	}, [leftValue, mode]);
 
+	const rightValue = line.right?.value;
 	const highlightedRight = useMemo(() => {
-		if (!line.right?.value || mode === 'text') return line.right?.value || ' ';
+		if (!rightValue || mode === 'text') return rightValue || ' ';
 		try {
-			return highlight(line.right.value);
+			return highlight(rightValue);
 		} catch {
-			return line.right.value;
+			return rightValue;
 		}
-	}, [line.right?.value, mode]);
+	}, [rightValue, mode]);
 
 	return (
 		<div className="flex w-full group">

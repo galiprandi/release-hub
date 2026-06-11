@@ -169,38 +169,28 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 				}
 			});
 
-			setExecutedResponse({
+			const responseData: CurlResponse = {
 				status,
 				statusText,
 				headers: headersObj,
 				body: bodyText,
 				responseTime,
-			});
+			};
+
+			setExecutedResponse(responseData);
 
 			// Update query with new response
-			setQuery(prev => prev ? {
+			setQuery((prev: QueryRecord | undefined) => prev ? {
 				...prev,
 				curl: curlString,
 				updatedAt: new Date().toISOString(),
-				response: {
-					status,
-					statusText,
-					headers: headersObj,
-					body: bodyText,
-					responseTime,
-				},
+				response: responseData,
 			} : {
 				id: '',
 				curl: curlString,
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
-				response: {
-					status,
-					statusText,
-					headers: headersObj,
-					body: bodyText,
-					responseTime,
-				},
+				response: responseData,
 			});
 
 			// Save to history with response after execution

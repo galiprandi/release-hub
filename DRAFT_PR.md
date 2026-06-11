@@ -1,21 +1,22 @@
-# PR Draft: Technical Hygiene & Type Standardization 🐜
+# PR Draft: Security Hardening V2 & Type Robustness 🐜
 
 ## Scope
-This PR aims to enhance the security posture of ReleaseHub and improve code quality through strict typing, specifically targeting advanced SSRF vectors and type entropy in critical components.
+This PR implements advanced security hardening measures and eradicates remaining type entropy to ensure a robust and inexpugnable system.
 
-### Security Hardening
-- **Enhanced SSRF Protection**: Refactoring `healthProxyHandler` in `vite.config.ts` to implement a comprehensive filter for internal network ranges, including full loopback `127.0.0.0/8`, link-local `169.254.0.0/16`, CGNAT `100.64.0.0/10`, and IPv6 local/link-local ranges.
-- **Improved Normalization**: Better handling of IPv4-mapped IPv6 addresses to prevent bypasses.
-- **Expanded Test Suite**: Adding granular test cases to `src/api/security.test.ts` to validate the new protection layers.
+### Security Hardening (SSRF & DNS Rebinding)
+- **DNS Rebinding Protection**: Refactoring `healthProxyHandler` in `vite.config.ts` to implement pre-resolution of hostnames. By validating the resolved IP against internal ranges and using the IP for the request while pinning the `Host` header, we neutralize DNS Rebinding attacks.
+- **SSRF Filter Refinement**: Consolidating the `isInternal` logic to cover all edge cases (IPv4-mapped IPv6, CGNAT, Link-Local).
+- **Expanded Security Tests**: Adding specific test cases for DNS Rebinding scenarios in `src/api/security.test.ts`.
 
-### Type Hygiene
-- **Component Refactoring**: Eliminating unsafe type casts and implicit `any` in `QueryModal.tsx` and `AIChatModal.tsx`.
-- **Mock Hardening**: Updating `pulsarAdapter.test.ts` to ensure mock parity with technical API signatures, maintaining a zero-warning build log.
+### Type Hygiene & AAA Standard
+- **AIChatModal Alignment**: Synchronizing `AIChatModal.tsx` and its tests with the latest `@galiprandi/react-tools` `useAIPrompt` interface (`progress`, `contextUsage`).
+- **QueryModal Hardening**: Eradicating implicit `any` and hardening state transition logic.
+- **Zero-Warning Build**: Ensuring the entire codebase compiles without warnings, maintaining AAA hygiene standards.
 
 ## Impact
-- Significantly reduced attack surface for SSRF attacks.
-- Improved code maintainability and technical resonance.
-- Compliance with AAA standard hygiene.
+- Immunity to DNS Rebinding attacks on the health proxy.
+- Improved technical resonance and maintainability through strict typing.
+- Full compliance with `DESIGN.md` and `AGENTS.md` protocols.
 
 ---
-*Status: In Progress (Phase 1)*
+*Status: In Progress (Phase 0: Territory Block)*

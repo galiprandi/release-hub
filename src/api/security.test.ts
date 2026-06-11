@@ -215,6 +215,46 @@ describe('Security Hardening', () => {
     });
   })
 
+  describe('DNS Rebinding Protection (Simulation)', () => {
+    // In vite.config.ts, we resolve the hostname and check the IP
+    // This test simulates that logic
+    const lookupAndValidate = async (hostname: string, mockLookup: (h: string) => Promise<string>) => {
+      const isInternal = (addr: string) => {
+        if (addr === '127.0.0.1' || addr === '::1') return true;
+        if (addr.startsWith('10.')) return true;
+        return false;
+      };
+
+      if (isInternal(hostname)) return { allowed: false, error: 'Hostname is internal' };
+
+      try {
+        const resolvedIp = await mockLookup(hostname);
+        if (isInternal(resolvedIp)) return { allowed: false, error: 'Resolved IP is internal' };
+        return { allowed: true, resolvedIp };
+      } catch {
+        return { allowed: false, error: 'DNS resolution failed' };
+      }
+    };
+
+    it('should block DNS Rebinding attack where hostname is external but resolves to internal IP', async () => {
+      const maliciousHostname = 'malicious.com';
+      const mockLookup = vi.fn().mockResolvedValue('127.0.0.1');
+
+      const result = await lookupAndValidate(maliciousHostname, mockLookup);
+      expect(result.allowed).toBe(false);
+      expect(result.error).toBe('Resolved IP is internal');
+    });
+
+    it('should allow legitimate external hostname resolving to external IP', async () => {
+      const legitHostname = 'google.com';
+      const mockLookup = vi.fn().mockResolvedValue('8.8.8.8');
+
+      const result = await lookupAndValidate(legitHostname, mockLookup);
+      expect(result.allowed).toBe(true);
+      expect(result.resolvedIp).toBe('8.8.8.8');
+    });
+  })
+
   describe('Flag Injection Protection', () => {
     const k8sNameRegex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
 

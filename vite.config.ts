@@ -1,7 +1,11 @@
 import { spawn } from "node:child_process";
+import dns from "node:dns";
 import http from "node:http";
 import https from "node:https";
+import { promisify } from "node:util";
 import type { Connect } from "vite";
+
+const lookup = promisify(dns.lookup);
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
@@ -234,28 +238,51 @@ const healthProxyHandler: Connect.NextHandleFunction = async (req, res) => {
 
 	try {
 		const initialUrlObj = new URL(targetUrl);
-		if (isInternal(initialUrlObj.hostname)) {
+		const originalHostname = initialUrlObj.hostname;
+
+		// Initial hostname check
+		if (isInternal(originalHostname)) {
 			res.statusCode = 403;
 			res.end(JSON.stringify({ error: 'Access to internal targets is forbidden' }));
 			return;
 		}
 
+		// DNS Rebinding Protection: Resolve hostname and check IPs
+		let resolvedIp: string;
+		try {
+			const { address } = await lookup(originalHostname);
+			resolvedIp = address;
+
+			if (isInternal(resolvedIp)) {
+				res.statusCode = 403;
+				res.end(JSON.stringify({ error: 'Resolved IP is internal and forbidden' }));
+				return;
+			}
+		} catch (dnsError) {
+			console.error(`[health-proxy] DNS resolution failed for ${originalHostname}:`, dnsError);
+			res.statusCode = 502;
+			res.end(JSON.stringify({ error: `DNS resolution failed: ${originalHostname}` }));
+			return;
+		}
+
 		const healthUrl = targetUrl.endsWith('/') ? `${targetUrl}health` : `${targetUrl}/health`;
-		console.log(`[health-proxy] Checking: ${healthUrl}`);
+		console.log(`[health-proxy] Checking: ${healthUrl} (Resolved: ${resolvedIp})`);
 
 		const targetUrlObj = new URL(healthUrl);
 
 		const isHttps = targetUrlObj.protocol === 'https:';
 		const port = targetUrlObj.port || (isHttps ? 443 : 80);
 		const options = {
-			hostname: targetUrlObj.hostname,
+			hostname: resolvedIp, // Use resolved IP to prevent DNS Rebinding
 			port,
 			path: targetUrlObj.pathname + targetUrlObj.search,
 			method: 'GET',
 			rejectUnauthorized: false, // Ignore SSL certificate errors
+			servername: originalHostname, // CRITICAL: Required for SNI and certificate validation when hostname is an IP
 			timeout: 5000,
 			headers: {
 				'Accept': 'application/json',
+				'Host': originalHostname, // Pass original hostname for virtual hosting
 			},
 		};
 

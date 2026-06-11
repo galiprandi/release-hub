@@ -1,21 +1,21 @@
-# PR Draft: Technical Hygiene & Type Standardization 🐜
+# 🐜 Fiona: Diff Viewer Hygiene & Type Standardization
+
+## Objective
+Eradicate technical entropy and React Compiler errors while hardening type safety in the GitHub Dashboard. This mission focuses on achieving a zero-warning build and ensuring Industrial Resonance V2 compliance.
 
 ## Scope
-This PR aims to enhance the security posture of ReleaseHub and improve code quality through strict typing, specifically targeting advanced SSRF vectors and type entropy in critical components.
+- **React Compiler Fix**: Resolve `preserve-manual-memoization` errors in `DiffViewer.tsx`.
+- **Type Hygiene**: Refine interfaces and eliminate unsafe assertions in `src/routes/github/index.tsx`.
+- **Entropy Cleanup**: Remove stale references to legacy components (FilterBar) and audit orphan hooks.
+- **Resonance V2 Alignment**: Ensure high-density typography and semantic consistency in modified views.
 
-### Security Hardening
-- **Enhanced SSRF Protection**: Refactoring `healthProxyHandler` in `vite.config.ts` to implement a comprehensive filter for internal network ranges, including full loopback `127.0.0.0/8`, link-local `169.254.0.0/16`, CGNAT `100.64.0.0/10`, and IPv6 local/link-local ranges.
-- **Improved Normalization**: Better handling of IPv4-mapped IPv6 addresses to prevent bypasses.
-- **Expanded Test Suite**: Adding granular test cases to `src/api/security.test.ts` to validate the new protection layers.
+## Technical Details
+- Adjusting `useMemo` dependencies to match inferred usage by React Compiler.
+- Replacing `as RepoDetails` and similar casts with strict type guards or pre-defined interfaces.
+- Global grep for `FilterBar` comments.
 
-### Type Hygiene
-- **Component Refactoring**: Eliminating unsafe type casts and implicit `any` in `QueryModal.tsx` and `AIChatModal.tsx`.
-- **Mock Hardening**: Updating `pulsarAdapter.test.ts` to ensure mock parity with technical API signatures, maintaining a zero-warning build log.
-
-## Impact
-- Significantly reduced attack surface for SSRF attacks.
-- Improved code maintainability and technical resonance.
-- Compliance with AAA standard hygiene.
-
----
-*Status: In Progress (Phase 1)*
+## Verification Plan
+- [ ] `npm run build` (Zero warnings)
+- [ ] `npm run lint` (Success)
+- [ ] `npm run test` (Regression check)
+- [ ] Playwright screenshots: `DiffViewer` & `GitHub Dashboard`.

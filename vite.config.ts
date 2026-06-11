@@ -1,20 +1,20 @@
-import { spawn } from "node:child_process";
+import { spawn, execSync } from "node:child_process";
 import dns from "node:dns";
 import http from "node:http";
 import https from "node:https";
 import { promisify } from "node:util";
-import type { Connect } from "vite";
-
-const lookup = promisify(dns.lookup);
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import type { Connect } from "vite";
 import {
 	DEFAULT_START_PORT,
 	DEFAULT_MAX_PORTS,
 } from "./src/config/portForward";
 import { setupTerminalMiddleware } from "./src/config/terminalMiddleware";
+
+const lookup = promisify(dns.lookup);
 
 // Get short git commit hash
 let gitShortHash = "unknown";
@@ -237,7 +237,7 @@ const healthProxyHandler: Connect.NextHandleFunction = async (req, res) => {
 
 		// IPv4 Check
 		const parts = addr.split(".").map(Number);
-		if (parts.length === 4 && !parts.some(isNaN)) {
+		if (parts.length === 4 && !parts.some(Number.isNaN)) {
 			const [p0, p1] = parts;
 			// Loopback (127.0.0.0/8)
 			if (p0 === 127) return true;

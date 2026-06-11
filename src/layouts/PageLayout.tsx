@@ -1,37 +1,36 @@
-import React, { type ReactNode, useState } from "react";
+import React, { type ReactNode, useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
+import * as Tooltip from "@radix-ui/react-tooltip";
+import html2canvas from "html2canvas";
 import {
+	Activity,
+	BookMarked,
+	Blocks,
 	Box,
 	Boxes,
-	Blocks,
-	Send,
-	Moon,
-	Sun,
-	BookMarked,
-	Newspaper,
-	MessageSquare,
-	Settings,
-	RefreshCw,
-	Activity,
-	GitCompare,
-	Sparkles,
 	Camera,
-	Terminal as TerminalIcon,
-	Copy,
 	Check,
+	Copy,
+	GitCompare,
+	MessageSquare,
+	Moon,
+	Newspaper,
+	RefreshCw,
+	Settings,
+	Sparkles,
+	Sun,
+	Terminal as TerminalIcon,
+	Send,
 } from "lucide-react";
-import { useEffect } from "react";
-import * as Tooltip from "@radix-ui/react-tooltip";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
 import { SettingsDialog } from "@/components/SettingsDialog";
 import { AIChatModal } from "@/components/AIChatModal";
 import { GenericSearch } from "@/components/GenericSearch";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { EmptyState } from "@/components/EmptyState";
-import { useGitUser } from "@/hooks/useGitUser";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { Terminal } from "@/components/shared/Terminal";
-import html2canvas from "html2canvas";
+import { useGitUser } from "@/hooks/useGitUser";
 
 interface PageLayoutProps {
 	children: ReactNode;
@@ -307,12 +306,12 @@ export function PageLayout({
 							<span>{footer?.left}</span>
 							<div className="flex items-center gap-4">
 								<span className="flex items-center gap-2">
+									<InstallButton />
 									{footer?.right}
 									<span className="font-mono">
 										Versión: {import.meta.env.VITE_GIT_COMMIT_HASH || "unknown"}
 									</span>
 								</span>
-								<InstallButton />
 							</div>
 						</div>
 					</footer>

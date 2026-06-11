@@ -1,28 +1,31 @@
+import { useCallback, useMemo, useState } from "react";
+import { z } from "zod";
 import {
 	createFileRoute,
 	Link,
 	Outlet,
+	useNavigate,
 	useRouterState,
 	useSearch,
-	useNavigate,
 } from "@tanstack/react-router";
-import { useState, useMemo, useCallback } from "react";
-import { z } from "zod";
+import { useQueries } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import {
-	Loader2,
-	Star,
 	Building2,
 	FolderOpen,
 	FolderPlus,
-	Search,
-	GitPullRequestCreateArrow,
-	Settings2,
-	GitPullRequest,
-	Play,
 	Github,
+	GitPullRequest,
+	GitPullRequestCreateArrow,
+	Loader2,
+	Play,
+	Search,
+	Settings2,
+	Star,
 } from "lucide-react";
-import * as Tooltip from "@radix-ui/react-tooltip";
-import { useQueries } from "@tanstack/react-query";
+import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
+import { Table } from "@/components/ui/Table";
 import { CommitLink } from "@/components/CommitLink";
 import { TagLink } from "@/components/TagLink";
 import { PromoteDialog } from "@/components/PromoteDialog";
@@ -32,18 +35,15 @@ import { CommitsModal } from "@/components/CommitsModal";
 import { PageLayout } from "@/layouts/PageLayout";
 import { RepoSearch } from "@/components/RepoSearch";
 import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
-import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
-import { Table } from "@/components/ui/Table";
-import type { ColumnDef } from "@tanstack/react-table";
+import { ProjectManagementDialog } from "@/components/ProjectManagementDialog";
+import { ProjectSelectionDialog } from "@/components/ProjectSelectionDialog";
+import { EmptyState } from "@/components/EmptyState";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
 import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
 import { useHealthMonitor } from "@/hooks/useHealthMonitor";
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
 import { runCommand } from "@/api/exec";
-import { ProjectManagementDialog } from "@/components/ProjectManagementDialog";
-import { ProjectSelectionDialog } from "@/components/ProjectSelectionDialog";
-import { EmptyState } from "@/components/EmptyState";
 import DayJS from "@/lib/dayjs";
 import { getPipelineStatusInfo } from "@/utils/pipelineStatus";
 
@@ -919,7 +919,7 @@ function AuthorCell({ repo }: { repo: RepoInfo }) {
 
 	const truncatedAuthor =
 		commitAuthor && commitAuthor.length > 25
-			? commitAuthor.slice(0, 25) + "..."
+			? `${commitAuthor.slice(0, 25)}...`
 			: commitAuthor;
 
 	return truncatedAuthor ? (

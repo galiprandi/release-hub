@@ -484,7 +484,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 						<div className="p-4 overflow-hidden flex flex-col">
 							{response ? (
 								<>
-									{/* Tabs - Using industrial resonance style from FilterBar */}
+									{/* Tabs - Using industrial resonance style */}
 									<IndustrialTabs
 										options={[
 											{ id: 'headers', label: 'Headers' },

@@ -58,3 +58,14 @@
 - **Estado**: En progreso 🏗️
 - **Cambios**:
   - [x] Fase 0: Territory Block.
+
+### 2026-06-11: Diff Viewer Hygiene & Type Standardization
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-diff-viewer-hygiene`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Corrección de errores del React Compiler en `DiffViewer.tsx` (memoization dependencies).
+  - [x] Erradicación de `any` y tipado estricto en el dashboard de GitHub.
+  - [x] Limpieza de comentarios obsoletos ("from FilterBar").
+  - [x] Validación E2E con Playwright (Diff Viewer & GitHub).
+  - [x] Zero-warning build y lint log.

@@ -14,6 +14,18 @@
   - [x] Eliminación de código muerto (ExternalLink en ContainerList.tsx).
 - **Resultado**: Dashboard más intuitivo, persistente y alineado con Industrial Resonance V2. Zero-warning build logrado.
 
+### 2026-06-12: DNS Rebinding Protection & Type Hygiene V2
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-hardening-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Implementación de protección DNS Rebinding en `healthProxyHandler` mediante pre-resolución de hostnames y validación de IPs.
+  - [x] Sincronización de `AIChatModal.tsx` con la interfaz `useAIPrompt` (progress, contextUsage).
+  - [x] Hardening de tipos en `QueryModal.tsx` para eliminar entropía técnica.
+  - [x] Expansión de tests de seguridad en `src/api/security.test.ts` con escenarios de DNS Rebinding.
+  - [x] Zero-warning build logrado.
+- **Resultado**: Blindaje total del proxy de salud contra ataques de re-vinculación DNS y tipos 100% resilientes.
+
 ### 2026-06-08: Security Hardening & Type Hygiene
 - **Agente**: Vesper 🐜
 - **Rama**: `🐜-Vesper-refactor-security-hardening-and-type-hygiene`

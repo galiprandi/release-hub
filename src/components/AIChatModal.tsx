@@ -71,7 +71,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const { data, status, prompt, reset, error } = useAIPrompt({
+	const { data, status, prompt, reset, error, progress, contextUsage } = useAIPrompt({
 		initialPrompts: [
 			{ role: "system", content: activeProfile.systemPrompt }
 		],
@@ -266,9 +266,19 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 					)}
 
 					{status === "downloading" && (
-						<div className="flex items-center gap-2 text-xs text-muted-foreground animate-pulse ml-11">
-							<Loader2 className="w-3 h-3 animate-spin" />
-							<span>Descargando recursos de IA...</span>
+						<div className="flex flex-col gap-1 ml-11">
+							<div className="flex items-center gap-2 text-xs text-muted-foreground animate-pulse">
+								<Loader2 className="w-3 h-3 animate-spin" />
+								<span>Descargando recursos de IA... {progress && progress.total > 0 ? `${Math.round((progress.loaded / progress.total) * 100)}%` : ""}</span>
+							</div>
+							{progress && progress.total > 0 && (
+								<div className="w-48 h-1 bg-muted/30 rounded-full overflow-hidden">
+									<div
+										className="h-full bg-ai transition-all duration-300"
+										style={{ width: `${(progress.loaded / progress.total) * 100}%` }}
+									/>
+								</div>
+							)}
 						</div>
 					)}
 
@@ -329,7 +339,13 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							className="w-full bg-transparent border-none focus:ring-0 text-sm resize-none py-2 px-1 max-h-32 min-h-[40px] placeholder:text-muted-foreground/60"
 							rows={1}
 						/>
-						{status === "prompting" ? (
+						<div className="flex items-center gap-2">
+							{contextUsage !== undefined && contextUsage > 0 && (
+								<span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-tighter">
+									CTX: {contextUsage}
+								</span>
+							)}
+							{status === "prompting" ? (
 							<button
 								onClick={() => reset()}
 								aria-label="Detener respuesta"
@@ -337,20 +353,21 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							>
 								<StopCircle className="w-4 h-4" />
 							</button>
-						) : (
-							<button
-								onClick={handleSend}
-								aria-label="Enviar mensaje"
-								disabled={!input.trim() || status === "initializing" || status === "downloading"}
-								className={`p-2 rounded-lg transition-all ${
-									input.trim()
-										? "bg-ai text-ai-foreground shadow-md hover:opacity-90"
-										: "bg-muted text-muted-foreground cursor-not-allowed"
-								}`}
-							>
-								<Send className="w-4 h-4" />
-							</button>
-						)}
+							) : (
+								<button
+									onClick={handleSend}
+									aria-label="Enviar mensaje"
+									disabled={!input.trim() || status === "initializing" || status === "downloading"}
+									className={`p-2 rounded-lg transition-all ${
+										input.trim()
+											? "bg-ai text-ai-foreground shadow-md hover:opacity-90"
+											: "bg-muted text-muted-foreground cursor-not-allowed"
+									}`}
+								>
+									<Send className="w-4 h-4" />
+								</button>
+							)}
+						</div>
 					</div>
 					<p className="mt-2 text-[10px] text-center text-muted-foreground/60">
 						La IA puede cometer errores. El procesamiento ocurre localmente en tu navegador.

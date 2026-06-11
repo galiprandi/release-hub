@@ -67,7 +67,7 @@ describe("AIChatModal", () => {
 			append: vi.fn(),
 			contextUsage: 0,
 			contextWindow: 0,
-		});
+		} as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 
@@ -90,7 +90,7 @@ describe("AIChatModal", () => {
 			append: vi.fn(),
 			contextUsage: 0,
 			contextWindow: 0,
-		});
+		} as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 
@@ -131,7 +131,7 @@ describe("AIChatModal", () => {
 			append: vi.fn(),
 			contextUsage: 0,
 			contextWindow: 0,
-		});
+		} as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 		const textarea = screen.getByPlaceholderText("Pregunta algo sobre ReleaseHub...");
@@ -158,7 +158,7 @@ describe("AIChatModal", () => {
 			append: vi.fn(),
 			contextUsage: 0,
 			contextWindow: 0,
-		});
+		} as ReturnType<typeof useAIPrompt>);
 
 		render(<AIChatModal isOpen={true} onClose={() => {}} />);
 		const clearButton = screen.getByLabelText("Limpiar");

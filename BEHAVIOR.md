@@ -37,8 +37,10 @@
 
 ## Module: Security Hardening
 - should allow commands in the safe list
+- should allow legitimate external hostname resolving to external IP
 - should allow public addresses
 - should block CGNAT addresses
+- should block DNS Rebinding attack where hostname is external but resolves to internal IP
 - should block IPv6 Link-Local and Unique Local addresses
 - should block cloud metadata addresses and link-local
 - should block loopback addresses and normalization bypasses

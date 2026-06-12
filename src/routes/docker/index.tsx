@@ -4,6 +4,7 @@ import { useDockerAccess } from '@/hooks/useDockerAccess';
 import { useQuery } from '@tanstack/react-query';
 import { ContainerList, type ContainerListRef } from '@/docker/components/ContainerList';
 import { StatusCard } from '@/components/ui/StatusCard';
+import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
 import { getContainers } from '@/api/docker';
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys';
 import { PageLayout } from '../../layouts/PageLayout';
@@ -13,7 +14,9 @@ export const Route = createFileRoute('/docker/')({
   component: DockerManagerPage,
   validateSearch: (search: Record<string, unknown>) => {
     return {
-      status: typeof search.status === 'string' ? search.status : 'running',
+      status: (['all', 'running', 'stopped', 'exited'].includes(search.status as string)
+        ? search.status
+        : 'running') as 'all' | 'running' | 'stopped' | 'exited',
     };
   },
 });
@@ -37,13 +40,17 @@ function DockerManagerPage() {
 
   // Derive active filter from query params - memoized to prevent re-renders
   const activeFilter = useMemo(() => {
-    return search.status ? { id: 'status', value: search.status } : null;
+    if (!search.status || search.status === 'all') return null;
+    return { id: 'status', value: search.status };
   }, [search.status]);
 
   const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
     navigate({
       to: '.',
-      search: filter ? { status: filter.value } : {},
+      search: (prev: Record<string, unknown>) => ({
+        ...prev,
+        status: filter?.value || 'all'
+      }),
     });
   }, [navigate]);
 
@@ -83,14 +90,31 @@ function DockerManagerPage() {
       actions={[headerActions]}
     >
       <div className="space-y-6">
+      {/* Filtros */}
+      {access?.hasAccess && (
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Estado:</span>
+            <IndustrialTabs
+              options={[
+                { id: 'all', label: `Todos (${filterCounts.all})` },
+                { id: 'running', label: `Ejecutando (${filterCounts.running})` },
+                { id: 'stopped', label: `Detenido (${filterCounts.stopped})` },
+                { id: 'exited', label: `Finalizado (${filterCounts.exited})` },
+              ]}
+              activeId={search.status || 'all'}
+              onChange={(id) => handleFilterChange({ id: 'status', value: id })}
+              className="w-[480px]"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Contenido */}
-      {checkingAccess ? (
-        <StatusCard type="loading" message="Verificando acceso a Docker..." />
-      ) : access?.hasAccess ? (
+      {checkingAccess ? null : access?.hasAccess ? (
         <ContainerList
           ref={containerListRef}
           searchQuery={searchQuery}
-          filterCounts={filterCounts}
           activeFilter={activeFilter}
           onFilterChange={handleFilterChange}
         />

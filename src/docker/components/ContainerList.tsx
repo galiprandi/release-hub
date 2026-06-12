@@ -20,12 +20,11 @@ export interface ContainerListRef {
 
 interface ContainerListProps {
 	searchQuery?: string
-	filterCounts?: { all: number; running: number; stopped: number; exited: number }
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }
 
-export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({ searchQuery = '', filterCounts, activeFilter, onFilterChange }, ref) => {
+export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({ searchQuery = '', activeFilter, onFilterChange }, ref) => {
 	const queryClient = useQueryClient()
 	const [selectedContainer, setSelectedContainer] = useState<ContainerInfo | null>(null)
 	const [isLogsModalOpen, setIsLogsModalOpen] = useState(false)
@@ -83,13 +82,11 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 	}
 
 	const handleViewLogs = (container: ContainerInfo) => {
-		console.log('[ContainerList] Opening logs for container:', container.name, 'ID:', container.id)
 		setSelectedContainer(container)
 		setIsLogsModalOpen(true)
 	}
 
 	const handleOpenTerminal = (container: ContainerInfo) => {
-		console.log('[ContainerList] Opening terminal for container:', container.name, 'ID:', container.id)
 		setSelectedContainer(container)
 		setIsTerminalModalOpen(true)
 	}
@@ -117,7 +114,6 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 				onStop={handleStop}
 				onViewLogs={handleViewLogs}
 				onOpenTerminal={handleOpenTerminal}
-				filterCounts={filterCounts}
 				activeFilter={activeFilter}
 				onFilterChange={onFilterChange}
 			/>
@@ -178,7 +174,6 @@ function ContainersTable({
 	onStop,
 	onViewLogs,
 	onOpenTerminal,
-	filterCounts,
 	activeFilter,
 	onFilterChange,
 }: {
@@ -188,7 +183,6 @@ function ContainersTable({
 	onStop: (containerId: string) => void
 	onViewLogs: (container: ContainerInfo) => void
 	onOpenTerminal: (container: ContainerInfo) => void
-	filterCounts?: { all: number; running: number; stopped: number; exited: number }
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
@@ -238,20 +232,10 @@ function ContainersTable({
 		},
 	], [onStart, onRestart, onStop, onViewLogs, onOpenTerminal])
 
-	const filters = useMemo(() => {
-		if (!filterCounts) return []
-		return [
-			{ label: 'Ejecutando', columnId: 'status' as const, value: 'running', count: filterCounts.running },
-			{ label: 'Detenido', columnId: 'status' as const, value: 'stopped', count: filterCounts.stopped },
-			{ label: 'Finalizado', columnId: 'status' as const, value: 'exited', count: filterCounts.exited },
-		]
-	}, [filterCounts])
-
 	return (
 		<Table
 			columns={columns}
 			data={containers}
-			filters={filters}
 			activeFilter={activeFilter}
 			onFilterChange={onFilterChange}
 		/>
@@ -279,7 +263,7 @@ function StatusCell({ container }: { container: ContainerInfo }) {
 	}
 
 	return (
-		<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-wider uppercase ${colorClass}`}>
+		<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-widest uppercase ${colorClass}`}>
 			{label}
 		</span>
 	)
@@ -291,7 +275,11 @@ function StartedCell({ container }: { container: ContainerInfo }) {
 		return runningFor
 	}
 
-	return <span className="text-xs font-medium text-muted-foreground tracking-tight">{parseRunningTime(container.runningFor)}</span>
+	return (
+		<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+			{parseRunningTime(container.runningFor)}
+		</span>
+	)
 }
 
 function PortsCell({ container }: { container: ContainerInfo }) {

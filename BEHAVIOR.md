@@ -55,7 +55,7 @@
 - should reject argument injection and path traversal in repo parameter
 - should reject names starting with hyphens (flag injection)
 - should reject names with spaces or shell characters
-- should reject path traversal in action parameter
+- should reject path traversal and unauthorized scripts in action parameter
 - should throw error if command is not an array (runtime enforcement)
 - should validate Docker container names correctly
 - should validate Kubernetes contexts correctly

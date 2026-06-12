@@ -1,22 +1,22 @@
-# PR Draft: Security Hardening V2 & Type Robustness 🐜
+# PR Draft: Docker UI Resonance Refactor 🐜
 
 ## Scope
-This PR implements advanced security hardening measures and eradicates remaining type entropy to ensure a robust and inexpugnable system.
+This PR implements the Industrial Resonance V2 standard in the Docker module, enhancing usability, consistency, and visual density.
 
-### Security Hardening (SSRF & DNS Rebinding)
-- **DNS Rebinding Protection**: Refactoring `healthProxyHandler` in `vite.config.ts` to implement pre-resolution of hostnames. By validating the resolved IP against internal ranges and using the IP for the request while pinning the `Host` header, we neutralize DNS Rebinding attacks.
-- **SSRF Filter Refinement**: Consolidating the `isInternal` logic to cover all edge cases (IPv4-mapped IPv6, CGNAT, Link-Local).
-- **Expanded Security Tests**: Adding specific test cases for DNS Rebinding scenarios in `src/api/security.test.ts`.
+### UI/UX Refinement (Industrial Resonance V2)
+- **IndustrialTabs Integration**: Migrating container status filtering from legacy table filters to a unified `IndustrialTabs` component in the main route, with persistent state via search parameters.
+- **High-Density Typography**: Updating table cells (Started, Status) to use the technical metadata standard (`text-[10px] font-bold uppercase tracking-wider`).
+- **Placeholder Standard**: Implementing the standard to render `null` during access verification to maintain a clean UI and avoid layout shifts.
+- **Technical Hygiene**: Eradicating legacy filter configurations and debug `console.log` statements.
 
-### Type Hygiene & AAA Standard
-- **AIChatModal Alignment**: Synchronizing `AIChatModal.tsx` and its tests with the latest `@galiprandi/react-tools` `useAIPrompt` interface (`progress`, `contextUsage`).
-- **QueryModal Hardening**: Eradicating implicit `any` and hardening state transition logic.
-- **Zero-Warning Build**: Ensuring the entire codebase compiles without warnings, maintaining AAA hygiene standards.
+### Alignment & Consistency
+- Full compliance with `DESIGN.md` and `AGENTS.md` protocols.
+- Zero-warning build log maintained.
 
 ## Impact
-- Immunity to DNS Rebinding attacks on the health proxy.
-- Improved technical resonance and maintainability through strict typing.
-- Full compliance with `DESIGN.md` and `AGENTS.md` protocols.
+- Improved navigation and state persistence in the Docker dashboard.
+- Enhanced visual harmony with other system modules (Health Monitor, GitHub).
+- Reduced technical entropy through code cleanup.
 
 ---
-*Status: In Progress (Phase 0: Territory Block)*
+*Status: Ready for Review 🐜*

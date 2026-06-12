@@ -65,6 +65,18 @@
   - [x] Validación E2E con Playwright y capturas de pantalla.
 ## Historial de Carol
 
+### 2026-06-15: Refactor Docker UI Resonance
+- **Rama**: `🐜-Carol-refactor-docker-ui-resonance`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Migración de filtrado a `IndustrialTabs` en la ruta de Docker.
+  - [x] Sincronización de estado con parámetro de búsqueda `status`.
+  - [x] Aplicación de `Resonance V2 Placeholder Standard` (null durante verificación).
+  - [x] Refactor de celdas `StartedCell` y `StatusCell` a alta densidad.
+  - [x] Eliminación de logs y filtros de tabla legados.
+  - [x] Zero-warning build y validación E2E exitosa.
+- **Resultado**: Dashboard de Docker alineado con Industrial Resonance V2, más denso y profesional.
+
 ### 2026-06-07: Refactor Kubernetes UI Resonance
 - **Rama**: `🐜-Carol-refactor-kubernetes-ui-resonance`
 - **Estado**: En progreso 🏗️

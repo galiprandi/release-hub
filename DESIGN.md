@@ -60,6 +60,13 @@
 
 ## Specific Module Standards
 
+### Docker UI Resonance
+- **Status Filtering**: Managed via top-level `IndustrialTabs` in the route, persisting state in the `status` search parameter (all, running, stopped, exited).
+- **Table Cells**:
+  - `StatusCell`: Badges using semantic tokens with 20% opacity (`bg-success/20`, etc.), `rounded-md`, and `text-[10px] font-bold uppercase tracking-wider`.
+  - `StartedCell`: Technical metadata using `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`.
+- **Placeholder Standard**: Access verification (`checkingAccess`) renders `null` to avoid layout shifts and maintain a clean visual state.
+
 ### Health Monitor Resonance
 - **Status Dots**: `w-1.5 h-1.5 rounded-full` with semantic shadows for health states (OK/Error). OK includes `animate-pulse`.
 - **Product Header**: Stats use semantic badges at 20% opacity. Product names use `tracking-tighter`.

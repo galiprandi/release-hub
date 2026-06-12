@@ -2,6 +2,101 @@
 
 > System prompt para agentes autónomos. Solo prohibiciones duras y enrutamiento. Para detalles, seguir referencias.
 
+## Aprendizaje de Build
+
+- Build exitoso ejecutando `npm install` primero, luego `npm run build`
+- El proyecto usa TypeScript + Vite (rolldown-vite@7.2.5)
+- Build genera archivos en `dist/` con chunks optimizados
+- Chunk principal grande (1.5MB) - considerar code-splitting futuro
+- No hay errores de TypeScript ni warnings críticos
+
+## Aprendizaje de Mejoras Implementadas
+
+### Mejora #6: Reemplazar confirm() nativo con Dialog del sistema
+- Se creó componente `DeleteConfirmDialog` usando Radix UI y `BaseDialog`
+- Se integró en `FetcherPage` reemplazando el `confirm()` nativo
+- El componente usa los tokens visuales del sistema (bg-destructive, text-destructive-foreground)
+- Muestra el preview del cURL a eliminar en el mensaje de confirmación
+- Build exitoso sin errores TypeScript
+- Patrón: usar `BaseDialog` para diálogos de confirmación consistentes con el diseño del sistema
+
+### Mejora #6.1: Crear componente ConfirmDialog genérico y reutilizable
+- Se creó `ConfirmDialog` genérico con 4 variantes: default, destructive, warning, success
+- Soporta configuración completa de botones, loading, iconos personalizados
+- Documentación exhaustiva con ejemplos de uso en JSDoc
+- `DeleteConfirmDialog` ahora es un wrapper simple de `ConfirmDialog`
+- Reducción de código: de 76 líneas a 60 líneas en DeleteConfirmDialog
+- Patrón: usar componentes genéricos bien documentados para diálogos consistentes
+
+#### Ejemplos de uso de ConfirmDialog:
+
+**1. Diálogo destructivo básico:**
+```tsx
+<ConfirmDialog
+  open={isOpen}
+  onOpenChange={setIsOpen}
+  onConfirm={handleDelete}
+  title="Eliminar elemento"
+  description="¿Estás seguro de que quieres eliminar este elemento?"
+  variant="destructive"
+/>
+```
+
+**2. Con acciones personalizadas:**
+```tsx
+<ConfirmDialog
+  open={isOpen}
+  onOpenChange={setIsOpen}
+  onConfirm={handleAction}
+  title="Confirmar acción"
+  description="Esta acción no se puede deshacer"
+  variant="warning"
+  actions={{
+    confirmText: "Sí, continuar",
+    cancelText: "No, cancelar"
+  }}
+/>
+```
+
+**3. Con contenido personalizado y loading:**
+```tsx
+<ConfirmDialog
+  open={isOpen}
+  onOpenChange={setIsOpen}
+  onConfirm={async () => {
+    await someAsyncOperation();
+  }}
+  title="Procesando"
+  description="Esto puede tomar unos segundos"
+  isLoading={isProcessing}
+>
+  <div className="mt-4 p-4 bg-muted rounded">
+    <p>Información adicional</p>
+  </div>
+</ConfirmDialog>
+```
+
+**4. Con icono personalizado:**
+```tsx
+<ConfirmDialog
+  open={isOpen}
+  onOpenChange={setIsOpen}
+  onConfirm={handleConfirm}
+  title="Custom Icon"
+  customIcon={<CustomIcon className="w-5 h-5" />}
+  description="Mensaje con icono personalizado"
+/>
+```
+
+## Limitaciones del Entorno
+
+### Playwright E2E Tests
+- Playwright no soporta navegadores en Ubuntu 26.04 (versión muy nueva)
+- Error: "Playwright does not support chromium/firefox on ubuntu26.04-x64"
+- Los tests E2E no pueden ejecutarse en este entorno actual
+- Validación alternativa: build exitoso + revisión de código manual
+- Para ejecutar tests E2E, se requiere un entorno con OS soportado por Playwright
+
 ## Prohibiciones (nunca violar)
 
 | # | Regla | Referencia |

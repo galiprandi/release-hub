@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { QueryModal } from '@/components/QueryModal';
 import { Table } from '@/components/ui/Table';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
 import type { ColumnDef } from '@tanstack/react-table';
 import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
@@ -34,6 +35,8 @@ function FetcherPage() {
 	const [editingQuery, setEditingQuery] = useState<QueryRecord | undefined>();
 	const [curlInput, setCurlInput] = useState('');
 	const lastClipboardContent = useRef<string | null>(null);
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+	const [queryToDelete, setQueryToDelete] = useState<QueryRecord | undefined>();
 
 	useEffect(() => {
 		if (access && !access.isInstalled) {
@@ -97,11 +100,18 @@ function FetcherPage() {
 	}, [curlInput]);
 
 
-	const handleDelete = useCallback((id: string) => {
-		if (confirm('¿Estás seguro de que quieres eliminar esta query del historial?')) {
-			deleteQueryRecord(id);
+	const handleDelete = useCallback((query: QueryRecord) => {
+		setQueryToDelete(query);
+		setDeleteDialogOpen(true);
+	}, []);
+
+	const handleConfirmDelete = useCallback(() => {
+		if (queryToDelete) {
+			deleteQueryRecord(queryToDelete.id);
+			setDeleteDialogOpen(false);
+			setQueryToDelete(undefined);
 		}
-	}, [deleteQueryRecord]);
+	}, [queryToDelete, deleteQueryRecord]);
 
 	const handleOpenModal = (query?: QueryRecord) => {
 		setEditingQuery(query);
@@ -212,6 +222,14 @@ function FetcherPage() {
 				query={activeQuery || editingQuery}
 				onClose={handleCloseModal}
 			/>
+
+			<DeleteConfirmDialog
+				open={deleteDialogOpen}
+				onOpenChange={setDeleteDialogOpen}
+				onConfirm={handleConfirmDelete}
+				itemName={queryToDelete ? `esta query (${queryToDelete.curl.slice(0, 50)}...)` : undefined}
+				isDeleting={isDeleting}
+			/>
 		</div>
 		</PageLayout>
 	);
@@ -231,7 +249,7 @@ function QueriesTable({
 	onOpenModal: (query: QueryRecord) => void
 	onCopyResponse: (query: QueryRecord) => void
 	onCopyCurl: (query: QueryRecord) => void
-	onDelete: (id: string) => void
+	onDelete: (query: QueryRecord) => void
 	isDeleting: boolean
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
@@ -394,7 +412,7 @@ function ActionsCell({
 	onOpenModal: (query: QueryRecord) => void
 	onCopyResponse: (query: QueryRecord) => void
 	onCopyCurl: (query: QueryRecord) => void
-	onDelete: (id: string) => void
+	onDelete: (query: QueryRecord) => void
 	isDeleting: boolean
 }) {
 	return (
@@ -421,7 +439,7 @@ function ActionsCell({
 			<div className="w-px h-4 bg-border/40 mx-0.5" />
 			<ActionButton
 				action={ACTION_DEFINITIONS.delete}
-				onClick={() => onDelete(query.id)}
+				onClick={() => onDelete(query)}
 				disabled={isDeleting}
 				size="sm"
 			/>

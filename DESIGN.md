@@ -4,7 +4,7 @@
 - **Typography**: `tracking-tight` (names), `text-[10px] font-bold uppercase tracking-wider` (labels).
 - **Hierarchy**: Semantic tokens + 20% opacity (`bg-success/20 border-success/20`).
 - **Geometry**: `rounded-xl` (containers), `rounded-lg` (actions), `rounded-md` (badges).
-- **Hardening**: Middleware `spawn` con `shell: false`. Allow-list estricto en `/local/exec`. SSRF protection bloqueando 127.0.0.0/8, 169.254.0.0/16, CGNAT y IPv6 local. DNS Rebinding protection mediante pre-resolución de hostnames en el proxy. Sanitización de inputs para CLI.
+- **Hardening**: Middleware `spawn` con `shell: false`. Allow-list estricto en `/local/exec`. Allow-list de scripts autorizados en `/local/script`. SSRF protection bloqueando 127.0.0.0/8, 169.254.0.0/16, CGNAT y IPv6 local. DNS Rebinding protection mediante pre-resolución de hostnames en el proxy. Sanitización de inputs para CLI.
 - **Standard Cells**: Health (semantic dots), PRs (primary badge), Workflows (status badge + pulse), Operations (high-density actions).
 - **Focus**: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1`.
 - **ARIA**: Explicit `aria-label` for icon buttons.

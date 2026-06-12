@@ -1,22 +1,20 @@
-# PR Draft: Security Hardening V2 & Type Robustness 🐜
+# PR Draft: Security Hardening & Type Resilience 🐜
 
 ## Scope
 This PR implements advanced security hardening measures and eradicates remaining type entropy to ensure a robust and inexpugnable system.
 
-### Security Hardening (SSRF & DNS Rebinding)
-- **DNS Rebinding Protection**: Refactoring `healthProxyHandler` in `vite.config.ts` to implement pre-resolution of hostnames. By validating the resolved IP against internal ranges and using the IP for the request while pinning the `Host` header, we neutralize DNS Rebinding attacks.
-- **SSRF Filter Refinement**: Consolidating the `isInternal` logic to cover all edge cases (IPv4-mapped IPv6, CGNAT, Link-Local).
-- **Expanded Security Tests**: Adding specific test cases for DNS Rebinding scenarios in `src/api/security.test.ts`.
+### Security Hardening (Middleware Audit)
+- **Script Allow-list**: Implementing a strict allow-list for the `action` parameter in `scriptHandler` (`vite.config.ts`) to prevent unauthorized script execution.
+- **SSRF & DNS Rebinding Verification**: Audit of current protections to ensure they cover all edge cases.
 
-### Type Hygiene & AAA Standard
-- **AIChatModal Alignment**: Synchronizing `AIChatModal.tsx` and its tests with the latest `@galiprandi/react-tools` `useAIPrompt` interface (`progress`, `contextUsage`).
-- **QueryModal Hardening**: Eradicating implicit `any` and hardening state transition logic.
-- **Zero-Warning Build**: Ensuring the entire codebase compiles without warnings, maintaining AAA hygiene standards.
+### Type Resilience & AAA Standard
+- **Eradication of `any`**: Deep audit of the `src/` directory to replace `any` usage with strict interfaces, `unknown`, or type guards.
+- **API Hardening**: Ensuring all API responses are strictly typed and resilient to changes.
 
 ## Impact
-- Immunity to DNS Rebinding attacks on the health proxy.
+- Prevent unauthorized execution of scripts via the dev server.
 - Improved technical resonance and maintainability through strict typing.
 - Full compliance with `DESIGN.md` and `AGENTS.md` protocols.
 
 ---
-*Status: In Progress (Phase 0: Territory Block)*
+*Status: Ready for Review*

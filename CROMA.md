@@ -2,6 +2,18 @@
 
 ## Historial de Misiones
 
+### 2026-06-13: Security Hardening (Script Allow-list) & Type Resilience Audit
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-hardening-and-type-resilience`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Implementación de allow-list estricto para el parámetro `action` en el middleware de ejecución de scripts (`vite.config.ts`).
+  - [x] Auditoría profunda de tipos para erradicar `any` en `src/`.
+  - [x] Actualización de `DESIGN.md` y `AGENTS.md` con los nuevos estándares de hardening.
+  - [x] Expansión de tests de seguridad en `src/api/security.test.ts` para verificar el allow-list de scripts.
+  - [x] Zero-warning build y type-check exitoso.
+- **Resultado**: Blindaje del dev server contra ejecución de scripts no autorizados y garantía de integridad de tipos en todo el repositorio.
+
 ### 2026-06-07: Refactor Resonance V2 (Health & Fetcher)
 - **Rama**: `🐜-Uma-refactor-health-resonance`
 - **Estado**: Finalizado ✅

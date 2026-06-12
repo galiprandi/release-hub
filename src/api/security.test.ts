@@ -86,11 +86,15 @@ describe('Security Hardening', () => {
     const validateAction = (action: string) => /^[a-zA-Z0-9-]+$/.test(action)
     const validateRepo = (repo: string) => /^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(repo) && !repo.includes('..')
 
-    it('should reject path traversal in action parameter', () => {
-      expect(validateAction('../etc/passwd')).toBe(false)
-      expect(validateAction('scripts/deploy')).toBe(false) // Only alphanumeric and hyphens
-      expect(validateAction('deploy; rm -rf /')).toBe(false)
-      expect(validateAction('trigger-staging-redeploy')).toBe(true)
+    it('should reject path traversal and unauthorized scripts in action parameter', () => {
+      const validateScripts = (action: string) => /^(healthcheck|install|start|trigger-staging-redeploy|uninstall)$/.test(action)
+
+      expect(validateScripts('../etc/passwd')).toBe(false)
+      expect(validateScripts('scripts/deploy')).toBe(false)
+      expect(validateScripts('deploy; rm -rf /')).toBe(false)
+      expect(validateScripts('trigger-staging-redeploy')).toBe(true)
+      expect(validateScripts('install')).toBe(true)
+      expect(validateScripts('malicious-script')).toBe(false)
     })
 
     it('should reject argument injection and path traversal in repo parameter', () => {

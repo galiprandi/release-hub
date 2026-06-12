@@ -14,6 +14,18 @@
   - [x] Eliminación de código muerto (ExternalLink en ContainerList.tsx).
 - **Resultado**: Dashboard más intuitivo, persistente y alineado con Industrial Resonance V2. Zero-warning build logrado.
 
+### 2026-06-12: Technical Hygiene & Unified Pipeline Standardization
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-standardization-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Desmantelamiento de hooks heredados (`usePipeline.ts`, `usePipelineDetector.ts`).
+  - [x] Migración de `usePipelineWithHealth` a la arquitectura de `UnifiedPipeline`.
+  - [x] Implementación del hook `useRepoDashboardDetails` para centralizar datos del dashboard con tipado estricto.
+  - [x] Erradicación de duplicación de tipos e implicit `any` en el dashboard de GitHub.
+  - [x] Zero-warning build logrado.
+- **Resultado**: Sistema más ligero, modular y 100% tipado, preparado para múltiples proveedores de pipeline.
+
 ### 2026-06-12: DNS Rebinding Protection & Type Hygiene V2
 - **Agente**: Vesper 🐜
 - **Rama**: `🐜-Vesper-refactor-security-hardening-v2`

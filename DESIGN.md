@@ -78,3 +78,9 @@
 - **Grouping**: Favorites are grouped by `context` (Boxes icon). Projects are grouped by `project.id` (Folder icon).
 - **Deployment Status**: Badges use semantic tokens (success/info/destructive/muted) with 20% opacity and `rounded-md`. Labels are localized (Saludable, Procesando, Degradado, Desconocido).
 - **Search UI**: High-density dropdown with technical metadata (Namespace, Context, Ready/Up-to-date counts) and keyboard-centric navigation hints.
+
+### GitHub UI Resonance
+- **Dashboard Layout**: Primary collection navigation (`IndustrialTabs`) and project management actions reside in the `PageLayout` header.
+- **Global Filtering**: Dashboard-level filtering (e.g., 'Pendientes') is managed via `IndustrialTabs` in the main view, persisting state in the `filter` search parameter.
+- **Table Cells**: Technical metadata (Health, PRs, Workflows, Date, Author) uses `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`.
+- **Health Indicators**: Semantic dots (`w-1.5 h-1.5`) with shadows. OK state includes `animate-pulse`.

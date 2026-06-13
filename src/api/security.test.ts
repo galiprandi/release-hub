@@ -83,7 +83,6 @@ describe('Security Hardening', () => {
 
   describe('Vite Middleware Hardening (Path Traversal)', () => {
     // Note: These tests simulate the logic in vite.config.ts since we can't easily test the Vite server in vitest
-    const validateAction = (action: string) => /^[a-zA-Z0-9-]+$/.test(action)
     const validateRepo = (repo: string) => /^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(repo) && !repo.includes('..')
 
     it('should reject path traversal and unauthorized scripts in action parameter', () => {

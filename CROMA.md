@@ -77,6 +77,19 @@
   - [x] Zero-warning build y validación E2E exitosa.
 - **Resultado**: Dashboard de Docker alineado con Industrial Resonance V2, más denso y profesional.
 
+### 2026-06-13: Security Hardening V3 (Shell Restriction & RFC 1123)
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-hardening-v3`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Restricción total de shells (`bash`, `sh`, `zsh`, `powershell.exe`) y `node` en el middleware local.
+  - [x] Implementación de límites de longitud y cumplimiento estricto de RFC 1123 en regex de validación Kubernetes.
+  - [x] Sincronización de validación en `terminalMiddleware.ts`.
+  - [x] Limpieza técnica de comentarios y documentación en `src/`.
+  - [x] Expansión de tests de seguridad (26 casos exitosos).
+  - [x] Zero-warning build verificado.
+- **Resultado**: Elevación del umbral de seguridad contra RCE y ataques de inyección, garantizando integridad técnica absoluta.
+
 ### 2026-06-07: Refactor Kubernetes UI Resonance
 - **Rama**: `🐜-Carol-refactor-kubernetes-ui-resonance`
 - **Estado**: En progreso 🏗️

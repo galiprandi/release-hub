@@ -71,10 +71,13 @@ const spawnAsync = (
 
 // Security Validation Patterns
 const VALIDATION = {
-	k8sName: /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
-	k8sNamespace: /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/,
-	context: /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/,
-	dockerName: /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/,
+	// RFC 1123 DNS Subdomain: max 253 chars, labels max 63 chars
+	k8sName:
+		/^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?(\.[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?)*$/,
+	// RFC 1123 DNS Label: max 63 chars
+	k8sNamespace: /^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$/,
+	context: /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/,
+	dockerName: /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/,
 	resourceType: /^(pod|deployment|service|ingress)$/,
 	scripts: /^(healthcheck|install|start|trigger-staging-redeploy|uninstall)$/,
 };
@@ -87,15 +90,10 @@ const SAFE_COMMANDS = [
 	"docker",
 	"curl",
 	"lsof",
-	"node",
 	"ls",
 	"echo",
 	"jq",
 	"helm",
-	"powershell.exe",
-	"zsh",
-	"bash",
-	"sh",
 ];
 
 /**

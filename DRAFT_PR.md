@@ -1,22 +1,19 @@
-# PR Draft: Docker UI Resonance Refactor 🐜
+# PR Draft: Security Hardening & Type Resilience V3 🐜
 
 ## Scope
-This PR implements the Industrial Resonance V2 standard in the Docker module, enhancing usability, consistency, and visual density.
+This PR focuses on tightening the security posture of the application's local middleware and ensuring technical hygiene in core modules.
 
-### UI/UX Refinement (Industrial Resonance V2)
-- **IndustrialTabs Integration**: Migrating container status filtering from legacy table filters to a unified `IndustrialTabs` component in the main route, with persistent state via search parameters.
-- **High-Density Typography**: Updating table cells (Started, Status) to use the technical metadata standard (`text-[10px] font-bold uppercase tracking-wider`).
-- **Placeholder Standard**: Implementing the standard to render `null` during access verification to maintain a clean UI and avoid layout shifts.
-- **Technical Hygiene**: Eradicating legacy filter configurations and debug `console.log` statements.
+### Security Hardening
+- **Restricted Command Allow-list**: Removed shells (`bash`, `sh`, `zsh`, `powershell.exe`) and `node` from the `/local/exec` allow-list to prevent arbitrary code execution.
+- **Strict Input Validation**: Synchronized and tightened Kubernetes resource validation regexes (RFC 1123) across `vite.config.ts` and `src/config/terminalMiddleware.ts`, including strict length limits.
 
-### Alignment & Consistency
-- Full compliance with `DESIGN.md` and `AGENTS.md` protocols.
-- Zero-warning build log maintained.
+### Type Hygiene & Documentation cleanup
+- **Entropy Reduction**: Cleaned up documentation and comments in `useUnifiedPipeline.ts` and `pulsarAdapter.test.ts` to improve technical clarity.
+- **Zero-Warning Build**: Verified that the codebase maintains a zero-warning build environment, ensuring no implicit `any` or technical debt in the modified areas.
 
-## Impact
-- Improved navigation and state persistence in the Docker dashboard.
-- Enhanced visual harmony with other system modules (Health Monitor, GitHub).
-- Reduced technical entropy through code cleanup.
+### Verification
+- **Security Tests**: Added 26 test cases in `src/api/security.test.ts` verifying the new restrictions and RFC 1123 compliance.
+- **Build Integrity**: Final verification successful via `npm run build`.
 
 ---
 *Status: Ready for Review 🐜*

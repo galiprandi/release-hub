@@ -102,10 +102,11 @@ export function setupTerminalMiddleware(server: ServerWithUpgrade) {
     const container = url.searchParams.get('container');
 
     // Validation patterns (RFC 1123 for K8s DNS labels/subdomains, standard Docker container names)
-    const k8sNameRegex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
-    const k8sNamespaceRegex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
-    const contextRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
-    const dockerNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
+    const k8sNameRegex =
+      /^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?(\.[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?)*$/;
+    const k8sNamespaceRegex = /^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$/;
+    const contextRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
+    const dockerNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
 
     // Validate type
     if (!type || !['k8s', 'docker', 'local'].includes(type)) {

@@ -77,11 +77,18 @@
   - [x] Zero-warning build y validación E2E exitosa.
 - **Resultado**: Dashboard de Docker alineado con Industrial Resonance V2, más denso y profesional.
 
-### 2026-06-07: Refactor Kubernetes UI Resonance
+### 2026-06-16: Refactor Kubernetes UI Resonance
 - **Rama**: `🐜-Carol-refactor-kubernetes-ui-resonance`
-- **Estado**: En progreso 🏗️
+- **Estado**: Finalizado ✅
 - **Cambios**:
-  - [x] Fase 0: Territory Block.
+  - [x] Estandarización de directorio: migración a `src/kubernetes/components/`.
+  - [x] Refinamiento de celdas Namespace, Age e Imágenes (alta densidad, badges).
+  - [x] Estandarización de `StatusCell` (semantic tokens + 20% opacidad).
+  - [x] Refactor de Terminal Modal: cabecera técnica doble línea y viewport zinc-950.
+  - [x] Pulido visual de `DeploymentSearch`: inputs `bg-muted/40` y jerarquía con divisores.
+  - [x] Higiene técnica: eliminación de logs y corrección de warnings en tests.
+  - [x] Validación visual y funcional con Playwright exitosa.
+- **Resultado**: Dashboard de Kubernetes elevado al estándar Industrial Resonance V2, con mayor densidad de información y coherencia técnica.
 
 ### 2026-06-11: Diff Viewer Hygiene & Type Standardization
 - **Agente**: Fiona 🐜

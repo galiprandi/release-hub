@@ -1,23 +1,27 @@
-# PR Draft: GitHub UI Resonance Refactor 🐜
+# PR Draft: Technical Hygiene & Unified Pipeline Standardization 🐜
+
+## Objective
+Eradicate technical entropy by decommissioning legacy pipeline hooks and standardizing the system around the `UnifiedPipeline` architecture. This PR also addresses type hygiene in the GitHub Dashboard to achieve AAA engineering standards.
 
 ## Scope
-This PR implements the Industrial Resonance V2 standard in the GitHub module, evolving the dashboard towards a higher density and better integration with the global product layout.
+- **Dead Code Elimination**:
+    - Remove `src/hooks/usePipelineDetector.ts` (superseded by `src/pipeline-core/hooks/useUnifiedPipeline.ts`).
+    - Remove `src/hooks/usePipeline.ts` (legacy Seki-only implementation).
+- **Architecture Standardization**:
+    - Refactor `usePipelineWithHealth` to utilize the `UnifiedPipeline` hook, enabling multi-provider support (Seki, Pulsar) across the dashboard.
+- **Type Hygiene**:
+    - Harden types in `src/routes/github/index.tsx`, eliminating implicit `any` and improving cell component robustness.
+- **Build Hygiene**:
+    - Resolve any resulting linter/build warnings to ensure a zero-warning log.
 
-### UI/UX Refinement (Industrial Resonance V2)
-- **Header Integration**: Moving collection navigation (`IndustrialTabs`) and project management actions to the `PageLayout` header for better visibility and consistency with Kubernetes/Docker modules.
-- **Global Filtering**: Promoting the "Pendientes" filter to a dashboard-level control, reducing redundancy across organization tables.
-- **High-Density Typography**: Updating column headers and technical metadata cells (`Health`, `PRs`, `Workflows`, `Date`, `Author`) to the technical standard (`text-[10px] font-bold uppercase tracking-wider`).
-- **Semantic Health**: Refining health indicators with standard pulse animations for OK states.
+## Technical Details
+- Migrating `usePipelineWithHealth` to the new abstraction layer.
+- Explicit typing for GraphQL queries and dashboard state.
+- Validation via `npm run build`.
 
-### Technical Hygiene
-- Eradicating redundant local filters and simplifying table configurations.
-- Ensuring full compliance with `DESIGN.md` and `AGENTS.md`.
-- Zero-warning build log maintenance.
-
-## Impact
-- Seamless navigation between repository collections.
-- Consistent visual language across all system modules.
-- Enhanced "Time to Value" by surfacing pending promotions and health status more effectively.
-
----
-*Status: Ready for Review 🐜*
+## Bitacora (CROMA.md)
+- [x] Phase 0: Territory Block.
+- [ ] Phase 1: Dead code elimination.
+- [ ] Phase 2: usePipelineWithHealth refactoring.
+- [ ] Phase 3: Type hardening.
+- [ ] Phase 4: Final verification.

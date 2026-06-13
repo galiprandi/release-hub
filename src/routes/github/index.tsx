@@ -42,6 +42,12 @@ import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
 import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
 import { useHealthMonitor } from "@/hooks/useHealthMonitor";
+import {
+	useRepoDashboardDetails,
+	type RepoDetails,
+	type Commit,
+	type Tag,
+} from "@/hooks/useRepoDashboardDetails";
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
 import { runCommand } from "@/api/exec";
 import DayJS from "@/lib/dayjs";
@@ -633,21 +639,11 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 	const [org, name] = repo.fullName.split("/");
 	const [isCommitsModalOpen, setIsCommitsModalOpen] = useState(false);
 
-	const detailsQuery = useQueries({
-		queries: [
-			{
-				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-				enabled: false,
-			},
-		],
-	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
+	const { data: queryData, isLoading } = useRepoDashboardDetails(repo.fullName);
 
-	const queryData = detailsQuery.data;
 	const commits = queryData?.commits;
 	const latestTag = queryData?.latestTag;
 	const pendingCount = queryData?.pendingCount || 0;
-
-	const isLoading = detailsQuery.isLoading;
 
 	if (isLoading) {
 		return (
@@ -710,15 +706,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 
 function TagCell({ repo }: { repo: RepoInfo }) {
 	const [org, name] = repo.fullName.split("/");
-	const detailsQuery = useQueries({
-		queries: [
-			{
-				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-				enabled: false,
-			},
-		],
-	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
-	const queryData = detailsQuery.data;
+	const { data: queryData, isLoading } = useRepoDashboardDetails(repo.fullName);
 	const latestTag = queryData?.latestTag;
 	const commits = queryData?.commits;
 	const prodPipeline = usePipelineWithHealth({
@@ -731,11 +719,11 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 		() =>
 			getPipelineStatusInfo(
 				prodPipeline.data?.events,
-				prodPipeline.data?.updated_at,
+				prodPipeline.data?.updatedAt,
 			),
 		[prodPipeline.data],
 	);
-	const isProdLoading = prodPipeline.isLoading || detailsQuery.isLoading;
+	const isProdLoading = prodPipeline.isLoading || isLoading;
 
 	const tagCommitInfo = useMemo(() => {
 		if (!latestTag?.commit || !commits) return undefined;
@@ -752,7 +740,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 		};
 	}, [latestTag, commits]);
 
-	if (detailsQuery.isLoading) {
+	if (isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
 	}
 
@@ -775,15 +763,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 
 function CommitCell({ repo }: { repo: RepoInfo }) {
 	const [org, name] = repo.fullName.split("/");
-	const detailsQuery = useQueries({
-		queries: [
-			{
-				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-				enabled: false,
-			},
-		],
-	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
-	const queryData = detailsQuery.data;
+	const { data: queryData, isLoading } = useRepoDashboardDetails(repo.fullName);
 	const latestCommit = queryData?.commits?.[0];
 	const stagingPipeline = usePipelineWithHealth({
 		product: repo.fullName,
@@ -794,11 +774,11 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 		() =>
 			getPipelineStatusInfo(
 				stagingPipeline.data?.events,
-				stagingPipeline.data?.updated_at,
+				stagingPipeline.data?.updatedAt,
 			),
 		[stagingPipeline.data],
 	);
-	const isStagingLoading = stagingPipeline.isLoading || detailsQuery.isLoading;
+	const isStagingLoading = stagingPipeline.isLoading || isLoading;
 
 	const commitInfo = useMemo(() => {
 		if (!latestCommit) return undefined;
@@ -811,7 +791,7 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 		};
 	}, [latestCommit]);
 
-	if (detailsQuery.isLoading) {
+	if (isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
 	}
 
@@ -833,18 +813,10 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 }
 
 function DateCell({ repo }: { repo: RepoInfo }) {
-	const detailsQuery = useQueries({
-		queries: [
-			{
-				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-				enabled: false,
-			},
-		],
-	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
-	const queryData = detailsQuery.data;
+	const { data: queryData, isLoading } = useRepoDashboardDetails(repo.fullName);
 	const commitDate = queryData?.commits?.[0]?.date;
 
-	if (detailsQuery.isLoading) {
+	if (isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-24 animate-pulse" />;
 	}
 
@@ -928,18 +900,10 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 }
 
 function AuthorCell({ repo }: { repo: RepoInfo }) {
-	const detailsQuery = useQueries({
-		queries: [
-			{
-				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-				enabled: false, // Using data from parent
-			},
-		],
-	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
-	const queryData = detailsQuery.data;
+	const { data: queryData, isLoading } = useRepoDashboardDetails(repo.fullName);
 	const commitAuthor = queryData?.commits?.[0]?.author;
 
-	if (detailsQuery.isLoading) {
+	if (isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-32 animate-pulse" />;
 	}
 
@@ -1088,15 +1052,7 @@ function OperationsCell({
 }) {
 	const [org, name] = repo.fullName.split("/");
 	const [isProjectSelectionOpen, setIsProjectSelectionOpen] = useState(false);
-	const detailsQuery = useQueries({
-		queries: [
-			{
-				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-				enabled: false,
-			},
-		],
-	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
-	const queryData = detailsQuery.data;
+	const { data: queryData } = useRepoDashboardDetails(repo.fullName);
 	const latestTag = queryData?.latestTag;
 
 	return (
@@ -1139,33 +1095,6 @@ function OperationsCell({
 	);
 }
 
-interface Commit {
-	hash: string;
-	shortHash: string;
-	author: string;
-	date: string;
-	message: string;
-	subject: string;
-	body: string;
-}
-
-interface Tag {
-	name: string;
-	commit: string;
-}
-
-interface RepoDetails {
-	fullName: string;
-	pendingCount: number;
-	latestTag: Tag | null;
-	commits: Commit[];
-	prCount: number;
-	actions: {
-		total: number;
-		running: number;
-		failed: number;
-	};
-}
 
 type RepoInfo = {
 	fullName: string;

@@ -1,22 +1,23 @@
-# PR Draft: Docker UI Resonance Refactor 🐜
+# PR Draft: GitHub UI Resonance Refactor 🐜
 
 ## Scope
-This PR implements the Industrial Resonance V2 standard in the Docker module, enhancing usability, consistency, and visual density.
+This PR implements the Industrial Resonance V2 standard in the GitHub module, evolving the dashboard towards a higher density and better integration with the global product layout.
 
 ### UI/UX Refinement (Industrial Resonance V2)
-- **IndustrialTabs Integration**: Migrating container status filtering from legacy table filters to a unified `IndustrialTabs` component in the main route, with persistent state via search parameters.
-- **High-Density Typography**: Updating table cells (Started, Status) to use the technical metadata standard (`text-[10px] font-bold uppercase tracking-wider`).
-- **Placeholder Standard**: Implementing the standard to render `null` during access verification to maintain a clean UI and avoid layout shifts.
-- **Technical Hygiene**: Eradicating legacy filter configurations and debug `console.log` statements.
+- **Header Integration**: Moving collection navigation (`IndustrialTabs`) and project management actions to the `PageLayout` header for better visibility and consistency with Kubernetes/Docker modules.
+- **Global Filtering**: Promoting the "Pendientes" filter to a dashboard-level control, reducing redundancy across organization tables.
+- **High-Density Typography**: Updating column headers and technical metadata cells (`Health`, `PRs`, `Workflows`, `Date`, `Author`) to the technical standard (`text-[10px] font-bold uppercase tracking-wider`).
+- **Semantic Health**: Refining health indicators with standard pulse animations for OK states.
 
-### Alignment & Consistency
-- Full compliance with `DESIGN.md` and `AGENTS.md` protocols.
-- Zero-warning build log maintained.
+### Technical Hygiene
+- Eradicating redundant local filters and simplifying table configurations.
+- Ensuring full compliance with `DESIGN.md` and `AGENTS.md`.
+- Zero-warning build log maintenance.
 
 ## Impact
-- Improved navigation and state persistence in the Docker dashboard.
-- Enhanced visual harmony with other system modules (Health Monitor, GitHub).
-- Reduced technical entropy through code cleanup.
+- Seamless navigation between repository collections.
+- Consistent visual language across all system modules.
+- Enhanced "Time to Value" by surfacing pending promotions and health status more effectively.
 
 ---
 *Status: Ready for Review 🐜*

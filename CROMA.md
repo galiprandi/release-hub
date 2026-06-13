@@ -2,6 +2,18 @@
 
 ## Historial de Misiones
 
+### 2026-06-13: Security Hardening (Script Allow-list) & Type Resilience Audit
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-hardening-and-type-resilience`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Implementación de allow-list estricto para el parámetro `action` en el middleware de ejecución de scripts (`vite.config.ts`).
+  - [x] Auditoría profunda de tipos para erradicar `any` en `src/`.
+  - [x] Actualización de `DESIGN.md` y `AGENTS.md` con los nuevos estándares de hardening.
+  - [x] Expansión de tests de seguridad en `src/api/security.test.ts` para verificar el allow-list de scripts.
+  - [x] Zero-warning build y type-check exitoso.
+- **Resultado**: Blindaje del dev server contra ejecución de scripts no autorizados y garantía de integridad de tipos en todo el repositorio.
+
 ### 2026-06-07: Refactor Resonance V2 (Health & Fetcher)
 - **Rama**: `🐜-Uma-refactor-health-resonance`
 - **Estado**: Finalizado ✅
@@ -65,6 +77,18 @@
   - [x] Validación E2E con Playwright y capturas de pantalla.
 ## Historial de Carol
 
+### 2026-06-15: Refactor Docker UI Resonance
+- **Rama**: `🐜-Carol-refactor-docker-ui-resonance`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Migración de filtrado a `IndustrialTabs` en la ruta de Docker.
+  - [x] Sincronización de estado con parámetro de búsqueda `status`.
+  - [x] Aplicación de `Resonance V2 Placeholder Standard` (null durante verificación).
+  - [x] Refactor de celdas `StartedCell` y `StatusCell` a alta densidad.
+  - [x] Eliminación de logs y filtros de tabla legados.
+  - [x] Zero-warning build y validación E2E exitosa.
+- **Resultado**: Dashboard de Docker alineado con Industrial Resonance V2, más denso y profesional.
+
 ### 2026-06-07: Refactor Kubernetes UI Resonance
 - **Rama**: `🐜-Carol-refactor-kubernetes-ui-resonance`
 - **Estado**: En progreso 🏗️
@@ -81,3 +105,16 @@
   - [x] Limpieza de comentarios obsoletos ("from FilterBar").
   - [x] Validación E2E con Playwright (Diff Viewer & GitHub).
   - [x] Zero-warning build y lint log.
+
+### 2026-06-16: Refactor GitHub UI Resonance V2
+- **Rama**: `🐜-Uma-refactor-github-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Evolución del layout: integración de navegación de colecciones y gestión de proyectos en el header de `PageLayout`.
+  - [x] Promoción del filtro "Pendientes" a nivel global (dashboard) sincronizado con el search param `filter`.
+  - [x] Refactorización de cabeceras de tabla y celdas de metadatos técnicos a alta densidad (`text-[10px] font-bold uppercase tracking-wider`).
+  - [x] Estandarización de `HealthCell` con sombras semánticas y animaciones pulse para estados OK.
+  - [x] Eliminación de filtros locales redundantes y código muerto.
+  - [x] Validación E2E con Playwright (`e2e/verify-github-ui.spec.ts`) y screenshots.
+  - [x] Zero-warning build y lint log.
+- **Resultado**: Dashboard de GitHub alineado con Industrial Resonance V2, optimizando el Time to Value y la consistencia visual.

@@ -76,6 +76,7 @@ const VALIDATION = {
 	context: /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/,
 	dockerName: /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/,
 	resourceType: /^(pod|deployment|service|ingress)$/,
+	scripts: /^(healthcheck|install|start|trigger-staging-redeploy|uninstall)$/,
 };
 
 const activePortForwards = new Map<string, ReturnType<typeof spawn>>();
@@ -427,10 +428,15 @@ const scriptHandler: Connect.NextHandleFunction = async (req, res) => {
 	}
 
 	// Sanitize action and repo to prevent path traversal and argument injection
-	// Strict alphanumeric and hyphen for action ensures it stays within ./scripts/
-	if (!/^[a-zA-Z0-9-]+$/.test(action)) {
-		res.statusCode = 400;
-		res.end(JSON.stringify({ error: "Invalid action name", success: false }));
+	// Strict allow-list for action ensures it stays within authorized scripts in ./scripts/
+	if (!VALIDATION.scripts.test(action)) {
+		res.statusCode = 403;
+		res.end(
+			JSON.stringify({
+				error: `Action "${action}" is not in the allow-list`,
+				success: false,
+			}),
+		);
 		return;
 	}
 

@@ -1,31 +1,19 @@
-# PR Draft: Kubernetes UI Resonance Refactor 🐜
+# PR Draft: Security Hardening & Type Resilience V3 🐜
 
 ## Scope
-This PR implements the Industrial Resonance V2 standard in the Kubernetes module, enhancing usability, consistency, and visual density.
+This PR focuses on tightening the security posture of the application's local middleware and ensuring technical hygiene in core modules.
 
-### UI/UX Refinement (Industrial Resonance V2)
-- **Directory Standardization**: Moving components to `src/kubernetes/components/` to align with the system's modular architecture.
-- **Table High-Density Headers & Cells**:
-  - Updating `Namespace`, `Age`, and `Images` cells to use the technical metadata standard (`text-[10px] font-bold uppercase tracking-wider`).
-  - Wrapping image names in badge containers for better visual separation.
-  - Ensuring `StatusCell` uses semantic tokens with 20% opacity.
-- **Terminal Modal Refinement**:
-  - High-density header with double-line title (Context / Deployment Name).
-  - Terminal icon with `primary/10` background.
-  - Zinc-950 viewport for a professional technical aesthetic.
-- **Search UI Refinement**:
-  - `DeploymentSearch` input updated to `bg-muted/40` and `border-border/60`.
-  - High-density dropdown with technical metadata and keyboard-centric navigation hints.
+### Security Hardening
+- **Restricted Command Allow-list**: Removed shells (`bash`, `sh`, `zsh`, `powershell.exe`) and `node` from the `/local/exec` allow-list to prevent arbitrary code execution.
+- **Strict Input Validation**: Synchronized and tightened Kubernetes resource validation regexes (RFC 1123) across `vite.config.ts` and `src/config/terminalMiddleware.ts`, including strict length limits.
 
-### Technical Hygiene
-- Eradicating debug `console.log` statements.
-- Ensuring a zero-warning build log.
-- Full compliance with `DESIGN.md` and `AGENTS.md` protocols.
+### Type Hygiene & Documentation cleanup
+- **Entropy Reduction**: Cleaned up documentation and comments in `useUnifiedPipeline.ts` and `pulsarAdapter.test.ts` to improve technical clarity.
+- **Zero-Warning Build**: Verified that the codebase maintains a zero-warning build environment, ensuring no implicit `any` or technical debt in the modified areas.
 
-## Impact
-- Improved visual harmony with other system modules (Health Monitor, GitHub, Docker).
-- Enhanced technical aesthetic and information density.
-- Standardized directory structure for better maintainability.
+### Verification
+- **Security Tests**: Added 26 test cases in `src/api/security.test.ts` verifying the new restrictions and RFC 1123 compliance.
+- **Build Integrity**: Final verification successful via `npm run build`.
 
 ## Bitacora (CROMA.md)
 - [x] Phase 0: Territory Block.

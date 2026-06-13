@@ -23,7 +23,7 @@ describe('pulsarAdapter', () => {
       .mockResolvedValueOnce({ stdout: JSON.stringify(mockJob), success: true, stderr: '' } as ExecResponse) // Jobs
       .mockResolvedValueOnce({ stdout: JSON.stringify(mockCommit), success: true, stderr: '' } as ExecResponse) // Commit
 
-    const result = await pulsarAdapter.fetch('o', 'r', 'commits', 'any')
+    const result = await pulsarAdapter.fetch('o', 'r', 'commits', 'main')
     expect(result?.id).toBe('gha-1')
     expect(result?.state).toBe('COMPLETED')
     expect(result?.events[0].name).toBe('Build')
@@ -35,7 +35,7 @@ describe('pulsarAdapter', () => {
       .mockResolvedValueOnce({ stdout: '123', success: true, stderr: '' } as ExecResponse) // Workflow ID
       .mockResolvedValueOnce({ stdout: '', success: true, stderr: '' } as ExecResponse) // No runs
 
-    const result = await pulsarAdapter.fetch('o', 'r', 'commits', 'any')
+    const result = await pulsarAdapter.fetch('o', 'r', 'commits', 'main')
     expect(result).toBeNull()
   })
 

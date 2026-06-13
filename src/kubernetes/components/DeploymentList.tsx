@@ -204,7 +204,6 @@ export const DeploymentList = ({
 	}
 
 	const handleViewLogs = (deployment: DeploymentInfo, deploymentContext: string) => {
-		console.log('[DeploymentList] Opening logs for deployment:', deployment.name, 'context:', deploymentContext)
 		setSelectedDeployment(deployment)
 		setSelectedContext(deploymentContext)
 		setIsLogsModalOpen(true)
@@ -214,7 +213,6 @@ export const DeploymentList = ({
 	const [deploymentToAssign, setDeploymentToAssign] = useState<string | null>(null)
 
 	const handleOpenTerminal = (deployment: DeploymentInfo, deploymentContext: string) => {
-		console.log('[DeploymentList] Opening terminal for deployment:', deployment.name, 'context:', deploymentContext)
 		setSelectedDeployment(deployment)
 		setSelectedContext(deploymentContext)
 		setSelectedPodName(null)
@@ -328,9 +326,18 @@ export const DeploymentList = ({
 						open={true}
 						onOpenChange={(open) => !open && setIsTerminalModalOpen(false)}
 						title={
-							<div className="flex items-center gap-2">
-								<TerminalIcon className="w-4 h-4 text-primary" />
-								<span>Terminal: {selectedDeployment.name}</span>
+							<div className="flex items-center gap-3">
+								<div className="p-2 rounded-lg bg-primary/10">
+									<TerminalIcon className="w-4 h-4 text-primary" />
+								</div>
+								<div className="flex flex-col">
+									<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 leading-none mb-1">
+										{selectedContext}
+									</span>
+									<span className="text-sm font-bold tracking-tight leading-none">
+										{selectedDeployment.name}
+									</span>
+								</div>
 							</div>
 						}
 						headerExtra={
@@ -352,7 +359,7 @@ export const DeploymentList = ({
 						maxWidth="max-w-6xl"
 						className="w-[90vw] h-[80vh] !p-0"
 					>
-						<div className="flex-1 min-h-0 bg-black rounded-b-lg overflow-hidden">
+						<div className="flex-1 min-h-0 bg-zinc-950 rounded-b-lg overflow-hidden">
 							<Terminal
 								key={`terminal-${activePodName || 'default'}`}
 								type="k8s"
@@ -435,7 +442,7 @@ function DeploymentsTable({
 			id: "namespace",
 			accessorKey: "namespace",
 			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Namespace</span>,
-			cell: ({ row }) => <span className="text-xs font-mono text-muted-foreground">{row.original.namespace}</span>,
+			cell: ({ row }) => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{row.original.namespace}</span>,
 			filterFn: 'equalsString',
 		},
 		{
@@ -518,7 +525,7 @@ function StatusCell({ deployment, isLoading }: { deployment: DeploymentInfo; isL
 		healthy: { className: 'bg-success/20 text-success border-success/20', label: 'Saludable' },
 		progressing: { className: 'bg-info/20 text-info border-info/20', label: 'Procesando' },
 		degraded: { className: 'bg-destructive/20 text-destructive border-destructive/20', label: 'Degradado' },
-		unknown: { className: 'bg-muted/40 text-muted-foreground border-border/40', label: 'Desconocido' },
+		unknown: { className: 'bg-muted/20 text-muted-foreground border-border/10', label: 'Desconocido' },
 	}
 
 	const variant = variants[deployment.status] || variants.unknown
@@ -534,7 +541,7 @@ function AgeCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoad
 	if (isLoading) {
 		return <div className="h-4 bg-muted rounded w-10" />
 	}
-	return <span className="text-xs font-medium text-muted-foreground tracking-tight">{deployment.age}</span>
+	return <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{deployment.age}</span>
 }
 
 function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
@@ -551,11 +558,16 @@ function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isL
 	}
 
 	return (
-		<div className="flex flex-col gap-0.5">
+		<div className="flex flex-col gap-1">
 			{shortImages.map((img, i) => (
-				<span key={i} className="text-xs text-muted-foreground font-mono truncate max-w-[180px]" title={deployment.images[i]}>
-					{img}
-				</span>
+				<div key={i} className="flex">
+					<span
+						className="inline-flex items-center px-1.5 py-0.5 rounded bg-muted/20 border border-border/10 text-[10px] font-medium text-muted-foreground tracking-tighter truncate max-w-[180px]"
+						title={deployment.images[i]}
+					>
+						{img}
+					</span>
+				</div>
 			))}
 		</div>
 	)

@@ -15,5 +15,9 @@ This PR focuses on tightening the security posture of the application's local mi
 - **Security Tests**: Added 26 test cases in `src/api/security.test.ts` verifying the new restrictions and RFC 1123 compliance.
 - **Build Integrity**: Final verification successful via `npm run build`.
 
----
-*Status: Ready for Review 🐜*
+## Bitacora (CROMA.md)
+- [x] Phase 0: Territory Block.
+- [ ] Phase 1: Dead code elimination.
+- [ ] Phase 2: usePipelineWithHealth refactoring.
+- [ ] Phase 3: Type hardening.
+- [ ] Phase 4: Final verification.

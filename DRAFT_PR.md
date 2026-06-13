@@ -27,5 +27,9 @@ This PR implements the Industrial Resonance V2 standard in the Kubernetes module
 - Enhanced technical aesthetic and information density.
 - Standardized directory structure for better maintainability.
 
----
-*Status: Ready for Review 🐜*
+## Bitacora (CROMA.md)
+- [x] Phase 0: Territory Block.
+- [ ] Phase 1: Dead code elimination.
+- [ ] Phase 2: usePipelineWithHealth refactoring.
+- [ ] Phase 3: Type hardening.
+- [ ] Phase 4: Final verification.

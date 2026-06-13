@@ -26,6 +26,18 @@
   - [x] Eliminación de código muerto (ExternalLink en ContainerList.tsx).
 - **Resultado**: Dashboard más intuitivo, persistente y alineado con Industrial Resonance V2. Zero-warning build logrado.
 
+### 2026-06-12: Technical Hygiene & Unified Pipeline Standardization
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-standardization-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Desmantelamiento de hooks heredados (`usePipeline.ts`, `usePipelineDetector.ts`).
+  - [x] Migración de `usePipelineWithHealth` a la arquitectura de `UnifiedPipeline`.
+  - [x] Implementación del hook `useRepoDashboardDetails` para centralizar datos del dashboard con tipado estricto.
+  - [x] Erradicación de duplicación de tipos e implicit `any` en el dashboard de GitHub.
+  - [x] Zero-warning build logrado.
+- **Resultado**: Sistema más ligero, modular y 100% tipado, preparado para múltiples proveedores de pipeline.
+
 ### 2026-06-12: DNS Rebinding Protection & Type Hygiene V2
 - **Agente**: Vesper 🐜
 - **Rama**: `🐜-Vesper-refactor-security-hardening-v2`
@@ -100,3 +112,16 @@
   - [x] Limpieza de comentarios obsoletos ("from FilterBar").
   - [x] Validación E2E con Playwright (Diff Viewer & GitHub).
   - [x] Zero-warning build y lint log.
+
+### 2026-06-16: Refactor GitHub UI Resonance V2
+- **Rama**: `🐜-Uma-refactor-github-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Evolución del layout: integración de navegación de colecciones y gestión de proyectos en el header de `PageLayout`.
+  - [x] Promoción del filtro "Pendientes" a nivel global (dashboard) sincronizado con el search param `filter`.
+  - [x] Refactorización de cabeceras de tabla y celdas de metadatos técnicos a alta densidad (`text-[10px] font-bold uppercase tracking-wider`).
+  - [x] Estandarización de `HealthCell` con sombras semánticas y animaciones pulse para estados OK.
+  - [x] Eliminación de filtros locales redundantes y código muerto.
+  - [x] Validación E2E con Playwright (`e2e/verify-github-ui.spec.ts`) y screenshots.
+  - [x] Zero-warning build y lint log.
+- **Resultado**: Dashboard de GitHub alineado con Industrial Resonance V2, optimizando el Time to Value y la consistencia visual.

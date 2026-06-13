@@ -1,22 +1,20 @@
-# PR Draft: Docker UI Resonance Refactor 🐜
+# PR Draft: Technical Hygiene & Entropy Cleanup 🐜
 
 ## Scope
-This PR implements the Industrial Resonance V2 standard in the Docker module, enhancing usability, consistency, and visual density.
+This PR performs a surgical cleanup of the repository, eradicating technical entropy and restoring a zero-warning build log.
 
-### UI/UX Refinement (Industrial Resonance V2)
-- **IndustrialTabs Integration**: Migrating container status filtering from legacy table filters to a unified `IndustrialTabs` component in the main route, with persistent state via search parameters.
-- **High-Density Typography**: Updating table cells (Started, Status) to use the technical metadata standard (`text-[10px] font-bold uppercase tracking-wider`).
-- **Placeholder Standard**: Implementing the standard to render `null` during access verification to maintain a clean UI and avoid layout shifts.
-- **Technical Hygiene**: Eradicating legacy filter configurations and debug `console.log` statements.
+### Refactoring & Standardization
+- **Pipeline Standardization**: Migrated `usePipelineWithHealth` to use the `UnifiedPipeline` architecture (`src/pipeline-core`).
+- **Type Resilience**: Refactored `getPipelineStatusInfo` and `extractRoutes` to consume unified `PipelineEvent` types, ensuring consistency across providers.
+- **Dead Code Elimination**: Eradicated legacy hooks `usePipeline.ts` and `usePipelineDetector.ts` that were identified as technical debt.
 
-### Alignment & Consistency
-- Full compliance with `DESIGN.md` and `AGENTS.md` protocols.
-- Zero-warning build log maintained.
+### Quality & Performance
+- **Build Hygiene**: Fixed unused variable warnings in `src/api/security.test.ts` to achieve a pristine build log.
+- **Dependency Optimization**: Reduced bundle size by removing redundant fetching logic.
 
-## Impact
-- Improved navigation and state persistence in the Docker dashboard.
-- Enhanced visual harmony with other system modules (Health Monitor, GitHub).
-- Reduced technical entropy through code cleanup.
+### Compliance
+- Full alignment with `DESIGN.md`, `AGENTS.md`, and Industrial Resonance V2 standards.
+- Validated with vitest and zero-warning build.
 
 ---
 *Status: Ready for Review 🐜*

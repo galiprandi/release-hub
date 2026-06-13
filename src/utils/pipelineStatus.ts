@@ -1,4 +1,4 @@
-import type { PipelineState } from "@/pipeline-core/types";
+import type { PipelineState, PipelineEvent } from "@/pipeline-core/types";
 
 export interface PipelineStatusInfo {
 	status: PipelineState | undefined;
@@ -12,7 +12,7 @@ export interface PipelineStatusInfo {
  * Centralizes logic previously duplicated across the application.
  */
 export function getPipelineStatusInfo(
-	events: { state: string; id: string; label?: { es: string }; markdown?: string; subevents?: { id: string; state: string }[] }[] | undefined,
+	events: PipelineEvent[] | undefined,
 	updatedAt?: string
 ): PipelineStatusInfo {
 	if (!events || events.length === 0) {
@@ -25,38 +25,26 @@ export function getPipelineStatusInfo(
 	const info: PipelineStatusInfo = {
 		status: undefined,
 		updatedAt,
-		failedStage: failedEvent?.label?.es,
+		failedStage: failedEvent?.name,
 		errorDetail: failedEvent?.markdown,
 	};
 
-	// If the last event is not CD (Deployment), use its state directly
-	if (lastEvent.id !== "CD") {
-		info.status = lastEvent.state as PipelineState;
-		return info;
+	// Identify all deployment-related events (handling both flat and nested structures)
+	const allEvents = events.flatMap((e) => [e, ...(e.subevents || [])]);
+	const deployEvents = allEvents.filter((e) => e.id.toUpperCase().startsWith("DEPLOY_"));
+
+	if (deployEvents.length > 0) {
+		const hasFailed = deployEvents.some((se) => se.state === "FAILED");
+		const hasWarn = deployEvents.some((se) => se.state === "WARN");
+		// Consider both SUCCESS and COMPLETED as successful terminal states
+		const allSuccess = deployEvents.every((se) => ["SUCCESS", "COMPLETED"].includes(se.state));
+
+		if (hasFailed) return { ...info, status: "FAILED" };
+		if (hasWarn) return { ...info, status: "WARN" };
+		if (allSuccess) return { ...info, status: "SUCCESS" };
 	}
 
-	// Filter only deployment subevents (DEPLOY_*)
-	const deploySubevents = lastEvent.subevents?.filter((se) => se.id.startsWith("DEPLOY_")) || [];
-
-	if (deploySubevents.length === 0) {
-		info.status = lastEvent.state as PipelineState;
-		return info;
-	}
-
-	// Determine state based on deployment subevents
-	const hasFailed = deploySubevents.some((se) => se.state === "FAILED");
-	const hasWarn = deploySubevents.some((se) => se.state === "WARN");
-	const allSuccess = deploySubevents.every((se) => se.state === "SUCCESS");
-
-	if (hasFailed) {
-		info.status = "FAILED";
-	} else if (hasWarn) {
-		info.status = "WARN";
-	} else if (allSuccess) {
-		info.status = "SUCCESS";
-	} else {
-		info.status = lastEvent.state as PipelineState;
-	}
-
+	// Fallback to the state of the very last event in the pipeline
+	info.status = lastEvent.state;
 	return info;
 }

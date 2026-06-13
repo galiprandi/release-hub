@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { usePipeline, usePipelineWithTag } from './usePipeline';
+import { useEffect, useMemo } from 'react';
+import { useUnifiedPipeline } from '@/pipeline-core';
 import { useHealthMonitor } from './useHealthMonitor';
 
 interface UsePipelineWithHealthOptions {
@@ -28,16 +28,20 @@ export function usePipelineWithHealth({
 }: UsePipelineWithHealthOptions) {
   const { extractEndpointsFromEvents } = useHealthMonitor();
 
+  const [org, repo] = useMemo(() => product.split('/'), [product]);
+
   // Infer environment from tag presence if not explicitly provided
   const inferredEnvironment: 'staging' | 'production' = tag ? 'production' : 'staging';
   const env = environment || inferredEnvironment;
 
-  // Always call both hooks to satisfy React Hook rules
-  const commitPipeline = usePipeline({ product, commit, enabled: enabled && !tag });
-  const tagPipeline = usePipelineWithTag({ product, commit, tag: tag || '', enabled: enabled && !!tag });
-
-  // Use the appropriate result based on whether we have a tag
-  const pipelineResult = tag ? tagPipeline : commitPipeline;
+  const pipelineResult = useUnifiedPipeline({
+    org,
+    repo,
+    viewMode: tag ? 'tags' : 'commits',
+    ref: tag || commit,
+    commit: tag ? commit : undefined,
+    enabled,
+  });
 
   // Extract endpoints when pipeline data changes
   useEffect(() => {

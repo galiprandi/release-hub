@@ -93,3 +93,17 @@
   - [x] Limpieza de comentarios obsoletos ("from FilterBar").
   - [x] Validación E2E con Playwright (Diff Viewer & GitHub).
   - [x] Zero-warning build y lint log.
+
+### 2026-06-17: Technical Hygiene & Entropy Cleanup
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-entropy-cleanup`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Migración de `usePipelineWithHealth` a la arquitectura `UnifiedPipeline`.
+  - [x] Estandarización de `PipelineEvent` con soporte para `markdown` y tipado unificado.
+  - [x] Refactor de `getPipelineStatusInfo` y `extractRoutes` para consumo de tipos unificados.
+  - [x] Erradicación de hooks legados `usePipeline.ts` y `usePipelineDetector.ts`.
+  - [x] Corrección de advertencias de build (variables no usadas en tests de seguridad).
+  - [x] Sincronización de nomenclatura de metadatos (camelCase `updatedAt`).
+  - [x] Zero-warning build logrado.
+- **Resultado**: Repositorio libre de entropía técnica en el núcleo de pipelines y build impecable.

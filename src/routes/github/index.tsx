@@ -705,7 +705,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 		() =>
 			getPipelineStatusInfo(
 				prodPipeline.data?.events,
-				prodPipeline.data?.updated_at,
+				prodPipeline.data?.updatedAt,
 			),
 		[prodPipeline.data],
 	);
@@ -768,7 +768,7 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 		() =>
 			getPipelineStatusInfo(
 				stagingPipeline.data?.events,
-				stagingPipeline.data?.updated_at,
+				stagingPipeline.data?.updatedAt,
 			),
 		[stagingPipeline.data],
 	);

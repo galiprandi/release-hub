@@ -137,3 +137,4 @@
 - **Docker UI**: Status filtering uses `IndustrialTabs` in the route, synced with `status` search parameter. Cell typography for technical metadata must use `text-[10px] font-bold uppercase tracking-wider`.
 - **Estructura**: Los componentes de módulo viven siempre en `src/<modulo>/components/`. Prohibido usar `componentes/`.
 - **Hardening**: Middleware `spawn` con `shell: false`. Allow-list estricto en `/local/exec` y `/local/script`. SSRF protection con DNS Rebinding protection (pre-resolución obligatoria) bloqueando 127.0.0.0/8, 169.254.0.0/16, CGNAT y IPv6 local. Proxy de salud requiere `servername` (SNI) al usar IPs resueltas.
+- **Pipeline Standards**: Obligatorio usar `useUnifiedPipeline` (`src/pipeline-core`). Las interfaces de eventos (`PipelineEvent`) deben incluir `markdown` para extracción de rutas y detalles de error. La nomenclatura de metadatos es estrictamente camelCase (`updatedAt`).

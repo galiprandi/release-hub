@@ -35,6 +35,7 @@ function mapSubEvent(sub: SubEvent): PipelineEvent {
 		state: mapSekiState(sub.state),
 		startedAt: sub.created_at,
 		completedAt: sub.updated_at,
+		markdown: sub.markdown,
 	}
 }
 
@@ -52,6 +53,7 @@ function flattenSekiEvents(events: SekiEvent[]): PipelineEvent[] {
 			state: mapSekiState(event.state),
 			startedAt: event.created_at,
 			completedAt: event.updated_at,
+			markdown: event.markdown,
 		})
 		
 		// Add subevents if present

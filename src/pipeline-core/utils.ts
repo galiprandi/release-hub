@@ -1,5 +1,3 @@
-import type { Event } from "@/api/seki.type";
-
 const ROUTE_REGEX = /(https?:\/\/[^\s<>"')]+)/gi;
 
 /**
@@ -38,13 +36,15 @@ const isExternalUrl = (url: string): boolean => {
 	}
 };
 
-export const extractRoutes = (events: Event[]) => {
+import type { PipelineEvent } from "./types";
+
+export const extractRoutes = (events: PipelineEvent[]) => {
 	const urls = new Set<string>();
-	events.flatMap(e => e.subevents || [])
-		.filter((sub) => sub.id.toUpperCase().startsWith("DEPLOY"))
-		.forEach((sub) => {
-			if (sub.markdown) {
-				const matches = sub.markdown.match(ROUTE_REGEX);
+	events
+		.filter((e) => e.id.toUpperCase().startsWith("DEPLOY"))
+		.forEach((event) => {
+			if (event.markdown) {
+				const matches = event.markdown.match(ROUTE_REGEX);
 				if (matches) {
 					matches.forEach((match) => {
 						const url = cleanUrl(match);

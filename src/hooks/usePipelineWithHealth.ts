@@ -1,3 +1,6 @@
+import { useEffect, useMemo } from 'react';
+import { useUnifiedPipeline } from '@/pipeline-core';
+import { useHealthMonitor } from './useHealthMonitor';
 import { useEffect } from 'react';
 import { useUnifiedPipeline } from '@/pipeline-core/hooks/useUnifiedPipeline';
 import { useHealthMonitor, type Environment } from './useHealthMonitor';
@@ -55,17 +58,19 @@ export function usePipelineWithHealth({
   const { extractEndpointsFromEvents } = useHealthMonitor();
   const [org, repo] = product.split('/');
 
-  // Infer environment from tag presence if not explicitly provided
-  const env = environment || (tag ? 'production' : 'staging');
+  const [org, repo] = useMemo(() => product.split('/'), [product]);
 
-  // Use Unified Pipeline instead of legacy Seki-only hooks
-  const pipeline = useUnifiedPipeline({
+  // Infer environment from tag presence if not explicitly provided
+  const inferredEnvironment: 'staging' | 'production' = tag ? 'production' : 'staging';
+  const env = environment || inferredEnvironment;
+
+  const pipelineResult = useUnifiedPipeline({
     org,
     repo,
     viewMode: tag ? 'tags' : 'commits',
     ref: tag || commit,
     commit: tag ? commit : undefined,
-    enabled: enabled && !!org && !!repo && (!!tag || !!commit),
+    enabled,
   });
 
   // Extract endpoints when pipeline data changes

@@ -1,19 +1,20 @@
-# PR Draft: Security Hardening & Type Resilience V3 🐜
+# PR Draft: Technical Hygiene & Entropy Cleanup 🐜
 
 ## Scope
-This PR focuses on tightening the security posture of the application's local middleware and ensuring technical hygiene in core modules.
+This PR performs a surgical cleanup of the repository, eradicating technical entropy and restoring a zero-warning build log.
 
-### Security Hardening
-- **Restricted Command Allow-list**: Removed shells (`bash`, `sh`, `zsh`, `powershell.exe`) and `node` from the `/local/exec` allow-list to prevent arbitrary code execution.
-- **Strict Input Validation**: Synchronized and tightened Kubernetes resource validation regexes (RFC 1123) across `vite.config.ts` and `src/config/terminalMiddleware.ts`, including strict length limits.
+### Refactoring & Standardization
+- **Pipeline Standardization**: Migrated `usePipelineWithHealth` to use the `UnifiedPipeline` architecture (`src/pipeline-core`).
+- **Type Resilience**: Refactored `getPipelineStatusInfo` and `extractRoutes` to consume unified `PipelineEvent` types, ensuring consistency across providers.
+- **Dead Code Elimination**: Eradicated legacy hooks `usePipeline.ts` and `usePipelineDetector.ts` that were identified as technical debt.
 
-### Type Hygiene & Documentation cleanup
-- **Entropy Reduction**: Cleaned up documentation and comments in `useUnifiedPipeline.ts` and `pulsarAdapter.test.ts` to improve technical clarity.
-- **Zero-Warning Build**: Verified that the codebase maintains a zero-warning build environment, ensuring no implicit `any` or technical debt in the modified areas.
+### Quality & Performance
+- **Build Hygiene**: Fixed unused variable warnings in `src/api/security.test.ts` to achieve a pristine build log.
+- **Dependency Optimization**: Reduced bundle size by removing redundant fetching logic.
 
-### Verification
-- **Security Tests**: Added 26 test cases in `src/api/security.test.ts` verifying the new restrictions and RFC 1123 compliance.
-- **Build Integrity**: Final verification successful via `npm run build`.
+### Compliance
+- Full alignment with `DESIGN.md`, `AGENTS.md`, and Industrial Resonance V2 standards.
+- Validated with vitest and zero-warning build.
 
 ## Bitacora (CROMA.md)
 - [x] Phase 0: Territory Block.

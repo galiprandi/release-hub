@@ -1,24 +1,21 @@
-# PR Draft: Technical Hygiene & Entropy Cleanup 🐜
+# PR Draft: Refactor Fetcher UI Resonance V2 🐜
 
 ## Scope
-This PR performs a surgical cleanup of the repository, eradicating technical entropy and restoring a zero-warning build log.
+This PR evolves the Fetcher module to the Industrial Resonance V2 standard, optimizing user flow and information density.
 
-### Refactoring & Standardization
-- **Pipeline Standardization**: Migrated `usePipelineWithHealth` to use the `UnifiedPipeline` architecture (`src/pipeline-core`).
-- **Type Resilience**: Refactored `getPipelineStatusInfo` and `extractRoutes` to consume unified `PipelineEvent` types, ensuring consistency across providers.
-- **Dead Code Elimination**: Eradicated legacy hooks `usePipeline.ts` and `usePipelineDetector.ts` that were identified as technical debt.
+### UI & UX Resonance
+- **Advanced Navigation**: Implementation of `IndustrialTabs` for persistent sorting and filtering, synchronized with search parameters.
+- **High-Density Typography**: Refactoring of technical metadata and table headers to the `text-[10px] font-bold uppercase` standard.
+- **Visual Hierarchy**: Refinement of `UrlCell` and status badges for improved readability and technical aesthetic.
 
-### Quality & Performance
-- **Build Hygiene**: Fixed unused variable warnings in `src/api/security.test.ts` to achieve a pristine build log.
-- **Dependency Optimization**: Reduced bundle size by removing redundant fetching logic.
-
-### Compliance
-- Full alignment with `DESIGN.md`, `AGENTS.md`, and Industrial Resonance V2 standards.
-- Validated with vitest and zero-warning build.
+### Technical Hardening
+- **Search Param Persistence**: Full synchronization of dashboard state (`method`, `sortBy`) with TanStack Router.
+- **Type Hygiene**: Eradication of implicit `any` and enforcement of strict validation in `validateSearch`.
+- **Zero-Warning Build**: Maintenance of a pristine build log and comprehensive test coverage.
 
 ## Bitacora (CROMA.md)
 - [x] Phase 0: Territory Block.
-- [ ] Phase 1: Dead code elimination.
-- [ ] Phase 2: usePipelineWithHealth refactoring.
-- [ ] Phase 3: Type hardening.
+- [ ] Phase 1: Search parameter synchronization.
+- [ ] Phase 2: Industrial Resonance V2 UI implementation.
+- [ ] Phase 3: Technical hygiene & documentation.
 - [ ] Phase 4: Final verification.

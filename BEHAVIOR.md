@@ -45,13 +45,15 @@
 - should block cloud metadata addresses and link-local
 - should block loopback addresses and normalization bypasses
 - should block private network addresses (RFC 1918)
+- should enforce RFC 1123 length limits
 - should handle single quotes within arguments correctly
 - should neutralize backtick injection in kubectl commands
 - should neutralize command substitution in curl commands
 - should neutralize pipe injection in array-based commands
 - should neutralize redirection injection in array-based commands
 - should neutralize semicolon injection in docker commands
-- should not contain dangerous commands
+- should not contain dangerous file commands
+- should not contain shells or node
 - should reject argument injection and path traversal in repo parameter
 - should reject names starting with hyphens (flag injection)
 - should reject names with spaces or shell characters

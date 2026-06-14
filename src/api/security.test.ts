@@ -107,9 +107,10 @@ describe('Security Hardening', () => {
 
   describe('Terminal Middleware Hardening', () => {
     // RFC 1123 DNS Subdomain standards
-    const k8sNameRegex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
-    const contextRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
-    const dockerNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
+    const k8sNameRegex =
+      /^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?(\.[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?)*$/;
+    const contextRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
+    const dockerNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
 
     it('should validate Kubernetes resource names correctly', () => {
       expect(k8sNameRegex.test('my-pod')).toBe(true)
@@ -117,6 +118,16 @@ describe('Security Hardening', () => {
       expect(k8sNameRegex.test('invalid_name')).toBe(false)
       expect(k8sNameRegex.test('valid.name.with.dots')).toBe(true) // Subdomains allow dots
       expect(k8sNameRegex.test('UpperCase')).toBe(false)
+    })
+
+    it('should enforce RFC 1123 length limits', () => {
+      const longLabel = 'a'.repeat(64);
+      const validLabel = 'a'.repeat(63);
+      expect(k8sNameRegex.test(longLabel)).toBe(false);
+      expect(k8sNameRegex.test(validLabel)).toBe(true);
+
+      const longContext = 'a'.repeat(129);
+      expect(contextRegex.test(longContext)).toBe(false);
     })
 
     it('should validate Kubernetes contexts correctly', () => {
@@ -274,8 +285,7 @@ describe('Security Hardening', () => {
 
   describe('Middleware Command Allow-listing', () => {
     const SAFE_COMMANDS = [
-      "gh", "kubectl", "docker", "curl", "lsof", "node", "ls", "echo", "jq", "helm",
-      "powershell.exe", "zsh", "bash", "sh"
+      "gh", "kubectl", "docker", "curl", "lsof", "ls", "echo", "jq", "helm"
     ];
 
     it('should allow commands in the safe list', () => {
@@ -285,7 +295,15 @@ describe('Security Hardening', () => {
       expect(SAFE_COMMANDS).toContain('curl');
     });
 
-    it('should not contain dangerous commands', () => {
+    it('should not contain shells or node', () => {
+      expect(SAFE_COMMANDS).not.toContain('bash');
+      expect(SAFE_COMMANDS).not.toContain('sh');
+      expect(SAFE_COMMANDS).not.toContain('zsh');
+      expect(SAFE_COMMANDS).not.toContain('powershell.exe');
+      expect(SAFE_COMMANDS).not.toContain('node');
+    });
+
+    it('should not contain dangerous file commands', () => {
       expect(SAFE_COMMANDS).not.toContain('rm');
       expect(SAFE_COMMANDS).not.toContain('mv');
       expect(SAFE_COMMANDS).not.toContain('cp');

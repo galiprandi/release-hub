@@ -163,7 +163,7 @@ export function DeploymentSearch() {
           onBlur={() => setIsEditable(false)}
           placeholder={`Buscar despliegues... (Cmd+K)`}
           aria-label="Búsqueda de deployments"
-          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/20 border border-border/10 rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all hover:bg-muted/30`}
+          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/40 border border-border/60 rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all hover:bg-muted/50`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -230,8 +230,8 @@ export function DeploymentSearch() {
                         </div>
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{deployment.namespace}</span>
-                          <span className="w-1 h-1 rounded-full bg-border" />
-                          <span className="text-[10px] font-medium text-muted-foreground truncate">{deployment.context}</span>
+                          <div className="w-px h-2.5 bg-border/60 mx-0.5" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 truncate">{deployment.context}</span>
                         </div>
                         <div className="flex items-center gap-3 mt-1.5">
                           <div className="flex items-center gap-1.5">

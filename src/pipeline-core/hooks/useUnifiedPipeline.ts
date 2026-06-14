@@ -91,7 +91,7 @@ interface UseUnifiedPipelineResult {
 	/** Loading states */
 	isLoading: boolean
 	isFetching: boolean
-	/** Error if any */
+	/** Error if one occurred */
 	error: Error | null
 	/** Refetch function */
 	refetch: () => void

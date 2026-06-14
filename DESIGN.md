@@ -4,7 +4,7 @@
 - **Typography**: `tracking-tight` (names), `text-[10px] font-bold uppercase tracking-wider` (labels).
 - **Hierarchy**: Semantic tokens + 20% opacity (`bg-success/20 border-success/20`).
 - **Geometry**: `rounded-xl` (containers), `rounded-lg` (actions), `rounded-md` (badges).
-- **Hardening**: Middleware `spawn` con `shell: false`. Allow-list estricto en `/local/exec`. Allow-list de scripts autorizados en `/local/script`. SSRF protection bloqueando 127.0.0.0/8, 169.254.0.0/16, CGNAT y IPv6 local. DNS Rebinding protection mediante pre-resolución de hostnames en el proxy. Sanitización de inputs para CLI.
+- **Hardening**: Middleware `spawn` con `shell: false`. Allow-list estricto en `/local/exec` (shells y node prohibidos). Validación estricta de recursos Kubernetes (RFC 1123) en todos los middlewares locales. Allow-list de scripts autorizados en `/local/script`. SSRF protection bloqueando 127.0.0.0/8, 169.254.0.0/16, CGNAT y IPv6 local. DNS Rebinding protection mediante pre-resolución de hostnames en el proxy. Sanitización de inputs para CLI.
 - **Standard Cells**: Health (semantic dots), PRs (primary badge), Workflows (status badge + pulse), Operations (high-density actions).
 - **Focus**: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1`.
 - **ARIA**: Explicit `aria-label` for icon buttons.
@@ -78,3 +78,9 @@
 - **Grouping**: Favorites are grouped by `context` (Boxes icon). Projects are grouped by `project.id` (Folder icon).
 - **Deployment Status**: Badges use semantic tokens (success/info/destructive/muted) with 20% opacity and `rounded-md`. Labels are localized (Saludable, Procesando, Degradado, Desconocido).
 - **Search UI**: High-density dropdown with technical metadata (Namespace, Context, Ready/Up-to-date counts) and keyboard-centric navigation hints.
+
+### GitHub UI Resonance
+- **Dashboard Layout**: Primary collection navigation (`IndustrialTabs`) and project management actions reside in the `PageLayout` header.
+- **Global Filtering**: Dashboard-level filtering (e.g., 'Pendientes') is managed via `IndustrialTabs` in the main view, persisting state in the `filter` search parameter.
+- **Table Cells**: Technical metadata (Health, PRs, Workflows, Date, Author) uses `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`.
+- **Health Indicators**: Semantic dots (`w-1.5 h-1.5`) with shadows. OK state includes `animate-pulse`.

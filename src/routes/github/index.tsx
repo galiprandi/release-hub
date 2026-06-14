@@ -42,6 +42,12 @@ import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
 import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
 import { useHealthMonitor } from "@/hooks/useHealthMonitor";
+import {
+	useRepoDashboardDetails,
+	type RepoDetails,
+	type Commit,
+	type Tag,
+} from "@/hooks/useRepoDashboardDetails";
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
 import { runCommand } from "@/api/exec";
 import DayJS from "@/lib/dayjs";
@@ -58,7 +64,9 @@ export const Route = createFileRoute("/github/")({
 });
 
 function Dashboard() {
-	const { tab: activeTab = "favorites" } = useSearch({ from: "/github/" });
+	const { tab: activeTab = "favorites", filter: activeFilter } = useSearch({
+		from: "/github/",
+	});
 	const navigate = useNavigate({ from: "/github/" });
 	const { favorites, projects, toggleFavorite } = useUserCollections();
 	const { isLoading: isLoadingRepos, data: summaryData } =
@@ -140,8 +148,57 @@ function Dashboard() {
 		<PageLayout
 			header={{
 				title: "Repositorios",
-				searchComponent: <RepoSearch />,
+				searchComponent: (
+					<div className="flex items-center gap-4">
+						<div className="flex items-center gap-2">
+							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+								Colecciones:
+							</span>
+							<IndustrialTabs
+								options={tabs.map((t) => ({
+									id: t.value,
+									label: (
+										<div className="flex items-center gap-1.5">
+											{t.icon && <t.icon className="w-3 h-3" />}
+											<span>{t.label}</span>
+											{t.count !== undefined && t.count > 0 && (
+												<span className="ml-1 px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-[9px]">
+													{t.count}
+												</span>
+											)}
+										</div>
+									),
+								}))}
+								activeId={activeTab}
+								onChange={(id) =>
+									navigate({
+										search: (prev: Record<string, unknown>) => ({
+											...prev,
+											tab: id as string,
+										}),
+									})
+								}
+							/>
+						</div>
+						<div className="w-px h-6 bg-border/40 mx-1" />
+						<RepoSearch />
+					</div>
+				),
 			}}
+			actions={[
+				<ActionButton
+					key="manage-projects"
+					action={{
+						icon: Settings2,
+						label: "Gestionar Proyectos",
+						color: "default",
+					}}
+					showLabel={true}
+					onClick={handleManageProjects}
+					size="md"
+					className="bg-muted/20 hover:bg-muted/30"
+				/>,
+			]}
 			isLoading={isLoadingRepos}
 			footer={
 				summaryData
@@ -164,49 +221,29 @@ function Dashboard() {
 			}
 		>
 			<div className="space-y-6">
-				{/* Tabs & Management */}
-				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-					<div className="flex items-center gap-2">
+				{/* Global Filters */}
+				{!isEmpty && (
+					<div className="flex items-center gap-2 px-1">
 						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-							Colecciones:
+							Filtrar:
 						</span>
 						<IndustrialTabs
-							options={tabs.map((t) => ({
-								id: t.value,
-								label: (
-									<div className="flex items-center gap-1.5">
-										{t.icon && <t.icon className="w-3 h-3" />}
-										<span>{t.label}</span>
-										{t.count !== undefined && t.count > 0 && (
-											<span className="ml-1 px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-[9px]">
-												{t.count}
-											</span>
-										)}
-									</div>
-								),
-							}))}
-							activeId={activeTab}
+							options={[
+								{ id: "all", label: "Todos" },
+								{ id: "true", label: "Pendientes" },
+							]}
+							activeId={activeFilter || "all"}
 							onChange={(id) =>
 								navigate({
 									search: (prev: Record<string, unknown>) => ({
 										...prev,
-										tab: id as string,
+										filter: id === "all" ? undefined : (id as string),
 									}),
 								})
 							}
 						/>
 					</div>
-					<ActionButton
-						action={{
-							icon: Settings2,
-							label: "Gestionar Proyectos",
-							color: "default",
-						}}
-						onClick={handleManageProjects}
-						size="md"
-						className="bg-muted/20 hover:bg-muted/30"
-					/>
-				</div>
+				)}
 
 				{/* Content */}
 				{isEmpty ? (
@@ -466,11 +503,6 @@ function ReposTable({
 		return pendingSet;
 	}, [repoDetailsQueries]);
 
-	const filters = useMemo(
-		() => [{ label: "Pendientes", columnId: "pending_filter", value: "true" }],
-		[],
-	);
-
 	const columns: ColumnDef<RepoInfo>[] = useMemo(
 		() => [
 			{
@@ -498,22 +530,38 @@ function ReposTable({
 			},
 			{
 				accessorKey: "tag",
-				header: "Producción",
+				header: () => (
+					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+						Producción
+					</span>
+				),
 				cell: ({ row }) => <TagCell repo={row.original} />,
 			},
 			{
 				accessorKey: "commit",
-				header: "Staging",
+				header: () => (
+					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+						Staging
+					</span>
+				),
 				cell: ({ row }) => <CommitCell repo={row.original} />,
 			},
 			{
 				id: "health",
-				header: "Salud",
+				header: () => (
+					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+						Salud
+					</span>
+				),
 				cell: ({ row }) => <HealthCell repo={row.original} />,
 			},
 			{
 				id: "prs",
-				header: "PRs",
+				header: () => (
+					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+						PRs
+					</span>
+				),
 				cell: ({ row }) => {
 					const details = repoDetailsQueries.find(
 						(q) => q.data?.fullName === row.original.fullName,
@@ -523,7 +571,11 @@ function ReposTable({
 			},
 			{
 				id: "actions_status",
-				header: "Workflows",
+				header: () => (
+					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+						Workflows
+					</span>
+				),
 				cell: ({ row }) => {
 					const details = repoDetailsQueries.find(
 						(q) => q.data?.fullName === row.original.fullName,
@@ -533,18 +585,30 @@ function ReposTable({
 			},
 			{
 				accessorKey: "updatedAt",
-				header: "Actividad",
+				header: () => (
+					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+						Actividad
+					</span>
+				),
 				cell: ({ row }) => <DateCell repo={row.original} />,
 			},
 			{
 				accessorKey: "author",
-				header: "Autor",
+				header: () => (
+					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+						Autor
+					</span>
+				),
 				cell: ({ row }) => <AuthorCell repo={row.original} />,
 			},
 			{
 				id: "operations",
 				accessorKey: "actions",
-				header: () => <div className="text-right">Operations</div>,
+				header: () => (
+					<div className="text-right text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+						Operations
+					</div>
+				),
 				enableSorting: false,
 				cell: ({ row }) => (
 					<OperationsCell
@@ -558,40 +622,8 @@ function ReposTable({
 		[org, favorites, onToggleFavorite, reposWithPending, repoDetailsQueries],
 	);
 
-	const navigate = useNavigate({ from: "/github/" });
-	const handleFilterChange = useCallback(
-		(id: string) => {
-			const filterValue = id === "all" ? undefined : id;
-			navigate({
-				search: (prev: Record<string, unknown>) => ({
-					...prev,
-					filter: filterValue,
-				}),
-			});
-		},
-		[navigate],
-	);
-
-	const tableTabs = useMemo(
-		() => [
-			{ id: "all", label: "Todos" },
-			...filters.map((f) => ({ id: f.value, label: f.label })),
-		],
-		[filters],
-	);
-
 	return (
 		<div className="space-y-4">
-			<div className="flex items-center gap-2 px-1">
-				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-					Filtrar:
-				</span>
-				<IndustrialTabs
-					options={tableTabs}
-					activeId={activeFilter || "all"}
-					onChange={handleFilterChange}
-				/>
-			</div>
 			<Table
 				columns={columns}
 				data={sortedRepos}
@@ -607,21 +639,11 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 	const [org, name] = repo.fullName.split("/");
 	const [isCommitsModalOpen, setIsCommitsModalOpen] = useState(false);
 
-	const detailsQuery = useQueries({
-		queries: [
-			{
-				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-				enabled: false,
-			},
-		],
-	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
+	const { data: queryData, isLoading } = useRepoDashboardDetails(repo.fullName);
 
-	const queryData = detailsQuery.data;
 	const commits = queryData?.commits;
 	const latestTag = queryData?.latestTag;
 	const pendingCount = queryData?.pendingCount || 0;
-
-	const isLoading = detailsQuery.isLoading;
 
 	if (isLoading) {
 		return (
@@ -684,15 +706,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 
 function TagCell({ repo }: { repo: RepoInfo }) {
 	const [org, name] = repo.fullName.split("/");
-	const detailsQuery = useQueries({
-		queries: [
-			{
-				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-				enabled: false,
-			},
-		],
-	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
-	const queryData = detailsQuery.data;
+	const { data: queryData, isLoading } = useRepoDashboardDetails(repo.fullName);
 	const latestTag = queryData?.latestTag;
 	const commits = queryData?.commits;
 	const prodPipeline = usePipelineWithHealth({
@@ -709,7 +723,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 			),
 		[prodPipeline.data],
 	);
-	const isProdLoading = prodPipeline.isLoading || detailsQuery.isLoading;
+	const isProdLoading = prodPipeline.isLoading || isLoading;
 
 	const tagCommitInfo = useMemo(() => {
 		if (!latestTag?.commit || !commits) return undefined;
@@ -726,7 +740,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 		};
 	}, [latestTag, commits]);
 
-	if (detailsQuery.isLoading) {
+	if (isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
 	}
 
@@ -749,15 +763,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 
 function CommitCell({ repo }: { repo: RepoInfo }) {
 	const [org, name] = repo.fullName.split("/");
-	const detailsQuery = useQueries({
-		queries: [
-			{
-				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-				enabled: false,
-			},
-		],
-	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
-	const queryData = detailsQuery.data;
+	const { data: queryData, isLoading } = useRepoDashboardDetails(repo.fullName);
 	const latestCommit = queryData?.commits?.[0];
 	const stagingPipeline = usePipelineWithHealth({
 		product: repo.fullName,
@@ -772,7 +778,7 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 			),
 		[stagingPipeline.data],
 	);
-	const isStagingLoading = stagingPipeline.isLoading || detailsQuery.isLoading;
+	const isStagingLoading = stagingPipeline.isLoading || isLoading;
 
 	const commitInfo = useMemo(() => {
 		if (!latestCommit) return undefined;
@@ -785,7 +791,7 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 		};
 	}, [latestCommit]);
 
-	if (detailsQuery.isLoading) {
+	if (isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
 	}
 
@@ -807,23 +813,15 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 }
 
 function DateCell({ repo }: { repo: RepoInfo }) {
-	const detailsQuery = useQueries({
-		queries: [
-			{
-				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-				enabled: false,
-			},
-		],
-	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
-	const queryData = detailsQuery.data;
+	const { data: queryData, isLoading } = useRepoDashboardDetails(repo.fullName);
 	const commitDate = queryData?.commits?.[0]?.date;
 
-	if (detailsQuery.isLoading) {
+	if (isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-24 animate-pulse" />;
 	}
 
 	return commitDate ? (
-		<div className="text-xs font-medium text-muted-foreground">
+		<div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
 			{DayJS(commitDate).fromNow()}
 		</div>
 	) : null;
@@ -852,16 +850,16 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 					>
 						<div className="flex items-center -space-x-1">
 							{unhealthyCount > 0 && (
-								<div className="w-2.5 h-2.5 rounded-full bg-destructive/20 border border-destructive/20 shadow-sm" />
+								<div className="w-1.5 h-1.5 rounded-full bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.4)]" />
 							)}
 							{healthyCount > 0 && (
-								<div className="w-2.5 h-2.5 rounded-full bg-success/20 border border-success/20 shadow-sm" />
+								<div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
 							)}
 							{pendingCount > 0 && (
-								<div className="w-2.5 h-2.5 rounded-full bg-muted/40 border border-border/40 shadow-sm" />
+								<div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 shadow-sm" />
 							)}
 						</div>
-						<span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
+						<span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider">
 							{endpoints.length} serv.
 						</span>
 					</Link>
@@ -902,18 +900,10 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 }
 
 function AuthorCell({ repo }: { repo: RepoInfo }) {
-	const detailsQuery = useQueries({
-		queries: [
-			{
-				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-				enabled: false, // Using data from parent
-			},
-		],
-	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
-	const queryData = detailsQuery.data;
+	const { data: queryData, isLoading } = useRepoDashboardDetails(repo.fullName);
 	const commitAuthor = queryData?.commits?.[0]?.author;
 
-	if (detailsQuery.isLoading) {
+	if (isLoading) {
 		return <div className="h-4 bg-muted/20 rounded w-32 animate-pulse" />;
 	}
 
@@ -924,7 +914,7 @@ function AuthorCell({ repo }: { repo: RepoInfo }) {
 
 	return truncatedAuthor ? (
 		<span
-			className="text-xs text-muted-foreground/80 font-medium"
+			className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60"
 			title={commitAuthor}
 		>
 			{truncatedAuthor}
@@ -1062,15 +1052,7 @@ function OperationsCell({
 }) {
 	const [org, name] = repo.fullName.split("/");
 	const [isProjectSelectionOpen, setIsProjectSelectionOpen] = useState(false);
-	const detailsQuery = useQueries({
-		queries: [
-			{
-				queryKey: queryKeys.git.dashboardDetails(repo.fullName),
-				enabled: false,
-			},
-		],
-	})[0] as { data: RepoDetails | undefined; isLoading: boolean };
-	const queryData = detailsQuery.data;
+	const { data: queryData } = useRepoDashboardDetails(repo.fullName);
 	const latestTag = queryData?.latestTag;
 
 	return (
@@ -1113,33 +1095,6 @@ function OperationsCell({
 	);
 }
 
-interface Commit {
-	hash: string;
-	shortHash: string;
-	author: string;
-	date: string;
-	message: string;
-	subject: string;
-	body: string;
-}
-
-interface Tag {
-	name: string;
-	commit: string;
-}
-
-interface RepoDetails {
-	fullName: string;
-	pendingCount: number;
-	latestTag: Tag | null;
-	commits: Commit[];
-	prCount: number;
-	actions: {
-		total: number;
-		running: number;
-		failed: number;
-	};
-}
 
 type RepoInfo = {
 	fullName: string;

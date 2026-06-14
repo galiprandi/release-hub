@@ -26,6 +26,18 @@
   - [x] Eliminación de código muerto (ExternalLink en ContainerList.tsx).
 - **Resultado**: Dashboard más intuitivo, persistente y alineado con Industrial Resonance V2. Zero-warning build logrado.
 
+### 2026-06-12: Technical Hygiene & Unified Pipeline Standardization
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-standardization-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Desmantelamiento de hooks heredados (`usePipeline.ts`, `usePipelineDetector.ts`).
+  - [x] Migración de `usePipelineWithHealth` a la arquitectura de `UnifiedPipeline`.
+  - [x] Implementación del hook `useRepoDashboardDetails` para centralizar datos del dashboard con tipado estricto.
+  - [x] Erradicación de duplicación de tipos e implicit `any` en el dashboard de GitHub.
+  - [x] Zero-warning build logrado.
+- **Resultado**: Sistema más ligero, modular y 100% tipado, preparado para múltiples proveedores de pipeline.
+
 ### 2026-06-12: DNS Rebinding Protection & Type Hygiene V2
 - **Agente**: Vesper 🐜
 - **Rama**: `🐜-Vesper-refactor-security-hardening-v2`
@@ -77,11 +89,32 @@
   - [x] Zero-warning build y validación E2E exitosa.
 - **Resultado**: Dashboard de Docker alineado con Industrial Resonance V2, más denso y profesional.
 
-### 2026-06-07: Refactor Kubernetes UI Resonance
-- **Rama**: `🐜-Carol-refactor-kubernetes-ui-resonance`
-- **Estado**: En progreso 🏗️
+### 2026-06-13: Security Hardening V3 (Shell Restriction & RFC 1123)
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-hardening-v3`
+- **Estado**: Finalizado ✅
 - **Cambios**:
-  - [x] Fase 0: Territory Block.
+  - [x] Restricción total de shells (`bash`, `sh`, `zsh`, `powershell.exe`) y `node` en el middleware local.
+  - [x] Implementación de límites de longitud y cumplimiento estricto de RFC 1123 en regex de validación Kubernetes.
+  - [x] Sincronización de validación en `terminalMiddleware.ts`.
+  - [x] Limpieza técnica de comentarios y documentación en `src/`.
+  - [x] Expansión de tests de seguridad (26 casos exitosos).
+  - [x] Zero-warning build verificado.
+- **Resultado**: Elevación del umbral de seguridad contra RCE y ataques de inyección, garantizando integridad técnica absoluta.
+
+### 2026-06-07: Refactor Kubernetes UI Resonance
+### 2026-06-16: Refactor Kubernetes UI Resonance
+- **Rama**: `🐜-Carol-refactor-kubernetes-ui-resonance`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Estandarización de directorio: migración a `src/kubernetes/components/`.
+  - [x] Refinamiento de celdas Namespace, Age e Imágenes (alta densidad, badges).
+  - [x] Estandarización de `StatusCell` (semantic tokens + 20% opacidad).
+  - [x] Refactor de Terminal Modal: cabecera técnica doble línea y viewport zinc-950.
+  - [x] Pulido visual de `DeploymentSearch`: inputs `bg-muted/40` y jerarquía con divisores.
+  - [x] Higiene técnica: eliminación de logs y corrección de warnings en tests.
+  - [x] Validación visual y funcional con Playwright exitosa.
+- **Resultado**: Dashboard de Kubernetes elevado al estándar Industrial Resonance V2, con mayor densidad de información y coherencia técnica.
 
 ### 2026-06-11: Diff Viewer Hygiene & Type Standardization
 - **Agente**: Fiona 🐜
@@ -107,3 +140,15 @@
   - [x] Sincronización de nomenclatura de metadatos (camelCase `updatedAt`).
   - [x] Zero-warning build logrado.
 - **Resultado**: Repositorio libre de entropía técnica en el núcleo de pipelines y build impecable.
+### 2026-06-16: Refactor GitHub UI Resonance V2
+- **Rama**: `🐜-Uma-refactor-github-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Evolución del layout: integración de navegación de colecciones y gestión de proyectos en el header de `PageLayout`.
+  - [x] Promoción del filtro "Pendientes" a nivel global (dashboard) sincronizado con el search param `filter`.
+  - [x] Refactorización de cabeceras de tabla y celdas de metadatos técnicos a alta densidad (`text-[10px] font-bold uppercase tracking-wider`).
+  - [x] Estandarización de `HealthCell` con sombras semánticas y animaciones pulse para estados OK.
+  - [x] Eliminación de filtros locales redundantes y código muerto.
+  - [x] Validación E2E con Playwright (`e2e/verify-github-ui.spec.ts`) y screenshots.
+  - [x] Zero-warning build y lint log.
+- **Resultado**: Dashboard de GitHub alineado con Industrial Resonance V2, optimizando el Time to Value y la consistencia visual.

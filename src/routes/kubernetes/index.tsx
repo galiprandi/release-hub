@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { Search, Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { DeploymentList } from "@/components/kubernetes/DeploymentList";
-import { DeploymentSearch } from "@/components/kubernetes/DeploymentSearch";
+import { DeploymentList } from "@/kubernetes/components/DeploymentList";
+import { DeploymentSearch } from "@/kubernetes/components/DeploymentSearch";
 import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
 import { applyCachePolicy } from "@/lib/queryKeys";
 import { PageLayout } from "@/layouts/PageLayout";

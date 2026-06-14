@@ -16,5 +16,9 @@ This PR performs a surgical cleanup of the repository, eradicating technical ent
 - Full alignment with `DESIGN.md`, `AGENTS.md`, and Industrial Resonance V2 standards.
 - Validated with vitest and zero-warning build.
 
----
-*Status: Ready for Review 🐜*
+## Bitacora (CROMA.md)
+- [x] Phase 0: Territory Block.
+- [ ] Phase 1: Dead code elimination.
+- [ ] Phase 2: usePipelineWithHealth refactoring.
+- [ ] Phase 3: Type hardening.
+- [ ] Phase 4: Final verification.

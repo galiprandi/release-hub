@@ -163,3 +163,22 @@
   - [x] Validación E2E con Playwright (`e2e/verify-github-ui.spec.ts`) and screenshots.
   - [x] Zero-warning build and lint log.
 - **Resultado**: Dashboard de GitHub alineado con Industrial Resonance V2, optimizando el Time to Value and la consistencia visual.
+  - [x] Refactorización de cabeceras de tabla y celdas de metadatos técnicos a alta densidad (`text-[10px] font-bold uppercase tracking-wider`).
+  - [x] Estandarización de `HealthCell` con sombras semánticas y animaciones pulse para estados OK.
+  - [x] Eliminación de filtros locales redundantes y código muerto.
+  - [x] Validación E2E con Playwright (`e2e/verify-github-ui.spec.ts`) y screenshots.
+  - [x] Zero-warning build y lint log.
+- **Resultado**: Dashboard de GitHub alineado con Industrial Resonance V2, optimizando el Time to Value y la consistencia visual.
+
+### 2026-06-18: Refactor Fetcher UI Resonance V2
+- **Rama**: `🐜-Uma-refactor-fetcher-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Implementación de `FetcherSearch` con tipado estricto y sincronización de search params (`method`, `sortBy`).
+  - [x] Migración a dual `IndustrialTabs` para filtrado por método y ordenamiento persistente.
+  - [x] Estandarización de `UrlCell` a alta densidad (Domain muted text-[10px], Path foreground text-sm).
+  - [x] Refactor de cabeceras de tabla a estándar V2 (`text-[10px] font-bold uppercase`).
+  - [x] Corrección de build: reparación de duplicación e inconsistencia de tipos en `usePipelineWithHealth.ts`.
+  - [x] Eliminación de lógica de filtrado heredada y código muerto.
+  - [x] Validación E2E exitosa con mocks de historial.
+- **Resultado**: Fetcher evolucionado al estándar Industrial Resonance V2, mejorando la densidad de información y la persistencia de estado. Build restaurado a cero advertencias.

@@ -32,7 +32,7 @@ export function usePipelineWithHealth({
   const inferredEnvironment: 'staging' | 'production' = tag ? 'production' : 'staging';
   const env = environment || inferredEnvironment;
 
-  const pipelineResult = useUnifiedPipeline({
+  const pipeline = useUnifiedPipeline({
     org,
     repo,
     viewMode: tag ? 'tags' : 'commits',

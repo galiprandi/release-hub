@@ -2,6 +2,19 @@
 
 ## Historial de Misiones
 
+### 2026-06-18: Surgical Hygiene & Resonance V3
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-resonance-v3`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Saneamiento de `usePipelineWithHealth.ts`: erradicación de syntax errors y entropía técnica.
+  - [x] Consolidación de imports y eliminación de declaraciones de variables duplicadas/shadowed.
+  - [x] Desmantelamiento de `mapToSekiEvent` (puente obsoleto) y eliminación de `any` casts.
+  - [x] Corrección de referencia a variable indefinida (`pipeline` -> `pipelineResult`).
+  - [x] Streamlining de `useEffect`: consumo nativo de `PipelineEvent[]` en el monitor de salud.
+  - [x] Zero-warning build log y lint audit exitoso.
+- **Resultado**: Núcleo de sincronización de pipelines restaurado a un estado AAA, libre de ruido técnico y 100% resiliente.
+
 ### 2026-06-13: Security Hardening (Script Allow-list) & Type Resilience Audit
 - **Agente**: Vesper 🐜
 - **Rama**: `🐜-Vesper-refactor-security-hardening-and-type-resilience`
@@ -62,8 +75,6 @@
   - [x] Actualización de `DESIGN.md` y `AGENTS.md` con estándares de hardening.
   - [x] Zero-warning build logrado.
 - **Resultado**: Superficie de ataque reducida significativamente y entropía técnica eliminada en componentes críticos.
-- **Estado**: En progreso (Draft)
-- **Objetivo**: Blindar el middleware contra SSRF avanzado y RCE mediante allow-lists, y erradicar la entropía de tipos en modales críticos.
 
 ### 2026-06-10: Technical Hygiene & Type Standardization
 - **Agente**: Fiona 🐜
@@ -94,7 +105,7 @@
 - **Rama**: `🐜-Vesper-refactor-security-hardening-v3`
 - **Estado**: Finalizado ✅
 - **Cambios**:
-  - [x] Restricción total de shells (`bash`, `sh`, `zsh`, `powershell.exe`) y `node` en el middleware local.
+  - [x] Restricción total de shells (`bash`, `sh`, `zsh`, `powershell.exe`) and `node` en el middleware local.
   - [x] Implementación de límites de longitud y cumplimiento estricto de RFC 1123 en regex de validación Kubernetes.
   - [x] Sincronización de validación en `terminalMiddleware.ts`.
   - [x] Limpieza técnica de comentarios y documentación en `src/`.
@@ -135,7 +146,7 @@
   - [x] Migración de `usePipelineWithHealth` a la arquitectura `UnifiedPipeline`.
   - [x] Estandarización de `PipelineEvent` con soporte para `markdown` y tipado unificado.
   - [x] Refactor de `getPipelineStatusInfo` y `extractRoutes` para consumo de tipos unificados.
-  - [x] Erradicación de hooks legados `usePipeline.ts` y `usePipelineDetector.ts`.
+  - [x] Erradicación de hooks legados `usePipeline.ts` and `usePipelineDetector.ts`.
   - [x] Corrección de advertencias de build (variables no usadas en tests de seguridad).
   - [x] Sincronización de nomenclatura de metadatos (camelCase `updatedAt`).
   - [x] Zero-warning build logrado.
@@ -144,8 +155,14 @@
 - **Rama**: `🐜-Uma-refactor-github-resonance-v2`
 - **Estado**: Finalizado ✅
 - **Cambios**:
-  - [x] Evolución del layout: integración de navegación de colecciones y gestión de proyectos en el header de `PageLayout`.
+  - [x] Evolución del layout: integración de navegación de colecciones and gestión de proyectos en el header de `PageLayout`.
   - [x] Promoción del filtro "Pendientes" a nivel global (dashboard) sincronizado con el search param `filter`.
+  - [x] Refactorización de cabeceras de tabla and celdas de metadatos técnicos a alta densidad (`text-[10px] font-bold uppercase tracking-wider`).
+  - [x] Estandarización de `HealthCell` con sombras semánticas and animaciones pulse para estados OK.
+  - [x] Eliminación de filtros locales redundantes and código muerto.
+  - [x] Validación E2E con Playwright (`e2e/verify-github-ui.spec.ts`) and screenshots.
+  - [x] Zero-warning build and lint log.
+- **Resultado**: Dashboard de GitHub alineado con Industrial Resonance V2, optimizando el Time to Value and la consistencia visual.
   - [x] Refactorización de cabeceras de tabla y celdas de metadatos técnicos a alta densidad (`text-[10px] font-bold uppercase tracking-wider`).
   - [x] Estandarización de `HealthCell` con sombras semánticas y animaciones pulse para estados OK.
   - [x] Eliminación de filtros locales redundantes y código muerto.
@@ -165,3 +182,15 @@
   - [x] Sincronización de `extractEndpointsFromEvents` para consumo directo de `PipelineEvent[]`.
   - [x] Zero-warning build y validación global de tests (206 pasados).
 - **Resultado**: Core de pipelines blindado contra entropía técnica y motor de cURL inexpugnable ante formatos malformados.
+### 2026-06-18: Refactor Fetcher UI Resonance V2
+- **Rama**: `🐜-Uma-refactor-fetcher-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Implementación de `FetcherSearch` con tipado estricto y sincronización de search params (`method`, `sortBy`).
+  - [x] Migración a dual `IndustrialTabs` para filtrado por método y ordenamiento persistente.
+  - [x] Estandarización de `UrlCell` a alta densidad (Domain muted text-[10px], Path foreground text-sm).
+  - [x] Refactor de cabeceras de tabla a estándar V2 (`text-[10px] font-bold uppercase`).
+  - [x] Corrección de build: reparación de duplicación e inconsistencia de tipos en `usePipelineWithHealth.ts`.
+  - [x] Eliminación de lógica de filtrado heredada y código muerto.
+  - [x] Validación E2E exitosa con mocks de historial.
+- **Resultado**: Fetcher evolucionado al estándar Industrial Resonance V2, mejorando la densidad de información y la persistencia de estado. Build restaurado a cero advertencias.

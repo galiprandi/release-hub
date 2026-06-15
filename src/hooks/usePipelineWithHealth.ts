@@ -58,5 +58,5 @@ export function usePipelineWithHealth({
     }
   }, [pipelineEvents, product, extractEndpointsFromEvents, env]);
 
-  return pipeline;
+  return pipelineResult;
 }

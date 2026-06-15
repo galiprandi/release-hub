@@ -22,3 +22,10 @@ This PR performs a surgical refinement of the repository's security hygiene, era
 - [x] Phase 2: curlParser.ts hardening & testing.
 - [x] Phase 3: Global technical validation.
 - [x] Phase 4: Final verification and submission.
+- [ ] Phase 1: Import and Declaration Cleanup.
+- [ ] Phase 2: Hook Logic Refinement.
+- [ ] Phase 3: Initial File Verification.
+- [ ] Phase 4: Technical Validation.
+- [ ] Phase 5: Documentation Update.
+- [ ] Phase 6: Pre-commit.
+- [ ] Phase 7: Submission.

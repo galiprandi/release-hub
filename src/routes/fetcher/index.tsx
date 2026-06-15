@@ -13,18 +13,26 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 import { PageLayout } from '@/layouts/PageLayout';
+import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
 import DayJS from '@/lib/dayjs';
+
+type FetcherSortBy = 'recent' | 'method' | 'status' | 'duration';
+type FetcherMethod = 'ALL' | 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+
+interface FetcherSearch {
+	method?: FetcherMethod;
+	sortBy?: FetcherSortBy;
+}
 
 export const Route = createFileRoute('/fetcher/')({
 	component: FetcherPage,
-	validateSearch: (search: Record<string, unknown>) => {
+	validateSearch: (search: Record<string, unknown>): FetcherSearch => {
 		return {
-			method: typeof search.method === 'string' ? search.method : undefined,
+			method: (search.method as FetcherMethod) || 'ALL',
+			sortBy: (search.sortBy as FetcherSortBy) || 'recent',
 		};
 	},
 });
-
-
 
 function FetcherPage() {
 	const { data: access, isLoading: checkingAccess } = useCurlAccess();
@@ -76,17 +84,58 @@ function FetcherPage() {
 		return () => window.removeEventListener('focus', checkClipboard);
 	}, []);
 
-	// Derive active filter from query params - memoized to prevent re-renders
-	const activeFilter = useMemo(() => {
-		return search.method ? { id: 'method', value: search.method } : null;
-	}, [search.method]);
-
-	const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
+	// Handle changes to filters and sorting
+	const handleFilterChange = useCallback((method: FetcherMethod) => {
 		navigate({
 			to: '.',
-			search: filter ? { method: filter.value } : {},
+			search: (prev: Record<string, unknown>) => ({ ...prev, method }),
 		});
 	}, [navigate]);
+
+	const handleSortChange = useCallback((sortBy: FetcherSortBy) => {
+		navigate({
+			to: '.',
+			search: (prev: Record<string, unknown>) => ({ ...prev, sortBy }),
+		});
+	}, [navigate]);
+
+	// Filter and sort history based on search parameters
+	const filteredAndSortedHistory = useMemo(() => {
+		let result = [...history];
+
+		// Filter
+		if (search.method && search.method !== 'ALL') {
+			result = result.filter(query => {
+				const parsed = parseCurlForDisplay(query.curl);
+				return parsed?.method.toUpperCase() === search.method;
+			});
+		}
+
+		// Sort
+		result.sort((a, b) => {
+			if (search.sortBy === 'recent') {
+				return new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime();
+			}
+			if (search.sortBy === 'method') {
+				const methodA = parseCurlForDisplay(a.curl)?.method || '';
+				const methodB = parseCurlForDisplay(b.curl)?.method || '';
+				return methodA.localeCompare(methodB);
+			}
+			if (search.sortBy === 'status') {
+				const statusA = a.response?.status || 0;
+				const statusB = b.response?.status || 0;
+				return statusB - statusA;
+			}
+			if (search.sortBy === 'duration') {
+				const durA = a.response?.responseTime || 0;
+				const durB = b.response?.responseTime || 0;
+				return durB - durA;
+			}
+			return 0;
+		});
+
+		return result;
+	}, [history, search.method, search.sortBy]);
 
 	// Validate curl in real-time
 	const isCurlValid = useMemo(() => {
@@ -185,6 +234,42 @@ function FetcherPage() {
 			actions={[headerActions]}
 		>
 			<div className="space-y-6">
+			{/* Navigation & Controls */}
+			{access?.hasAccess && history.length > 0 && (
+				<div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-muted/10 p-4 rounded-xl border border-border/40">
+					<div className="flex flex-col gap-2 w-full sm:w-auto">
+						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Filtrar por Método</span>
+						<IndustrialTabs
+							options={[
+								{ id: 'ALL', label: 'Todos' },
+								{ id: 'GET', label: 'GET' },
+								{ id: 'POST', label: 'POST' },
+								{ id: 'PUT', label: 'PUT' },
+								{ id: 'DELETE', label: 'DELETE' },
+								{ id: 'PATCH', label: 'PATCH' },
+							]}
+							activeId={search.method || 'ALL'}
+							onChange={handleFilterChange}
+							className="w-full sm:w-[480px]"
+						/>
+					</div>
+					<div className="flex flex-col gap-2 w-full sm:w-auto">
+						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Ordenar por</span>
+						<IndustrialTabs
+							options={[
+								{ id: 'recent', label: 'Recientes' },
+								{ id: 'method', label: 'Método' },
+								{ id: 'status', label: 'Status' },
+								{ id: 'duration', label: 'Duración' },
+							]}
+							activeId={search.sortBy || 'recent'}
+							onChange={handleSortChange}
+							className="w-full sm:w-[400px]"
+						/>
+					</div>
+				</div>
+			)}
+
 			{/* Content */}
 			{checkingAccess ? (
 				<StatusCard type="loading" message="Verificando acceso a curl..." />
@@ -199,14 +284,12 @@ function FetcherPage() {
 					/>
 				) : (
 					<QueriesTable
-						queries={history}
+						queries={filteredAndSortedHistory}
 						onOpenModal={handleOpenModal}
 						onCopyResponse={handleCopyResponse}
 						onCopyCurl={handleCopyCurl}
 						onDelete={handleDelete}
 						isDeleting={isDeleting}
-						activeFilter={activeFilter}
-						onFilterChange={handleFilterChange}
 					/>
 				)
 			) : (
@@ -242,8 +325,6 @@ function QueriesTable({
 	onCopyCurl,
 	onDelete,
 	isDeleting,
-	activeFilter,
-	onFilterChange,
 }: {
 	queries: QueryRecord[]
 	onOpenModal: (query: QueryRecord) => void
@@ -251,13 +332,11 @@ function QueriesTable({
 	onCopyCurl: (query: QueryRecord) => void
 	onDelete: (query: QueryRecord) => void
 	isDeleting: boolean
-	activeFilter?: { id: string; value: string } | null
-	onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
 	const columns: ColumnDef<QueryRecord>[] = useMemo(() => [
 		{
 			accessorKey: "url",
-			header: "URL",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">URL</span>,
 			cell: ({ row }) => <UrlCell query={row.original} />,
 		},
 		{
@@ -266,30 +345,30 @@ function QueriesTable({
 				const parsed = parseCurlForDisplay(row.curl);
 				return parsed?.method || '';
 			},
-			header: "Método",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Método</span>,
 			cell: ({ row }) => <MethodCell query={row.original} />,
 			filterFn: 'equalsString',
 		},
 		{
 			accessorKey: "updatedAt",
-			header: "Enviado",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Enviado</span>,
 			cell: ({ row }) => <SentCell query={row.original} />,
 		},
 		{
 			accessorKey: "responseTime",
-			header: "Tiempo",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Tiempo</span>,
 			cell: ({ row }) => <ResponseTimeCell query={row.original} />,
 		},
 		{
 			id: "status",
 			accessorFn: (row) => row.response?.status || null,
-			header: "Status",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Status</span>,
 			cell: ({ row }) => <StatusCell query={row.original} />,
 		},
 		{
 			id: "actions",
 			accessorKey: "actions",
-			header: "Acciones",
+			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 text-right block">Acciones</span>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<ActionsCell
@@ -309,14 +388,6 @@ function QueriesTable({
 			columns={columns}
 			data={queries}
 			pageSize={20}
-			filters={[
-				{ label: 'GET', columnId: 'method', value: 'GET' },
-				{ label: 'POST', columnId: 'method', value: 'POST' },
-				{ label: 'PATCH', columnId: 'method', value: 'PATCH' },
-				{ label: 'PUT', columnId: 'method', value: 'PUT' },
-			]}
-			activeFilter={activeFilter}
-			onFilterChange={onFilterChange}
 		/>
 	)
 }
@@ -349,10 +420,10 @@ function UrlCell({ query }: { query: QueryRecord }) {
 	const fullPath = parsed.path.length > 80 ? `${parsed.path.slice(0, 80)}...` : parsed.path
 	return (
 		<div className="flex flex-col">
-			<span className="text-sm font-medium tracking-tight text-foreground truncate max-w-md">
+			<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 truncate max-w-md">
 				{parsed.domain}
 			</span>
-			<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 truncate max-w-md">
+			<span className="text-sm font-medium tracking-tight text-foreground truncate max-w-md">
 				{fullPath}
 			</span>
 		</div>

@@ -59,7 +59,6 @@ export function useKubectlNamespaceAccess(namespace: string | null, context?: st
 			// Verificar que kubectl esté instalado
 			const isInstalled = await checkKubectlInstalled();
 			if (!isInstalled) {
-				console.log('[K8s] kubectl is not installed');
 				return {
 					canGetPods: false,
 					canGetDeployments: false,
@@ -68,13 +67,10 @@ export function useKubectlNamespaceAccess(namespace: string | null, context?: st
 					validContext: null,
 				};
 			}
-			console.log('[K8s] kubectl is installed');
 
 			// Si se proporciona un contexto específico, usarlo
 			if (context) {
-				const access = await checkContextAccess(namespace, context);
-				console.log('[K8s] Checked specific context:', context, 'hasAccess:', access.hasAccess);
-				return access;
+				return await checkContextAccess(namespace, context);
 			}
 
 			// Si no se proporciona contexto, detectar automáticamente el primero con permisos
@@ -85,7 +81,6 @@ export function useKubectlNamespaceAccess(namespace: string | null, context?: st
 			if (currentContext) {
 				const currentAccess = await checkContextAccess(namespace, currentContext);
 				if (currentAccess.hasAccess) {
-					console.log('[K8s] Using current context with access:', currentContext);
 					return currentAccess;
 				}
 			}
@@ -95,13 +90,11 @@ export function useKubectlNamespaceAccess(namespace: string | null, context?: st
 				if (ctx === currentContext) continue; // Ya probado
 				const access = await checkContextAccess(namespace, ctx);
 				if (access.hasAccess) {
-					console.log('[K8s] Found valid context:', ctx);
 					return access;
 				}
 			}
 
 			// Ningún contexto tiene permisos
-			console.log('[K8s] No context has access to namespace:', namespace);
 			return {
 				canGetPods: false,
 				canGetDeployments: false,

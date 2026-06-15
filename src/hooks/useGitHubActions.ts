@@ -170,8 +170,6 @@ const getWorkflowRuns = async (
   limit: number = 5
 ): Promise<{ workflow_runs: WorkflowRun[] }> => {
   try {
-    console.log(`[GitHub Actions] Looking for workflow: ${workflowName} in ${org}/${repo}`)
-
     // Get workflow ID from workflow name first
     const { stdout: workflowStdout } = await runCommand([
       'gh',
@@ -180,18 +178,14 @@ const getWorkflowRuns = async (
       '--jq',
       `.workflows[] | select(.name == "${workflowName}") | {id, name}`,
     ])
-    console.log(`[GitHub Actions] Workflow lookup stdout:`, workflowStdout)
 
     const workflowData = JSON.parse(workflowStdout)
-    console.log(`[GitHub Actions] Parsed workflow data:`, workflowData)
 
     if (!workflowData || !workflowData.id) {
-      console.warn(`[GitHub Actions] Workflow "${workflowName}" not found`)
       return { workflow_runs: [] }
     }
 
     // Get runs using workflow ID
-    console.log(`[GitHub Actions] Fetching runs for workflow ID: ${workflowData.id}`)
     const { stdout } = await runCommand([
       'gh',
       'api',
@@ -199,17 +193,12 @@ const getWorkflowRuns = async (
       '--jq',
       '{workflow_runs: [.workflow_runs[] | {id, name, head_sha, status, conclusion, created_at, updated_at, html_url}]}',
     ])
-    console.log(`[GitHub Actions] Runs stdout (raw):`, stdout)
-    console.log(`[GitHub Actions] Runs stdout length:`, stdout.length)
 
     if (!stdout || stdout.trim() === '' || stdout === 'null') {
-      console.warn('[GitHub Actions] Empty response from API')
       return { workflow_runs: [] }
     }
 
-    const result = JSON.parse(stdout)
-    console.log(`[GitHub Actions] Parsed runs:`, result)
-    return result
+    return JSON.parse(stdout)
   } catch (error) {
     console.error('[GitHub Actions] Error fetching workflow runs:', error)
     return { workflow_runs: [] }

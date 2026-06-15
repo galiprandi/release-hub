@@ -129,6 +129,19 @@
 - should create valid pipeline data structure
 - should support minimal pipeline data
 
+## Module: curlParser
+- should handle encoded brackets in Seki URLs
+- should handle escaped characters in quotes
+- should handle line continuations
+- should not be confused by URLs inside headers or bodies
+- should parse a POST request with -X and -d
+- should parse a simple GET request
+- should parse multiple headers with -H
+- should parse query parameters correctly
+- should support compact flags like -XPOST and -d'data'
+- should support compact header flag -H'Key: Value'
+- should throw error if no URL is found
+
 ## Module: diffEngine
 - should default to text
 - should detect CSS

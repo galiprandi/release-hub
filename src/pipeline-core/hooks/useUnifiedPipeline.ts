@@ -36,14 +36,10 @@ export function usePipelineDetection({
 	const query = useQuery({
 		queryKey: ['pipeline-detection', org, repo],
 		queryFn: async () => {
-			console.log('[PipelineDetection] Checking', org, repo)
-			
 			for (const adapter of adapters) {
-				console.log(`[PipelineDetection] Checking ${adapter.name}...`)
 				try {
 					const supported = await adapter.supports(org, repo)
 					if (supported) {
-						console.log(`[PipelineDetection] ${adapter.name} is supported`)
 						return adapter.name
 					}
 				} catch (error) {
@@ -51,7 +47,6 @@ export function usePipelineDetection({
 				}
 			}
 			
-			console.log('[PipelineDetection] No supported provider found')
 			return null
 		},
 		enabled: enabled && !!org && !!repo,
@@ -127,7 +122,6 @@ export function useUnifiedPipeline({
 				throw new Error('No pipeline adapter available')
 			}
 			
-			console.log(`[UnifiedPipeline] Fetching from ${provider} for ${org}/${repo} (${viewMode})`)
 			const result = await adapter.fetch(org, repo, viewMode, ref, commit)
 			
 			if (!result) {

@@ -182,6 +182,18 @@
   - [x] Sincronización de `extractEndpointsFromEvents` para consumo directo de `PipelineEvent[]`.
   - [x] Zero-warning build y validación global de tests (206 pasados).
 - **Resultado**: Core de pipelines blindado contra entropía técnica y motor de cURL inexpugnable ante formatos malformados.
+### 2026-06-19: Technical Hygiene & Build Restoration
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-build-hygiene-v4`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Restauración del build: corrección de error de referencia en `usePipelineWithHealth.ts` (`pipelineResult` -> `pipeline`).
+  - [x] Erradicación de statements de depuración (`console.log`) en hooks core (`useUnifiedPipeline`, `useGitHubActions`, `useKubectlNamespaceAccess`).
+  - [x] Auditoría de higiene técnica: verificación de ausencia de código muerto y cumplimiento de estándar AAA.
+  - [x] Zero-warning build log y lint audit.
+  - [x] Validación funcional completa (206 tests unitarios + E2E selectivos).
+- **Resultado**: Build restaurado a un estado prístino y core del sistema libre de ruido técnico, garantizando un entorno de desarrollo profesional y eficiente.
+
 ### 2026-06-18: Refactor Fetcher UI Resonance V2
 - **Rama**: `🐜-Uma-refactor-fetcher-resonance-v2`
 - **Estado**: Finalizado ✅

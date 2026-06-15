@@ -26,7 +26,6 @@ export function usePipelineWithHealth({
   environment,
 }: UsePipelineWithHealthOptions) {
   const { extractEndpointsFromEvents } = useHealthMonitor();
-
   const [org, repo] = useMemo(() => product.split('/'), [product]);
 
   // Infer environment from tag presence if not explicitly provided
@@ -44,10 +43,10 @@ export function usePipelineWithHealth({
 
   // Extract endpoints when pipeline data changes
   useEffect(() => {
-    if (pipeline.data?.events && product) {
-      extractEndpointsFromEvents(product, pipeline.data.events, env);
+    if (pipelineResult.data?.events && product) {
+      extractEndpointsFromEvents(product, pipelineResult.data.events, env);
     }
-  }, [pipeline.data?.events, product, extractEndpointsFromEvents, env]);
+  }, [pipelineResult.data?.events, product, extractEndpointsFromEvents, env]);
 
-  return pipeline;
+  return pipelineResult;
 }

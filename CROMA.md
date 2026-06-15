@@ -170,6 +170,18 @@
   - [x] Zero-warning build y lint log.
 - **Resultado**: Dashboard de GitHub alineado con Industrial Resonance V2, optimizando el Time to Value y la consistencia visual.
 
+### 2026-06-18: Security Hygiene & cURL Parser Hardening
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-hygiene-hardening-v4`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Refactorización de `usePipelineWithHealth.ts` para eliminar entropía (duplicate imports/vars) y erradicar `as any`.
+  - [x] Implementación de un tokenizador de estado sólido en `src/utils/curlParser.ts` con soporte para flags compactos e inyecciones neutralizadas.
+  - [x] Creación de suite de tests exhaustiva `src/utils/curlParser.test.ts` (11 casos de éxito).
+  - [x] Estabilización de dependencias de `useMemo` para compatibilidad con React Compiler.
+  - [x] Sincronización de `extractEndpointsFromEvents` para consumo directo de `PipelineEvent[]`.
+  - [x] Zero-warning build y validación global de tests (206 pasados).
+- **Resultado**: Core de pipelines blindado contra entropía técnica y motor de cURL inexpugnable ante formatos malformados.
 ### 2026-06-18: Refactor Fetcher UI Resonance V2
 - **Rama**: `🐜-Uma-refactor-fetcher-resonance-v2`
 - **Estado**: Finalizado ✅

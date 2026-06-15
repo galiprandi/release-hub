@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { useUnifiedPipeline } from '@/pipeline-core';
+import { useUnifiedPipeline } from '@/pipeline-core/hooks/useUnifiedPipeline';
 import { useHealthMonitor, type Environment } from './useHealthMonitor';
 
 interface UsePipelineWithHealthOptions {
@@ -26,10 +26,15 @@ export function usePipelineWithHealth({
   environment,
 }: UsePipelineWithHealthOptions) {
   const { extractEndpointsFromEvents } = useHealthMonitor();
-  const [org, repo] = useMemo(() => product.split('/'), [product]);
+
+  // Extract org and repo from product string with stabilization
+  const [org, repo] = useMemo(() => {
+    const [o, r] = product.split('/');
+    return [o || '', r || ''];
+  }, [product]);
 
   // Infer environment from tag presence if not explicitly provided
-  const inferredEnvironment: 'staging' | 'production' = tag ? 'production' : 'staging';
+  const inferredEnvironment: Environment = tag ? 'production' : 'staging';
   const env = environment || inferredEnvironment;
 
   const pipeline = useUnifiedPipeline({
@@ -41,12 +46,17 @@ export function usePipelineWithHealth({
     enabled,
   });
 
+  // React Compiler compatibility: extract deep property to local variable
+  const pipelineEvents = pipeline.data?.events;
+
   // Extract endpoints when pipeline data changes
   useEffect(() => {
-    if (pipelineResult.data?.events && product) {
-      extractEndpointsFromEvents(product, pipelineResult.data.events, env);
+    if (pipelineEvents && product) {
+      // useHealthMonitor.extractEndpointsFromEvents now accepts PipelineEvent[]
+      // directly after recent refactoring, eliminating the need for mapToSekiEvent
+      extractEndpointsFromEvents(product, pipelineEvents, env);
     }
-  }, [pipelineResult.data?.events, product, extractEndpointsFromEvents, env]);
+  }, [pipelineEvents, product, extractEndpointsFromEvents, env]);
 
   return pipelineResult;
 }

@@ -1,24 +1,27 @@
-# PR Draft: Technical Hygiene & Resonance V3 🐜
+# PR Draft: Security Hygiene & Type Resilience Refinement 🐜
 
 ## Scope
-Surgical cleanup of `src/hooks/usePipelineWithHealth.ts` to eradicate syntax errors, technical entropy, and obsolete mapping logic, restoring a zero-warning build log.
+This PR performs a surgical refinement of the repository's security hygiene, eradicating technical entropy in core hooks and hardening the cURL parsing engine.
 
-### Refactoring & Standardization
-- **Import Consolidation**: Eradicated duplicate imports of React hooks and pipeline utilities.
-- **Variable Hygiene**: Resolved shadowed and duplicated declarations for `org` and `repo` using `useMemo` for technical consistency.
-- **Mapping Eradication**: Removed the obsolete `mapToSekiEvent` bridge and `any` casts, as `useHealthMonitor` now natively supports `PipelineEvent[]`.
-- **Logic Correction**: Fixed critical undefined variable reference (`pipeline` vs `pipelineResult`) and streamlined `useEffect` dependencies.
+### Refactoring & Technical Hygiene
+- **usePipelineWithHealth Refinement**: Eradicated duplicate imports and variable declarations in `src/hooks/usePipelineWithHealth.ts`.
+- **Type Resilience**: Eliminated unsafe `as any` casts in pipeline mapping logic, leveraging the standardized `PipelineEvent` interface.
+- **React Compiler Compatibility**: Applied stabilization fixes for `useMemo` dependencies to maintain performance and compatibility.
 
-### Quality & Performance
-- **Build Hygiene**: Restoring a zero-warning build and lint log.
-- **Entropy Reduction**: Eliminating dead mapping logic and redundant splits.
+### Security Hardening
+- **cURL Parser Evolution**: Enhanced `src/utils/curlParser.ts` to support compact flags (e.g., `-H'Header'`) and robust URL detection.
+- **Comprehensive Coverage**: Implemented `src/utils/curlParser.test.ts` to ensure the parsing engine is resilient against malformed inputs and complex payloads.
 
-### Compliance
-- Full alignment with `DESIGN.md`, `AGENTS.md`, and Industrial Resonance V2 standards.
-- Validated with vitest and zero-warning build.
+### Quality Assurance
+- **Zero-Warning Build**: Achieved a pristine build log and full type integrity.
+- **Full Test Suite Validation**: Verified system resilience with a complete test run (Unit, Security, E2E).
 
 ## Bitacora (CROMA.md)
 - [x] Phase 0: Territory Block.
+- [x] Phase 1: usePipelineWithHealth refinement.
+- [x] Phase 2: curlParser.ts hardening & testing.
+- [x] Phase 3: Global technical validation.
+- [x] Phase 4: Final verification and submission.
 - [ ] Phase 1: Import and Declaration Cleanup.
 - [ ] Phase 2: Hook Logic Refinement.
 - [ ] Phase 3: Initial File Verification.

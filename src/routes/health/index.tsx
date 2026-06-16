@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Activity, ExternalLink, ChevronDown } from 'lucide-react';
+import { Activity, ExternalLink, ChevronDown, Box } from 'lucide-react';
 import { useHealthMonitor } from '@/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
 import { Table } from '@/components/ui/Table';
@@ -62,16 +62,12 @@ function ProductSection({
   isChecking,
   onCheckEndpoint,
   onRemoveEndpoint,
-  activeFilter,
-  onFilterChange,
 }: {
   product: string;
   endpoints: ReturnType<typeof useHealthMonitor>['endpoints'];
   isChecking: boolean;
   onCheckEndpoint: (id: string) => void;
   onRemoveEndpoint: (id: string) => void;
-  activeFilter?: { id: string; value: string } | null
-  onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
   const [org, productName] = product.split('/');
 
@@ -95,7 +91,7 @@ function ProductSection({
   });
 
   // Ordenar endpoints: production primero, luego staging
-  const sortedEndpoints = endpoints.sort((a, b) => {
+  const sortedEndpoints = [...endpoints].sort((a, b) => {
     if (a.environment !== b.environment) {
       return a.environment === 'production' ? -1 : 1;
     }
@@ -103,18 +99,23 @@ function ProductSection({
   });
 
   return (
-    <div className="bg-background rounded-xl border border-border/60 overflow-hidden shadow-sm">
+    <div className="bg-muted/10 rounded-xl border border-border/40 overflow-hidden shadow-sm transition-all duration-200">
       {/* Header del producto */}
-      <div className="flex items-center justify-between bg-muted/40 border-b border-border/60 px-4 py-2">
-        <div className="flex items-center gap-2">
-          <Link
-            to="/github/$org/$repo"
-            params={{ org, repo: productName }}
-            className={`font-medium tracking-tighter text-foreground hover:text-primary transition-colors ${FOCUS_RING} rounded-md px-1 -ml-1`}
-          >
-            {productName}
-          </Link>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">({services.length} servicios)</span>
+      <div className="flex items-center justify-between bg-muted/40 border-b border-border/40 px-5 py-3">
+        <div className="flex items-center gap-3">
+          <div className="p-1.5 rounded-lg bg-primary/10">
+            <Box className="w-4 h-4 text-primary" />
+          </div>
+          <div className="flex flex-col">
+            <Link
+              to="/github/$org/$repo"
+              params={{ org, repo: productName }}
+              className={`text-sm font-semibold tracking-tighter text-foreground hover:text-primary transition-colors ${FOCUS_RING} rounded-md px-1 -ml-1`}
+            >
+              {productName}
+            </Link>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{org} • {services.length} servicios</span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {(() => {
@@ -124,20 +125,20 @@ function ProductSection({
             return (
               <>
                 {healthy > 0 && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-success/20 border border-success/20 text-[10px] font-bold uppercase tracking-wider text-success">
-                    <div className="w-1.5 h-1.5 rounded-full bg-success" />
+                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-success/20 border border-success/20 text-[10px] font-bold uppercase tracking-wider text-success shadow-sm shadow-success/10">
+                    <div className="w-1.5 h-1.5 rounded-full bg-success shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
                     {healthy} OK
                   </span>
                 )}
                 {pending > 0 && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-muted/20 border border-border/20 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/20 border border-border/20 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
                     {pending} Pendiente
                   </span>
                 )}
                 {unhealthy > 0 && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-destructive/20 border border-destructive/20 text-[10px] font-bold uppercase tracking-wider text-destructive">
-                    <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-destructive/20 border border-destructive/20 text-[10px] font-bold uppercase tracking-wider text-destructive shadow-sm shadow-destructive/10">
+                    <div className="w-1.5 h-1.5 rounded-full bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.4)]" />
                     {unhealthy} Error
                   </span>
                 )}
@@ -153,8 +154,6 @@ function ProductSection({
         isChecking={isChecking}
         onCheckEndpoint={onCheckEndpoint}
         onRemoveEndpoint={onRemoveEndpoint}
-        activeFilter={activeFilter}
-        onFilterChange={onFilterChange}
       />
     </div>
   );
@@ -165,15 +164,11 @@ function EndpointsTable({
   isChecking,
   onCheckEndpoint,
   onRemoveEndpoint,
-  activeFilter,
-  onFilterChange,
 }: {
   endpoints: ReturnType<typeof useHealthMonitor>['endpoints']
   isChecking: boolean
   onCheckEndpoint: (id: string) => void
   onRemoveEndpoint: (id: string) => void
-  activeFilter?: { id: string; value: string } | null
-  onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
   const columns: ColumnDef<(typeof endpoints)[0]>[] = [
     {
@@ -181,10 +176,6 @@ function EndpointsTable({
       accessorFn: (row) => row.isHealthy,
       header: "",
       cell: ({ row }) => <StatusCell endpoint={row.original} />,
-      filterFn: (row, columnId, filterValue) => {
-        const value = row.getValue(columnId);
-        return value === (filterValue === 'false' ? false : filterValue);
-      },
     },
     {
       accessorKey: "service",
@@ -196,7 +187,6 @@ function EndpointsTable({
       accessorFn: (row) => row.environment,
       header: "Ambiente",
       cell: ({ row }) => <EnvironmentCell endpoint={row.original} />,
-      filterFn: 'equalsString',
     },
     {
       accessorKey: "lastChecked",
@@ -221,7 +211,7 @@ function EndpointsTable({
     {
       id: "actions",
       accessorKey: "actions",
-      header: "Acciones",
+      header: () => <span className="text-right block">Acciones</span>,
       enableSorting: false,
       cell: ({ row }) => (
         <ActionsCell
@@ -234,35 +224,21 @@ function EndpointsTable({
     },
   ]
 
-  const filters = useMemo(() => {
-    const stagingCount = endpoints.filter(e => e.environment === 'staging').length;
-    const productionCount = endpoints.filter(e => e.environment === 'production').length;
-    const unhealthyCount = endpoints.filter(e => e.isHealthy === false).length;
-
-    return [
-      { label: 'Staging', columnId: 'environment', value: 'staging', count: stagingCount },
-      { label: 'Production', columnId: 'environment', value: 'production', count: productionCount },
-      { label: 'Con errores', columnId: 'status', value: 'false', count: unhealthyCount },
-    ];
-  }, [endpoints]);
-
   return (
-    <div className='p-4'>
-    <Table
-      columns={columns}
-      data={endpoints}
-      filters={filters}
-      activeFilter={activeFilter}
-      onFilterChange={onFilterChange}
+    <div className='px-1 py-1'>
+      <Table
+        columns={columns}
+        data={endpoints}
+        className="border-none shadow-none rounded-none bg-transparent"
       />
-      </div>
+    </div>
   )
 }
 
 function StatusCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
-  if (endpoint.isHealthy === null) return <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
-  if (endpoint.isHealthy === true) return <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-  return <div className="w-1.5 h-1.5 rounded-full bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.4)]" />
+  if (endpoint.isHealthy === null) return <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 ml-2" />
+  if (endpoint.isHealthy === true) return <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)] ml-2" />
+  return <div className="w-1.5 h-1.5 rounded-full bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.4)] ml-2" />
 }
 
 function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
@@ -338,7 +314,7 @@ function UrlCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['
   return (
     <div className="flex flex-col gap-0.5" title={endpoint.url}>
       {domain && (
-        <span className="text-[10px] font-medium text-muted-foreground/60 leading-none truncate max-w-[250px]">
+        <span className="text-[10px] font-bold uppercase text-muted-foreground/60 leading-none truncate max-w-[250px]">
           {domain}
         </span>
       )}
@@ -361,7 +337,7 @@ function ActionsCell({
   onRemoveEndpoint: (id: string) => void
 }) {
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
       <ActionButton
         action={ACTION_DEFINITIONS.refresh}
         onClick={() => onCheckEndpoint(endpoint.id)}
@@ -407,6 +383,7 @@ function HealthMonitorPage() {
   const search = useSearch({ from: '/health/' });
 
   const sortBy = (search.sortBy as 'default' | 'errors' | 'recent') || 'default';
+  const environment = search.environment || 'all';
 
   const handleSortChange = useCallback((newSort: string) => {
     navigate({
@@ -415,32 +392,34 @@ function HealthMonitorPage() {
     });
   }, [navigate]);
 
-  // Derivar filtro activo de query params
-  const activeFilter = useMemo(() => {
-    if (!search.environment) return null;
-    if (search.environment === 'staging' || search.environment === 'production') {
-      return { id: 'environment', value: search.environment };
-    }
-    if (search.environment === 'unhealthy') {
-      return { id: 'status', value: 'false' };
-    }
-    return null;
-  }, [search.environment]);
-
-  const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
+  const handleEnvironmentChange = useCallback((newEnv: string) => {
     navigate({
       to: '.',
-      search: filter ? { environment: filter.value === 'false' ? 'unhealthy' : filter.value } : {},
+      search: (prev: Record<string, unknown>) => ({
+        ...prev,
+        environment: newEnv === 'all' ? undefined : newEnv
+      }),
     });
   }, [navigate]);
 
+  // Dynamic counts for environment filters
+  const envCounts = useMemo(() => {
+    return {
+      all: endpoints.length,
+      staging: endpoints.filter(e => e.environment === 'staging').length,
+      production: endpoints.filter(e => e.environment === 'production').length,
+      unhealthy: endpoints.filter(e => e.isHealthy === false).length,
+    };
+  }, [endpoints]);
+
   // Filtrar endpoints según el filtro seleccionado
-  const filteredEndpoints = endpoints.filter((ep) => {
-    if (!activeFilter) return true;
-    if (activeFilter.id === 'environment' && ep.environment !== activeFilter.value) return false;
-    if (activeFilter.id === 'status' && ep.isHealthy !== (activeFilter.value === 'false' ? false : true)) return false;
-    return true;
-  });
+  const filteredEndpoints = useMemo(() => {
+    return endpoints.filter((ep) => {
+      if (environment === 'all') return true;
+      if (environment === 'unhealthy') return ep.isHealthy === false;
+      return ep.environment === environment;
+    });
+  }, [endpoints, environment]);
 
   // Auto-check on mount
   useEffect(() => {
@@ -536,10 +515,24 @@ function HealthMonitorPage() {
       refreshFn={checkAllEndpoints}
     >
       <div className="space-y-6">
-      {/* Ordenamiento */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Ordenar por:</span>
+      {/* Filtros y Ordenamiento */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-muted/10 p-4 rounded-xl border border-border/40">
+        <div className="flex flex-col gap-2 w-full sm:w-auto">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Ambiente</span>
+          <IndustrialTabs
+            options={[
+              { id: 'all', label: `Todos (${envCounts.all})` },
+              { id: 'production', label: `Production (${envCounts.production})` },
+              { id: 'staging', label: `Staging (${envCounts.staging})` },
+              { id: 'unhealthy', label: `Con errores (${envCounts.unhealthy})` },
+            ]}
+            activeId={environment}
+            onChange={handleEnvironmentChange}
+            className="w-full sm:w-[540px]"
+          />
+        </div>
+        <div className="flex flex-col gap-2 w-full sm:w-auto">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Ordenar por</span>
           <IndustrialTabs
             options={[
               { id: 'default', label: 'Nombre' },
@@ -548,7 +541,7 @@ function HealthMonitorPage() {
             ]}
             activeId={sortBy}
             onChange={handleSortChange}
-            className="w-72"
+            className="w-full sm:w-[320px]"
           />
         </div>
       </div>
@@ -561,10 +554,10 @@ function HealthMonitorPage() {
         <EmptyState
           icon={<Activity className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />}
           label="Sin resultados"
-          caption={!activeFilter
+          caption={environment === 'all'
             ? 'Navega a un producto favorito para detectar servicios automáticamente y comenzar el monitoreo.'
             : 'No hay servicios que coincidan con los filtros aplicados actualmente.'}
-          action={!activeFilter && (
+          action={environment === 'all' && (
             <Link
               to="/github"
               className={`inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm hover:opacity-90 transition-all ${FOCUS_RING}`}
@@ -575,7 +568,7 @@ function HealthMonitorPage() {
           )}
         />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {sortedProducts.map((product) => (
             <ProductSection
               key={product}
@@ -584,8 +577,6 @@ function HealthMonitorPage() {
               isChecking={isChecking}
               onCheckEndpoint={checkEndpoint}
               onRemoveEndpoint={removeEndpoint}
-              activeFilter={activeFilter}
-              onFilterChange={handleFilterChange}
             />
           ))}
         </div>

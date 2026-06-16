@@ -1,21 +1,29 @@
-# PR Draft: Technical Hygiene & Build Restoration 🐜
+# PR Draft: Industrial Resonance V2 Polish 🐜
 
 ## Scope
-This PR restores the build integrity and performs a surgical cleanup of technical entropy, ensuring the repository meets the AAA standard for engineering excellence.
+This PR focuses on polishing the UI/UX of the application, aligning several key views with the **Industrial Resonance V2** standard. The goal is to improve information density, consistency, and professional aesthetic across the Health Monitor and Novedades dashboards.
 
-### Refactoring & Technical Hygiene
-- **Build Restoration**: Resolved a critical reference error in `src/hooks/usePipelineWithHealth.ts` (`pipelineResult` -> `pipeline`).
-- **Entropy Reduction**: Systematic audit and removal of debug `console.log` statements in core hooks (`useUnifiedPipeline`, `useGitHubActions`, `useKubectlNamespaceAccess`).
-- **Standard Alignment**: Final sweep to ensure a zero-warning build and lint log, adhering to the Industrial Resonance V2 and AAA engineering standards.
+### UI/UX Refinements
+- **Health Monitor Dashboard**:
+  - Centralized environment filtering (Production, Staging, Unhealthy) using `IndustrialTabs` at the top level.
+  - Implementation of dynamic counts for filter tabs to provide immediate health status overview.
+  - Removal of redundant table-level filters to reduce visual clutter and layout shifts.
+- **Novedades View**:
+  - Implemented high-density technical header with the 'Newspaper' icon.
+  - Encapsulated content in a `bg-muted/10` container with `rounded-xl` geometry and `border-border/40` for improved visual hierarchy.
+- **Core Table Component**:
+  - Standardized internal filter bar styling using `bg-muted/40`.
+  - Applied high-density technical typography (`text-[10px] font-bold uppercase`) to filter labels and buttons.
 
 ### Quality Assurance
-- **Zero-Warning Build**: Achieved a pristine build log and full type integrity.
-- **Functional Validation**: Verified system resilience with 206 unit tests passing and successful E2E validation for GitHub and Kubernetes dashboards.
+- **Visual Verification**: Validated layouts across multiple routes to ensure consistency.
+- **Zero-Warning Build**: Verified that all changes maintain a pristine build log.
+- **Testing**: Executed relevant unit and E2E tests to ensure stability.
 
 ## Bitacora (CROMA.md)
 - [x] Phase 0: Territory Block.
-- [x] Phase 1: Build restoration in `usePipelineWithHealth.ts`.
-- [x] Phase 2: Technical debt audit (lint & debug logs).
-- [x] Phase 3: Global functional validation.
-- [x] Phase 4: Documentation update.
-- [x] Phase 5: Final verification and submission.
+- [ ] Phase 1: Health Monitor Refactor.
+- [ ] Phase 2: Novedades Page Refinement.
+- [ ] Phase 3: Table Component Styling Polish.
+- [ ] Phase 4: Documentation Update (`AGENTS.md`, `DESIGN.md`).
+- [ ] Phase 5: Global Validation & Submission.

@@ -117,11 +117,11 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 		<div className={twMerge(clsx("w-full rounded-xl border border-border/60 shadow-sm overflow-hidden bg-background", className))}>
 			{/* Filter Bar */}
 			{filters && filters.length > 0 && (
-				<div className="px-4 py-3 border-b border-border/60 bg-muted/20">
+				<div className="px-4 py-2 border-b border-border/60 bg-muted/40">
 					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
 						<div className="flex items-center gap-2">
 							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{filterLabel}</span>
-							<div className="flex items-center gap-1.5">
+							<div className="flex items-center gap-1.5 p-1 bg-muted/20 rounded-lg border border-border/40">
 								<button
 									type="button"
 									onClick={handleResetFilters}
@@ -129,8 +129,8 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 									className={clsx(
 										"px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1",
 										currentActiveFilter === null
-											? "bg-info/20 text-info shadow-sm"
-											: "bg-muted text-foreground hover:bg-muted/80"
+											? "bg-background shadow-sm text-foreground ring-1 ring-border/20"
+											: "text-muted-foreground hover:bg-accent hover:text-foreground"
 									)}
 								>
 									Todos{totalCount > 0 ? ` (${totalCount})` : ''}
@@ -146,8 +146,8 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 											className={clsx(
 												"px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1",
 												isActive
-													? "bg-info/20 text-info shadow-sm"
-													: "bg-muted text-foreground hover:bg-muted/80"
+													? "bg-background shadow-sm text-foreground ring-1 ring-border/20"
+													: "text-muted-foreground hover:bg-accent hover:text-foreground"
 											)}
 										>
 											{filter.label}{filter.count !== undefined ? ` (${filter.count})` : ''}

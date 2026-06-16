@@ -69,8 +69,9 @@
 
 ### Health Monitor Resonance
 - **Status Dots**: `w-1.5 h-1.5 rounded-full` with semantic shadows for health states (OK/Error). OK includes `animate-pulse`.
-- **Product Header**: Stats use semantic badges at 20% opacity. Product names use `tracking-tighter`.
-- **Double-line URLs**: Table displays domain (muted, `text-[10px]`) and path (foreground, `font-mono text-xs`).
+- **Product Header**: Stats use semantic badges at 20% opacity. Product names use `tracking-tighter`. Headers are encapsulated in `bg-muted/40` with `Box` icon and high-density technical metadata.
+- **Filtering & Sorting**: Dual `IndustrialTabs` implementation at the route level for environment (All, Production, Staging, Unhealthy) and sorting (Name, Errors, Recent). Tabs must include real-time counts.
+- **Double-line URLs**: Table displays domain (muted, `text-[10px] font-bold uppercase`) and path (foreground, `font-mono text-xs`).
 - **Revalidation**: `bg-primary animate-pulse` dot in header during background checks.
 
 ### Kubernetes UI Resonance

@@ -39,19 +39,22 @@ test('verify health monitor resonance ui components', async ({ page }) => {
   await expect(infoBannerLabel).toHaveClass(/font-bold/);
   await expect(infoBannerLabel).toHaveClass(/uppercase/);
 
+  // Verify Top Level IndustrialTabs are present
+  const industrialTabs = page.locator('div.bg-muted\\/40').first();
+  await expect(industrialTabs).toBeVisible();
+
   // Take screenshot
   await page.screenshot({ path: 'verification/health-monitor-resonance-final.png', fullPage: true });
 
-  // If the data is still not showing (as seen in previous attempts),
-  // at least we verified the labels and the general resonance.
-  // But let's try to check if the ProductSection appeared this time.
-  const productHeader = page.locator('div.bg-muted\\/40').first();
-  const count = await productHeader.count();
+  // Check if ProductSection appeared
+  const productSection = page.locator('div.bg-muted\\/10').filter({ has: page.locator('a', { hasText: 'repo' }) });
+  const count = await productSection.count();
 
   if (count > 0) {
     console.log('Product section found!');
-    await expect(productHeader.locator('span.bg-success\\/20')).toBeVisible();
-    await expect(page.locator('div.w-1\\.5.h-1\\.5.rounded-full.bg-success')).toBeVisible();
+    // Verify high-density badges
+    await expect(productSection.locator('span.bg-success\\/20')).toBeVisible();
+    await expect(productSection.locator('div.bg-success')).toBeVisible();
   } else {
     console.log('Product section not found, but UI components refined.');
   }

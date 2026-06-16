@@ -1,21 +1,27 @@
-# PR Draft: Technical Hygiene & Build Restoration 🐜
+# PR Draft: Refactor Health & Novedades Resonance V2 🐜
 
 ## Scope
-This PR restores the build integrity and performs a surgical cleanup of technical entropy, ensuring the repository meets the AAA standard for engineering excellence.
+This PR evolves the Health Monitor and Novedades views to the Industrial Resonance V2 standard, optimizing "Time to Value" and reducing interface friction.
 
-### Refactoring & Technical Hygiene
-- **Build Restoration**: Resolved a critical reference error in `src/hooks/usePipelineWithHealth.ts` (`pipelineResult` -> `pipeline`).
-- **Entropy Reduction**: Systematic audit and removal of debug `console.log` statements in core hooks (`useUnifiedPipeline`, `useGitHubActions`, `useKubectlNamespaceAccess`).
-- **Standard Alignment**: Final sweep to ensure a zero-warning build and lint log, adhering to the Industrial Resonance V2 and AAA engineering standards.
+### Health Monitor Refinement
+- **Navigation Elevation**: Migration of sorting and environment filtering to the `PageLayout` header using `IndustrialTabs`.
+- **Help UX**: Transformation of the vertical `InfoBanner` into a technical help `ActionButton` and dialog.
+- **High-Density Product Sections**: Updated `ProductSection` with `Box` icons, high-density typography, and `bg-muted/10` containers.
 
-### Quality Assurance
-- **Zero-Warning Build**: Achieved a pristine build log and full type integrity.
-- **Functional Validation**: Verified system resilience with 206 unit tests passing and successful E2E validation for GitHub and Kubernetes dashboards.
+### Novedades Evolution
+- **Technical Header**: Integration of a dedicated header with the `Newspaper` icon.
+- **Content Encapsulation**: Better visual hierarchy using standard V2 container geometry and styling.
+
+### Quality Assurance & Standards
+- **Standard Alignment**: Updates to `DESIGN.md` and `AGENTS.md`.
+- **Zero-Warning Build**: Strict adherence to AAA engineering standards.
+- **E2E Validation**: UI verification via Playwright with screenshots.
 
 ## Bitacora (CROMA.md)
 - [x] Phase 0: Territory Block.
-- [x] Phase 1: Build restoration in `usePipelineWithHealth.ts`.
-- [x] Phase 2: Technical debt audit (lint & debug logs).
-- [x] Phase 3: Global functional validation.
-- [x] Phase 4: Documentation update.
-- [x] Phase 5: Final verification and submission.
+- [ ] Phase 1: Health Monitor navigation refactor.
+- [ ] Phase 2: Health Monitor Help UI transformation.
+- [ ] Phase 3: ProductSection standardization.
+- [ ] Phase 4: Novedades page evolution.
+- [ ] Phase 5: Documentation & Standards update.
+- [ ] Phase 6: Global validation (Build & E2E).

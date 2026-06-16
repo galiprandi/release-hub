@@ -1,21 +1,22 @@
-# PR Draft: Technical Hygiene & Build Restoration 🐜
+# PR Draft: Security Hardening & XSS Protection 🐜
 
 ## Scope
-This PR restores the build integrity and performs a surgical cleanup of technical entropy, ensuring the repository meets the AAA standard for engineering excellence.
+This PR implements critical security hardening against Cross-Site Scripting (XSS) vulnerabilities in the log utilities and diff viewer, ensuring the application is resilient against malicious payloads in logs and code comparisons.
 
-### Refactoring & Technical Hygiene
-- **Build Restoration**: Resolved a critical reference error in `src/hooks/usePipelineWithHealth.ts` (`pipelineResult` -> `pipeline`).
-- **Entropy Reduction**: Systematic audit and removal of debug `console.log` statements in core hooks (`useUnifiedPipeline`, `useGitHubActions`, `useKubectlNamespaceAccess`).
-- **Standard Alignment**: Final sweep to ensure a zero-warning build and lint log, adhering to the Industrial Resonance V2 and AAA engineering standards.
+### Security Hardening & XSS Protection
+- **Log Utilities Hardening**: Implemented strict HTML escaping in `highlightLogLine` to prevent XSS via log messages.
+- **Diff Viewer Hardening**: Secured the `DiffViewer` and `sugar-high` integration to ensure highlighted code is sanitized and safe for rendering via `dangerouslySetInnerHTML`.
+- **Vulnerability Audit**: Created a comprehensive XSS test suite to verify protections and prevent regressions.
 
 ### Quality Assurance
-- **Zero-Warning Build**: Achieved a pristine build log and full type integrity.
-- **Functional Validation**: Verified system resilience with 206 unit tests passing and successful E2E validation for GitHub and Kubernetes dashboards.
+- **Security Validation**: Verified XSS neutralization with dedicated tests in `src/api/xss.test.ts`.
+- **AAA Standard Alignment**: Maintained zero-warning build and lint logs, adhering to the Industrial Resonance V2 and AAA engineering standards.
+- **Global Regression Testing**: Ensured no regressions in existing security and functional tests.
 
 ## Bitacora (CROMA.md)
 - [x] Phase 0: Territory Block.
-- [x] Phase 1: Build restoration in `usePipelineWithHealth.ts`.
-- [x] Phase 2: Technical debt audit (lint & debug logs).
-- [x] Phase 3: Global functional validation.
-- [x] Phase 4: Documentation update.
-- [x] Phase 5: Final verification and submission.
+- [ ] Phase 1: Security Audit & XSS Vulnerability Confirmation.
+- [ ] Phase 2: Implementation of Hardening & Sanitization.
+- [ ] Phase 3: Global Verification & Regression Testing.
+- [ ] Phase 4: Documentation Update (AGENTS.md, DESIGN.md).
+- [ ] Phase 5: Final Verification and Submission.

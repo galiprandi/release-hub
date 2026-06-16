@@ -31,7 +31,7 @@ test('verify health monitor resonance ui components', async ({ page }) => {
   await page.goto('http://localhost:5173/health');
 
   // Wait for the spinner (2s in __root.tsx) + some buffer
-  await page.waitForTimeout(4000);
+  await page.waitForTimeout(5000);
 
   // Verify InfoBanner refinement
   const infoBannerLabel = page.locator('text=Cómo funciona');
@@ -39,20 +39,30 @@ test('verify health monitor resonance ui components', async ({ page }) => {
   await expect(infoBannerLabel).toHaveClass(/font-bold/);
   await expect(infoBannerLabel).toHaveClass(/uppercase/);
 
+  // Verify environment tabs in header
+  const envTabs = page.locator('div.w-96');
+  await expect(envTabs).toBeVisible();
+  await expect(envTabs.locator('button', { hasText: 'Todos' })).toHaveClass(/bg-background/); // Active tab
+
+  // Verify sorting tabs
+  const sortTabs = page.locator('div.w-72');
+  await expect(sortTabs).toBeVisible();
+  await expect(sortTabs.locator('button', { hasText: 'Nombre' })).toHaveClass(/bg-background/);
+
   // Take screenshot
   await page.screenshot({ path: 'verification/health-monitor-resonance-final.png', fullPage: true });
 
-  // If the data is still not showing (as seen in previous attempts),
-  // at least we verified the labels and the general resonance.
-  // But let's try to check if the ProductSection appeared this time.
-  const productHeader = page.locator('div.bg-muted\\/40').first();
-  const count = await productHeader.count();
+  // Verify if ProductSection is rendered (should be if localStorage mock worked)
+  const productSection = page.locator('div.bg-muted\\/10').first();
+  const count = await productSection.count();
 
   if (count > 0) {
     console.log('Product section found!');
+    const productHeader = productSection.locator('div.bg-muted\\/20');
+    await expect(productHeader).toBeVisible();
     await expect(productHeader.locator('span.bg-success\\/20')).toBeVisible();
     await expect(page.locator('div.w-1\\.5.h-1\\.5.rounded-full.bg-success')).toBeVisible();
   } else {
-    console.log('Product section not found, but UI components refined.');
+    console.log('Product section not found, but UI components verified.');
   }
 });

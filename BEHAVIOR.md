@@ -66,6 +66,12 @@
 ## Module: api/seki
 - fetchPipeline retorna el pipeline
 
+## Module: XSS Vulnerability Audit
+- should escape HTML in highlighted code
+- should escape HTML tags to prevent XSS
+- should prevent XSS in search filters
+- should prevent XSS when highlighting log levels
+
 ## Module: AIChatModal
 - calls prompt with multimodal signature when send button is clicked
 - calls reset when clear button is clicked

@@ -14,7 +14,7 @@
 - **StatusCard**: Loading/error/offline states.
 - **ActionButton**: Iconographic with tooltip.
 - **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering.
-- **Docker Terminal**: `bg-primary/10` icons, double-line titles, `bg-zinc-950` background.
+- **Terminal**: High-density technical header with session metadata (e.g., 'Sesión Local Activa', '/bin/bash'). Semantic status dots (OK/Error) with technical shadows. Viewport uses `bg-zinc-950` background.
 - **BaseDialog**: Modal consistency.
 
 ## Cache-First Tokens (ADR-001)
@@ -83,9 +83,10 @@
 
 ### Kubernetes UI Resonance
 - **Dashboard Navigation**: Uses `IndustrialTabs` for switching between 'Favoritos' and 'Proyectos'. State is persisted via `tab` search parameter.
+- **Namespace Filtering**: Promoted to the `PageLayout` header using `IndustrialTabs`, synchronized with the `namespace` search parameter. Per-table filter bars are removed for high-density consistency.
 - **Grouping**: Favorites are grouped by `context` (Boxes icon). Projects are grouped by `project.id` (Folder icon).
 - **Deployment Status**: Badges use semantic tokens (success/info/destructive/muted) with 20% opacity and `rounded-md`. Labels are localized (Saludable, Procesando, Degradado, Desconocido).
-- **Search UI**: High-density dropdown with technical metadata (Namespace, Context, Ready/Up-to-date counts) and keyboard-centric navigation hints.
+- **Search UI**: High-density dropdown with technical metadata (Namespace, Context, Ready/Up-to-date/Available counts) and keyboard-centric navigation hints.
 
 ### GitHub UI Resonance
 - **Dashboard Layout**: Primary collection navigation (`IndustrialTabs`) and project management actions reside in the `PageLayout` header.

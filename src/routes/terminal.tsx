@@ -10,12 +10,31 @@ export const Route = createFileRoute('/terminal')({
 function TerminalPage() {
   return (
     <PageLayout
-      header={{ title: "Terminal" }}
-    >
-      <div className="flex-1 flex flex-col min-h-0 bg-black rounded-xl overflow-hidden border border-border/40 shadow-2xl">
-        <div className="flex items-center gap-2 px-4 py-2 bg-muted/40 border-b border-border/60">
+      header={{
+        title: (
+          <div className="flex items-center gap-2">
             <TerminalIcon className="w-4 h-4 text-primary" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Sesión Local</span>
+            <span>Terminal</span>
+          </div>
+        )
+      }}
+    >
+      <div className="flex-1 flex flex-col min-h-0 bg-zinc-950 rounded-xl overflow-hidden border border-border/40 shadow-2xl">
+        <div className="flex items-center justify-between px-4 py-2.5 bg-muted/20 border-b border-border/40">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">Sesión Local Activa</span>
+            </div>
+            <div className="w-px h-3 bg-border/40" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 font-mono">/bin/bash</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">Status</span>
+               <span className="px-1.5 py-0.5 rounded bg-success/20 border border-success/20 text-[9px] font-bold text-success uppercase tracking-widest">Connected</span>
+            </div>
+          </div>
         </div>
         <Terminal type="local" className="border-none rounded-none flex-1" />
       </div>

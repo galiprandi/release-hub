@@ -103,3 +103,10 @@
   - `UrlCell`: Domain as technical metadata (`text-[10px] font-bold uppercase text-muted-foreground/60`) and Path as primary content (`text-sm font-medium`).
   - Headers: Standard high-density `span` pattern (`text-[10px] font-bold uppercase tracking-wider`).
   - Actions: 20% opacity backgrounds on hover for `ActionButton` components.
+
+### Diff Viewer Resonance
+- **Navigation**: Uses `IndustrialTabs` in `DiffControls` for mode selection (JSON, JWT, cURL, JS, TS, etc.).
+- **Typography**: High-density technical metadata (`text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`) for panel headers and comparison results.
+- **Visual Containers**: Main view and panels use `bg-muted/10` background and `border-border/60` for refined hierarchy.
+- **Empty State**: Uses `bg-muted/10` and `border-border/40` geometry with `tracking-widest` typography for technical placeholders.
+- **Controls**: Action buttons (Solo diffs, Expand, Copy) use semantic shadows and 20% opacity backgrounds on hover/active states.

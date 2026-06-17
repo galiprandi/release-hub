@@ -68,6 +68,8 @@
 - **Placeholder Standard**: Access verification (`checkingAccess`) renders `null` to avoid layout shifts and maintain a clean visual state.
 
 ### Health Monitor Resonance
+- **Route Filtering**: Primary environment filtering (Production, Staging, Unhealthy) is moved to the PageLayout header using IndustrialTabs (synchronized with `environment` search parameter).
+- **Product Grouping**: Product sections use `bg-muted/10` containers with `rounded-xl` geometry and technical `Box` icons in `bg-muted/20` headers.
 - **Navigation & Controls**: Environment filtering (All, Prod, Stag, Error) and Sorting (Nombre, Errores, Recientes) are globalized in the `PageLayout` header using `IndustrialTabs`.
 - **Technical Help**: Help instructions are moved to a `HelpCircle` ActionButton in the header that triggers a `BaseDialog`.
 - **Status Dots**: `w-1.5 h-1.5 rounded-full` with semantic shadows for health states (OK/Error). OK includes `animate-pulse`.
@@ -90,6 +92,10 @@
 - **Global Filtering**: Dashboard-level filtering (e.g., 'Pendientes') is managed via `IndustrialTabs` in the main view, persisting state in the `filter` search parameter.
 - **Table Cells**: Technical metadata (Health, PRs, Workflows, Date, Author) uses `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`.
 - **Health Indicators**: Semantic dots (`w-1.5 h-1.5`) with shadows. OK state includes `animate-pulse`.
+
+### Novedades Page Resonance
+- **Header**: High-density technical header with the 'Newspaper' icon.
+- **Content**: Encapsulated in a `bg-muted/10` container with `border-border/40`, `rounded-xl` geometry, and `p-8` padding.
 
 ### Fetcher UI Resonance
 - **Navigation & Sorting**: Dual `IndustrialTabs` implementation for method filtering (ALL, GET, POST, etc.) and persistent sorting (Recent, Method, Status, Duration), synchronized with `method` and `sortBy` search parameters.

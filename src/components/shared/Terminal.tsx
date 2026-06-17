@@ -77,7 +77,6 @@ export function Terminal({ type, name, podName, namespace, context, container, c
     socketRef.current = ws;
 
     ws.onopen = () => {
-      console.log('[Terminal] WebSocket connected');
       // Send initial size
       const dims = fitAddon.proposeDimensions();
       if (dims) {

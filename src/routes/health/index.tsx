@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Activity, ExternalLink, HelpCircle, Box } from 'lucide-react';
+import { Activity, ExternalLink, ChevronDown, Box } from 'lucide-react';
 import { useHealthMonitor } from '@/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
 import { Table } from '@/components/ui/Table';
@@ -28,10 +28,11 @@ const FOCUS_RING = "focus-visible:ring-2 focus-visible:ring-primary focus-visibl
 
 function HealthHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   return (
-    <BaseDialog
-      open={open}
-      onOpenChange={onOpenChange}
-      title={
+    <div className="bg-info/10 border border-info/20 rounded-xl overflow-hidden transition-all duration-200">
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-info/20 transition-colors ${FOCUS_RING}`}
+      >
         <div className="flex items-center gap-2">
           <HelpCircle className="w-4 h-4 text-primary" />
           <span>Monitoreo de Salud</span>
@@ -119,9 +120,9 @@ function ProductSection({
   return (
     <div className="bg-muted/10 rounded-xl border border-border/40 overflow-hidden shadow-sm">
       {/* Header del producto */}
-      <div className="flex items-center justify-between bg-muted/40 border-b border-border/60 px-4 py-2">
+      <div className="flex items-center justify-between bg-muted/20 border-b border-border/40 px-4 py-2">
         <div className="flex items-center gap-2">
-          <Box className="w-3.5 h-3.5 text-primary/40" />
+          <Box className="w-4 h-4 text-primary/60" />
           <Link
             to="/github/$org/$repo"
             params={{ org, repo: productName }}
@@ -194,7 +195,7 @@ function EndpointsTable({
     {
       id: "status",
       accessorFn: (row) => row.isHealthy,
-      header: "",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Status</span>,
       cell: ({ row }) => <StatusCell endpoint={row.original} />,
       filterFn: (row, columnId, filterValue) => {
         const value = row.getValue(columnId);
@@ -203,40 +204,40 @@ function EndpointsTable({
     },
     {
       accessorKey: "service",
-      header: "Ruta",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Ruta</span>,
       cell: ({ row }) => <span className="font-medium tracking-tight text-foreground">{row.original.service || '/'}</span>,
     },
     {
       id: "environment",
       accessorFn: (row) => row.environment,
-      header: "Ambiente",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Ambiente</span>,
       cell: ({ row }) => <EnvironmentCell endpoint={row.original} />,
       filterFn: 'equalsString',
     },
     {
       accessorKey: "lastChecked",
-      header: "Verificado",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Verificado</span>,
       cell: ({ row }) => <LastCheckedCell endpoint={row.original} />,
     },
     {
       accessorKey: "responseTime",
-      header: "Tiempo",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Tiempo</span>,
       cell: ({ row }) => <ResponseTimeCell endpoint={row.original} />,
     },
     {
       accessorKey: "url",
-      header: "URL",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">URL</span>,
       cell: ({ row }) => <UrlCell endpoint={row.original} />,
     },
     {
       accessorKey: "error",
-      header: "Error",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Error</span>,
       cell: ({ row }) => <ErrorCell endpoint={row.original} />,
     },
     {
       id: "actions",
       accessorKey: "actions",
-      header: "Acciones",
+      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Acciones</span>,
       enableSorting: false,
       cell: ({ row }) => (
         <ActionsCell
@@ -423,6 +424,7 @@ function HealthMonitorPage() {
   const search = useSearch({ from: '/health/' });
 
   const sortBy = (search.sortBy as 'default' | 'errors' | 'recent') || 'default';
+  const environment = search.environment || 'all';
 
   const handleSortChange = useCallback((newSort: string) => {
     navigate({
@@ -431,9 +433,19 @@ function HealthMonitorPage() {
     });
   }, [navigate]);
 
+  const handleEnvironmentChange = useCallback((newEnv: string) => {
+    navigate({
+      to: '.',
+      search: (prev: Record<string, unknown>) => ({
+        ...prev,
+        environment: newEnv === 'all' ? undefined : newEnv
+      }),
+    });
+  }, [navigate]);
+
   // Derivar filtro activo de query params
   const activeFilter = useMemo(() => {
-    if (!search.environment) return null;
+    if (!search.environment || search.environment === 'all') return null;
     if (search.environment === 'staging' || search.environment === 'production') {
       return { id: 'environment', value: search.environment };
     }
@@ -552,6 +564,7 @@ function HealthMonitorPage() {
       header={{
         title: (
           <div className="flex items-center gap-2">
+            <Activity className="w-4 h-4 text-primary" />
             <span>Health Monitor</span>
             {isChecking && (
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" title="Revalidando..." />
@@ -559,34 +572,17 @@ function HealthMonitorPage() {
           </div>
         ),
         searchComponent: (
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Filtrar:</span>
-              <IndustrialTabs
-                options={[
-                  { id: 'all', label: 'Todos' },
-                  { id: 'production', label: 'Prod' },
-                  { id: 'staging', label: 'Stag' },
-                  { id: 'unhealthy', label: 'Error' },
-                ]}
-                activeId={search.environment || 'all'}
-                onChange={(id) => handleFilterChange(id === 'all' ? null : { id: 'environment', value: id as string })}
-              />
-            </div>
-            <div className="w-px h-6 bg-border/40 mx-1" />
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Ordenar:</span>
-              <IndustrialTabs
-                options={[
-                  { id: 'default', label: 'Nombre' },
-                  { id: 'errors', label: 'Errores' },
-                  { id: 'recent', label: 'Recientes' },
-                ]}
-                activeId={sortBy}
-                onChange={handleSortChange}
-              />
-            </div>
-          </div>
+          <IndustrialTabs
+            options={[
+              { id: 'all', label: 'Todos' },
+              { id: 'production', label: 'Production' },
+              { id: 'staging', label: 'Staging' },
+              { id: 'unhealthy', label: 'Unhealthy' },
+            ]}
+            activeId={environment}
+            onChange={handleEnvironmentChange}
+            className="w-96"
+          />
         )
       }}
       actions={[headerActions]}

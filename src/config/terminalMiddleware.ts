@@ -200,8 +200,6 @@ export function setupTerminalMiddleware(server: ServerWithUpgrade) {
       return;
     }
 
-    console.log(`[Terminal] Started ${command} ${args.join(' ')} (PID: ${term.pid})`);
-
     term.onData((data) => {
       if (ws.readyState === WebSocket.OPEN) {
         ws.send(data);
@@ -223,12 +221,10 @@ export function setupTerminalMiddleware(server: ServerWithUpgrade) {
     });
 
     ws.on('close', () => {
-      console.log(`[Terminal] Closing session (PID: ${term.pid})`);
       term.kill();
     });
 
     term.onExit(() => {
-      console.log(`[Terminal] Process exited (PID: ${term.pid})`);
       if (ws.readyState === WebSocket.OPEN) {
         ws.close();
       }

@@ -208,6 +208,17 @@
   - [x] Validación funcional completa (206 tests unitarios + E2E selectivos).
 - **Resultado**: Build restaurado a un estado prístino y core del sistema libre de ruido técnico, garantizando un entorno de desarrollo profesional y eficiente.
 
+### 2026-06-20: Security Hardening & XSS Protection
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-xss-hardening-v5`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Implementación de escapado HTML estricto en `highlightLogLine` (logUtils.tsx) para neutralizar XSS en logs.
+  - [x] Hardening de `DiffViewer.tsx` con fallbacks seguros (`escapeHtml`) para errores de resaltado sintáctico.
+  - [x] Creación de suite de tests `src/api/xss.test.ts` para auditoría y prevención de regresiones XSS.
+  - [x] Actualización de `AGENTS.md` y `DESIGN.md` con estándares de protección XSS.
+  - [x] Zero-warning build y validación global de 210 tests.
+- **Resultado**: Aplicación blindada contra inyecciones XSS en logs y visores de código, elevando la integridad del sistema al estándar AAA.
 ### 2026-06-20: Refactor Novedades & Health Monitor Resonance V2
 - **Agente**: Fiona 🐜
 - **Rama**: `🐜-Fiona-refactor-hygiene-resonance-v5`

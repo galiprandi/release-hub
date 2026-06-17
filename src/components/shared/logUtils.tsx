@@ -12,13 +12,27 @@ export function stripAnsiCodes(text: string): string {
 }
 
 /**
+ * Escapa caracteres HTML para prevenir XSS
+ */
+export function escapeHtml(text: string): string {
+	if (!text) return "";
+	return text
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;");
+}
+
+/**
  * Resalta una línea de log con colores según timestamps, niveles de log y filtros
  */
 export function highlightLogLine(line: string, filter?: string, customHighlight?: string): React.ReactNode {
 	if (!line) return line;
 
-	// Limpiar ANSI color codes antes de resaltar
-	let highlighted = stripAnsiCodes(line);
+	// Limpiar ANSI color codes y escapar HTML antes de resaltar para prevenir XSS
+	// El resaltado agregará sus propios tags HTML seguros
+	let highlighted = escapeHtml(stripAnsiCodes(line));
 
 	// Patrón para timestamps (ej: 2024-04-30 10:00:00, Apr 30 10:00:00, etc.)
 	const timestampPattern = /^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})|^(\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})|^(\d{2}:\d{2}:\d{2})/;

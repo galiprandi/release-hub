@@ -6,6 +6,7 @@ import { DiffPanel } from './DiffPanel';
 import { clsx } from 'clsx';
 import { GitCompare, Maximize2, Minimize2, Clock, Filter } from 'lucide-react';
 import { highlight } from 'sugar-high';
+import { escapeHtml } from '@/components/shared/logUtils';
 
 interface DiffViewerProps {
 	mode: DiffMode;
@@ -216,7 +217,8 @@ function DiffLineRow({ line, mode }: { line: DiffLine; mode: DiffMode }) {
 		try {
 			return highlight(leftValue);
 		} catch {
-			return leftValue;
+			// Fallback seguro si falla el resaltado
+			return escapeHtml(leftValue);
 		}
 	}, [leftValue, mode]);
 
@@ -226,7 +228,8 @@ function DiffLineRow({ line, mode }: { line: DiffLine; mode: DiffMode }) {
 		try {
 			return highlight(rightValue);
 		} catch {
-			return rightValue;
+			// Fallback seguro si falla el resaltado
+			return escapeHtml(rightValue);
 		}
 	}, [rightValue, mode]);
 

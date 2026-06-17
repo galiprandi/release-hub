@@ -233,14 +233,24 @@ export function DeploymentSearch() {
                           <div className="w-px h-2.5 bg-border/60 mx-0.5" />
                           <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 truncate">{deployment.context}</span>
                         </div>
-                        <div className="flex items-center gap-3 mt-1.5">
+                        <div className="flex items-center gap-4 mt-2">
                           <div className="flex items-center gap-1.5">
                              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">Ready</span>
-                             <span className="text-[10px] font-mono font-medium">{deployment.ready}</span>
+                             <span className="px-1.5 py-0.5 rounded bg-muted/40 border border-border/10 text-[10px] font-mono font-bold text-foreground">
+                               {deployment.ready}
+                             </span>
                           </div>
                           <div className="flex items-center gap-1.5">
                              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">Up-to-date</span>
-                             <span className="text-[10px] font-mono font-medium">{deployment.upToDate}</span>
+                             <span className="px-1.5 py-0.5 rounded bg-muted/40 border border-border/10 text-[10px] font-mono font-bold text-foreground">
+                               {deployment.upToDate}
+                             </span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">Available</span>
+                             <span className="px-1.5 py-0.5 rounded bg-muted/40 border border-border/10 text-[10px] font-mono font-bold text-foreground">
+                               {deployment.available}
+                             </span>
                           </div>
                         </div>
                       </div>

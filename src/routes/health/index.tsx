@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Activity, ExternalLink, ChevronDown, Box } from 'lucide-react';
+import { Activity, ExternalLink, Box, HelpCircle } from 'lucide-react';
 import { useHealthMonitor } from '@/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
 import { Table } from '@/components/ui/Table';
@@ -28,11 +28,10 @@ const FOCUS_RING = "focus-visible:ring-2 focus-visible:ring-primary focus-visibl
 
 function HealthHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   return (
-    <div className="bg-info/10 border border-info/20 rounded-xl overflow-hidden transition-all duration-200">
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-info/20 transition-colors ${FOCUS_RING}`}
-      >
+    <BaseDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={
         <div className="flex items-center gap-2">
           <HelpCircle className="w-4 h-4 text-primary" />
           <span>Monitoreo de Salud</span>
@@ -425,13 +424,6 @@ function HealthMonitorPage() {
 
   const sortBy = (search.sortBy as 'default' | 'errors' | 'recent') || 'default';
   const environment = search.environment || 'all';
-
-  const handleSortChange = useCallback((newSort: string) => {
-    navigate({
-      to: '.',
-      search: (prev: Record<string, unknown>) => ({ ...prev, sortBy: newSort }),
-    });
-  }, [navigate]);
 
   const handleEnvironmentChange = useCallback((newEnv: string) => {
     navigate({

@@ -231,6 +231,20 @@
   - [x] Zero-warning build: mantenimiento del estándar de build y lint impecable.
 - **Resultado**: Interfaz de usuario elevada al estándar Industrial Resonance V2 en módulos críticos, optimizando la jerarquía de información y eliminando ruido técnico.
 
+### 2026-06-21: Refactor Kubernetes & Terminal Resonance V2
+- **Agente**: Uma 🐜
+- **Rama**: `🐜-Uma-refactor-kubernetes-terminal-resonance`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Refactor de Kubernetes Dashboard: promoción de filtro de Namespace al header de `PageLayout` mediante `IndustrialTabs`.
+  - [x] Eliminación de barras de filtrado locales en tablas de despliegues para mayor densidad visual.
+  - [x] Evolución de `DeploymentSearch`: integración de metadatos técnicos (Ready/Up-to-date/Available) con badges de alta densidad.
+  - [x] Refactor de ruta de Terminal: implementación de header técnico con metadatos de sesión y alineación con Resonance V2.
+  - [x] Hotfix en Health Monitor: restauración de `HealthHelpDialog` corrigiendo sintaxis y uso de `BaseDialog`.
+  - [x] Saneamiento del entorno: restauración de dependencias y herramientas de build (`tsc`, `vitest`).
+  - [x] Zero-warning build y validación global de tests (210 pasados).
+- **Resultado**: Dashboards de Kubernetes y Terminal elevados al estándar Industrial Resonance V2, optimizando la persistencia de estado y la jerarquía de información.
+
 ### 2026-06-18: Refactor Fetcher UI Resonance V2
 - **Rama**: `🐜-Uma-refactor-fetcher-resonance-v2`
 - **Estado**: Finalizado ✅

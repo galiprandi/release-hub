@@ -62,6 +62,9 @@ export function useUserCollections() {
 			if (cached) return cached;
 			return loadCollectionsFromStorage();
 		},
+		initialData: () => {
+			return queryClient.getQueryData<UserCollections>(queryKeys.user.collections()) || loadCollectionsFromStorage();
+		},
 		staleTime: Infinity,
 		gcTime: Infinity,
 	});

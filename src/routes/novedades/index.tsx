@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Newspaper } from "lucide-react";
 import { Streamdown } from "streamdown";
-import { Newspaper } from "lucide-react";
 import { PageLayout } from "../../layouts/PageLayout";
 import novedadesContent from "../../../NOVEDADES.md?raw";
 

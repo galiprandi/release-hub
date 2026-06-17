@@ -124,7 +124,7 @@
 ## Referencias rápidas
 
 - **Tokens**: Solo de `DESIGN.md`. Nunca hardcodeados (`text-zinc-500`, `bg-red-500`).
-- **Health Monitor**: Status dots (`w-1.5 h-1.5`), semantic badges (/20 opacity), double-line URLs.
+- **Health Monitor**: Status dots (`w-1.5 h-1.5`), semantic badges (/20 opacity), double-line URLs. Header-based filtering and sorting (IndustrialTabs), help ActionButton with technical dialog, and bg-muted/10 containers for ProductSections.
 - **Foco**: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1`.
 - **Navigation**: Prefer `IndustrialTabs` over legacy `FilterBar` or `select` for sorting/filtering. State must be synced with search params.
 - **Type Hygiene**: Prohibido `any`. Interfaces explícitas o `unknown` + validación. Casts de tipo en handlers deben usar `id as typeof stateVariable`. Mocks de test deben sincronizarse con firmas reales mediante casts de interfaces (`as ExecResponse`).
@@ -133,6 +133,7 @@
 - **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Use localized status labels (Saludable, Procesando, etc.).
 - **Mutaciones**: Optimistic update + revalidación selectiva. Nunca `window.location.reload()`.
 - **Resiliencia**: Si CLI falla (`kubectl`, `docker`), redirigir a `<module>/setup`.
+- **Novedades**: Technical header with Newspaper icon. Content encapsulated in bg-muted/10 containers with rounded-xl and p-8 padding.
 - **Docker UI**: Status filtering uses `IndustrialTabs` in the route, synced with `status` search parameter. Cell typography for technical metadata must use `text-[10px] font-bold uppercase tracking-wider`.
 - **Fetcher UI**: Filtering and sorting must be implemented via dual `IndustrialTabs` in the route, persisting state in `method` and `sortBy` search parameters. `UrlCell` uses a double-line pattern: Muted Domain (`text-[10px] font-bold uppercase`) and Foreground Path (`text-sm medium`).
 - **GitHub UI**: Collection navigation and management actions are in the `PageLayout` header. Dashboard-level filtering uses `IndustrialTabs` synced with `filter` search parameter. Technical metadata cels use high-density typography (`text-[10px] font-bold uppercase tracking-wider`).

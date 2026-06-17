@@ -10,6 +10,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { PageLayout } from '../../layouts/PageLayout';
 import DayJS from '@/lib/dayjs';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
+import { BaseDialog } from '@/components/ui/BaseDialog';
 
 export const Route = createFileRoute('/health/')({
   component: HealthMonitorPage,
@@ -25,9 +26,7 @@ export const Route = createFileRoute('/health/')({
 
 const FOCUS_RING = "focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1";
 
-function InfoBanner() {
-  const [isExpanded, setIsExpanded] = useState(false);
-
+function HealthHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   return (
     <div className="bg-info/10 border border-info/20 rounded-xl overflow-hidden transition-all duration-200">
       <button
@@ -35,24 +34,40 @@ function InfoBanner() {
         className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-info/20 transition-colors ${FOCUS_RING}`}
       >
         <div className="flex items-center gap-2">
-          <Activity className="w-5 h-5 text-info" />
-          <span className="text-[10px] font-bold uppercase tracking-wider text-info">Cómo funciona</span>
+          <HelpCircle className="w-4 h-4 text-primary" />
+          <span>Monitoreo de Salud</span>
         </div>
-        <ChevronDown className={`w-5 h-5 text-info transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
-      </button>
+      }
+    >
+      <div className="space-y-4 py-4">
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          El Monitor de Salud permite supervisar el estado de disponibilidad de tus servicios en tiempo real.
+        </p>
 
-      {isExpanded && (
-        <div className="px-4 pb-4">
-          <div className="text-sm text-info/90 pt-2 border-t border-info/20">
-            <ul className="space-y-1 list-disc list-inside">
-              <li>Los endpoints se detectan automáticamente desde los pipelines de deploy</li>
-              <li>Se verifica el endpoint <code className="bg-info/20 px-1 rounded font-mono">/health</code> en cada URL</li>
-              <li>Los servicios se eliminan automáticamente cuando quitas un repo de favoritos</li>
-            </ul>
-          </div>
+        <div className="space-y-3">
+          <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Funcionamiento Técnico</h4>
+          <ul className="space-y-2">
+            {[
+              "Detección automática de endpoints desde pipelines de despliegue",
+              "Verificación periódica del endpoint /health en cada URL detectada",
+              "Limpieza automática de servicios al remover repositorios de favoritos",
+              "Persistencia de estados de salud para análisis de estabilidad"
+            ].map((text, i) => (
+              <li key={i} className="flex items-start gap-3 text-sm">
+                <div className="mt-1.5 w-1 h-1 rounded-full bg-primary shrink-0" />
+                <span>{text}</span>
+              </li>
+            ))}
+          </ul>
         </div>
-      )}
-    </div>
+
+        <div className="p-3 rounded-lg bg-muted/30 border border-border/40">
+          <p className="text-[10px] text-muted-foreground leading-relaxed italic">
+            Tip: Puedes filtrar por ambiente o estado de error directamente desde la barra superior para focalizar tu atención.
+          </p>
+        </div>
+      </div>
+    </BaseDialog>
   );
 }
 
@@ -404,6 +419,7 @@ function HealthMonitorPage() {
   } = useHealthMonitor();
 
   const { favorites } = useUserCollections();
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const navigate = useNavigate();
   const search = useSearch({ from: '/health/' });
 
@@ -513,6 +529,17 @@ function HealthMonitorPage() {
 
   const headerActions = (
     <div className="flex gap-2">
+      <ActionButton
+        action={{
+          icon: HelpCircle,
+          label: "Ayuda",
+          color: "default"
+        }}
+        onClick={() => setIsHelpOpen(true)}
+        size="md"
+        className="bg-muted/20 hover:bg-muted/30"
+      />
+      <div className="w-px h-6 bg-border/40 mx-1" />
       {stats.unhealthy > 0 && (
         <ActionButton
           action={{
@@ -562,25 +589,7 @@ function HealthMonitorPage() {
       refreshFn={checkAllEndpoints}
     >
       <div className="space-y-6">
-      {/* Ordenamiento */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Ordenar por:</span>
-          <IndustrialTabs
-            options={[
-              { id: 'default', label: 'Nombre' },
-              { id: 'errors', label: 'Errores' },
-              { id: 'recent', label: 'Recientes' },
-            ]}
-            activeId={sortBy}
-            onChange={handleSortChange}
-            className="w-72"
-          />
-        </div>
-      </div>
-
-      {/* Info banner - expandible */}
-      <InfoBanner />
+      <HealthHelpDialog open={isHelpOpen} onOpenChange={setIsHelpOpen} />
 
       {/* Endpoints by product */}
       {filteredEndpoints.length === 0 ? (

@@ -135,19 +135,22 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
 			<div className="flex-1 flex flex-col border rounded-xl bg-muted/10 shadow-sm overflow-hidden border-border/60 min-h-0">
 				<div className="px-4 py-2 border-b bg-muted/20 border-border/60 flex items-center justify-between">
 					<div className="flex items-center gap-4">
-						<h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-							Resultado de Comparación
-						</h3>
+						<div className="flex items-center gap-2">
+							<GitCompare className="w-3.5 h-3.5 text-primary/60" />
+							<h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+								Resultado de Comparación
+							</h3>
+						</div>
 						{mode === 'jwt' && (expirationA || expirationB) && (
-							<div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+							<div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider">
 								{expirationA && (
-									<span className="flex items-center gap-1 text-muted-foreground">
+									<span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-warning/10 text-warning border border-warning/20">
 										<Clock className="w-3 h-3" />
 										<span>A: {expirationA}</span>
 									</span>
 								)}
 								{expirationB && (
-									<span className="flex items-center gap-1 text-muted-foreground">
+									<span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-warning/10 text-warning border border-warning/20">
 										<Clock className="w-3 h-3" />
 										<span>B: {expirationB}</span>
 									</span>
@@ -159,19 +162,20 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
 						<button
 							onClick={() => setShowOnlyDiffs(!showOnlyDiffs)}
 							className={clsx(
-								"p-1.5 rounded-md transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider",
+								"p-1.5 rounded-md transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider border",
 								showOnlyDiffs
-									? "bg-primary/20 text-primary shadow-[0_0_8px_rgba(var(--primary),0.2)]"
-									: "text-muted-foreground/60 hover:text-foreground hover:bg-muted/20"
+									? "bg-primary/20 text-primary border-primary/20 shadow-[0_0_8px_rgba(var(--primary),0.2)]"
+									: "text-muted-foreground/60 hover:text-foreground hover:bg-muted/20 border-transparent"
 							)}
 							title={showOnlyDiffs ? "Mostrar todas las líneas" : "Mostrar solo diferencias"}
 						>
 							<Filter className="w-3.5 h-3.5" />
 							<span className="hidden sm:inline">Solo diffs</span>
 						</button>
+						<div className="w-px h-4 bg-border/40 mx-1" />
 						<button
 							onClick={() => setIsExpanded(!isExpanded)}
-							className="p-1.5 rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted/20 transition-all"
+							className="p-1.5 rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted/20 transition-all border border-transparent"
 							title={isExpanded ? "Restaurar" : "Expandir"}
 						>
 							{isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}

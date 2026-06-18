@@ -70,8 +70,8 @@
 ### Health Monitor Resonance
 - **Route Filtering**: Primary environment filtering (Production, Staging, Unhealthy) is moved to the PageLayout header using IndustrialTabs (synchronized with `environment` search parameter).
 - **Product Grouping**: Product sections use `bg-muted/10` containers with `rounded-xl` geometry and technical `Box` icons in `bg-muted/20` headers.
-- **Navigation & Controls**: Environment filtering (All, Prod, Stag, Error) and Sorting (Nombre, Errores, Recientes) are globalized in the `PageLayout` header using `IndustrialTabs`.
-- **Technical Help**: Help instructions are moved to a `HelpCircle` ActionButton in the header that triggers a `BaseDialog`.
+- **Navigation & Controls**: Environment filtering and Sorting are globalized in the `PageLayout` header using `IndustrialTabs` preceded by high-density technical labels (`Ambiente:`, `Orden:`).
+- **Technical Help**: Help instructions use a `HelpCircle` ActionButton in the header with `showLabel` enabled, triggering a `BaseDialog`.
 - **Status Dots**: `w-1.5 h-1.5 rounded-full` with semantic shadows for health states (OK/Error). OK includes `animate-pulse`.
 - **Product Section**: Encapsulated in `bg-muted/10` with `rounded-xl`. Header includes the standard `Box` icon and high-density technical metadata.
 - **Double-line URLs**: Table displays domain (muted, `text-[10px]`) and path (foreground, `font-mono text-xs`).

@@ -25,8 +25,8 @@ export const Route = createFileRoute("/kubernetes/")({
 });
 
 function KubernetesPage() {
-	const { deploymentFavorites = [], projects = [] } = useUserCollections();
-	const safeDeploymentFavorites = deploymentFavorites || [];
+	const { deploymentFavorites, projects } = useUserCollections();
+	const safeDeploymentFavorites = useMemo(() => deploymentFavorites || [], [deploymentFavorites]);
 	const navigate = useNavigate({ from: '/kubernetes' });
 	const search = useSearch({ from: '/kubernetes' });
 	const activeTab = search.tab as 'favorites' | 'projects';

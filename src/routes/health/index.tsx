@@ -435,6 +435,16 @@ function HealthMonitorPage() {
     });
   }, [navigate]);
 
+  const handleSortChange = useCallback((newSort: string) => {
+    navigate({
+      to: '.',
+      search: (prev: Record<string, unknown>) => ({
+        ...prev,
+        sortBy: newSort === 'default' ? undefined : newSort
+      }),
+    });
+  }, [navigate]);
+
   // Derivar filtro activo de query params
   const activeFilter = useMemo(() => {
     if (!search.environment || search.environment === 'all') return null;
@@ -528,6 +538,7 @@ function HealthMonitorPage() {
           color: "default"
         }}
         onClick={() => setIsHelpOpen(true)}
+        showLabel
         size="md"
         className="bg-muted/20 hover:bg-muted/30"
       />
@@ -564,29 +575,39 @@ function HealthMonitorPage() {
           </div>
         ),
         searchComponent: (
-          <div className="flex items-center gap-2">
-            <IndustrialTabs
-              options={[
-                { id: 'all', label: 'Todos' },
-                { id: 'production', label: 'Production' },
-                { id: 'staging', label: 'Staging' },
-                { id: 'unhealthy', label: 'Unhealthy' },
-              ]}
-              activeId={environment}
-              onChange={handleEnvironmentChange}
-              className="w-80"
-            />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+                Ambiente:
+              </span>
+              <IndustrialTabs
+                options={[
+                  { id: 'all', label: 'Todos' },
+                  { id: 'production', label: 'Production' },
+                  { id: 'staging', label: 'Staging' },
+                  { id: 'unhealthy', label: 'Unhealthy' },
+                ]}
+                activeId={environment}
+                onChange={handleEnvironmentChange}
+                className="w-80"
+              />
+            </div>
             <div className="w-px h-6 bg-border/40 mx-1" />
-            <IndustrialTabs
-              options={[
-                { id: 'default', label: 'Nombre' },
-                { id: 'errors', label: 'Errores' },
-                { id: 'recent', label: 'Recientes' },
-              ]}
-              activeId={sortBy}
-              onChange={handleSortChange}
-              className="w-80"
-            />
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+                Orden:
+              </span>
+              <IndustrialTabs
+                options={[
+                  { id: 'default', label: 'Nombre' },
+                  { id: 'errors', label: 'Errores' },
+                  { id: 'recent', label: 'Recientes' },
+                ]}
+                activeId={sortBy}
+                onChange={handleSortChange}
+                className="w-80"
+              />
+            </div>
           </div>
         )
       }}

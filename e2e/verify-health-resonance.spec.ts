@@ -38,7 +38,7 @@ test('verify health monitor resonance ui components', async ({ page }) => {
   await expect(title).toBeVisible();
 
   // Verify environment tabs in header
-  const envTabs = page.locator('div.w-96');
+  const envTabs = page.locator('div.w-96').first();
   await expect(envTabs).toBeVisible();
 
   // Verify if ProductSection is rendered

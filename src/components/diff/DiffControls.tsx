@@ -23,8 +23,8 @@ export function DiffControls({ mode, onModeChange }: DiffControlsProps) {
 	const options = modes.map(m => ({
 		id: m.id,
 		label: (
-			<div className="flex items-center gap-2">
-				<m.icon className="w-3.5 h-3.5" />
+			<div className="flex items-center gap-1.5">
+				<m.icon className={`w-3.5 h-3.5 ${mode === m.id ? 'text-primary' : 'text-muted-foreground/60'}`} />
 				<span>{m.label}</span>
 			</div>
 		)
@@ -35,7 +35,7 @@ export function DiffControls({ mode, onModeChange }: DiffControlsProps) {
 			options={options}
 			activeId={mode}
 			onChange={onModeChange}
-			className="max-w-[80vw] overflow-x-auto no-scrollbar"
+			className="max-w-[80vw] overflow-x-auto no-scrollbar scrollbar-hide"
 		/>
 	);
 }

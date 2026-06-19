@@ -282,3 +282,16 @@
   - [x] Auditoría AAA: Verificación de ausencia de código muerto, logs de depuración y tipos inseguros en el core.
   - [x] Zero-warning build y lint log logrados satisfactoriamente.
 - **Resultado**: Estabilidad del repositorio restaurada y alineación estética de Health Monitor completada bajo el estándar Industrial Resonance V2.
+
+### 2026-06-22: Security Hardening V7 (SSRF Expansion & Terminal Audit)
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-hardening-v7`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] SSRF Protection Expansion: Fortalecimiento de `isInternalAddress` para detectar bypasses mediante IPs en formato decimal y hexadecimal.
+  - [x] Terminal Middleware Validation: Creación de suite de tests `src/config/terminalMiddleware.test.ts` para auditar la validación de parámetros de sesión.
+  - [x] Script Handler Hardening: Refuerzo de validación de repositorios en `vite.config.ts` mediante regex estricta de patrón `org/repo`.
+  - [x] Technical Hygiene: Erradicación de `: any` en tests de seguridad, migrando a casts técnicos AAA (`ChildProcess`).
+  - [x] Zero-warning build y validación global de tests (216 pasados).
+- **Resultado**: Superficie de ataque reducida mediante el cierre de vectores SSRF avanzados y blindaje de middlewares locales.

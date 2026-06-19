@@ -10,7 +10,7 @@
 - **ARIA**: Explicit `aria-label` for icon buttons.
 
 ## Component Patterns
-- **Table**: `bg-muted/40` headers, technical metadata, vertical dividers. Badges at `/20` opacity.
+- **Table**: `bg-muted/40` headers, technical metadata, vertical dividers. Internal filter bar uses `bg-muted/40` with a nested segmented-control layout for a professional aesthetic.
 - **StatusCard**: Loading/error/offline states.
 - **ActionButton**: Iconographic with tooltip.
 - **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering.
@@ -70,8 +70,8 @@
 ### Health Monitor Resonance
 - **Route Filtering**: Primary environment filtering (Production, Staging, Unhealthy) is moved to the PageLayout header using IndustrialTabs (synchronized with `environment` search parameter).
 - **Product Grouping**: Product sections use `bg-muted/10` containers with `rounded-xl` geometry and technical `Box` icons in `bg-muted/20` headers.
-- **Navigation & Controls**: Environment filtering and Sorting are globalized in the `PageLayout` header using `IndustrialTabs` preceded by high-density technical labels (`Ambiente:`, `Orden:`).
-- **Technical Help**: Help instructions use a `HelpCircle` ActionButton in the header with `showLabel` enabled, triggering a `BaseDialog`.
+- **Navigation & Controls**: Environment filtering (All, Prod, Stag, Error) and Sorting (Nombre, Errores, Recientes) are globalized in the `PageLayout` header using `IndustrialTabs`. Environment tabs include dynamic status counts (e.g., 'Production (5)').
+- **Technical Help**: Help instructions are moved to a `HelpCircle` ActionButton in the header that triggers a `BaseDialog`.
 - **Status Dots**: `w-1.5 h-1.5 rounded-full` with semantic shadows for health states (OK/Error). OK includes `animate-pulse`.
 - **Product Section**: Encapsulated in `bg-muted/10` with `rounded-xl`. Header includes the standard `Box` icon and high-density technical metadata.
 - **Double-line URLs**: Table displays domain (muted, `text-[10px]`) and path (foreground, `font-mono text-xs`).
@@ -106,8 +106,8 @@
   - Actions: 20% opacity backgrounds on hover for `ActionButton` components.
 
 ### Diff Viewer Resonance
-- **Navigation**: Uses `IndustrialTabs` in `DiffControls` for mode selection (JSON, JWT, cURL, JS, TS, etc.).
+- **Navigation**: Uses `IndustrialTabs` in `DiffControls` for mode selection (JSON, JWT, cURL, JS, TS, etc.), synchronized with the `mode` search parameter in `src/routes/diff.tsx`.
 - **Typography**: High-density technical metadata (`text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`) for panel headers and comparison results.
-- **Visual Containers**: Main view and panels use `bg-muted/10` background and `border-border/60` for refined hierarchy.
+- **Visual Containers**: Main view and panels use `bg-muted/10` background and `border-border/60` for refined hierarchy. Panel headers include a decorative semantic dot for visual anchoring.
 - **Empty State**: Uses `bg-muted/10` and `border-border/40` geometry with `tracking-widest` typography for technical placeholders.
 - **Controls**: Action buttons (Solo diffs, Expand, Copy) use semantic shadows and 20% opacity backgrounds on hover/active states.

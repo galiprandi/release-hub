@@ -164,6 +164,10 @@
 - should identify removals
 - should sort keys recursively
 
+## Module: security utils
+- should identify internal addresses
+- should succeed when process closes before timeout
+
 ## Module: sekiToken utility
 - retorna el token string o null
 - retorna false si sekiToken es nulo o no existe

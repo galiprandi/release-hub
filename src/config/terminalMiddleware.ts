@@ -1,43 +1,13 @@
-import { spawn } from 'node:child_process';
 import * as pty from 'node-pty';
 import { WebSocket, WebSocketServer } from 'ws';
 import { IncomingMessage } from 'http';
 import { Duplex } from 'stream';
+import { VALIDATION } from '../utils/security';
+import { spawnAsync } from '../utils/node/spawn';
 
 interface ServerWithUpgrade {
   on(event: 'upgrade', listener: (request: IncomingMessage, socket: Duplex, head: Buffer) => void): void;
 }
-
-/**
- * Secure alternative to execAsync for internal middleware use.
- */
-const spawnAsync = (
-  args: string[],
-): Promise<{ stdout: string; stderr: string; success: boolean; error?: string }> => {
-  return new Promise((resolve) => {
-    const [cmd, ...cmdArgs] = args;
-    const child = spawn(cmd, cmdArgs, { shell: false });
-
-    let stdout = '';
-    let stderr = '';
-
-    child.stdout.on('data', (data: Buffer) => {
-      stdout += data.toString();
-    });
-
-    child.stderr.on('data', (data: Buffer) => {
-      stderr += data.toString();
-    });
-
-    child.on('close', (code: number | null) => {
-      resolve({ stdout, stderr, success: code === 0 });
-    });
-
-    child.on('error', (err: Error) => {
-      resolve({ stdout, stderr, success: false, error: err.message });
-    });
-  });
-};
 
 async function resolveNameToPod(name: string, namespace: string, context?: string | null): Promise<string | null> {
   try {
@@ -101,13 +71,6 @@ export function setupTerminalMiddleware(server: ServerWithUpgrade) {
     const context = url.searchParams.get('context');
     const container = url.searchParams.get('container');
 
-    // Validation patterns (RFC 1123 for K8s DNS labels/subdomains, standard Docker container names)
-    const k8sNameRegex =
-      /^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?(\.[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?)*$/;
-    const k8sNamespaceRegex = /^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$/;
-    const contextRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
-    const dockerNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
-
     // Validate type
     if (!type || !['k8s', 'docker', 'local'].includes(type)) {
       ws.send('\r\n[ERROR] Invalid terminal type\r\n');
@@ -117,7 +80,7 @@ export function setupTerminalMiddleware(server: ServerWithUpgrade) {
 
     // Validate name if present
     if (name) {
-      const nameRegex = type === 'k8s' ? k8sNameRegex : dockerNameRegex;
+      const nameRegex = type === 'k8s' ? VALIDATION.k8sName : VALIDATION.dockerName;
       if (!nameRegex.test(name)) {
         ws.send(`\r\n[ERROR] Invalid ${type === 'k8s' ? 'resource' : 'container'} name format\r\n`);
         ws.close();
@@ -126,14 +89,14 @@ export function setupTerminalMiddleware(server: ServerWithUpgrade) {
     }
 
     // Validate namespace if present
-    if (namespace && namespace !== 'default' && !k8sNamespaceRegex.test(namespace)) {
+    if (namespace && namespace !== 'default' && !VALIDATION.k8sNamespace.test(namespace)) {
       ws.send('\r\n[ERROR] Invalid namespace format\r\n');
       ws.close();
       return;
     }
 
     // Validate context if present
-    if (context && !contextRegex.test(context)) {
+    if (context && !VALIDATION.context.test(context)) {
       ws.send('\r\n[ERROR] Invalid context format\r\n');
       ws.close();
       return;
@@ -142,7 +105,7 @@ export function setupTerminalMiddleware(server: ServerWithUpgrade) {
     // Validate container if present
     if (container) {
       const isK8s = type === 'k8s';
-      const containerRegex = isK8s ? k8sNameRegex : dockerNameRegex;
+      const containerRegex = isK8s ? VALIDATION.k8sName : VALIDATION.dockerName;
       if (!containerRegex.test(container)) {
         ws.send('\r\n[ERROR] Invalid container name format\r\n');
         ws.close();

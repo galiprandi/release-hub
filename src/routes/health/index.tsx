@@ -440,7 +440,7 @@ function HealthMonitorPage() {
       to: '.',
       search: (prev: Record<string, unknown>) => ({
         ...prev,
-        sortBy: newSort === 'default' ? undefined : newSort
+        sortBy: newSort === 'default' ? undefined : (newSort as 'errors' | 'recent')
       }),
     });
   }, [navigate]);

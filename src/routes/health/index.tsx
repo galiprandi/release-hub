@@ -435,6 +435,16 @@ function HealthMonitorPage() {
     });
   }, [navigate]);
 
+  const handleSortChange = useCallback((newSort: string) => {
+    navigate({
+      to: '.',
+      search: (prev: Record<string, unknown>) => ({
+        ...prev,
+        sortBy: newSort === 'default' ? undefined : (newSort as 'errors' | 'recent')
+      }),
+    });
+  }, [navigate]);
+
   // Derivar filtro activo de query params
   const activeFilter = useMemo(() => {
     if (!search.environment || search.environment === 'all') return null;

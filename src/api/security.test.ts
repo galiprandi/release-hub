@@ -3,6 +3,7 @@ import { apiExec, runCommand } from './exec'
 import { startContainer } from './docker'
 import { getDeployment } from './kubectl'
 import { executeCurlCommand } from './curl'
+import { isInternalAddress, VALIDATION, SAFE_COMMANDS } from '../utils/security'
 
 describe('Security Hardening', () => {
   beforeEach(() => {
@@ -82,18 +83,16 @@ describe('Security Hardening', () => {
   })
 
   describe('Vite Middleware Hardening (Path Traversal)', () => {
-    // Note: These tests simulate the logic in vite.config.ts since we can't easily test the Vite server in vitest
+    // Note: These tests simulate the logic in vite.config.ts using centralized VALIDATION
     const validateRepo = (repo: string) => /^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(repo) && !repo.includes('..')
 
     it('should reject path traversal and unauthorized scripts in action parameter', () => {
-      const validateScripts = (action: string) => /^(healthcheck|install|start|trigger-staging-redeploy|uninstall)$/.test(action)
-
-      expect(validateScripts('../etc/passwd')).toBe(false)
-      expect(validateScripts('scripts/deploy')).toBe(false)
-      expect(validateScripts('deploy; rm -rf /')).toBe(false)
-      expect(validateScripts('trigger-staging-redeploy')).toBe(true)
-      expect(validateScripts('install')).toBe(true)
-      expect(validateScripts('malicious-script')).toBe(false)
+      expect(VALIDATION.scripts.test('../etc/passwd')).toBe(false)
+      expect(VALIDATION.scripts.test('scripts/deploy')).toBe(false)
+      expect(VALIDATION.scripts.test('deploy; rm -rf /')).toBe(false)
+      expect(VALIDATION.scripts.test('trigger-staging-redeploy')).toBe(true)
+      expect(VALIDATION.scripts.test('install')).toBe(true)
+      expect(VALIDATION.scripts.test('malicious-script')).toBe(false)
     })
 
     it('should reject argument injection and path traversal in repo parameter', () => {
@@ -106,126 +105,79 @@ describe('Security Hardening', () => {
   })
 
   describe('Terminal Middleware Hardening', () => {
-    // RFC 1123 DNS Subdomain standards
-    const k8sNameRegex =
-      /^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?(\.[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?)*$/;
-    const contextRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
-    const dockerNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
-
     it('should validate Kubernetes resource names correctly', () => {
-      expect(k8sNameRegex.test('my-pod')).toBe(true)
-      expect(k8sNameRegex.test('my-pod; rm -rf /')).toBe(false)
-      expect(k8sNameRegex.test('invalid_name')).toBe(false)
-      expect(k8sNameRegex.test('valid.name.with.dots')).toBe(true) // Subdomains allow dots
-      expect(k8sNameRegex.test('UpperCase')).toBe(false)
+      expect(VALIDATION.k8sName.test('my-pod')).toBe(true)
+      expect(VALIDATION.k8sName.test('my-pod; rm -rf /')).toBe(false)
+      expect(VALIDATION.k8sName.test('invalid_name')).toBe(false)
+      expect(VALIDATION.k8sName.test('valid.name.with.dots')).toBe(true) // Subdomains allow dots
+      expect(VALIDATION.k8sName.test('UpperCase')).toBe(false)
     })
 
     it('should enforce RFC 1123 length limits', () => {
       const longLabel = 'a'.repeat(64);
       const validLabel = 'a'.repeat(63);
-      expect(k8sNameRegex.test(longLabel)).toBe(false);
-      expect(k8sNameRegex.test(validLabel)).toBe(true);
+      expect(VALIDATION.k8sName.test(longLabel)).toBe(false);
+      expect(VALIDATION.k8sName.test(validLabel)).toBe(true);
 
       const longContext = 'a'.repeat(129);
-      expect(contextRegex.test(longContext)).toBe(false);
+      expect(VALIDATION.context.test(longContext)).toBe(false);
     })
 
     it('should validate Kubernetes contexts correctly', () => {
-      expect(contextRegex.test('gke_project_region_cluster')).toBe(true)
-      expect(contextRegex.test('context; whoami')).toBe(false)
+      expect(VALIDATION.context.test('gke_project_region_cluster')).toBe(true)
+      expect(VALIDATION.context.test('context; whoami')).toBe(false)
     })
 
     it('should validate Docker container names correctly', () => {
-      expect(dockerNameRegex.test('my_container')).toBe(true)
-      expect(dockerNameRegex.test('my-container-123')).toBe(true)
-      expect(dockerNameRegex.test('container; exit')).toBe(false)
+      expect(VALIDATION.dockerName.test('my_container')).toBe(true)
+      expect(VALIDATION.dockerName.test('my-container-123')).toBe(true)
+      expect(VALIDATION.dockerName.test('container; exit')).toBe(false)
     })
   })
 
   describe('Internal SSRF Protection', () => {
-    const isInternal = (hostname: string) => {
-      let addr = hostname.toLowerCase().replace(/^\[|\]$/g, '');
-
-      // Normalize IPv4-mapped IPv6 (e.g. ::ffff:127.0.0.1)
-      if (addr.startsWith('::ffff:')) {
-        addr = addr.slice(7);
-      }
-
-      if (addr === 'localhost' || addr === '::1' || addr === '::' || addr === '0.0.0.0') return true;
-      if (addr.endsWith('.local') || addr.endsWith('.internal')) return true;
-
-      // IPv4 Check
-      const parts = addr.split('.').map(Number);
-      if (parts.length === 4 && !parts.some(isNaN)) {
-        const [p0, p1] = parts;
-        // Loopback (127.0.0.0/8)
-        if (p0 === 127) return true;
-        // RFC 1918 Private Space
-        if (p0 === 10) return true;
-        if (p0 === 172 && p1 >= 16 && p1 <= 31) return true;
-        if (p0 === 192 && p1 === 168) return true;
-        // Link-Local (169.254.0.0/16)
-        if (p0 === 169 && p1 === 254) return true;
-        // Shared Address Space / CGNAT (100.64.0.0/10)
-        if (p0 === 100 && p1 >= 64 && p1 <= 127) return true;
-      }
-
-      // IPv6 Check (simple prefix checks)
-      if (addr.includes(':')) {
-        // Link-local (fe80::/10)
-        if (addr.startsWith('fe8') || addr.startsWith('fe9') || addr.startsWith('fea') || addr.startsWith('feb')) return true;
-        // Unique Local (fc00::/7) -> fc00::/8 and fd00::/8
-        if (addr.startsWith('fc') || addr.startsWith('fd')) return true;
-      }
-
-      // Cloud Metadata
-      if (addr === 'metadata.google.internal' || addr === 'instance-data') return true;
-
-      return false;
-    };
-
     it('should block loopback addresses and normalization bypasses', () => {
-      expect(isInternal('localhost')).toBe(true);
-      expect(isInternal('127.0.0.1')).toBe(true);
-      expect(isInternal('127.8.8.8')).toBe(true); // Full 127.0.0.0/8
-      expect(isInternal('::1')).toBe(true);
-      expect(isInternal('[::1]')).toBe(true);
-      expect(isInternal('::')).toBe(true);
-      expect(isInternal('0.0.0.0')).toBe(true);
-      expect(isInternal('::ffff:127.0.0.1')).toBe(true);
-      expect(isInternal('::ffff:127.0.0.2')).toBe(true);
+      expect(isInternalAddress('localhost')).toBe(true);
+      expect(isInternalAddress('127.0.0.1')).toBe(true);
+      expect(isInternalAddress('127.8.8.8')).toBe(true); // Full 127.0.0.0/8
+      expect(isInternalAddress('::1')).toBe(true);
+      expect(isInternalAddress('[::1]')).toBe(true);
+      expect(isInternalAddress('::')).toBe(true);
+      expect(isInternalAddress('0.0.0.0')).toBe(true);
+      expect(isInternalAddress('::ffff:127.0.0.1')).toBe(true);
+      expect(isInternalAddress('::ffff:127.0.0.2')).toBe(true);
     });
 
     it('should block private network addresses (RFC 1918)', () => {
-      expect(isInternal('10.0.0.1')).toBe(true);
-      expect(isInternal('172.16.0.1')).toBe(true);
-      expect(isInternal('172.31.255.255')).toBe(true);
-      expect(isInternal('192.168.1.1')).toBe(true);
+      expect(isInternalAddress('10.0.0.1')).toBe(true);
+      expect(isInternalAddress('172.16.0.1')).toBe(true);
+      expect(isInternalAddress('172.31.255.255')).toBe(true);
+      expect(isInternalAddress('192.168.1.1')).toBe(true);
     });
 
     it('should block CGNAT addresses', () => {
-      expect(isInternal('100.64.0.1')).toBe(true);
-      expect(isInternal('100.127.255.255')).toBe(true);
-      expect(isInternal('100.63.255.255')).toBe(false);
+      expect(isInternalAddress('100.64.0.1')).toBe(true);
+      expect(isInternalAddress('100.127.255.255')).toBe(true);
+      expect(isInternalAddress('100.63.255.255')).toBe(false);
     });
 
     it('should block IPv6 Link-Local and Unique Local addresses', () => {
-      expect(isInternal('fe80::1')).toBe(true);
-      expect(isInternal('fc00::')).toBe(true);
-      expect(isInternal('fd00::1')).toBe(true);
+      expect(isInternalAddress('fe80::1')).toBe(true);
+      expect(isInternalAddress('fc00::')).toBe(true);
+      expect(isInternalAddress('fd00::1')).toBe(true);
     });
 
     it('should block cloud metadata addresses and link-local', () => {
-      expect(isInternal('169.254.169.254')).toBe(true);
-      expect(isInternal('169.254.0.1')).toBe(true);
-      expect(isInternal('metadata.google.internal')).toBe(true);
-      expect(isInternal('instance-data')).toBe(true);
+      expect(isInternalAddress('169.254.169.254')).toBe(true);
+      expect(isInternalAddress('169.254.0.1')).toBe(true);
+      expect(isInternalAddress('metadata.google.internal')).toBe(true);
+      expect(isInternalAddress('instance-data')).toBe(true);
     });
 
     it('should allow public addresses', () => {
-      expect(isInternal('google.com')).toBe(false);
-      expect(isInternal('8.8.8.8')).toBe(false);
-      expect(isInternal('my-service.prod.company.com')).toBe(false);
+      expect(isInternalAddress('google.com')).toBe(false);
+      expect(isInternalAddress('8.8.8.8')).toBe(false);
+      expect(isInternalAddress('my-service.prod.company.com')).toBe(false);
     });
   })
 
@@ -233,17 +185,11 @@ describe('Security Hardening', () => {
     // In vite.config.ts, we resolve the hostname and check the IP
     // This test simulates that logic
     const lookupAndValidate = async (hostname: string, mockLookup: (h: string) => Promise<string>) => {
-      const isInternal = (addr: string) => {
-        if (addr === '127.0.0.1' || addr === '::1') return true;
-        if (addr.startsWith('10.')) return true;
-        return false;
-      };
-
-      if (isInternal(hostname)) return { allowed: false, error: 'Hostname is internal' };
+      if (isInternalAddress(hostname)) return { allowed: false, error: 'Hostname is internal' };
 
       try {
         const resolvedIp = await mockLookup(hostname);
-        if (isInternal(resolvedIp)) return { allowed: false, error: 'Resolved IP is internal' };
+        if (isInternalAddress(resolvedIp)) return { allowed: false, error: 'Resolved IP is internal' };
         return { allowed: true, resolvedIp };
       } catch {
         return { allowed: false, error: 'DNS resolution failed' };
@@ -270,24 +216,18 @@ describe('Security Hardening', () => {
   })
 
   describe('Flag Injection Protection', () => {
-    const k8sNameRegex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
-
     it('should reject names starting with hyphens (flag injection)', () => {
-      expect(k8sNameRegex.test('--kubeconfig=/root/.kube/config')).toBe(false);
-      expect(k8sNameRegex.test('-n')).toBe(false);
+      expect(VALIDATION.k8sName.test('--kubeconfig=/root/.kube/config')).toBe(false);
+      expect(VALIDATION.k8sName.test('-n')).toBe(false);
     });
 
     it('should reject names with spaces or shell characters', () => {
-      expect(k8sNameRegex.test('pod-name; rm -rf /')).toBe(false);
-      expect(k8sNameRegex.test('pod name')).toBe(false);
+      expect(VALIDATION.k8sName.test('pod-name; rm -rf /')).toBe(false);
+      expect(VALIDATION.k8sName.test('pod name')).toBe(false);
     });
   })
 
   describe('Middleware Command Allow-listing', () => {
-    const SAFE_COMMANDS = [
-      "gh", "kubectl", "docker", "curl", "lsof", "ls", "echo", "jq", "helm"
-    ];
-
     it('should allow commands in the safe list', () => {
       expect(SAFE_COMMANDS).toContain('gh');
       expect(SAFE_COMMANDS).toContain('kubectl');

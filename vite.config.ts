@@ -1,4 +1,4 @@
-import { spawn, execSync } from "node:child_process";
+import { execSync, spawn } from "node:child_process";
 import dns from "node:dns";
 import http from "node:http";
 import https from "node:https";
@@ -13,6 +13,12 @@ import {
 	DEFAULT_MAX_PORTS,
 } from "./src/config/portForward";
 import { setupTerminalMiddleware } from "./src/config/terminalMiddleware";
+import {
+	VALIDATION,
+	SAFE_COMMANDS,
+	isInternalAddress,
+} from "./src/utils/security";
+import { spawnAsync } from "./src/utils/node/spawn";
 
 const lookup = promisify(dns.lookup);
 
@@ -26,75 +32,7 @@ try {
 	// Fallback if not in git repo
 }
 
-/**
- * Execute a command using spawn without a shell.
- * This is the secure alternative to exec/execAsync.
- */
-const spawnAsync = (
-	args: string[],
-	stdin?: string,
-): Promise<{
-	stdout: string;
-	stderr: string;
-	success: boolean;
-	error?: string;
-}> => {
-	return new Promise((resolve) => {
-		const [cmd, ...cmdArgs] = args;
-		const child = spawn(cmd, cmdArgs, { shell: false });
-
-		let stdout = "";
-		let stderr = "";
-
-		child.stdout.on("data", (data) => {
-			stdout += data.toString();
-		});
-
-		child.stderr.on("data", (data) => {
-			stderr += data.toString();
-		});
-
-		if (stdin && child.stdin) {
-			child.stdin.write(stdin);
-			child.stdin.end();
-		}
-
-		child.on("close", (code) => {
-			resolve({ stdout, stderr, success: code === 0 });
-		});
-
-		child.on("error", (err) => {
-			resolve({ stdout, stderr, success: false, error: err.message });
-		});
-	});
-};
-
-// Security Validation Patterns
-const VALIDATION = {
-	// RFC 1123 DNS Subdomain: max 253 chars, labels max 63 chars
-	k8sName:
-		/^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?(\.[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?)*$/,
-	// RFC 1123 DNS Label: max 63 chars
-	k8sNamespace: /^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$/,
-	context: /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/,
-	dockerName: /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/,
-	resourceType: /^(pod|deployment|service|ingress)$/,
-	scripts: /^(healthcheck|install|start|trigger-staging-redeploy|uninstall)$/,
-};
-
 const activePortForwards = new Map<string, ReturnType<typeof spawn>>();
-
-const SAFE_COMMANDS = [
-	"gh",
-	"kubectl",
-	"docker",
-	"curl",
-	"lsof",
-	"ls",
-	"echo",
-	"jq",
-	"helm",
-];
 
 /**
  * Handler for /local/exec endpoint - works in both dev and preview
@@ -217,66 +155,12 @@ const healthProxyHandler: Connect.NextHandleFunction = async (req, res) => {
 		return;
 	}
 
-	const isInternal = (hostname: string) => {
-		let addr = hostname.toLowerCase().replace(/^\[|\]$/g, "");
-
-		// Normalize IPv4-mapped IPv6 (e.g. ::ffff:127.0.0.1)
-		if (addr.startsWith("::ffff:")) {
-			addr = addr.slice(7);
-		}
-
-		if (
-			addr === "localhost" ||
-			addr === "::1" ||
-			addr === "::" ||
-			addr === "0.0.0.0"
-		)
-			return true;
-		if (addr.endsWith(".local") || addr.endsWith(".internal")) return true;
-
-		// IPv4 Check
-		const parts = addr.split(".").map(Number);
-		if (parts.length === 4 && !parts.some(Number.isNaN)) {
-			const [p0, p1] = parts;
-			// Loopback (127.0.0.0/8)
-			if (p0 === 127) return true;
-			// RFC 1918 Private Space
-			if (p0 === 10) return true;
-			if (p0 === 172 && p1 >= 16 && p1 <= 31) return true;
-			if (p0 === 192 && p1 === 168) return true;
-			// Link-Local (169.254.0.0/16)
-			if (p0 === 169 && p1 === 254) return true;
-			// Shared Address Space / CGNAT (100.64.0.0/10)
-			if (p0 === 100 && p1 >= 64 && p1 <= 127) return true;
-		}
-
-		// IPv6 Check (simple prefix checks)
-		if (addr.includes(":")) {
-			// Link-local (fe80::/10)
-			if (
-				addr.startsWith("fe8") ||
-				addr.startsWith("fe9") ||
-				addr.startsWith("fea") ||
-				addr.startsWith("feb")
-			)
-				return true;
-			// Unique Local (fc00::/7) -> fc00::/8 and fd00::/8
-			if (addr.startsWith("fc") || addr.startsWith("fd")) return true;
-		}
-
-		// Cloud Metadata
-		if (addr === "metadata.google.internal" || addr === "instance-data")
-			return true;
-
-		return false;
-	};
-
 	try {
 		const initialUrlObj = new URL(targetUrl);
 		const originalHostname = initialUrlObj.hostname;
 
 		// Initial hostname check
-		if (isInternal(originalHostname)) {
+		if (isInternalAddress(originalHostname)) {
 			res.statusCode = 403;
 			res.end(
 				JSON.stringify({ error: "Access to internal targets is forbidden" }),
@@ -290,7 +174,7 @@ const healthProxyHandler: Connect.NextHandleFunction = async (req, res) => {
 			const { address } = await lookup(originalHostname);
 			resolvedIp = address;
 
-			if (isInternal(resolvedIp)) {
+			if (isInternalAddress(resolvedIp)) {
 				res.statusCode = 403;
 				res.end(
 					JSON.stringify({ error: "Resolved IP is internal and forbidden" }),

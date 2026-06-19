@@ -282,3 +282,16 @@
   - [x] Auditoría AAA: Verificación de ausencia de código muerto, logs de depuración y tipos inseguros en el core.
   - [x] Zero-warning build y lint log logrados satisfactoriamente.
 - **Resultado**: Estabilidad del repositorio restaurada y alineación estética de Health Monitor completada bajo el estándar Industrial Resonance V2.
+
+### 2026-06-23: Refactor Docker Resonance V2
+- **Agente**: Uma 🐜
+- **Rama**: `🐜-Uma-refactor-docker-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] Refactor de ruta Docker: promoción de `IndustrialTabs` (Estado) al header de `PageLayout` y actualización de título con icono `Boxes`.
+  - [x] Evolución de componentes de contenedor: estandarización de `StatusCell` (dots + badges), `StartedCell` y `PortsCell` (integrated selector) al estándar Resonance V2.
+  - [x] Mejora de UX en tabla: las operaciones en `ActionsCell` ahora se revelan solo al hacer hover para mayor foco visual.
+  - [x] Evolución de Empty State: implementación del patrón técnico Resonance V2 con tipografía `tracking-[0.2em]`.
+  - [x] Zero-warning build y validación E2E exitosa con Playwright.
+- **Resultado**: Módulo Docker elevado al estándar Industrial Resonance V2, optimizando la jerarquía de información y la consistencia estética.

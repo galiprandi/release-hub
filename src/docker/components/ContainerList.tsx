@@ -10,7 +10,7 @@ import { BaseDialog } from "@/components/ui/BaseDialog"
 import { StatusCard } from "@/components/ui/StatusCard"
 import { Table } from "@/components/ui/Table"
 import { EmptyState } from "@/components/EmptyState"
-import { Boxes } from "lucide-react"
+import { Boxes, Box } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
 
@@ -98,9 +98,19 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 	if (!Array.isArray(sortedContainers) || sortedContainers.length === 0) {
 		return (
 			<EmptyState
-				icon={<Boxes className="w-12 h-12 text-muted-foreground/20" />}
-				label={searchQuery ? "No se encontraron resultados" : "No hay contenedores"}
-				caption={searchQuery ? `No hay contenedores que coincidan con "${searchQuery}"` : "No se detectaron contenedores en este entorno."}
+				icon={
+					<div className="p-4 rounded-full bg-muted/20 border border-border/40">
+						<Boxes className="w-10 h-10 text-muted-foreground/40" />
+					</div>
+				}
+				label={searchQuery ? "Búsqueda sin resultados" : "Sin contenedores"}
+				caption={
+					<span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
+						{searchQuery
+							? `No hay contenedores que coincidan con "${searchQuery}"`
+							: "No se detectaron contenedores activos en el daemon local."}
+					</span>
+				}
 			/>
 		)
 	}
@@ -189,7 +199,14 @@ function ContainersTable({
 	const columns: ColumnDef<ContainerInfo>[] = useMemo(() => [
 		{
 			accessorKey: "name",
-			header: "Contenedor",
+			header: () => (
+				<div className="flex items-center gap-2">
+					<Box className="w-3.5 h-3.5 text-primary/40" />
+					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+						Contenedor
+					</span>
+				</div>
+			),
 			cell: ({ row }) => <ContainerNameCell container={row.original} />,
 		},
 		{
@@ -200,24 +217,40 @@ function ContainersTable({
 				if (normalizedStatus.includes('exited')) return 'exited'
 				return 'stopped'
 			},
-			header: "Estado",
+			header: () => (
+				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					Estado
+				</span>
+			),
 			cell: ({ row }) => <StatusCell container={row.original} />,
 			filterFn: 'equalsString',
 		},
 		{
 			accessorKey: "runningFor",
-			header: "Iniciado",
+			header: () => (
+				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					Iniciado
+				</span>
+			),
 			cell: ({ row }) => <StartedCell container={row.original} />,
 		},
 		{
 			accessorKey: "ports",
-			header: "Puertos",
+			header: () => (
+				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					Puertos
+				</span>
+			),
 			cell: ({ row }) => <PortsCell container={row.original} />,
 		},
 		{
 			id: "actions",
 			accessorKey: "actions",
-			header: "Acciones",
+			header: () => (
+				<div className="text-right text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					Operations
+				</div>
+			),
 			enableSorting: false,
 			cell: ({ row }) => (
 				<ActionsCell
@@ -243,7 +276,11 @@ function ContainersTable({
 }
 
 function ContainerNameCell({ container }: { container: ContainerInfo }) {
-	return <span className="font-medium text-foreground text-sm tracking-tight">{container.name}</span>
+	return (
+		<span className="font-semibold text-foreground text-sm tracking-tight">
+			{container.name}
+		</span>
+	)
 }
 
 function StatusCell({ container }: { container: ContainerInfo }) {
@@ -253,19 +290,27 @@ function StatusCell({ container }: { container: ContainerInfo }) {
 
 	let colorClass = 'bg-muted/20 text-muted-foreground border-border/20'
 	let label = 'Detenido'
+	let dotColor = 'bg-muted-foreground/40'
 
 	if (running) {
 		colorClass = 'bg-success/20 text-success border-success/20'
-		label = 'Ejecutando'
+		label = 'Running'
+		dotColor = 'bg-success shadow-[0_0_8px_rgba(34,197,94,0.4)] animate-pulse'
 	} else if (exited) {
 		colorClass = 'bg-destructive/20 text-destructive border-destructive/20'
-		label = 'Finalizado'
+		label = 'Exited'
+		dotColor = 'bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.4)]'
 	}
 
 	return (
-		<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-widest uppercase ${colorClass}`}>
-			{label}
-		</span>
+		<div className="flex items-center gap-2">
+			<div className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
+			<span
+				className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-widest uppercase ${colorClass}`}
+			>
+				{label}
+			</span>
+		</div>
 	)
 }
 
@@ -276,7 +321,7 @@ function StartedCell({ container }: { container: ContainerInfo }) {
 	}
 
 	return (
-		<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+		<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">
 			{parseRunningTime(container.runningFor)}
 		</span>
 	)
@@ -332,24 +377,33 @@ function PortsCell({ container }: { container: ContainerInfo }) {
 
 	return (
 		<div className="flex items-center gap-1.5">
-			<select
-				value={selectedPort}
-				onChange={(e) => setSelectedPort(e.target.value)}
-				className="text-[10px] font-bold uppercase tracking-wider border border-border/40 rounded-lg px-2 py-1 bg-muted/40 hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 cursor-pointer"
-				aria-label="Seleccionar puerto"
-			>
-				{externalPorts.map((port, index) => (
-					<option key={`${port}-${index}`} value={port}>
-						:{port}
-					</option>
-				))}
-			</select>
-			<ActionButton
-				action={ACTION_DEFINITIONS.openPort}
-				onClick={() => handlePortClick(selectedPort)}
-				disabled={!selectedPort}
-				tooltipSide="top"
-			/>
+			<div className="flex items-center bg-muted/20 border border-border/40 rounded-lg p-0.5">
+				<select
+					value={selectedPort}
+					onChange={(e) => setSelectedPort(e.target.value)}
+					className="text-[10px] font-bold uppercase tracking-wider bg-transparent px-2 py-0.5 hover:bg-muted/20 rounded-md transition-all focus-visible:outline-none cursor-pointer border-none"
+					aria-label="Seleccionar puerto"
+				>
+					{externalPorts.map((port, index) => (
+						<option
+							key={`${port}-${index}`}
+							value={port}
+							className="bg-background text-foreground"
+						>
+							:{port}
+						</option>
+					))}
+				</select>
+				<div className="w-px h-3 bg-border/40 mx-0.5" />
+				<ActionButton
+					action={ACTION_DEFINITIONS.openPort}
+					onClick={() => handlePortClick(selectedPort)}
+					disabled={!selectedPort}
+					size="sm"
+					tooltipSide="top"
+					className="hover:bg-transparent"
+				/>
+			</div>
 		</div>
 	)
 }
@@ -372,36 +426,41 @@ function ActionsCell({
 	const running = isRunning(container.status)
 
 	return (
-		<div className="flex items-center justify-end gap-1.5">
+		<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
 			<div className="flex items-center gap-1">
 				<ActionButton
 					action={ACTION_DEFINITIONS.viewLogs}
 					onClick={() => onViewLogs(container)}
+					size="sm"
 				/>
 				<ActionButton
 					action={ACTION_DEFINITIONS.openTerminal}
 					onClick={() => onOpenTerminal(container)}
 					disabled={!running}
+					size="sm"
 				/>
 			</div>
 
-			<div className="w-px h-4 bg-border/40 mx-1" aria-hidden="true" />
+			<div className="w-px h-4 bg-border/20 mx-0.5" aria-hidden="true" />
 
 			<div className="flex items-center gap-1">
 				<ActionButton
 					action={ACTION_DEFINITIONS.startContainer}
 					onClick={() => onStart(container.id)}
 					disabled={running}
+					size="sm"
 				/>
 				<ActionButton
 					action={ACTION_DEFINITIONS.restartContainer}
 					onClick={() => onRestart(container.id)}
 					disabled={!running}
+					size="sm"
 				/>
 				<ActionButton
 					action={ACTION_DEFINITIONS.stopContainer}
 					onClick={() => onStop(container.id)}
 					disabled={!running}
+					size="sm"
 				/>
 			</div>
 		</div>

@@ -61,11 +61,14 @@
 ## Specific Module Standards
 
 ### Docker UI Resonance
-- **Status Filtering**: Managed via top-level `IndustrialTabs` in the route, persisting state in the `status` search parameter (all, running, stopped, exited).
+- **Header Promotion**: Status filtering (`IndustrialTabs`) and technical icons (`Boxes`) are promoted to the `PageLayout` header.
+- **Status Filtering**: Persistent state in the `status` search parameter (all, running, stopped, exited).
 - **Table Cells**:
-  - `StatusCell`: Badges using semantic tokens with 20% opacity (`bg-success/20`, etc.), `rounded-md`, and `text-[10px] font-bold uppercase tracking-wider`.
-  - `StartedCell`: Technical metadata using `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`.
-- **Placeholder Standard**: Access verification (`checkingAccess`) renders `null` to avoid layout shifts and maintain a clean visual state.
+  - `StatusCell`: Semantic status dots (OK/Error) + badges using semantic tokens with 20% opacity, `rounded-md`, and `text-[10px] font-bold uppercase tracking-wider`.
+  - `StartedCell`: Technical metadata using `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40`.
+  - `PortsCell`: High-density selector integrated into an industrial container with `bg-muted/20`.
+  - `ActionsCell`: Operations hidden by default (`opacity-0`), revealed on hover using `group-hover:opacity-100`.
+- **Placeholder Standard**: Access verification (`checkingAccess`) renders `null` to avoid layout shifts. Empty states follow the technical Resonance V2 pattern with `tracking-[0.2em]`.
 
 ### Health Monitor Resonance
 - **Route Filtering**: Primary environment filtering (Production, Staging, Unhealthy) is moved to the PageLayout header using IndustrialTabs (synchronized with `environment` search parameter).

@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, useSearch, useRouterState } from '@tansta
 import { useRef, useState, useMemo, useCallback, useEffect } from 'react';
 import { useDockerAccess } from '@/hooks/useDockerAccess';
 import { useQuery } from '@tanstack/react-query';
+import { Boxes } from 'lucide-react';
 import { ContainerList, type ContainerListRef } from '@/docker/components/ContainerList';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
@@ -77,54 +78,60 @@ function DockerManagerPage() {
 
   const headerActions = (
     <ActionButton
+      key="refresh-docker"
       action={ACTION_DEFINITIONS.refresh}
       onClick={handleRefresh}
       showLabel={true}
-      className="bg-background border border-border/60 shadow-sm px-4 py-2 rounded-lg"
+      className="bg-muted/20 hover:bg-muted/30"
     />
   );
 
   return (
     <PageLayout
-      header={{ title: "Docker" }}
-      actions={[headerActions]}
-    >
-      <div className="space-y-6">
-      {/* Filtros */}
-      {access?.hasAccess && (
-        <div className="flex items-center gap-4">
+      header={{
+        title: (
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Estado:</span>
+            <Boxes className="w-4 h-4 text-primary" />
+            <span>Docker</span>
+          </div>
+        ),
+        searchComponent: access?.hasAccess ? (
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+              Estado:
+            </span>
             <IndustrialTabs
               options={[
-                { id: 'all', label: `Todos (${filterCounts.all})` },
-                { id: 'running', label: `Ejecutando (${filterCounts.running})` },
-                { id: 'stopped', label: `Detenido (${filterCounts.stopped})` },
-                { id: 'exited', label: `Finalizado (${filterCounts.exited})` },
+                { id: "all", label: `Todos (${filterCounts.all})` },
+                { id: "running", label: `Ejecutando (${filterCounts.running})` },
+                { id: "stopped", label: `Detenido (${filterCounts.stopped})` },
+                { id: "exited", label: `Finalizado (${filterCounts.exited})` },
               ]}
-              activeId={search.status || 'all'}
-              onChange={(id) => handleFilterChange({ id: 'status', value: id })}
+              activeId={search.status || "all"}
+              onChange={(id) => handleFilterChange({ id: "status", value: id })}
               className="w-[480px]"
             />
           </div>
-        </div>
-      )}
-
-      {/* Contenido */}
-      {checkingAccess ? null : access?.hasAccess ? (
-        <ContainerList
-          ref={containerListRef}
-          searchQuery={searchQuery}
-          activeFilter={activeFilter}
-          onFilterChange={handleFilterChange}
-        />
-      ) : (
-        <StatusCard
-          type="error"
-          message="No se tiene acceso a Docker. Asegúrate de que Docker esté instalado y en ejecución."
-          onRetry={handleRefresh}
-        />
-      )}
+        ) : undefined,
+      }}
+      actions={[headerActions]}
+    >
+      <div className="space-y-6">
+        {/* Contenido */}
+        {checkingAccess ? null : access?.hasAccess ? (
+          <ContainerList
+            ref={containerListRef}
+            searchQuery={searchQuery}
+            activeFilter={activeFilter}
+            onFilterChange={handleFilterChange}
+          />
+        ) : (
+          <StatusCard
+            type="error"
+            message="No se tiene acceso a Docker. Asegúrate de que Docker esté instalado y en ejecución."
+            onRetry={handleRefresh}
+          />
+        )}
       </div>
     </PageLayout>
   );

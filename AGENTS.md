@@ -151,3 +151,8 @@
 - **Terminal Route**: Aligned with Industrial Resonance V2, adding a high-density technical header with session metadata (Shell, Connection Status).
 - **Deployment Search**: Enhanced results with technical metadata (Ready, Up-to-date, Available counts) using standard badges.
 - **Health Monitor**: Corrected `HealthHelpDialog` implementation to use `BaseDialog` correctly.
+
+### Mejora #8: Technical Hygiene & Entropy Cleanup
+- **Entropy Removal**: Eradicated orphan hook `useKubectlNamespaceAccess.ts` to reduce codebase complexity and maintain AAA standards.
+- **Type Safety**: Replaced `: any` with explicit `ChildProcess` mock typing in `security.test.ts`, ensuring full linter compliance and type resilience.
+- **Build Integrity**: Maintained zero-warning build and lint state across the entire repository.

@@ -1,24 +1,16 @@
-# PR Draft: Security Centralization & Hardening V7
+# Draft PR: Technical Hygiene & Entropy Cleanup V8
 
-**Agent**: Vesper 🐜
-**Mission**: Centralize security logic and harden process execution and SSRF protection.
+## Propósito
+Continuar con la misión de saneamiento técnico del repositorio, eliminando código muerto y erradicando advertencias del linter para mantener el estándar AAA.
 
-## Planned Changes
-- [ ] **Centralize Security Utilities**: Create `src/utils/security.ts` to host RFC 1123 validations, `SAFE_COMMANDS`, SSRF protection (`isInternalAddress`), and a hardened `spawnAsync` with a 30s timeout.
-- [ ] **Middleware Refactor**: Update `vite.config.ts` and `src/config/terminalMiddleware.ts` to consume centralized security utilities, eliminating logic duplication.
-- [ ] **Process Hardening**: Enforce timeouts on all spawned processes to prevent resource exhaustion.
-- [ ] **Test Expansion**: Expand `src/api/security.test.ts` to cover new centralized utilities and edge cases.
-- [ ] **Documentation**: Update `AGENTS.md` and `DESIGN.md` with the new standards.
+## Cambios propuestos
+- **Higiene Técnica**: Eliminación de uso de `any` en `src/utils/security.test.ts`.
+- **Limpieza de Entropía**: Eliminación del hook huérfano `src/hooks/useKubectlNamespaceAccess.ts`.
+- **Validación**: Verificación de zero-warning build y lint.
 
-## Targeted Files
-- `src/utils/security.ts` (New)
-- `vite.config.ts`
-- `src/config/terminalMiddleware.ts`
-- `src/api/security.test.ts`
-- `AGENTS.md`
-- `DESIGN.md`
-
-## Verification Plan
-- [ ] Zero-warning build and lint audit.
-- [ ] Full test suite execution (Vitest).
-- [ ] Manual verification of `/local/exec` and terminal sessions.
+## Estado
+- [x] Phase 0: Territory Block
+- [ ] Higiene de tipos en tests
+- [ ] Eliminación de código muerto
+- [ ] Verificación de Build & Lint
+- [ ] Actualización de Documentación

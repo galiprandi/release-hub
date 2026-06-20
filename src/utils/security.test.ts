@@ -14,7 +14,7 @@ vi.mock('node:child_process', async (importOriginal) => {
 describe('security utils', () => {
   describe('spawnAsync', () => {
     it('should succeed when process closes before timeout', async () => {
-      const mockProcess: any = {
+      const mockProcess = {
         stdout: { on: vi.fn() },
         stderr: { on: vi.fn() },
         on: vi.fn((event, handler) => {
@@ -23,7 +23,7 @@ describe('security utils', () => {
           }
         }),
         kill: vi.fn(),
-      };
+      } as unknown as childProcess.ChildProcess;
 
       vi.mocked(childProcess.spawn).mockReturnValue(mockProcess);
 

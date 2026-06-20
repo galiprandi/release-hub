@@ -67,7 +67,7 @@ function DockerSetupPage() {
 				<div className="flex items-center justify-end">
 					<button
 						onClick={() => navigate({ to: "/docker" })}
-						className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-bold uppercase tracking-wider focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-[10px] font-bold uppercase tracking-wider focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 					>
 						Ir a Docker
 						<ArrowRight className="w-4 h-4" />
@@ -79,13 +79,16 @@ function DockerSetupPage() {
 				{results.map((result) => (
 					<div key={result.name}>
 						{result.isInstalled ? (
-							<div className="flex items-start gap-3 text-success text-sm border border-success/20 rounded-xl p-4 bg-success/10 shadow-sm">
+							<div className="flex items-start gap-3 text-success text-sm border border-success/20 rounded-xl p-4 bg-success/10 shadow-sm transition-all hover:bg-success/20">
 								<CheckCircle className="w-5 h-5 mt-0.5" />
 								<div className="flex-1">
-									<p className="font-bold uppercase tracking-tight">{result.name}</p>
-									<p className="text-muted-foreground text-xs mt-1">{result.description}</p>
-									{result.version && <p className="text-xs font-mono text-muted-foreground mt-1 opacity-80">Versión: {result.version}</p>}
-									{!result.isRequired && <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mt-1">(Opcional)</p>}
+									<div className="flex items-center gap-2">
+										<p className="text-[10px] font-bold uppercase tracking-wider">{result.name}</p>
+										<span className="px-1.5 py-0.5 rounded-md bg-success/20 border border-success/20 text-[8px] font-bold uppercase">Instalado</span>
+									</div>
+									<p className="text-muted-foreground text-xs mt-1 leading-relaxed">{result.description}</p>
+									{result.version && <p className="text-[10px] font-mono text-muted-foreground/60 mt-2">Versión: {result.version}</p>}
+									{!result.isRequired && <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 mt-1">(Opcional)</p>}
 								</div>
 							</div>
 						) : (
@@ -144,23 +147,26 @@ function MissingCard({
 	}, [commands, detectedOS]);
 
 	return (
-		<div className="border border-destructive/20 rounded-xl p-4 bg-destructive/10 shadow-sm text-destructive">
+		<div className="border border-destructive/20 rounded-xl p-4 bg-destructive/10 shadow-sm text-destructive transition-all hover:bg-destructive/15">
 			<button
 				onClick={() => setOpen(!open)}
 				className="w-full flex items-center gap-3 text-left focus-visible:outline-none"
 			>
 				<XCircle className="w-5 h-5 flex-shrink-0" />
 				<div className="flex-1">
-					<h2 className="font-bold uppercase tracking-tight flex items-center gap-2 text-destructive">
-						{icon}
-						{title}
-					</h2>
-					<p className="text-xs text-muted-foreground mt-1">{description}</p>
+					<div className="flex items-center gap-2">
+						<h2 className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 text-destructive">
+							{icon}
+							{title}
+						</h2>
+						<span className="px-1.5 py-0.5 rounded-md bg-destructive/20 border border-destructive/20 text-[8px] font-bold uppercase">Requerido</span>
+					</div>
+					<p className="text-xs text-muted-foreground/60 mt-1 leading-relaxed">{description}</p>
 				</div>
-				{open ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+				{open ? <ChevronDown className="w-4 h-4 text-muted-foreground/60" /> : <ChevronRight className="w-4 h-4 text-muted-foreground/60" />}
 			</button>
 			{open && (
-				<div className="mt-4 bg-muted/40 border border-border/40 p-4 rounded-lg text-sm font-mono space-y-3">
+				<div className="mt-4 bg-muted/10 border border-border/40 p-4 rounded-lg text-sm font-mono space-y-3">
 					{filteredCommands.map((c) => (
 						<div key={c.cmd}>
 							{c.label && <p className="text-muted-foreground"># {c.label}</p>}

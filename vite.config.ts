@@ -323,8 +323,8 @@ const scriptHandler: Connect.NextHandleFunction = async (req, res) => {
 	}
 
 	// Repo should follow org/repo pattern (alphanumeric, hyphen, underscore, dot, slash)
-	// Explicitly disallow .. and ensure it doesn't start with a hyphen to prevent flag injection
-	if (!/^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(repo) || repo.includes("..")) {
+	// Centralized validation ensures org/repo format and prevents flag injection or traversal
+	if (!VALIDATION.repository.test(repo)) {
 		res.statusCode = 400;
 		res.end(JSON.stringify({ error: "Invalid repo name", success: false }));
 		return;

@@ -88,6 +88,19 @@
   - [x] Validación E2E con Playwright y capturas de pantalla.
 ## Historial de Carol
 
+### 2026-06-22: Refactor GitHub Detail & Dashboard Resonance V2
+- **Agente**: Carol 🐜
+- **Rama**: `🐜-Carol-refactor-github-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Refactor de Repository Detail View: promoción de navegación (Commits/Tags) y enlaces externos (PRs, Actions) al header y acciones de `PageLayout`.
+  - [x] Estandarización de `ProjectSelector` en el header de detalle para mayor densidad visual.
+  - [x] Dashboard GitHub: estandarización del bar de filtrado global con contenedores `bg-muted/40` y bordes técnicos.
+  - [x] Evolución de `HealthCell`: integración de etiquetas técnicas ("OK", "ERROR") y mantenimiento de animaciones pulse.
+  - [x] Refinamiento de celdas `PRsCell` y `ActionsStatusCell` con fondos semánticos al 20% y bordes técnicos.
+  - [x] Zero-warning build y validación de higiene técnica AAA.
+- **Resultado**: Interfaz de GitHub alineada con Industrial Resonance V2, optimizando la jerarquía de información y la consistencia técnica.
+
 ### 2026-06-15: Refactor Docker UI Resonance
 - **Rama**: `🐜-Carol-refactor-docker-ui-resonance`
 - **Estado**: Finalizado ✅
@@ -245,6 +258,20 @@
   - [x] Zero-warning build: mantenimiento del estándar de build y lint impecable.
 - **Resultado**: Interfaz de usuario elevada al estándar Industrial Resonance V2 en módulos críticos, optimizando la jerarquía de información y eliminando ruido técnico.
 
+### 2026-06-21: Refactor Kubernetes & Terminal Resonance V2
+- **Agente**: Uma 🐜
+- **Rama**: `🐜-Uma-refactor-kubernetes-terminal-resonance`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Refactor de Kubernetes Dashboard: promoción de filtro de Namespace al header de `PageLayout` mediante `IndustrialTabs`.
+  - [x] Eliminación de barras de filtrado locales en tablas de despliegues para mayor densidad visual.
+  - [x] Evolución de `DeploymentSearch`: integración de metadatos técnicos (Ready/Up-to-date/Available) con badges de alta densidad.
+  - [x] Refactor de ruta de Terminal: implementación de header técnico con metadatos de sesión y alineación con Resonance V2.
+  - [x] Hotfix en Health Monitor: restauración de `HealthHelpDialog` corrigiendo sintaxis y uso de `BaseDialog`.
+  - [x] Saneamiento del entorno: restauración de dependencias y herramientas de build (`tsc`, `vitest`).
+  - [x] Zero-warning build y validación global de tests (210 pasados).
+- **Resultado**: Dashboards de Kubernetes y Terminal elevados al estándar Industrial Resonance V2, optimizando la persistencia de estado y la jerarquía de información.
+
 ### 2026-06-18: Refactor Fetcher UI Resonance V2
 - **Rama**: `🐜-Uma-refactor-fetcher-resonance-v2`
 - **Estado**: Finalizado ✅
@@ -257,3 +284,63 @@
   - [x] Eliminación de lógica de filtrado heredada y código muerto.
   - [x] Validación E2E exitosa con mocks de historial.
 - **Resultado**: Fetcher evolucionado al estándar Industrial Resonance V2, mejorando la densidad de información y la persistencia de estado. Build restaurado a cero advertencias.
+
+### 2026-06-21: Surgical Hygiene & Build Restoration V6
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-resonance-v6`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Restauración del Build: Corrección de JSX malformado y variables indefinidas en `src/routes/health/index.tsx`.
+  - [x] Saneamiento de Novedades: Eliminación de imports duplicados (`Newspaper`) en `src/routes/novedades/index.tsx`.
+  - [x] Optimización de Rendimiento: Implementación de `initialData` en `useUserCollections.ts` para eliminar parpadeos de UI y mejorar la hidratación en tests E2E.
+  - [x] Higiene Técnica AAA: Remoción de código muerto e imports no utilizados (`ChevronDown`).
+  - [x] Validación Global: Zero-warning build log, 210 tests unitarios exitosos y validación funcional via Playwright.
+- **Resultado**: Integridad del repositorio restaurada al estándar AAA, con un build impecable y una experiencia de usuario más fluida y resiliente.
+
+### 2026-06-22: Surgical Hygiene & Resonance V2 Alignment
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-restoration-v7`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] Restauración del Build: Implementación de `handleSortChange` en `src/routes/health/index.tsx` corrigiendo error de compilación.
+  - [x] Alineación Resonance V2: Refactor de `HealthMonitor` agregando etiquetas técnicas (`Ambiente:`, `Orden:`) a `IndustrialTabs` y habilitando `showLabel` en el botón de ayuda.
+  - [x] Higiene de React Hooks: Corrección de advertencia de dependencia en `src/routes/kubernetes/index.tsx` mediante `useMemo` para `safeDeploymentFavorites`.
+  - [x] Auditoría AAA: Verificación de ausencia de código muerto, logs de depuración y tipos inseguros en el core.
+  - [x] Zero-warning build y lint log logrados satisfactoriamente.
+- **Resultado**: Estabilidad del repositorio restaurada y alineación estética de Health Monitor completada bajo el estándar Industrial Resonance V2.
+
+### 2026-06-22: Security Hardening V7 (SSRF Expansion & Terminal Audit)
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-hardening-v7`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] SSRF Protection Expansion: Fortalecimiento de `isInternalAddress` para detectar bypasses mediante IPs en formato decimal y hexadecimal.
+  - [x] Terminal Middleware Validation: Creación de suite de tests `src/config/terminalMiddleware.test.ts` para auditar la validación de parámetros de sesión.
+  - [x] Script Handler Hardening: Refuerzo de validación de repositorios en `vite.config.ts` mediante regex estricta de patrón `org/repo`.
+  - [x] Technical Hygiene: Erradicación de `: any` en tests de seguridad, migrando a casts técnicos AAA (`ChildProcess`).
+  - [x] Zero-warning build y validación global de tests (216 pasados).
+- **Resultado**: Superficie de ataque reducida mediante el cierre de vectores SSRF avanzados y blindaje de middlewares locales.
+### 2026-06-23: Technical Hygiene & Entropy Cleanup V8
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-entropy-cleanup-v8`
+- **Estado**: En progreso 🏗️
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] Higiene Técnica: Erradicación de `any` en `src/utils/security.test.ts` mediante tipado explícito de mocks.
+  - [x] Eliminación de Entropía: Remoción del hook huérfano `src/hooks/useKubectlNamespaceAccess.ts`.
+  - [x] Auditoría AAA: Verificación de build y lint sin advertencias (zero-warning state).
+  - [x] Validación Global: Ejecución exitosa de 212 tests unitarios y de integración.
+- **Resultado**: Repositorio refinado con mayor integridad de tipos y libre de componentes huérfanos, manteniendo el estándar de ingeniería AAA.
+### 2026-06-23: Surgical Hygiene Audit V9
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-audit-v9`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block & PR Audit.
+  - [x] Saneamiento de Linter: Erradicación de `any` en `src/utils/security.test.ts` mediante casts seguros a `childProcess.ChildProcess`.
+  - [x] Eliminación de Código Muerto: Remoción del hook huérfano `src/hooks/useKubectlNamespaceAccess.ts`.
+  - [x] Documentación: Actualización de `AGENTS.md` y `DESIGN.md` con los nuevos estándares de higiene técnica.
+  - [x] Verificación Global: Zero-warning build log y lint audit exitoso.
+- **Resultado**: Higiene del repositorio elevada mediante la eliminación de entropía técnica y código huérfano, manteniendo el estándar AAA.

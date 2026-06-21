@@ -413,20 +413,6 @@ function DeploymentsTable({
 		return [...deployments].sort((a, b) => a.name.localeCompare(b.name))
 	}, [deployments]) as DeploymentWithContext[]
 
-	// Get unique namespaces for filters
-	const namespaces = useMemo(() => {
-		const uniqueNamespaces = Array.from(new Set(deployments.map(d => d.namespace))).sort()
-		return uniqueNamespaces
-	}, [deployments])
-
-	const filters = useMemo(() => {
-		return namespaces.map(ns => ({
-			label: ns,
-			columnId: 'namespace' as const,
-			value: ns,
-		}))
-	}, [namespaces])
-
 	const columns: ColumnDef<DeploymentWithContext, unknown>[] = useMemo(() => [
 		{
 			accessorKey: "name",
@@ -497,7 +483,6 @@ function DeploymentsTable({
 		<Table
 			columns={columns}
 			data={sortedDeployments}
-			filters={filters}
 			activeFilter={activeFilter}
 			onFilterChange={onFilterChange}
 		/>

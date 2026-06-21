@@ -1,6 +1,6 @@
 import type { DiffMode } from '@/utils/diffEngine';
 import { Fingerprint, Terminal, FileText, Code2, FileJson, FileCode, Hash, Type, type LucideIcon } from 'lucide-react';
-import { clsx } from 'clsx';
+import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
 
 interface DiffControlsProps {
 	mode: DiffMode;
@@ -20,23 +20,22 @@ export function DiffControls({ mode, onModeChange }: DiffControlsProps) {
 		{ id: 'text', label: 'Text', icon: FileText },
 	];
 
+	const options = modes.map(m => ({
+		id: m.id,
+		label: (
+			<div className="flex items-center gap-1.5">
+				<m.icon className={`w-3.5 h-3.5 ${mode === m.id ? 'text-primary' : 'text-muted-foreground/60'}`} />
+				<span>{m.label}</span>
+			</div>
+		)
+	}));
+
 	return (
-		<div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border/60 shadow-sm overflow-x-auto max-w-[80vw] no-scrollbar">
-			{modes.map((m) => (
-				<button
-					key={m.id}
-					onClick={() => onModeChange(m.id)}
-					className={clsx(
-						"flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-tight transition-all",
-						mode === m.id
-							? "bg-background text-primary shadow-sm ring-1 ring-border/20"
-							: "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-					)}
-				>
-					<m.icon className="w-4 h-4" />
-					{m.label}
-				</button>
-			))}
-		</div>
+		<IndustrialTabs
+			options={options}
+			activeId={mode}
+			onChange={onModeChange}
+			className="max-w-[80vw] overflow-x-auto no-scrollbar scrollbar-hide"
+		/>
 	);
 }

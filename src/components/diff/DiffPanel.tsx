@@ -31,14 +31,17 @@ export function DiffPanel({
 	};
 
 	return (
-		<div className="flex flex-col h-full border rounded-xl bg-background shadow-sm overflow-hidden border-border/60">
+		<div className="flex flex-col h-full border rounded-xl bg-muted/10 shadow-sm overflow-hidden border-border/60">
 			<div className="flex items-center justify-between px-4 py-2 border-b bg-muted/20 border-border/60">
-				<h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-					{title}
-				</h3>
+				<div className="flex items-center gap-2">
+					<div className="w-1 h-1 rounded-full bg-primary/40" />
+					<h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+						{title}
+					</h3>
+				</div>
 				<button
 					onClick={handleCopy}
-					className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+					className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/20 rounded-md transition-all border border-transparent hover:border-border/40"
 					title="Copiar contenido"
 				>
 					{copied ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}

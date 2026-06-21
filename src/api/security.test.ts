@@ -83,7 +83,7 @@ describe('Security Hardening', () => {
   })
 
   describe('Vite Middleware Hardening (Path Traversal)', () => {
-    // Note: These tests simulate the logic in vite.config.ts since we can't easily test the Vite server in vitest
+    // Note: These tests simulate the logic in vite.config.ts using centralized VALIDATION
     const validateRepo = (repo: string) => /^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(repo) && !repo.includes('..')
 
     it('should reject path traversal and unauthorized scripts in action parameter', () => {
@@ -262,24 +262,18 @@ describe('Security Hardening', () => {
   })
 
   describe('Flag Injection Protection', () => {
-    const k8sNameRegex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
-
     it('should reject names starting with hyphens (flag injection)', () => {
-      expect(k8sNameRegex.test('--kubeconfig=/root/.kube/config')).toBe(false);
-      expect(k8sNameRegex.test('-n')).toBe(false);
+      expect(VALIDATION.k8sName.test('--kubeconfig=/root/.kube/config')).toBe(false);
+      expect(VALIDATION.k8sName.test('-n')).toBe(false);
     });
 
     it('should reject names with spaces or shell characters', () => {
-      expect(k8sNameRegex.test('pod-name; rm -rf /')).toBe(false);
-      expect(k8sNameRegex.test('pod name')).toBe(false);
+      expect(VALIDATION.k8sName.test('pod-name; rm -rf /')).toBe(false);
+      expect(VALIDATION.k8sName.test('pod name')).toBe(false);
     });
   })
 
   describe('Middleware Command Allow-listing', () => {
-    const SAFE_COMMANDS = [
-      "gh", "kubectl", "docker", "curl", "lsof", "ls", "echo", "jq", "helm"
-    ];
-
     it('should allow commands in the safe list', () => {
       expect(SAFE_COMMANDS).toContain('gh');
       expect(SAFE_COMMANDS).toContain('kubectl');

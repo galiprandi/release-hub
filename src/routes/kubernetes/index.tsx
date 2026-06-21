@@ -25,8 +25,8 @@ export const Route = createFileRoute("/kubernetes/")({
 });
 
 function KubernetesPage() {
-	const { deploymentFavorites = [], projects = [] } = useUserCollections();
-	const safeDeploymentFavorites = deploymentFavorites || [];
+	const { deploymentFavorites, projects } = useUserCollections();
+	const safeDeploymentFavorites = useMemo(() => deploymentFavorites || [], [deploymentFavorites]);
 	const navigate = useNavigate({ from: '/kubernetes' });
 	const search = useSearch({ from: '/kubernetes' });
 	const activeTab = search.tab as 'favorites' | 'projects';
@@ -59,6 +59,22 @@ function KubernetesPage() {
 		...applyCachePolicy("kubectl"),
 	});
 
+	// Extract unique namespaces from all deployments for global filtering
+	const availableNamespaces = useMemo(() => {
+		const nsSet = new Set<string>();
+		safeDeploymentFavorites.forEach(id => {
+			const [, ns] = id.split('/');
+			if (ns) nsSet.add(ns);
+		});
+		projects.forEach(p => {
+			p.deployments?.forEach((id: string) => {
+				const [, ns] = id.split('/');
+				if (ns) nsSet.add(ns);
+			});
+		});
+		return Array.from(nsSet).sort();
+	}, [safeDeploymentFavorites, projects]);
+
 	const hasContent = activeTab === 'favorites' ? safeDeploymentFavorites.length > 0 : projects.some(p => p.deployments.length > 0);
 
 	return (
@@ -66,16 +82,35 @@ function KubernetesPage() {
 			header={{
 				title: "Kubernetes",
 				searchComponent: isInstalled ? (
-					<div className="flex items-center gap-4">
-						<IndustrialTabs
-							options={[
-								{ id: 'favorites', label: 'Favoritos' },
-								{ id: 'projects', label: 'Proyectos' },
-							]}
-							activeId={activeTab}
-							onChange={handleTabChange}
-							className="w-48"
-						/>
+					<div className="flex items-center gap-6">
+						<div className="flex items-center gap-2">
+							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Vistas:</span>
+							<IndustrialTabs
+								options={[
+									{ id: 'favorites', label: 'Favoritos' },
+									{ id: 'projects', label: 'Proyectos' },
+								]}
+								activeId={activeTab}
+								onChange={handleTabChange}
+								className="w-48"
+							/>
+						</div>
+
+						{availableNamespaces.length > 0 && (
+							<div className="flex items-center gap-2">
+								<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Namespace:</span>
+								<IndustrialTabs
+									options={[
+										{ id: 'all', label: 'Todos' },
+										...availableNamespaces.map(ns => ({ id: ns, label: ns }))
+									]}
+									activeId={search.namespace || 'all'}
+									onChange={(id) => handleFilterChange(id === 'all' ? null : { id: 'namespace', value: id })}
+									className="min-w-[120px]"
+								/>
+							</div>
+						)}
+						<div className="w-px h-6 bg-border/40 mx-1" />
 						<DeploymentSearch />
 					</div>
 				) : undefined

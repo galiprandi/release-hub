@@ -76,16 +76,12 @@ function ProductSection({
   isChecking,
   onCheckEndpoint,
   onRemoveEndpoint,
-  activeFilter,
-  onFilterChange,
 }: {
   product: string;
   endpoints: ReturnType<typeof useHealthMonitor>['endpoints'];
   isChecking: boolean;
   onCheckEndpoint: (id: string) => void;
   onRemoveEndpoint: (id: string) => void;
-  activeFilter?: { id: string; value: string } | null
-  onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
   const [org, productName] = product.split('/');
 
@@ -168,8 +164,6 @@ function ProductSection({
         isChecking={isChecking}
         onCheckEndpoint={onCheckEndpoint}
         onRemoveEndpoint={onRemoveEndpoint}
-        activeFilter={activeFilter}
-        onFilterChange={onFilterChange}
       />
     </div>
   );
@@ -180,15 +174,11 @@ function EndpointsTable({
   isChecking,
   onCheckEndpoint,
   onRemoveEndpoint,
-  activeFilter,
-  onFilterChange,
 }: {
   endpoints: ReturnType<typeof useHealthMonitor>['endpoints']
   isChecking: boolean
   onCheckEndpoint: (id: string) => void
   onRemoveEndpoint: (id: string) => void
-  activeFilter?: { id: string; value: string } | null
-  onFilterChange?: (filter: { id: string; value: string } | null) => void
 }) {
   const columns: ColumnDef<(typeof endpoints)[0]>[] = [
     {
@@ -196,10 +186,6 @@ function EndpointsTable({
       accessorFn: (row) => row.isHealthy,
       header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Status</span>,
       cell: ({ row }) => <StatusCell endpoint={row.original} />,
-      filterFn: (row, columnId, filterValue) => {
-        const value = row.getValue(columnId);
-        return value === (filterValue === 'false' ? false : filterValue);
-      },
     },
     {
       accessorKey: "service",
@@ -211,7 +197,6 @@ function EndpointsTable({
       accessorFn: (row) => row.environment,
       header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Ambiente</span>,
       cell: ({ row }) => <EnvironmentCell endpoint={row.original} />,
-      filterFn: 'equalsString',
     },
     {
       accessorKey: "lastChecked",
@@ -249,28 +234,13 @@ function EndpointsTable({
     },
   ]
 
-  const filters = useMemo(() => {
-    const stagingCount = endpoints.filter(e => e.environment === 'staging').length;
-    const productionCount = endpoints.filter(e => e.environment === 'production').length;
-    const unhealthyCount = endpoints.filter(e => e.isHealthy === false).length;
-
-    return [
-      { label: 'Staging', columnId: 'environment', value: 'staging', count: stagingCount },
-      { label: 'Production', columnId: 'environment', value: 'production', count: productionCount },
-      { label: 'Con errores', columnId: 'status', value: 'false', count: unhealthyCount },
-    ];
-  }, [endpoints]);
-
   return (
     <div className='p-4'>
-    <Table
-      columns={columns}
-      data={endpoints}
-      filters={filters}
-      activeFilter={activeFilter}
-      onFilterChange={onFilterChange}
+      <Table
+        columns={columns}
+        data={endpoints}
       />
-      </div>
+    </div>
   )
 }
 
@@ -430,7 +400,7 @@ function HealthMonitorPage() {
       to: '.',
       search: (prev: Record<string, unknown>) => ({
         ...prev,
-        environment: newEnv === 'all' ? undefined : newEnv
+        sortBy: newSort === 'default' ? undefined : (newSort as 'errors' | 'recent')
       }),
     });
   }, [navigate]);
@@ -554,8 +524,21 @@ function HealthMonitorPage() {
     </div>
   );
 
+  const envOptions = useMemo(() => {
+    const stagingCount = endpoints.filter(e => e.environment === 'staging').length;
+    const productionCount = endpoints.filter(e => e.environment === 'production').length;
+    const unhealthyCount = endpoints.filter(e => e.isHealthy === false).length;
+
+    return [
+      { id: 'all', label: 'Todos' },
+      { id: 'production', label: `Production (${productionCount})` },
+      { id: 'staging', label: `Staging (${stagingCount})` },
+      { id: 'unhealthy', label: `Unhealthy (${unhealthyCount})` },
+    ];
+  }, [endpoints]);
+
   return (
-    <PageLayout 
+    <PageLayout
       header={{
         title: (
           <div className="flex items-center gap-2">
@@ -567,17 +550,25 @@ function HealthMonitorPage() {
           </div>
         ),
         searchComponent: (
-          <IndustrialTabs
-            options={[
-              { id: 'all', label: 'Todos' },
-              { id: 'production', label: 'Production' },
-              { id: 'staging', label: 'Staging' },
-              { id: 'unhealthy', label: 'Unhealthy' },
-            ]}
-            activeId={environment}
-            onChange={handleEnvironmentChange}
-            className="w-96"
-          />
+          <div className="flex items-center gap-2">
+            <IndustrialTabs
+              options={envOptions}
+              activeId={environment}
+              onChange={handleEnvironmentChange}
+              className="w-96"
+            />
+            <div className="w-px h-6 bg-border/40 mx-1" />
+            <IndustrialTabs
+              options={[
+                { id: 'default', label: 'Nombre' },
+                { id: 'errors', label: 'Errores' },
+                { id: 'recent', label: 'Recientes' },
+              ]}
+              activeId={sortBy}
+              onChange={handleSortChange}
+              className="w-96"
+            />
+          </div>
         )
       }}
       actions={[headerActions]}
@@ -614,8 +605,6 @@ function HealthMonitorPage() {
               isChecking={isChecking}
               onCheckEndpoint={checkEndpoint}
               onRemoveEndpoint={removeEndpoint}
-              activeFilter={activeFilter}
-              onFilterChange={handleFilterChange}
             />
           ))}
         </div>

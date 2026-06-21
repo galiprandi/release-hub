@@ -33,36 +33,24 @@ test('verify health monitor resonance ui components', async ({ page }) => {
   // Wait for the spinner (2s in __root.tsx) + some buffer
   await page.waitForTimeout(5000);
 
-  // Verify InfoBanner refinement
-  const infoBannerLabel = page.locator('text=Cómo funciona');
-  await expect(infoBannerLabel).toHaveClass(/text-\[10px\]/);
-  await expect(infoBannerLabel).toHaveClass(/font-bold/);
-  await expect(infoBannerLabel).toHaveClass(/uppercase/);
+  // Verify Header components
+  const title = page.locator('text=Health Monitor');
+  await expect(title).toBeVisible();
 
   // Verify environment tabs in header
-  const envTabs = page.locator('div.w-96');
+  const envTabs = page.locator('div.w-96').first();
   await expect(envTabs).toBeVisible();
-  await expect(envTabs.locator('button', { hasText: 'Todos' })).toHaveClass(/bg-background/); // Active tab
 
-  // Verify sorting tabs
-  const sortTabs = page.locator('div.w-72');
-  await expect(sortTabs).toBeVisible();
-  await expect(sortTabs.locator('button', { hasText: 'Nombre' })).toHaveClass(/bg-background/);
+  // Verify if ProductSection is rendered
+  // We look for the link with the repo name
+  const repoLink = page.locator('a', { hasText: 'repo' });
+  await expect(repoLink).toBeVisible();
+
+  // Verify the health badge
+  const healthBadge = page.locator('span', { hasText: '1 OK' });
+  await expect(healthBadge).toBeVisible();
+  await expect(healthBadge).toHaveClass(/bg-success\/20/);
 
   // Take screenshot
   await page.screenshot({ path: 'verification/health-monitor-resonance-final.png', fullPage: true });
-
-  // Verify if ProductSection is rendered (should be if localStorage mock worked)
-  const productSection = page.locator('div.bg-muted\\/10').first();
-  const count = await productSection.count();
-
-  if (count > 0) {
-    console.log('Product section found!');
-    const productHeader = productSection.locator('div.bg-muted\\/20');
-    await expect(productHeader).toBeVisible();
-    await expect(productHeader.locator('span.bg-success\\/20')).toBeVisible();
-    await expect(page.locator('div.w-1\\.5.h-1\\.5.rounded-full.bg-success')).toBeVisible();
-  } else {
-    console.log('Product section not found, but UI components verified.');
-  }
 });

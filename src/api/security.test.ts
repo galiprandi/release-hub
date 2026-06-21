@@ -3,7 +3,7 @@ import { apiExec, runCommand } from './exec'
 import { startContainer } from './docker'
 import { getDeployment } from './kubectl'
 import { executeCurlCommand } from './curl'
-import { VALIDATION, isInternalAddress } from '../utils/security'
+import { VALIDATION, isInternalAddress, SAFE_COMMANDS } from '../utils/security'
 
 describe('Security Hardening', () => {
   beforeEach(() => {
@@ -78,7 +78,7 @@ describe('Security Hardening', () => {
 
     it('should throw error if command is not an array (runtime enforcement)', async () => {
       // @ts-expect-error - testing runtime check for non-array input
-      await expect(runCommand('ls -la' as any)).rejects.toThrow('Security violation: runCommand requires an array of arguments')
+      await expect(runCommand('ls -la')).rejects.toThrow('Security violation: runCommand requires an array of arguments')
     })
   })
 

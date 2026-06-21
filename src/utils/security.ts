@@ -14,6 +14,8 @@ export const VALIDATION = {
   scripts: /^(healthcheck|install|start|trigger-staging-redeploy|uninstall)$/,
 };
 
+export const SAFE_COMMANDS = ["gh", "kubectl", "docker", "curl"];
+
 /**
  * Checks if a hostname or IP address refers to an internal network.
  * Used for SSRF protection.
@@ -34,6 +36,22 @@ export const isInternalAddress = (hostname: string): boolean => {
   )
     return true;
   if (addr.endsWith(".local") || addr.endsWith(".internal")) return true;
+
+  // Handle decimal/hex IPv4 bypasses
+  if (/^(0x[0-9a-f]+|[0-9]+)$/i.test(addr)) {
+    try {
+      const val = BigInt(addr);
+      if (val <= 0xffffffffn) {
+        const p0 = Number((val >> 24n) & 0xffn);
+        const p1 = Number((val >> 16n) & 0xffn);
+        const p2 = Number((val >> 8n) & 0xffn);
+        const p3 = Number(val & 0xffn);
+        addr = `${p0}.${p1}.${p2}.${p3}`;
+      }
+    } catch {
+      // Not a valid big int, continue with normal flow
+    }
+  }
 
   // IPv4 Check
   const parts = addr.split(".").map(Number);

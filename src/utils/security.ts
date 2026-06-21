@@ -43,7 +43,35 @@ export const isInternalAddress = (hostname: string): boolean => {
     return true;
   if (addr.endsWith('.local') || addr.endsWith('.internal')) return true;
 
-  // IPv4 Check
+  // IPv4 Check (including decimal and hex)
+  if (/^0x[0-9a-f]+$/i.test(addr)) {
+    const num = parseInt(addr, 16);
+    if (!Number.isNaN(num) && num <= 0xffffffff) {
+      const p0 = (num >> 24) & 0xff;
+      const p1 = (num >> 16) & 0xff;
+      if (p0 === 127) return true; // 127.0.0.0/8
+      if (p0 === 10) return true; // 10.0.0.0/8
+      if (p0 === 172 && p1 >= 16 && p1 <= 31) return true; // 172.16.0.0/12
+      if (p0 === 192 && p1 === 168) return true; // 192.168.0.0/16
+      if (p0 === 169 && p1 === 254) return true; // 169.254.0.0/16
+      if (p0 === 100 && p1 >= 64 && p1 <= 127) return true; // 100.64.0.0/10
+    }
+  }
+
+  if (/^\d+$/.test(addr)) {
+    const num = parseInt(addr, 10);
+    if (!Number.isNaN(num) && num <= 0xffffffff) {
+      const p0 = (num >> 24) & 0xff;
+      const p1 = (num >> 16) & 0xff;
+      if (p0 === 127) return true;
+      if (p0 === 10) return true;
+      if (p0 === 172 && p1 >= 16 && p1 <= 31) return true;
+      if (p0 === 192 && p1 === 168) return true;
+      if (p0 === 169 && p1 === 254) return true;
+      if (p0 === 100 && p1 >= 64 && p1 <= 127) return true;
+    }
+  }
+
   const parts = addr.split('.').map(Number);
   if (parts.length === 4 && !parts.some(Number.isNaN)) {
     const [p0, p1] = parts;

@@ -88,6 +88,19 @@
   - [x] Validación E2E con Playwright y capturas de pantalla.
 ## Historial de Carol
 
+### 2026-06-22: Refactor GitHub Detail & Dashboard Resonance V2
+- **Agente**: Carol 🐜
+- **Rama**: `🐜-Carol-refactor-github-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Refactor de Repository Detail View: promoción de navegación (Commits/Tags) y enlaces externos (PRs, Actions) al header y acciones de `PageLayout`.
+  - [x] Estandarización de `ProjectSelector` en el header de detalle para mayor densidad visual.
+  - [x] Dashboard GitHub: estandarización del bar de filtrado global con contenedores `bg-muted/40` y bordes técnicos.
+  - [x] Evolución de `HealthCell`: integración de etiquetas técnicas ("OK", "ERROR") y mantenimiento de animaciones pulse.
+  - [x] Refinamiento de celdas `PRsCell` y `ActionsStatusCell` con fondos semánticos al 20% y bordes técnicos.
+  - [x] Zero-warning build y validación de higiene técnica AAA.
+- **Resultado**: Interfaz de GitHub alineada con Industrial Resonance V2, optimizando la jerarquía de información y la consistencia técnica.
+
 ### 2026-06-15: Refactor Docker UI Resonance
 - **Rama**: `🐜-Carol-refactor-docker-ui-resonance`
 - **Estado**: Finalizado ✅

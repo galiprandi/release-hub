@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { clsx } from "clsx";
 import { z } from "zod";
 import {
 	createFileRoute,
@@ -227,21 +228,23 @@ function Dashboard() {
 						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
 							Filtrar:
 						</span>
-						<IndustrialTabs
-							options={[
-								{ id: "all", label: "Todos" },
-								{ id: "true", label: "Pendientes" },
-							]}
-							activeId={activeFilter || "all"}
-							onChange={(id) =>
-								navigate({
-									search: (prev: Record<string, unknown>) => ({
-										...prev,
-										filter: id === "all" ? undefined : (id as string),
-									}),
-								})
-							}
-						/>
+						<div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border/40">
+							<IndustrialTabs
+								options={[
+									{ id: "all", label: "Todos" },
+									{ id: "true", label: "Pendientes" },
+								]}
+								activeId={activeFilter || "all"}
+								onChange={(id) =>
+									navigate({
+										search: (prev: Record<string, unknown>) => ({
+											...prev,
+											filter: id === "all" ? undefined : (id as string),
+										}),
+									})
+								}
+							/>
+						</div>
 					</div>
 				)}
 
@@ -837,6 +840,8 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 	const unhealthyCount = endpoints.filter((e) => e.isHealthy === false).length;
 	const pendingCount = endpoints.filter((e) => e.isHealthy === null).length;
 
+	const statusLabel = unhealthyCount > 0 ? "ERROR" : "OK";
+
 	return (
 		<Tooltip.Provider>
 			<Tooltip.Root>
@@ -859,9 +864,19 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 								<div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 shadow-sm" />
 							)}
 						</div>
-						<span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider">
-							{endpoints.length} serv.
-						</span>
+						<div className="flex items-center gap-1.5">
+							<span
+								className={clsx(
+									"text-[10px] font-bold uppercase tracking-wider",
+									unhealthyCount > 0 ? "text-destructive" : "text-success",
+								)}
+							>
+								{statusLabel}
+							</span>
+							<span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">
+								({endpoints.length})
+							</span>
+						</div>
 					</Link>
 				</Tooltip.Trigger>
 				<Tooltip.Portal>
@@ -941,7 +956,7 @@ function PRsCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
 						href={`https://github.com/${org}/${name}/pulls`}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="inline-flex items-center gap-1.5 px-2 py-1 bg-primary/20 text-primary border border-primary/20 rounded-lg hover:bg-primary/30 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						className="inline-flex items-center gap-1.5 px-2 py-1 bg-primary/20 text-primary border border-primary/20 rounded-md hover:bg-primary/30 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 						aria-label={`${prCount} pull requests abiertos`}
 					>
 						<GitPullRequest className="w-3 h-3" />
@@ -991,16 +1006,17 @@ function ActionsStatusCell({
 						href={`https://github.com/${org}/${name}/actions`}
 						target="_blank"
 						rel="noopener noreferrer"
-						className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 border ${
+						className={clsx(
+							"inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 border",
 							hasFailure
 								? "bg-destructive/20 text-destructive border-destructive/20 hover:bg-destructive/30"
 								: isRunning
 									? "bg-warning/20 text-warning border-warning/20 hover:bg-warning/30"
-									: "bg-success/20 text-success border-success/20 hover:bg-success/30"
-						}`}
+									: "bg-success/20 text-success border-success/20 hover:bg-success/30",
+						)}
 						aria-label={`Estado de GitHub Actions: ${hasFailure ? "Fallido" : isRunning ? "En progreso" : "Exitoso"}`}
 					>
-						<Play className={`w-3 h-3 ${isRunning ? "animate-pulse" : ""}`} />
+						<Play className={clsx("w-3 h-3", isRunning && "animate-pulse")} />
 						<span className="text-[10px] font-bold uppercase tracking-wider">
 							{hasFailure ? "Error" : isRunning ? "Running" : "Success"}
 						</span>
@@ -1056,7 +1072,7 @@ function OperationsCell({
 	const latestTag = queryData?.latestTag;
 
 	return (
-		<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+		<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200">
 			<FreezeDialog repo={repo.fullName} iconOnly={true} />
 			<ForceRedeployDialog repo={repo.fullName} iconOnly={true} />
 			<PromoteDialog

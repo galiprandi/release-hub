@@ -93,9 +93,12 @@
 
 ### GitHub UI Resonance
 - **Dashboard Layout**: Primary collection navigation (`IndustrialTabs`) and project management actions reside in the `PageLayout` header.
-- **Global Filtering**: Dashboard-level filtering (e.g., 'Pendientes') is managed via `IndustrialTabs` in the main view, persisting state in the `filter` search parameter.
-- **Table Cells**: Technical metadata (Health, PRs, Workflows, Date, Author) uses `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`.
-- **Health Indicators**: Semantic dots (`w-1.5 h-1.5`) with shadows. OK state includes `animate-pulse`.
+- **Global Filtering**: Dashboard-level filtering (e.g., 'Pendientes') uses `IndustrialTabs` enclosed in `bg-muted/40` containers with `border-border/40` to match technical standards.
+- **Table Cells**:
+  - `HealthCell`: Includes semantic dots (OK pulse) and high-density technical labels ('OK'/'ERROR') with semantic colors.
+  - `PRsCell` & `ActionsStatusCell`: Use semantic backgrounds with 20% opacity and technical borders.
+  - `OperationsCell`: Implements hover-to-reveal (`opacity-0 group-hover:opacity-100`) to maintain layout focus.
+- **Detail View**: Navigation (Commits/Tags), external links (PRs, Actions), and `ProjectSelector` are promoted to the `PageLayout` header and actions array. Links use `bg-muted/40` and high-density technical typography.
 
 ### Novedades Page Resonance
 - **Header**: High-density technical header with the 'Newspaper' icon.

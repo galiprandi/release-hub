@@ -295,3 +295,37 @@
   - [x] Zero-warning build y lint audit impecable.
   - [x] Actualización de `AGENTS.md` y `DESIGN.md` con los nuevos estándares de hardening SSRF.
 - **Resultado**: Aplicación blindada contra ataques SSRF avanzados y lógica de seguridad consolidada bajo el estándar AAA.
+### 2026-06-22: Security Hardening V7 (SSRF Expansion & Terminal Audit)
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-hardening-v7`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] SSRF Protection Expansion: Fortalecimiento de `isInternalAddress` para detectar bypasses mediante IPs en formato decimal y hexadecimal.
+  - [x] Terminal Middleware Validation: Creación de suite de tests `src/config/terminalMiddleware.test.ts` para auditar la validación de parámetros de sesión.
+  - [x] Script Handler Hardening: Refuerzo de validación de repositorios en `vite.config.ts` mediante regex estricta de patrón `org/repo`.
+  - [x] Technical Hygiene: Erradicación de `: any` en tests de seguridad, migrando a casts técnicos AAA (`ChildProcess`).
+  - [x] Zero-warning build y validación global de tests (216 pasados).
+- **Resultado**: Superficie de ataque reducida mediante el cierre de vectores SSRF avanzados y blindaje de middlewares locales.
+### 2026-06-23: Technical Hygiene & Entropy Cleanup V8
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-entropy-cleanup-v8`
+- **Estado**: En progreso 🏗️
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] Higiene Técnica: Erradicación de `any` en `src/utils/security.test.ts` mediante tipado explícito de mocks.
+  - [x] Eliminación de Entropía: Remoción del hook huérfano `src/hooks/useKubectlNamespaceAccess.ts`.
+  - [x] Auditoría AAA: Verificación de build y lint sin advertencias (zero-warning state).
+  - [x] Validación Global: Ejecución exitosa de 212 tests unitarios y de integración.
+- **Resultado**: Repositorio refinado con mayor integridad de tipos y libre de componentes huérfanos, manteniendo el estándar de ingeniería AAA.
+### 2026-06-23: Surgical Hygiene Audit V9
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-audit-v9`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block & PR Audit.
+  - [x] Saneamiento de Linter: Erradicación de `any` en `src/utils/security.test.ts` mediante casts seguros a `childProcess.ChildProcess`.
+  - [x] Eliminación de Código Muerto: Remoción del hook huérfano `src/hooks/useKubectlNamespaceAccess.ts`.
+  - [x] Documentación: Actualización de `AGENTS.md` y `DESIGN.md` con los nuevos estándares de higiene técnica.
+  - [x] Verificación Global: Zero-warning build log y lint audit exitoso.
+- **Resultado**: Higiene del repositorio elevada mediante la eliminación de entropía técnica y código huérfano, manteniendo el estándar AAA.

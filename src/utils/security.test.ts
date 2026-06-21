@@ -18,13 +18,13 @@ describe('security utils', () => {
       const mockProcess: any = {
         stdout: { on: vi.fn() },
         stderr: { on: vi.fn() },
-        on: vi.fn((event, handler) => {
+        on: vi.fn((event: string, handler: (code: number) => void) => {
           if (event === 'close') {
             setTimeout(() => handler(0), 10);
           }
         }),
         kill: vi.fn(),
-      };
+      } as unknown as childProcess.ChildProcess;
 
       vi.mocked(childProcess.spawn).mockReturnValue(mockProcess);
 

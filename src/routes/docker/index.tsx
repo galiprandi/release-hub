@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, useSearch, useRouterState } from '@tansta
 import { useRef, useState, useMemo, useCallback, useEffect } from 'react';
 import { useDockerAccess } from '@/hooks/useDockerAccess';
 import { useQuery } from '@tanstack/react-query';
+import { Boxes } from 'lucide-react';
 import { ContainerList, type ContainerListRef } from '@/docker/components/ContainerList';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
@@ -86,13 +87,14 @@ function DockerManagerPage() {
 
   return (
     <PageLayout
-      header={{ title: "Docker" }}
-      actions={[headerActions]}
-    >
-      <div className="space-y-6">
-      {/* Filtros */}
-      {access?.hasAccess && (
-        <div className="flex items-center gap-4">
+      header={{
+        title: (
+          <div className="flex items-center gap-2">
+            <Boxes className="w-4 h-4 text-primary" />
+            <span>Docker</span>
+          </div>
+        ),
+        searchComponent: access?.hasAccess ? (
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Estado:</span>
             <IndustrialTabs
@@ -104,12 +106,14 @@ function DockerManagerPage() {
               ]}
               activeId={search.status || 'all'}
               onChange={(id) => handleFilterChange({ id: 'status', value: id })}
-              className="w-[480px]"
+              className="w-full sm:w-[520px]"
             />
           </div>
-        </div>
-      )}
-
+        ) : undefined
+      }}
+      actions={[headerActions]}
+    >
+      <div className="space-y-6">
       {/* Contenido */}
       {checkingAccess ? null : access?.hasAccess ? (
         <ContainerList

@@ -56,15 +56,18 @@
 ## Layout V2
 - Sidebar fijo (50px). Sticky header with backdrop-blur.
 - Contenido `px-8`, `gap-6`.
-- **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente.
+- **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente. La eliminación de código muerto (`useKubectlNamespaceAccess.ts`) es mandatoria para mantener la higiene.
 
 ## Specific Module Standards
 
 ### Docker UI Resonance
-- **Status Filtering**: Managed via top-level `IndustrialTabs` in the route, persisting state in the `status` search parameter (all, running, stopped, exited).
+- **Header Promotion**: Status filtering (Todos, Ejecutando, Detenido, Finalizado) is promoted to the `PageLayout` header using `IndustrialTabs`, synchronized with the `status` search parameter. Header title includes the technical `Boxes` icon.
 - **Table Cells**:
-  - `StatusCell`: Badges using semantic tokens with 20% opacity (`bg-success/20`, etc.), `rounded-md`, and `text-[10px] font-bold uppercase tracking-wider`.
-  - `StartedCell`: Technical metadata using `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`.
+  - `StatusCell`: High-density technical status labels (OK, ERROR, Detenido) accompanied by semantic dots with shadows and animations (OK = pulse). Backgrounds use 20% opacity semantic tokens.
+  - `StartedCell`: High-density technical metadata using `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`.
+  - `PortsCell`: Standardized selection of external ports with high-density technical badges for opening ports.
+  - `ActionsCell`: Operations are hidden until row hover using the `opacity-0 group-hover:opacity-100` pattern to reduce visual noise.
+- **Empty State**: V2 technical style featuring a centered layout with a `Boxes` icon in a circular `bg-muted/20` container and bold uppercase tracking-wider typography.
 - **Placeholder Standard**: Access verification (`checkingAccess`) renders `null` to avoid layout shifts and maintain a clean visual state.
 
 ### Health Monitor Resonance

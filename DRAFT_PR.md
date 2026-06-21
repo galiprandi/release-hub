@@ -1,23 +1,16 @@
-# DRAFT PR: Refactor Docker Resonance V2
+# Draft PR: Technical Hygiene & Entropy Cleanup V8
 
-## Overview
-Refactorización integral del módulo Docker para alinearlo con el estándar **Industrial Resonance V2**. El objetivo es mejorar la densidad de información, promover filtros globales al header y estandarizar la estética técnica de las tablas y celdas.
+## Propósito
+Continuar con la misión de saneamiento técnico del repositorio, eliminando código muerto y erradicando advertencias del linter para mantener el estándar AAA.
 
-## Cambios Propuestos
-- **Header Promotion**: Migración de `IndustrialTabs` (Estado) al header de `PageLayout`.
-- **Iconografía Técnica**: Integración del icono `Boxes` en el header y refinamiento de iconos en celdas.
-- **Estandarización de Celdas**: Refactor de `StatusCell`, `StartedCell` y `PortsCell` con tipografía de alta densidad y tokens semánticos al 20%.
-- **Empty State V2**: Evolución del estado vacío para seguir el patrón técnico de resonancia.
-- **Higiene Técnica**: Garantizar zero-warning build y tipos estrictos.
+## Cambios propuestos
+- **Higiene Técnica**: Eliminación de uso de `any` en `src/utils/security.test.ts`.
+- **Limpieza de Entropía**: Eliminación del hook huérfano `src/hooks/useKubectlNamespaceAccess.ts`.
+- **Validación**: Verificación de zero-warning build y lint.
 
-## Impacto
-- Mejora en el aprovechamiento del espacio vertical.
-- Consistencia visual con los módulos de Kubernetes y GitHub.
-- Reducción de fricción en la navegación y filtrado de contenedores.
-
-## targeted Files
-- `src/routes/docker/index.tsx`
-- `src/docker/components/ContainerList.tsx`
-- `src/routes/docker/setup.tsx`
-- `AGENTS.md`
-- `DESIGN.md`
+## Estado
+- [x] Phase 0: Territory Block
+- [ ] Higiene de tipos en tests
+- [ ] Eliminación de código muerto
+- [ ] Verificación de Build & Lint
+- [ ] Actualización de Documentación

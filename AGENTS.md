@@ -153,6 +153,10 @@
 - **Deployment Search**: Enhanced results with technical metadata (Ready, Up-to-date, Available counts) using standard badges.
 - **Health Monitor**: Corrected `HealthHelpDialog` implementation to use `BaseDialog` correctly.
 
+### Mejora #8: Technical Hygiene & Entropy Cleanup
+- **Entropy Removal**: Eradicated orphan hook `useKubectlNamespaceAccess.ts` to reduce codebase complexity and maintain AAA standards.
+- **Type Safety**: Replaced `: any` with explicit `ChildProcess` mock typing in `security.test.ts`, ensuring full linter compliance and type resilience.
+- **Build Integrity**: Maintained zero-warning build and lint state across the entire repository.
 ### Mejora #8: Refactor Docker Resonance V2
 - **Header Promotion**: Promoted container status filtering to the `PageLayout` header using `IndustrialTabs` (synchronized with `status` search param). Integrated technical `Boxes` icon in the title.
 - **High-Density Cells**: Implemented `StatusCell` with semantic dots/pulse and high-density labels. Refined `StartedCell` and `PortsCell` typography.

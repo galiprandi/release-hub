@@ -295,3 +295,25 @@
   - [x] Technical Hygiene: Erradicación de `: any` en tests de seguridad, migrando a casts técnicos AAA (`ChildProcess`).
   - [x] Zero-warning build y validación global de tests (216 pasados).
 - **Resultado**: Superficie de ataque reducida mediante el cierre de vectores SSRF avanzados y blindaje de middlewares locales.
+### 2026-06-23: Technical Hygiene & Entropy Cleanup V8
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-entropy-cleanup-v8`
+- **Estado**: En progreso 🏗️
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] Higiene Técnica: Erradicación de `any` en `src/utils/security.test.ts` mediante tipado explícito de mocks.
+  - [x] Eliminación de Entropía: Remoción del hook huérfano `src/hooks/useKubectlNamespaceAccess.ts`.
+  - [x] Auditoría AAA: Verificación de build y lint sin advertencias (zero-warning state).
+  - [x] Validación Global: Ejecución exitosa de 212 tests unitarios y de integración.
+- **Resultado**: Repositorio refinado con mayor integridad de tipos y libre de componentes huérfanos, manteniendo el estándar de ingeniería AAA.
+### 2026-06-23: Surgical Hygiene Audit V9
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-audit-v9`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block & PR Audit.
+  - [x] Saneamiento de Linter: Erradicación de `any` en `src/utils/security.test.ts` mediante casts seguros a `childProcess.ChildProcess`.
+  - [x] Eliminación de Código Muerto: Remoción del hook huérfano `src/hooks/useKubectlNamespaceAccess.ts`.
+  - [x] Documentación: Actualización de `AGENTS.md` y `DESIGN.md` con los nuevos estándares de higiene técnica.
+  - [x] Verificación Global: Zero-warning build log y lint audit exitoso.
+- **Resultado**: Higiene del repositorio elevada mediante la eliminación de entropía técnica y código huérfano, manteniendo el estándar AAA.

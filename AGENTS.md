@@ -130,11 +130,12 @@
 - **Type Hygiene**: Prohibido `any`. Interfaces explícitas o `unknown` + validación. Casts de tipo en handlers deben usar `id as typeof stateVariable`. Mocks de test deben sincronizarse con firmas reales mediante casts de interfaces (`as ExecResponse`).
 - **Dashboard Data**: Usar `useRepoDashboardDetails` para acceder a datos de repositorios en el dashboard de GitHub. Prohibido duplicar tipos de `RepoDetails` o realizar casts manuales en los componentes de celda.
 - **Build Log**: Zero-warning build is mandatory. Outdated hook signatures in mocks/tests must be synchronized immediately.
+- **Dead Code Elimination**: Components and hooks identified as orphans must be removed immediately. Legacy hooks `usePipeline.ts`, `usePipelineDetector.ts`, and `useKubectlNamespaceAccess.ts` have been eradicated.
 - **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Use localized status labels (Saludable, Procesando, etc.).
 - **Mutaciones**: Optimistic update + revalidación selectiva. Nunca `window.location.reload()`.
 - **Resiliencia**: Si CLI falla (`kubectl`, `docker`), redirigir a `<module>/setup`.
 - **Novedades**: Technical header with Newspaper icon. Content encapsulated in bg-muted/10 containers with rounded-xl and p-8 padding.
-- **Docker UI**: Status filtering uses `IndustrialTabs` in the route, synced with `status` search parameter. Cell typography for technical metadata must use `text-[10px] font-bold uppercase tracking-wider`.
+- **Docker UI**: Status filtering is promoted to the `PageLayout` header using `IndustrialTabs` synced with the `status` search param. High-density cells use semantic dots (`StatusCell`) and hover-to-reveal patterns (`ActionsCell`). Typography: `text-[10px] font-bold uppercase tracking-wider`.
 - **Fetcher UI**: Filtering and sorting must be implemented via dual `IndustrialTabs` in the route, persisting state in `method` and `sortBy` search parameters. `UrlCell` uses a double-line pattern: Muted Domain (`text-[10px] font-bold uppercase`) and Foreground Path (`text-sm medium`).
 - **Diff Viewer**: Mode selection uses `IndustrialTabs`, synchronized with the `mode` search parameter. Technical metadata headers and comparison results use `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`. Containers use `bg-muted/10` and `border-border/60`. Empty states use `tracking-widest` placeholders.
 - **GitHub UI**: Collection navigation and management actions are in the `PageLayout` header. Dashboard-level filtering uses `IndustrialTabs` synced with `filter` search parameter. Technical metadata cels use high-density typography (`text-[10px] font-bold uppercase tracking-wider`).
@@ -152,3 +153,14 @@
 - **Terminal Route**: Aligned with Industrial Resonance V2, adding a high-density technical header with session metadata (Shell, Connection Status).
 - **Deployment Search**: Enhanced results with technical metadata (Ready, Up-to-date, Available counts) using standard badges.
 - **Health Monitor**: Corrected `HealthHelpDialog` implementation to use `BaseDialog` correctly.
+
+### Mejora #8: Technical Hygiene & Entropy Cleanup
+- **Entropy Removal**: Eradicated orphan hook `useKubectlNamespaceAccess.ts` to reduce codebase complexity and maintain AAA standards.
+- **Type Safety**: Replaced `: any` with explicit `ChildProcess` mock typing in `security.test.ts`, ensuring full linter compliance and type resilience.
+- **Build Integrity**: Maintained zero-warning build and lint state across the entire repository.
+### Mejora #8: Refactor Docker Resonance V2
+- **Header Promotion**: Promoted container status filtering to the `PageLayout` header using `IndustrialTabs` (synchronized with `status` search param). Integrated technical `Boxes` icon in the title.
+- **High-Density Cells**: Implemented `StatusCell` with semantic dots/pulse and high-density labels. Refined `StartedCell` and `PortsCell` typography.
+- **Visual Hygiene**: Applied hover-to-reveal pattern in `ActionsCell` to maintain a clean layout.
+- **Empty State**: Updated to Industrial Resonance V2 technical aesthetic with centered layout and bold tracking-wider typography.
+- **Setup Page**: Aligned OS detection badges and command containers with the V2 technical style.

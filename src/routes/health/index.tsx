@@ -105,7 +105,7 @@ function ProductSection({
   });
 
   // Ordenar endpoints: production primero, luego staging
-  const sortedEndpoints = endpoints.sort((a, b) => {
+  const sortedEndpoints = [...endpoints].sort((a, b) => {
     if (a.environment !== b.environment) {
       return a.environment === 'production' ? -1 : 1;
     }
@@ -400,16 +400,6 @@ function HealthMonitorPage() {
       to: '.',
       search: (prev: Record<string, unknown>) => ({
         ...prev,
-        environment: newEnv === 'all' ? undefined : newEnv
-      }),
-    });
-  }, [navigate]);
-
-  const handleSortChange = useCallback((newSort: string) => {
-    navigate({
-      to: '.',
-      search: (prev: Record<string, unknown>) => ({
-        ...prev,
         sortBy: newSort === 'default' ? undefined : (newSort as 'errors' | 'recent')
       }),
     });
@@ -426,6 +416,16 @@ function HealthMonitorPage() {
     }
     return null;
   }, [search.environment]);
+
+  const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
+    navigate({
+      to: '.',
+      search: (prev: Record<string, unknown>) => ({
+        ...prev,
+        environment: filter ? (filter.value === 'false' ? 'unhealthy' : filter.value) : undefined
+      }),
+    });
+  }, [navigate]);
 
   // Filtrar endpoints según el filtro seleccionado
   const filteredEndpoints = endpoints.filter((ep) => {
@@ -493,7 +493,7 @@ function HealthMonitorPage() {
   });
 
   const headerActions = (
-    <div className="flex gap-2">
+    <div key="header-actions" className="flex gap-2">
       <ActionButton
         action={{
           icon: HelpCircle,

@@ -1,8 +1,11 @@
-// Security Validation Patterns
+/**
+ * Security validation patterns and utilities.
+ * Consolidates RFC 1123 DNS standards and SSRF protection logic.
+ */
+
 export const VALIDATION = {
   // RFC 1123 DNS Subdomain: max 253 chars, labels max 63 chars
-  k8sName:
-    /^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?(\.[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?)*$/,
+  k8sName: /^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?(\.[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?)*$/,
   // RFC 1123 DNS Label: max 63 chars
   k8sNamespace: /^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$/,
   context: /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/,
@@ -11,68 +14,29 @@ export const VALIDATION = {
   scripts: /^(healthcheck|install|start|trigger-staging-redeploy|uninstall)$/,
 };
 
-export const SAFE_COMMANDS = [
-  'gh',
-  'kubectl',
-  'docker',
-  'curl',
-  'lsof',
-  'ls',
-  'echo',
-  'jq',
-  'helm',
-];
-
 /**
- * SSRF Protection: Check if a hostname or IP is internal.
+ * Checks if a hostname or IP address refers to an internal network.
+ * Used for SSRF protection.
  */
 export const isInternalAddress = (hostname: string): boolean => {
-  let addr = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+  let addr = hostname.toLowerCase().replace(/^\[|\]$/g, "");
 
   // Normalize IPv4-mapped IPv6 (e.g. ::ffff:127.0.0.1)
-  if (addr.startsWith('::ffff:')) {
+  if (addr.startsWith("::ffff:")) {
     addr = addr.slice(7);
   }
 
   if (
-    addr === 'localhost' ||
-    addr === '::1' ||
-    addr === '::' ||
-    addr === '0.0.0.0'
+    addr === "localhost" ||
+    addr === "::1" ||
+    addr === "::" ||
+    addr === "0.0.0.0"
   )
     return true;
-  if (addr.endsWith('.local') || addr.endsWith('.internal')) return true;
+  if (addr.endsWith(".local") || addr.endsWith(".internal")) return true;
 
-  // IPv4 Check (including decimal and hex)
-  if (/^0x[0-9a-f]+$/i.test(addr)) {
-    const num = parseInt(addr, 16);
-    if (!Number.isNaN(num) && num <= 0xffffffff) {
-      const p0 = (num >> 24) & 0xff;
-      const p1 = (num >> 16) & 0xff;
-      if (p0 === 127) return true; // 127.0.0.0/8
-      if (p0 === 10) return true; // 10.0.0.0/8
-      if (p0 === 172 && p1 >= 16 && p1 <= 31) return true; // 172.16.0.0/12
-      if (p0 === 192 && p1 === 168) return true; // 192.168.0.0/16
-      if (p0 === 169 && p1 === 254) return true; // 169.254.0.0/16
-      if (p0 === 100 && p1 >= 64 && p1 <= 127) return true; // 100.64.0.0/10
-    }
-  }
-
-  if (/^\d+$/.test(addr)) {
-    const num = parseInt(addr, 10);
-    if (!Number.isNaN(num) && num <= 0xffffffff) {
-      const p0 = (num >> 24) & 0xff;
-      const p1 = (num >> 16) & 0xff;
-      if (p0 === 127) return true;
-      if (p0 === 10) return true;
-      if (p0 === 172 && p1 >= 16 && p1 <= 31) return true;
-      if (p0 === 192 && p1 === 168) return true;
-      if (p0 === 169 && p1 === 254) return true;
-      if (p0 === 100 && p1 >= 64 && p1 <= 127) return true;
-    }
-  }
-
-  const parts = addr.split('.').map(Number);
+  // IPv4 Check
+  const parts = addr.split(".").map(Number);
   if (parts.length === 4 && !parts.some(Number.isNaN)) {
     const [p0, p1] = parts;
     // Loopback (127.0.0.0/8)
@@ -88,21 +52,21 @@ export const isInternalAddress = (hostname: string): boolean => {
   }
 
   // IPv6 Check (simple prefix checks)
-  if (addr.includes(':')) {
+  if (addr.includes(":")) {
     // Link-local (fe80::/10)
     if (
-      addr.startsWith('fe8') ||
-      addr.startsWith('fe9') ||
-      addr.startsWith('fea') ||
-      addr.startsWith('feb')
+      addr.startsWith("fe8") ||
+      addr.startsWith("fe9") ||
+      addr.startsWith("fea") ||
+      addr.startsWith("feb")
     )
       return true;
     // Unique Local (fc00::/7) -> fc00::/8 and fd00::/8
-    if (addr.startsWith('fc') || addr.startsWith('fd')) return true;
+    if (addr.startsWith("fc") || addr.startsWith("fd")) return true;
   }
 
   // Cloud Metadata
-  if (addr === 'metadata.google.internal' || addr === 'instance-data')
+  if (addr === "metadata.google.internal" || addr === "instance-data")
     return true;
 
   return false;

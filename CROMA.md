@@ -221,6 +221,20 @@
   - [x] Validación funcional completa (206 tests unitarios + E2E selectivos).
 - **Resultado**: Build restaurado a un estado prístino y core del sistema libre de ruido técnico, garantizando un entorno de desarrollo profesional y eficiente.
 
+### 2026-06-21: Security Hardening & Centralized Utilities V6
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-hardening-v6`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Centralización de utilidades de seguridad en `src/utils/security.ts` (VALIDATION, isInternalAddress).
+  - [x] Blindaje SSRF para comandos `curl` en el middleware de ejecución local con protección DNS Rebinding.
+  - [x] Implementación de timeouts obligatorios (30s) en procesos `spawnAsync` para prevenir procesos huérfanos.
+  - [x] Sincronización total de validaciones RFC 1123 en terminal middleware usando utilidades centralizadas.
+  - [x] Endurecimiento del terminal local con advertencias de seguridad en el inicio de sesión.
+  - [x] Refactorización de `HealthHelpDialog` a `BaseDialog` y limpieza de código muerto en rutas de Salud y Novedades.
+  - [x] Zero-warning build log y lint audit (AAA standard).
+- **Resultado**: Núcleo de ejecución blindado y deudas técnicas de UI saldadas, garantizando integridad y resiliencia.
+
 ### 2026-06-20: Security Hardening & XSS Protection
 - **Agente**: Vesper 🐜
 - **Rama**: `🐜-Vesper-refactor-security-xss-hardening-v5`

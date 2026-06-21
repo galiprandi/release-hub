@@ -72,26 +72,6 @@
 - should prevent XSS in search filters
 - should prevent XSS when highlighting log levels
 
-## Module: usePortForward
-- connects successfully
-- disconnects successfully
-- reports error on failed connect
-- starts with idle status
-
-## Module: usePortFree
-- returns a free port
-- returns null when no free port found
-
-## Module: useRepoPermission
-- debe retornar objeto vacío si el JSON es inválido
-- debe retornar permisos cuando el comando es exitoso
-
-## Module: useWebMCP
-- get_repo_details tool calls runCommand correctly
-- promote_to_production tool calls APIs correctly
-- registers all tools on mount
-- search_repositories tool calls runCommand correctly
-
 ## Module: AIChatModal
 - calls prompt with multimodal signature when send button is clicked
 - calls reset when clear button is clicked
@@ -126,6 +106,26 @@
 - should render trigger button
 - should suggest next version correctly
 - should toggle commits list with accessibility attributes
+
+## Module: usePortForward
+- connects successfully
+- disconnects successfully
+- reports error on failed connect
+- starts with idle status
+
+## Module: usePortFree
+- returns a free port
+- returns null when no free port found
+
+## Module: useRepoPermission
+- debe retornar objeto vacío si el JSON es inválido
+- debe retornar permisos cuando el comando es exitoso
+
+## Module: useWebMCP
+- get_repo_details tool calls runCommand correctly
+- promote_to_production tool calls APIs correctly
+- registers all tools on mount
+- search_repositories tool calls runCommand correctly
 
 ## Module: Pipeline Core Types
 - should accept valid provider values

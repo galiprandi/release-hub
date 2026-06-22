@@ -7,6 +7,8 @@ import type { DeploymentInfo } from '@/api/kubectl'
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton'
 import { DeploymentProjectSelectionDialog } from './DeploymentProjectSelectionDialog'
 
+type DeploymentWithContext = DeploymentInfo & { context: string }
+
 export function DeploymentSearch() {
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
@@ -16,43 +18,29 @@ export function DeploymentSearch() {
   const [isEditable, setIsEditable] = useState(false)
   const searchWidth = 'w-[35dvw]'
 
-  // Search deployments on-demand with debounce
-  const { data: allDeployments, isLoading, refetch } = useQuery({
-    queryKey: ['kubectl', 'all-deployments-search'],
+  // Debounce the query for namespace search
+  const [debouncedQuery, setDebouncedQuery] = useState('')
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query), 400)
+    return () => clearTimeout(timer)
+  }, [query])
+
+  // Search deployments by namespace across all contexts in parallel
+  const { data: searchResults, isLoading } = useQuery({
+    queryKey: ['kubectl', 'search-namespace', debouncedQuery],
     queryFn: async () => {
-      const { getContexts, getDeployments } = await import('@/api/kubectl')
+      if (!debouncedQuery) return [] as DeploymentWithContext[]
+      const { searchDeploymentsByNamespace, getContexts } = await import('@/api/kubectl')
       const contexts = await getContexts()
-      if (!contexts || contexts.length === 0) return []
-
-      const deploymentsByContext = await Promise.all(
-        contexts.map(async (ctx) => {
-          try {
-            const deployments = await getDeployments(undefined, ctx)
-            return { context: ctx, deployments }
-          } catch {
-            return { context: ctx, deployments: [] }
-          }
-        })
-      )
-
-      return deploymentsByContext.flatMap(({ context: ctx, deployments }) =>
-        deployments.map((d: DeploymentInfo) => ({ ...d, context: ctx }))
-      )
+      if (!contexts || contexts.length === 0) return [] as DeploymentWithContext[]
+      return searchDeploymentsByNamespace(debouncedQuery, contexts)
     },
     ...applyCachePolicy('kubectl'),
-    enabled: false,
+    enabled: debouncedQuery.length > 0,
   })
 
-  // Filter deployments based on query
-  const results = useMemo(() => {
-    if (!query || !allDeployments) return []
-    const lowerQuery = query.toLowerCase()
-    return allDeployments.filter(d => 
-      d.name.toLowerCase().includes(lowerQuery) ||
-      d.namespace.toLowerCase().includes(lowerQuery) ||
-      `${d.namespace}/${d.name}`.toLowerCase().includes(lowerQuery)
-    ).slice(0, 50) // Limit to 50 results
-  }, [query, allDeployments])
+  const results = useMemo(() => (searchResults || []).slice(0, 50), [searchResults])
 
   const { toggleDeploymentFavorite, isDeploymentFavorite } = useUserCollections()
   const [isProjectSelectionOpen, setIsProjectSelectionOpen] = useState(false)
@@ -157,11 +145,10 @@ export function DeploymentSearch() {
           }}
           onFocus={() => {
             setIsEditable(true);
-            if (!allDeployments) refetch();
             if (query.length >= 2) setIsOpen(true);
           }}
           onBlur={() => setIsEditable(false)}
-          placeholder={`Buscar despliegues... (Cmd+K)`}
+          placeholder={`Buscar por namespace... (ej: yumi-ticket-control)`}
           aria-label="Búsqueda de deployments"
           className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/40 border border-border/60 rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all hover:bg-muted/50`}
           autoComplete="off"
@@ -192,15 +179,15 @@ export function DeploymentSearch() {
           {isLoading ? (
             <div className="p-4 text-center text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
-              <p className="text-sm">Cargando deployments...</p>
+              <p className="text-sm">Buscando en todos los contextos...</p>
             </div>
           ) : !hasResults ? (
             <div className="p-4 text-center text-muted-foreground">
               <Terminal className="w-5 h-5 mx-auto mb-2 opacity-50" />
               <p className="text-sm">
-                {query.length >= 2
-                  ? 'Sin resultados coincidentes'
-                  : 'Ingreso de texto para iniciar búsqueda'}
+                {debouncedQuery.length > 0
+                  ? `Sin deployments en namespace "${debouncedQuery}"`
+                  : 'Escribe un namespace para buscar'}
               </p>
             </div>
           ) : (

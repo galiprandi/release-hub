@@ -245,6 +245,23 @@ export async function getDeployment(name: string, namespace: string, context?: s
   }
 }
 
+export async function searchDeploymentsByNamespace(namespace: string, contexts: string[]): Promise<Array<DeploymentInfo & { context: string }>> {
+  const results = await Promise.all(
+    contexts.map(async (ctx) => {
+      try {
+        const args = ['kubectl', 'get', 'deployments', '-n', sanitizeNamespace(namespace), '-o', 'json'];
+        args.push(`--context=${sanitizeContext(ctx)}`);
+        const result = await runCommand(args);
+        const deployments = parseDeploymentsJson(result.stdout, namespace);
+        return deployments.map(d => ({ ...d, context: ctx }));
+      } catch {
+        return [];
+      }
+    })
+  );
+  return results.flat();
+}
+
 export async function getDeployments(namespace?: string, context?: string): Promise<DeploymentInfo[]> {
   const args = ['kubectl', 'get', 'deployments'];
   if (namespace) {
@@ -284,24 +301,8 @@ export async function getDeployments(namespace?: string, context?: string): Prom
         const allResults = await Promise.all(deploymentPromises);
         return allResults.flat();
       } catch {
-        // If we can't even list namespaces, try known namespaces
-        const knownNamespaces = ['argentina-arcus', 'colombia-arcus', 'jc-test', 'seki-runners', 'default'];
-        
-        // Execute all known namespace queries in parallel
-        const deploymentPromises = knownNamespaces.map(async (ns) => {
-          try {
-            const innerArgs = ['kubectl', 'get', 'deployments', '-n', sanitizeNamespace(ns), '-o', 'json'];
-            if (context) innerArgs.push(`--context=${sanitizeContext(context)}`);
-            const result = await runCommand(innerArgs);
-            return parseDeploymentsJson(result.stdout, ns);
-          } catch {
-            // Skip namespaces where we don't have permission
-            return [];
-          }
-        });
-
-        const allResults = await Promise.all(deploymentPromises);
-        return allResults.flat();
+        // No permissions to list namespaces and no specific namespace requested
+        return [];
       }
     }
     // If specific namespace was requested and failed, return empty

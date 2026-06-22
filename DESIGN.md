@@ -86,6 +86,7 @@
 - **Content**: Encapsulated in `bg-muted/10` container with `rounded-xl` and `p-8` for optimal readability.
 
 ### Kubernetes UI Resonance
+- **Setup Page**: Aligned with Industrial Resonance V2 aesthetic. Features high-density technical badges for status (uppercase metadata), and command containers utilizing `bg-muted/10` backgrounds and `border-border/40` borders. Cards utilize `rounded-xl` geometry and semantic tokens with 20% opacity for backgrounds (`bg-success/10`, `bg-destructive/10`).
 - **Dashboard Navigation**: Uses `IndustrialTabs` for switching between 'Favoritos' and 'Proyectos'. State is persisted via `tab` search parameter.
 - **Namespace Filtering**: Promoted to the `PageLayout` header using `IndustrialTabs`, synchronized with the `namespace` search parameter. Per-table filter bars are removed for high-density consistency.
 - **Grouping**: Favorites are grouped by `context` (Boxes icon). Projects are grouped by `project.id` (Folder icon).

@@ -131,7 +131,7 @@
 - **Dashboard Data**: Usar `useRepoDashboardDetails` para acceder a datos de repositorios en el dashboard de GitHub. Prohibido duplicar tipos de `RepoDetails` o realizar casts manuales en los componentes de celda.
 - **Build Log**: Zero-warning build is mandatory. Outdated hook signatures in mocks/tests must be synchronized immediately.
 - **Dead Code Elimination**: Components and hooks identified as orphans must be removed immediately. Legacy hooks `usePipeline.ts`, `usePipelineDetector.ts`, and `useKubectlNamespaceAccess.ts` have been eradicated.
-- **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Use localized status labels (Saludable, Procesando, etc.). Deployment search is on-demand by namespace across all contexts in parallel (no hardcoded namespace list).
+- **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Use localized status labels (Saludable, Procesando, etc.). Deployment search is on-demand by namespace across all contexts in parallel (no hardcoded namespace list). Setup page aligned with V2 standard using high-density badges, semantic tokens with 20% opacity, and technical command containers.
 - **Mutaciones**: Optimistic update + revalidación selectiva. Nunca `window.location.reload()`.
 - **Resiliencia**: Si CLI falla (`kubectl`, `docker`), redirigir a `<module>/setup`.
 - **Novedades**: Technical header with Newspaper icon. Content encapsulated in bg-muted/10 containers with rounded-xl and p-8 padding.
@@ -147,6 +147,13 @@
 - **cURL Parser**: Hardened state-machine tokenizer in `src/utils/curlParser.ts` supporting compact flags (e.g., `-H'Value'`). URL normalization via `new URL().toString()` ensures consistent formatting. Verified via `src/utils/curlParser.test.ts`.
 - **XSS Protection**: Mandatory HTML escaping in any component using `dangerouslySetInnerHTML`. Log utilities (`logUtils.tsx`) must escape the raw line before applying highlighting tags. Diff viewer (`DiffViewer.tsx`) must provide a safe `escapeHtml` fallback if syntax highlighting fails. Verified via `src/api/xss.test.ts`.
 - **SSRF Hardening Standard**: `isInternalAddress` in `src/utils/security.ts` must account for decimal and hexadecimal IP representations to prevent bypasses. All proxy and health check middlewares must utilize this centralized utility.
+
+### Mejora #11: Kubernetes Setup Resonance V2 Refactor
+- **Setup Page Resonance**: Refactored `src/routes/kubernetes/setup.tsx` to align with Industrial Resonance V2 aesthetic.
+- **Typography**: Applied `text-[10px] font-bold uppercase tracking-wider` to technical labels and badges.
+- **Geometry**: Standardized to `rounded-xl` for cards and `rounded-md` for badges.
+- **Visuals**: Used semantic tokens with 20% opacity (`bg-success/10`, `bg-destructive/10`) and technical command containers (`bg-muted/10`).
+- **Hygiene**: Verified zero-warning build and lint, and implemented Playwright E2E verification.
 
 ### Mejora #10: Surgical Hygiene & Resonance V2 Alignment
 - **Restore SAFE_COMMANDS**: Exported `SAFE_COMMANDS` from `src/utils/security.ts` and updated consumers to maintain strict allow-listing for local execution.

@@ -88,6 +88,19 @@
   - [x] Validación E2E con Playwright y capturas de pantalla.
 ## Historial de Carol
 
+### 2026-06-22: Refactor GitHub Detail & Dashboard Resonance V2
+- **Agente**: Carol 🐜
+- **Rama**: `🐜-Carol-refactor-github-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Refactor de Repository Detail View: promoción de navegación (Commits/Tags) y enlaces externos (PRs, Actions) al header y acciones de `PageLayout`.
+  - [x] Estandarización de `ProjectSelector` en el header de detalle para mayor densidad visual.
+  - [x] Dashboard GitHub: estandarización del bar de filtrado global con contenedores `bg-muted/40` y bordes técnicos.
+  - [x] Evolución de `HealthCell`: integración de etiquetas técnicas ("OK", "ERROR") y mantenimiento de animaciones pulse.
+  - [x] Refinamiento de celdas `PRsCell` y `ActionsStatusCell` con fondos semánticos al 20% y bordes técnicos.
+  - [x] Zero-warning build y validación de higiene técnica AAA.
+- **Resultado**: Interfaz de GitHub alineada con Industrial Resonance V2, optimizando la jerarquía de información y la consistencia técnica.
+
 ### 2026-06-15: Refactor Docker UI Resonance
 - **Rama**: `🐜-Carol-refactor-docker-ui-resonance`
 - **Estado**: Finalizado ✅
@@ -208,6 +221,20 @@
   - [x] Validación funcional completa (206 tests unitarios + E2E selectivos).
 - **Resultado**: Build restaurado a un estado prístino y core del sistema libre de ruido técnico, garantizando un entorno de desarrollo profesional y eficiente.
 
+### 2026-06-21: Security Hardening & Centralized Utilities V6
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-hardening-v6`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Centralización de utilidades de seguridad en `src/utils/security.ts` (VALIDATION, isInternalAddress).
+  - [x] Blindaje SSRF para comandos `curl` en el middleware de ejecución local con protección DNS Rebinding.
+  - [x] Implementación de timeouts obligatorios (30s) en procesos `spawnAsync` para prevenir procesos huérfanos.
+  - [x] Sincronización total de validaciones RFC 1123 en terminal middleware usando utilidades centralizadas.
+  - [x] Endurecimiento del terminal local con advertencias de seguridad en el inicio de sesión.
+  - [x] Refactorización de `HealthHelpDialog` a `BaseDialog` y limpieza de código muerto en rutas de Salud y Novedades.
+  - [x] Zero-warning build log y lint audit (AAA standard).
+- **Resultado**: Núcleo de ejecución blindado y deudas técnicas de UI saldadas, garantizando integridad y resiliencia.
+
 ### 2026-06-20: Security Hardening & XSS Protection
 - **Agente**: Vesper 🐜
 - **Rama**: `🐜-Vesper-refactor-security-xss-hardening-v5`
@@ -282,3 +309,38 @@
   - [x] Auditoría AAA: Verificación de ausencia de código muerto, logs de depuración y tipos inseguros en el core.
   - [x] Zero-warning build y lint log logrados satisfactoriamente.
 - **Resultado**: Estabilidad del repositorio restaurada y alineación estética de Health Monitor completada bajo el estándar Industrial Resonance V2.
+
+### 2026-06-22: Security Hardening V7 (SSRF Expansion & Terminal Audit)
+- **Agente**: Vesper 🐜
+- **Rama**: `🐜-Vesper-refactor-security-hardening-v7`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] SSRF Protection Expansion: Fortalecimiento de `isInternalAddress` para detectar bypasses mediante IPs en formato decimal y hexadecimal.
+  - [x] Terminal Middleware Validation: Creación de suite de tests `src/config/terminalMiddleware.test.ts` para auditar la validación de parámetros de sesión.
+  - [x] Script Handler Hardening: Refuerzo de validación de repositorios en `vite.config.ts` mediante regex estricta de patrón `org/repo`.
+  - [x] Technical Hygiene: Erradicación de `: any` en tests de seguridad, migrando a casts técnicos AAA (`ChildProcess`).
+  - [x] Zero-warning build y validación global de tests (216 pasados).
+- **Resultado**: Superficie de ataque reducida mediante el cierre de vectores SSRF avanzados y blindaje de middlewares locales.
+### 2026-06-23: Technical Hygiene & Entropy Cleanup V8
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-entropy-cleanup-v8`
+- **Estado**: En progreso 🏗️
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] Higiene Técnica: Erradicación de `any` en `src/utils/security.test.ts` mediante tipado explícito de mocks.
+  - [x] Eliminación de Entropía: Remoción del hook huérfano `src/hooks/useKubectlNamespaceAccess.ts`.
+  - [x] Auditoría AAA: Verificación de build y lint sin advertencias (zero-warning state).
+  - [x] Validación Global: Ejecución exitosa de 212 tests unitarios y de integración.
+- **Resultado**: Repositorio refinado con mayor integridad de tipos y libre de componentes huérfanos, manteniendo el estándar de ingeniería AAA.
+### 2026-06-23: Surgical Hygiene Audit V9
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-audit-v9`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block & PR Audit.
+  - [x] Saneamiento de Linter: Erradicación de `any` en `src/utils/security.test.ts` mediante casts seguros a `childProcess.ChildProcess`.
+  - [x] Eliminación de Código Muerto: Remoción del hook huérfano `src/hooks/useKubectlNamespaceAccess.ts`.
+  - [x] Documentación: Actualización de `AGENTS.md` y `DESIGN.md` con los nuevos estándares de higiene técnica.
+  - [x] Verificación Global: Zero-warning build log y lint audit exitoso.
+- **Resultado**: Higiene del repositorio elevada mediante la eliminación de entropía técnica y código huérfano, manteniendo el estándar AAA.

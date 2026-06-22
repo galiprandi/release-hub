@@ -72,6 +72,14 @@
 - should prevent XSS in search filters
 - should prevent XSS when highlighting log levels
 
+## Module: terminalMiddleware
+- should register upgrade handler
+- should reject invalid context
+- should reject invalid docker container name
+- should reject invalid k8s resource name
+- should reject invalid namespace
+- should reject invalid terminal type
+
 ## Module: AIChatModal
 - calls prompt with multimodal signature when send button is clicked
 - calls reset when clear button is clicked
@@ -165,6 +173,12 @@
 - should sort keys recursively
 
 ## Module: security utils
+- should handle IPv4-mapped IPv6 addresses
+- should handle IPv6 addresses
+- should handle cloud metadata and local domains
+- should handle decimal and hex IP bypasses
+- should identify CGNAT addresses
+- should identify IPv4 range variations
 - should identify internal addresses
 - should succeed when process closes before timeout
 

@@ -9,7 +9,6 @@ import { Terminal } from "@/components/shared/Terminal"
 import { BaseDialog } from "@/components/ui/BaseDialog"
 import { StatusCard } from "@/components/ui/StatusCard"
 import { Table } from "@/components/ui/Table"
-import { EmptyState } from "@/components/EmptyState"
 import { Boxes } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
@@ -97,11 +96,17 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 
 	if (!Array.isArray(sortedContainers) || sortedContainers.length === 0) {
 		return (
-			<EmptyState
-				icon={<Boxes className="w-12 h-12 text-muted-foreground/20" />}
-				label={searchQuery ? "No se encontraron resultados" : "No hay contenedores"}
-				caption={searchQuery ? `No hay contenedores que coincidan con "${searchQuery}"` : "No se detectaron contenedores en este entorno."}
-			/>
+			<div className="flex flex-col items-center justify-center py-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
+				<div className="p-4 rounded-full bg-muted/20 border border-border/40 mb-4">
+					<Boxes className="w-8 h-8 text-muted-foreground/40" />
+				</div>
+				<h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+					{searchQuery ? "No se encontraron resultados" : "No hay contenedores"}
+				</h3>
+				<p className="text-xs text-muted-foreground/60 mt-1 max-w-[300px] text-center">
+					{searchQuery ? `No hay contenedores que coincidan con "${searchQuery}"` : "No se detectaron contenedores en este entorno."}
+				</p>
+			</div>
 		)
 	}
 
@@ -252,20 +257,26 @@ function StatusCell({ container }: { container: ContainerInfo }) {
 	const exited = status.includes('exited')
 
 	let colorClass = 'bg-muted/20 text-muted-foreground border-border/20'
+	let dotClass = 'bg-muted-foreground/60'
 	let label = 'Detenido'
 
 	if (running) {
 		colorClass = 'bg-success/20 text-success border-success/20'
-		label = 'Ejecutando'
+		dotClass = 'bg-success shadow-[0_0_8px_rgba(34,197,94,0.4)] animate-pulse'
+		label = 'OK'
 	} else if (exited) {
 		colorClass = 'bg-destructive/20 text-destructive border-destructive/20'
-		label = 'Finalizado'
+		dotClass = 'bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.4)]'
+		label = 'ERROR'
 	}
 
 	return (
-		<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-widest uppercase ${colorClass}`}>
-			{label}
-		</span>
+		<div className="flex items-center gap-2">
+			<div className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
+			<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-widest uppercase ${colorClass}`}>
+				{label}
+			</span>
+		</div>
 	)
 }
 
@@ -372,7 +383,7 @@ function ActionsCell({
 	const running = isRunning(container.status)
 
 	return (
-		<div className="flex items-center justify-end gap-1.5">
+		<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
 			<div className="flex items-center gap-1">
 				<ActionButton
 					action={ACTION_DEFINITIONS.viewLogs}

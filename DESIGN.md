@@ -4,7 +4,7 @@
 - **Typography**: `tracking-tight` (names), `text-[10px] font-bold uppercase tracking-wider` (labels).
 - **Hierarchy**: Semantic tokens + 20% opacity (`bg-success/20 border-success/20`).
 - **Geometry**: `rounded-xl` (containers), `rounded-lg` (actions), `rounded-md` (badges).
-- **Hardening**: Middleware `spawn` con `shell: false` y timeout obligatorio de 30s (`spawnAsync`). Centralización de seguridad en `src/utils/security.ts`. Allow-list estricto en `/local/exec` (shells y node prohibidos). Validación estricta de recursos Kubernetes (RFC 1123) en todos los middlewares locales. Allow-list de scripts autorizados en `/local/script`. SSRF protection bloqueando 127.0.0.0/8, 169.254.0.0/16, CGNAT y IPv6 local. DNS Rebinding protection mediante pre-resolución de hostnames en el proxy. Sanitización de inputs para CLI. Escapado HTML obligatorio en componentes que utilicen `dangerouslySetInnerHTML` (XSS Hardening).
+- **Hardening**: Middleware `spawn` con `shell: false` y timeout obligatorio de 30s (`spawnAsync`). Centralización de seguridad en `src/utils/security.ts`. Allow-list estricto en `/local/exec` (shells y node prohibidos). Validación estricta de recursos Kubernetes (RFC 1123) en todos los middlewares locales. Allow-list de scripts autorizados en `/local/script`. SSRF protection bloqueando 127.0.0.0/8, 169.254.0.0/16, CGNAT y IPv6 local, incluyendo representaciones decimales y hexadecimales de IPs. DNS Rebinding protection mediante pre-resolución de hostnames en el proxy. Sanitización de inputs para CLI. Escapado HTML obligatorio en componentes que utilicen `dangerouslySetInnerHTML` (XSS Hardening).
 - **Standard Cells**: Health (semantic dots), PRs (primary badge), Workflows (status badge + pulse), Operations (high-density actions).
 - **Focus**: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1`.
 - **ARIA**: Explicit `aria-label` for icon buttons.
@@ -56,15 +56,18 @@
 ## Layout V2
 - Sidebar fijo (50px). Sticky header with backdrop-blur.
 - Contenido `px-8`, `gap-6`.
-- **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente.
+- **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente. La eliminación de código muerto (`useKubectlNamespaceAccess.ts`) es mandatoria para mantener la higiene.
 
 ## Specific Module Standards
 
 ### Docker UI Resonance
-- **Status Filtering**: Managed via top-level `IndustrialTabs` in the route, persisting state in the `status` search parameter (all, running, stopped, exited).
+- **Header Promotion**: Status filtering (Todos, Ejecutando, Detenido, Finalizado) is promoted to the `PageLayout` header using `IndustrialTabs`, synchronized with the `status` search parameter. Header title includes the technical `Boxes` icon.
 - **Table Cells**:
-  - `StatusCell`: Badges using semantic tokens with 20% opacity (`bg-success/20`, etc.), `rounded-md`, and `text-[10px] font-bold uppercase tracking-wider`.
-  - `StartedCell`: Technical metadata using `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`.
+  - `StatusCell`: High-density technical status labels (OK, ERROR, Detenido) accompanied by semantic dots with shadows and animations (OK = pulse). Backgrounds use 20% opacity semantic tokens.
+  - `StartedCell`: High-density technical metadata using `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`.
+  - `PortsCell`: Standardized selection of external ports with high-density technical badges for opening ports.
+  - `ActionsCell`: Operations are hidden until row hover using the `opacity-0 group-hover:opacity-100` pattern to reduce visual noise.
+- **Empty State**: V2 technical style featuring a centered layout with a `Boxes` icon in a circular `bg-muted/20` container and bold uppercase tracking-wider typography.
 - **Placeholder Standard**: Access verification (`checkingAccess`) renders `null` to avoid layout shifts and maintain a clean visual state.
 
 ### Health Monitor Resonance
@@ -90,9 +93,12 @@
 
 ### GitHub UI Resonance
 - **Dashboard Layout**: Primary collection navigation (`IndustrialTabs`) and project management actions reside in the `PageLayout` header.
-- **Global Filtering**: Dashboard-level filtering (e.g., 'Pendientes') is managed via `IndustrialTabs` in the main view, persisting state in the `filter` search parameter.
-- **Table Cells**: Technical metadata (Health, PRs, Workflows, Date, Author) uses `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`.
-- **Health Indicators**: Semantic dots (`w-1.5 h-1.5`) with shadows. OK state includes `animate-pulse`.
+- **Global Filtering**: Dashboard-level filtering (e.g., 'Pendientes') uses `IndustrialTabs` enclosed in `bg-muted/40` containers with `border-border/40` to match technical standards.
+- **Table Cells**:
+  - `HealthCell`: Includes semantic dots (OK pulse) and high-density technical labels ('OK'/'ERROR') with semantic colors.
+  - `PRsCell` & `ActionsStatusCell`: Use semantic backgrounds with 20% opacity and technical borders.
+  - `OperationsCell`: Implements hover-to-reveal (`opacity-0 group-hover:opacity-100`) to maintain layout focus.
+- **Detail View**: Navigation (Commits/Tags), external links (PRs, Actions), and `ProjectSelector` are promoted to the `PageLayout` header and actions array. Links use `bg-muted/40` and high-density technical typography.
 
 ### Novedades Page Resonance
 - **Header**: High-density technical header with the 'Newspaper' icon.

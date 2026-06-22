@@ -1,24 +1,21 @@
-# PR Draft: Security Centralization & Hardening V7
+# Draft PR: Security Hardening V7 - Vesper 🐜
 
-**Agent**: Vesper 🐜
-**Mission**: Centralize security logic and harden process execution and SSRF protection.
+## Descripción
+Esta misión se centra en elevar el umbral de seguridad y robustez del sistema mediante una auditoría profunda de superficies de ataque y la implementación de controles de validación más estrictos.
 
-## Planned Changes
-- [ ] **Centralize Security Utilities**: Create `src/utils/security.ts` to host RFC 1123 validations, `SAFE_COMMANDS`, SSRF protection (`isInternalAddress`), and a hardened `spawnAsync` with a 30s timeout.
-- [ ] **Middleware Refactor**: Update `vite.config.ts` and `src/config/terminalMiddleware.ts` to consume centralized security utilities, eliminating logic duplication.
-- [ ] **Process Hardening**: Enforce timeouts on all spawned processes to prevent resource exhaustion.
-- [ ] **Test Expansion**: Expand `src/api/security.test.ts` to cover new centralized utilities and edge cases.
-- [ ] **Documentation**: Update `AGENTS.md` and `DESIGN.md` with the new standards.
+## Objetivos
+- [ ] **Technical Hygiene & Type Resilience**: Erradicación total de `any` en los tests de seguridad, migrando a tipos estrictos o casts seguros (`ChildProcess`).
+- [ ] **SSRF Protection Expansion**: Fortalecimiento de `isInternalAddress` contra bypasses avanzados (decimal/hex IPs) y expansión de la suite de pruebas.
+- [ ] **Terminal Middleware Validation**: Creación de una suite de tests dedicada para `terminalMiddleware.ts` para garantizar la integridad de los parámetros de sesión.
+- [ ] **Script Handler Hardening**: Refuerzo de la validación de repositorios en el middleware de ejecución de scripts para prevenir inyecciones colaterales.
+- [ ] **Zero-warning Build**: Mantener el estándar AAA de build y lint sin advertencias.
 
-## Targeted Files
-- `src/utils/security.ts` (New)
-- `vite.config.ts`
+## Zona de Trabajo
+- `src/utils/security.ts`
+- `src/utils/security.test.ts`
 - `src/config/terminalMiddleware.ts`
-- `src/api/security.test.ts`
+- `src/config/terminalMiddleware.test.ts`
+- `vite.config.ts`
 - `AGENTS.md`
 - `DESIGN.md`
-
-## Verification Plan
-- [ ] Zero-warning build and lint audit.
-- [ ] Full test suite execution (Vitest).
-- [ ] Manual verification of `/local/exec` and terminal sessions.
+- `CROMA.md`

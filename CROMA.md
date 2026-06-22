@@ -357,3 +357,17 @@
   - [x] Higiene Técnica: Refinamiento de suites de tests reemplazando casts inseguros por directivas `@ts-expect-error` y eliminación de código muerto.
   - [x] Verificación Global: Zero-warning build log, lint audit impecable y 227 tests unitarios exitosos.
 - **Resultado**: Integridad del repositorio restaurada y blindaje de seguridad expandido, manteniendo el estándar de ingeniería AAA y la consistencia estética Industrial Resonance V2.
+
+### 2026-06-24: Omnisearch Evolution & Resonance V2 Search
+- **Agente**: Uma 🐜
+- **Rama**: `🐜-Uma-refactor-search-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block & Mission Draft.
+  - [x] Docker Search Implementation: Creación de `ContainerSearch` e integración en el header de la ruta Docker para filtrado en tiempo real.
+  - [x] Fetcher Search Evolution: Implementación de búsqueda persistente (`q` param) en el historial de Fetcher integrada en el header.
+  - [x] Omnisearch Refinement: Estandarización de `RepoSearch` y `GenericSearch` con el estándar V2 (`bg-muted/40`, `border-border/60`, `focus:ring-primary/20`).
+  - [x] Metadata Badges: Integración de badges técnicos de alta densidad (`REPO`, `FILE`) en los resultados de búsqueda.
+  - [x] Build & Hygiene: Restauración de imports faltantes, zero-warning build logrado y 233 tests exitosos.
+  - [x] Documentación: Actualización de `DESIGN.md` y `AGENTS.md` con los nuevos estándares de búsqueda.
+- **Resultado**: Experiencia de búsqueda unificada y expandida a todos los módulos críticos, eliminando silos de información y alineando la interfaz con el estándar Industrial Resonance V2.

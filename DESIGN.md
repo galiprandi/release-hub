@@ -12,6 +12,7 @@
 
 ## Component Patterns
 - **Table**: `bg-muted/40` headers, technical metadata, vertical dividers. Internal filter bar uses `bg-muted/40` with a nested segmented-control layout for a professional aesthetic.
+- **Search Inputs**: Standardized to `bg-muted/40` with `border-border/60`. Focus state uses `focus:ring-primary/20`. Technical search results in dropdowns include high-density badges (`REPO`, `FILE`, `CONT`) with 10% opacity backgrounds.
 - **StatusCard**: Loading/error/offline states.
 - **ActionButton**: Iconographic with tooltip.
 - **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering.
@@ -62,7 +63,7 @@
 ## Specific Module Standards
 
 ### Docker UI Resonance
-- **Header Promotion**: Status filtering (Todos, Ejecutando, Detenido, Finalizado) is promoted to the `PageLayout` header using `IndustrialTabs`, synchronized with the `status` search parameter. Header title includes the technical `Boxes` icon.
+- **Header Promotion**: Status filtering (Todos, Ejecutando, Detenido, Finalizado) is promoted to the `PageLayout` header using `IndustrialTabs`, synchronized with the `status` search parameter. Header title includes the technical `Boxes` icon. Integrated `ContainerSearch` in the header for real-time name and image filtering.
 - **Table Cells**:
   - `StatusCell`: High-density technical status labels (OK, ERROR, Detenido) accompanied by semantic dots with shadows and animations (OK = pulse). Backgrounds use 20% opacity semantic tokens.
   - `StartedCell`: High-density technical metadata using `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`.
@@ -107,6 +108,7 @@
 
 ### Fetcher UI Resonance
 - **Navigation & Sorting**: Dual `IndustrialTabs` implementation for method filtering (ALL, GET, POST, etc.) and persistent sorting (Recent, Method, Status, Duration), synchronized with `method` and `sortBy` search parameters.
+- **Header Search**: Integrated persistent text search in the header (`q` search parameter) for filtering history by URL, domain, or method.
 - **Table Structure**:
   - `UrlCell`: Domain as technical metadata (`text-[10px] font-bold uppercase text-muted-foreground/60`) and Path as primary content (`text-sm font-medium`).
   - Headers: Standard high-density `span` pattern (`text-[10px] font-bold uppercase tracking-wider`).

@@ -144,7 +144,7 @@ export function GenericSearch<T>({
           onBlur={() => setIsEditable(false)}
           placeholder={placeholder}
           aria-label="Búsqueda"
-          className={`${width} pl-9 pr-14 py-2 bg-muted rounded-md text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
+          className={`${width} pl-9 pr-14 py-2 bg-muted/40 border border-border/60 rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/40`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"

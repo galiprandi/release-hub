@@ -34,9 +34,6 @@
 - getDeployments parses JSON output for single namespace
 - getDeployments parses JSON output with all-namespaces
 - getDeployments throws for invalid namespace format
-- getDeployments returns empty array when no permissions to list namespaces (no hardcoded fallback)
-- searchDeploymentsByNamespace searches a namespace across all contexts in parallel
-- searchDeploymentsByNamespace returns deployments with context field attached
 
 ## Module: Security Hardening
 - should allow commands in the safe list

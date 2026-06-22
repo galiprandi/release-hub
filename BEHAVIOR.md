@@ -37,12 +37,15 @@
 
 ## Module: Security Hardening
 - should allow commands in the safe list
+- should allow curl to legitimate external URL
 - should allow legitimate external hostname resolving to external IP
 - should allow public addresses
 - should block CGNAT addresses
 - should block DNS Rebinding attack where hostname is external but resolves to internal IP
 - should block IPv6 Link-Local and Unique Local addresses
 - should block cloud metadata addresses and link-local
+- should block curl to external hostname resolving to internal IP (Rebinding)
+- should block curl to internal hostname
 - should block loopback addresses and normalization bypasses
 - should block private network addresses (RFC 1918)
 - should enforce RFC 1123 length limits

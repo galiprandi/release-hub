@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react"
 import React from "react"
-import { MessageSquare, Loader2, CheckCircle2, Send, AlertCircle, Sparkles, Terminal } from "lucide-react"
+import { MessageSquare, Loader2, CheckCircle2, Send, AlertCircle, Sparkles, Terminal, ChevronRight } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useAISummarize } from "@galiprandi/react-tools"
 import { useAIErrorProcessor } from "@/hooks/useAIErrorProcessor"
@@ -246,9 +246,9 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 					type="button"
 					onClick={() => handleOpenChange(true)}
 					aria-haspopup="dialog"
-					className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+					className="inline-flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-muted/20 border border-transparent hover:border-border/40 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
 				>
-					<MessageSquare className="w-4 h-4" />
+					<MessageSquare className="w-3.5 h-3.5" />
 					Feedback
 				</button>
 			)}
@@ -256,48 +256,48 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 				open={open}
 				onOpenChange={handleOpenChange}
 				title={
-					<>
-						{step === "describe" && <><MessageSquare className="w-4 h-4" /> Describí tu feedback</>}
-						{step === "review" && <><CheckCircle2 className="w-4 h-4" /> Revisá tu feedback</>}
-						{step === "sending" && <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>}
-						{step === "success" && <><CheckCircle2 className="w-4 h-4 text-success" /> ¡Feedback enviado!</>}
-						{step === "error" && <><AlertCircle className="w-4 h-4 text-destructive" /> Error</>}
-					</>
+					<div className="flex items-center gap-2">
+						{step === "describe" && <><MessageSquare className="w-4 h-4 text-primary" /> <span>Describí tu feedback</span></>}
+						{step === "review" && <><CheckCircle2 className="w-4 h-4 text-primary" /> <span>Revisá tu feedback</span></>}
+						{step === "sending" && <><Loader2 className="w-4 h-4 animate-spin text-primary" /> <span>Enviando...</span></>}
+						{step === "success" && <><CheckCircle2 className="w-4 h-4 text-success" /> <span>¡Feedback enviado!</span></>}
+						{step === "error" && <><AlertCircle className="w-4 h-4 text-destructive" /> <span>Error</span></>}
+					</div>
 				}
-				description="Enviar feedback sobre ReleaseHub"
+				description="Panel de comunicación directa con el equipo de ingeniería de ReleaseHub."
 				maxWidth={dialogWidth}
 			>
 				{/* Stepper Visual */}
 					{step !== "sending" && step !== "success" && step !== "error" && (
-						<div className="flex items-center justify-center gap-4 mb-6" role="stepper" aria-label="Progreso del feedback">
+						<div className="flex items-center justify-center gap-6 mb-8" role="stepper" aria-label="Progreso del feedback">
 							{steps.map((s, idx) => (
 								<React.Fragment key={s.id}>
-									<div className="flex flex-col items-center gap-1">
+									<div className="flex flex-col items-center gap-2">
 										<button
 											type="button"
 											onClick={() => handleStepClick(s.id)}
 											aria-current={s.id === step ? "step" : undefined}
 											aria-label={`Paso ${idx + 1}: ${s.label}${isCompleted(s.id) ? " - Completado" : s.id === step ? " - Actual" : ""}`}
 											aria-disabled={idx > currentStepIndex}
-											className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 ${
+											className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${
 												isCompleted(s.id) 
-													? "bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-110 cursor-pointer shadow-sm active:scale-95"
+													? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_10px_rgba(var(--primary),0.3)] cursor-pointer"
 													: s.id === step 
-														? "bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-110 cursor-pointer shadow-sm active:scale-95"
-														: "bg-muted text-muted-foreground hover:bg-muted/80 hover:scale-105 cursor-pointer active:scale-95"
+														? "bg-primary text-primary-foreground shadow-[0_0_10px_rgba(var(--primary),0.3)] cursor-pointer"
+														: "bg-muted/40 text-muted-foreground/40 border border-border/20 cursor-default"
 											} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2`}
 										>
-											{isCompleted(s.id) ? <CheckCircle2 className="w-4 h-4 text-primary-foreground" /> : idx + 1}
+											{isCompleted(s.id) ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
 										</button>
-										<span className={`text-xs font-medium ${
-											s.id === step ? "text-foreground" : "text-muted-foreground"
+										<span className={`text-[10px] font-bold uppercase tracking-widest ${
+											s.id === step ? "text-foreground" : "text-muted-foreground/40"
 										}`} aria-hidden="true">
 											{s.label}
 										</span>
 									</div>
 									{idx < steps.length - 1 && (
-										<div className={`w-12 h-0.5 ${
-															isCompleted(s.id) ? "bg-primary" : "bg-muted"
+										<div className={`w-12 h-px ${
+															isCompleted(s.id) ? "bg-primary shadow-[0_0_8px_rgba(var(--primary),0.5)]" : "bg-border/20"
 														}`} aria-hidden="true" />
 									)}
 								</React.Fragment>
@@ -307,33 +307,54 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 
 					{/* Step 1: Describe */}
 					{step === "describe" && (
-						<div className="flex flex-col flex-1 overflow-y-auto">
+						<div className="flex flex-col flex-1 overflow-y-auto scrollbar-hide">
 							<div className="space-y-4">
-								<div>
-									<label htmlFor="feedback-description" className="block text-sm font-medium mb-2">
-										Descripción
+								<div className="space-y-2">
+									<label htmlFor="feedback-description" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+										Descripción Técnica
 									</label>
 									<textarea
 										id="feedback-description"
+										autoFocus
 										value={description}
 										onChange={(e) => setDescription(e.target.value)}
-										placeholder="Explicá en detalle tu idea, problema o sugerencia. Cuanto más contexto des, mejor será el resultado..."
+										placeholder="Explica en detalle tu idea, problema o sugerencia. El sistema utilizará IA para normalizar el reporte..."
 										rows={8}
-										className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary resize-none transition-all duration-200"
+										className="w-full px-4 py-3 text-xs bg-muted/10 border border-border/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-all duration-200 leading-relaxed font-mono"
 									/>
 								</div>
 
-								{aiError && <p className="text-sm text-destructive">{aiError.message}</p>}
-								{error && <p className="text-sm text-destructive">{error}</p>}
+								{aiError && (
+									<div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center gap-2">
+										<AlertCircle className="w-4 h-4 text-destructive" />
+										<p className="text-[10px] font-bold uppercase tracking-wider text-destructive">{aiError.message}</p>
+									</div>
+								)}
+								{error && (
+									<div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center gap-2">
+										<AlertCircle className="w-4 h-4 text-destructive" />
+										<p className="text-[10px] font-bold uppercase tracking-wider text-destructive">{error}</p>
+									</div>
+								)}
 							</div>
 
-							<div className="mt-4 pt-4 border-t flex justify-end flex-shrink-0">
+							<div className="mt-8 pt-4 border-t border-border/40 flex justify-end flex-shrink-0">
 								<button
 									onClick={handleNext}
-									disabled={isGenerating || isEnhancing}
-									className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+									disabled={isGenerating || isEnhancing || !description.trim()}
+									className="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm"
 								>
-									{(isGenerating || isEnhancing) ? <><Loader2 className="w-4 h-4 animate-spin" /> {getStatusMessage}</> : "Siguiente"}
+									{(isGenerating || isEnhancing) ? (
+										<>
+											<Loader2 className="w-3.5 h-3.5 animate-spin" />
+											<span>{getStatusMessage}</span>
+										</>
+									) : (
+										<>
+											<span>Siguiente</span>
+											<ChevronRight className="w-3.5 h-3.5" />
+										</>
+									)}
 								</button>
 							</div>
 						</div>
@@ -341,46 +362,57 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 
 					{/* Step: Review */}
 					{step === "review" && (
-						<div className="flex flex-col flex-1 overflow-y-auto">
-							<div className="space-y-4">
-								<div>
-									<label htmlFor="feedback-title" className="block text-sm font-medium mb-2">
-										Título
+						<div className="flex flex-col flex-1 overflow-y-auto scrollbar-hide">
+							<div className="space-y-6">
+								<div className="space-y-2">
+									<label htmlFor="feedback-title" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+										Título Sugerido por IA
 									</label>
 									<input
 										id="feedback-title"
 										type="text"
 										value={aiTitle}
 										onChange={(e) => setAiTitle(e.target.value)}
-										className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
+										className="w-full px-4 py-3 text-xs bg-muted/10 border border-border/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold uppercase tracking-tight"
 									/>
 								</div>
 
-								<div>
-									<label htmlFor="feedback-body" className="block text-sm font-medium mb-2">
-										Descripción
+								<div className="space-y-2">
+									<label htmlFor="feedback-body" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+										Propuesta Estructurada
 									</label>
 									<textarea
 										id="feedback-body"
 										value={aiBody}
 										onChange={(e) => setAiBody(e.target.value)}
 										rows={8}
-										className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary resize-none transition-all duration-200"
+										className="w-full px-4 py-3 text-xs bg-muted/10 border border-border/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-all duration-200 leading-relaxed"
 									/>
 								</div>
 
 								<div className="flex items-center gap-2">
-									<span className="text-xs bg-muted px-2 py-1 rounded-full">feedback</span>
+									<span className="text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 px-2.5 py-1 rounded-md">
+										#feedback
+									</span>
+									<span className="text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground/60 border border-border/40 px-2.5 py-1 rounded-md">
+										#ai-generated
+									</span>
 								</div>
 							</div>
 
-							<div className="mt-4 pt-4 border-t flex justify-end flex-shrink-0">
+							<div className="mt-8 pt-4 border-t border-border/40 flex justify-between items-center flex-shrink-0">
+								<button
+									onClick={() => setStep("describe")}
+									className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+								>
+									Volver a editar
+								</button>
 								<button
 									onClick={handleSend}
 									disabled={!aiTitle.trim() || !aiBody.trim()}
-									className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+									className="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm"
 								>
-									<Send className="w-4 h-4" />
+									<Send className="w-3.5 h-3.5" />
 									Enviar Feedback
 								</button>
 							</div>
@@ -389,12 +421,15 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 
 					{/* Step: Sending */}
 					{step === "sending" && (
-						<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
-							<Loader2 className="w-12 h-12 animate-spin text-primary" />
-							<div>
-								<p className="text-lg font-semibold">Creando issue en GitHub...</p>
-								<p className="text-sm text-muted-foreground mt-1">
-									Esto puede demorar unos segundos
+						<div className="flex flex-col items-center justify-center flex-1 py-12 text-center space-y-6">
+							<div className="relative">
+								<div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
+								<Loader2 className="w-16 h-16 animate-spin text-primary relative z-10" />
+							</div>
+							<div className="space-y-2">
+								<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground">Sincronizando con GitHub</p>
+								<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">
+									Creando registro técnico en galiprandi/release-hub
 								</p>
 							</div>
 						</div>
@@ -402,90 +437,101 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 
 					{/* Step: Success */}
 					{step === "success" && (
-						<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
-							<CheckCircle2 className="w-12 h-12 text-success" />
-							<div>
-								<p className="text-lg font-semibold">¡Feedback enviado!</p>
-								<p className="text-sm text-muted-foreground mt-1">
-									Tu feedback ha sido enviado como issue en GitHub
-								</p>
+						<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-6">
+							<div className="w-16 h-16 rounded-full bg-success/10 border border-success/20 flex items-center justify-center shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+								<CheckCircle2 className="w-8 h-8 text-success" />
+							</div>
+							<div className="space-y-4">
+								<div className="space-y-1">
+									<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-success">¡Feedback Enviado!</p>
+									<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+										Tu propuesta ya es un issue oficial
+									</p>
+								</div>
 								{issueUrl && (
 									<a
 										href={issueUrl}
 										target="_blank"
 										rel="noopener noreferrer"
-										className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-2"
+										className="inline-flex items-center gap-2 px-4 py-2 bg-muted/20 border border-border/40 rounded-lg text-[10px] font-bold uppercase tracking-wider text-primary hover:bg-muted/40 transition-all"
 									>
-										Ver issue en GitHub
-										<Send className="w-3 h-3" />
+										<span>Ver en GitHub</span>
+										<Terminal className="w-3.5 h-3.5" />
 									</a>
 								)}
 							</div>
 							<button
 								type="button"
 								onClick={() => handleOpenChange(false)}
-								className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
+								className="w-full mt-4 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm"
 							>
-								Cerrar
+								Finalizar
 							</button>
 						</div>
 					)}
 
 					{/* Step: Error */}
 					{step === "error" && (
-						<div className="flex flex-col items-center justify-center flex-1 py-4 text-center space-y-4">
-							<div className="space-y-2">
+						<div className="flex flex-col items-center justify-center flex-1 py-4 text-center space-y-6">
+							<div className="w-full space-y-4">
 								{isProcessingError ? (
-									<div className="flex flex-col items-center gap-4">
-										<Loader2 className="w-12 h-12 animate-spin text-primary" />
-										<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+									<div className="flex flex-col items-center gap-6 py-8">
+										<div className="relative">
+											<div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
+											<Loader2 className="w-16 h-16 animate-spin text-primary relative z-10" />
+										</div>
+										<div className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
 											<Sparkles className="w-4 h-4" />
-											<span>Analizando error con IA...</span>
+											<span>Análisis IA en curso</span>
 										</div>
 									</div>
 								) : (
-									<div className="space-y-3">
-										<AlertCircle className="w-12 h-12 text-destructive mx-auto" />
-										<div className="flex items-center justify-end gap-2">
+									<div className="space-y-4">
+										<div className="w-16 h-16 rounded-full bg-destructive/10 border border-destructive/20 flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+											<AlertCircle className="w-8 h-8 text-destructive" />
+										</div>
+										<div className="flex items-center justify-center gap-2">
 											<button
 												onClick={() => setShowOriginalError(!showOriginalError)}
-												className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 ${
+												className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all flex items-center gap-1.5 border ${
 													showOriginalError 
-														? 'bg-destructive/10 text-destructive' 
-														: 'bg-purple-500/10 text-purple-500'
+														? 'bg-destructive/10 text-destructive border-destructive/20 shadow-[0_0_8px_rgba(239,68,68,0.2)]'
+														: 'bg-muted/40 text-muted-foreground/60 border-border/40'
 												}`}
 											>
 												{showOriginalError ? (
 													<>
-														<Terminal className="w-3 h-3" />
-														Error original
+														<Terminal className="w-3.5 h-3.5" />
+														Error Original
 													</>
 												) : (
 													<>
-														<Sparkles className="w-3 h-3" />
+														<Sparkles className="w-3.5 h-3.5" />
 														Análisis IA
 													</>
 												)}
 											</button>
 										</div>
-										<div className="text-sm text-destructive prose prose-sm max-w-none">
-											{showOriginalError ? originalError : error}
+										<div className="bg-muted/10 border border-border/40 rounded-xl p-4 text-[11px] font-medium leading-relaxed text-left">
+											<div className={showOriginalError ? "text-destructive font-mono" : "text-foreground"}>
+												{showOriginalError ? originalError : error}
+											</div>
 										</div>
 									</div>
 								)}
 							</div>
-							<div className="flex gap-2">
+							<div className="flex gap-3 w-full">
 								<button
 									type="button"
 									onClick={() => handleOpenChange(false)}
-									className="px-4 py-2 text-sm font-medium border rounded-md hover:bg-accent transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
+									className="flex-1 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider border border-border/60 rounded-lg hover:bg-muted/20 transition-all"
 								>
 									Cerrar
 								</button>
 								<button
 									type="button"
 									onClick={() => setStep("review")}
-									className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
+									className="flex-1 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm"
 								>
 									Reintentar
 								</button>

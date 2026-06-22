@@ -395,22 +395,19 @@ function HealthMonitorPage() {
   const sortBy = (search.sortBy as 'default' | 'errors' | 'recent') || 'default';
   const environment = search.environment || 'all';
 
+  const handleSortChange = useCallback((newSort: string) => {
+    navigate({
+      to: '.',
+      search: (prev: Record<string, unknown>) => ({ ...prev, sortBy: newSort }),
+    });
+  }, [navigate]);
+
   const handleEnvironmentChange = useCallback((newEnv: string) => {
     navigate({
       to: '.',
       search: (prev: Record<string, unknown>) => ({
         ...prev,
         environment: newEnv === 'all' ? undefined : newEnv
-      }),
-    });
-  }, [navigate]);
-
-  const handleSortChange = useCallback((newSort: string) => {
-    navigate({
-      to: '.',
-      search: (prev: Record<string, unknown>) => ({
-        ...prev,
-        sortBy: newSort === 'default' ? undefined : (newSort as 'errors' | 'recent')
       }),
     });
   }, [navigate]);

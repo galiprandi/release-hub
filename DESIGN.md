@@ -1,6 +1,7 @@
 # Design System - ReleaseHub
 
 ## Industrial Resonance V2
+- **Font**: Inter (Google Fonts, variable opsz 14-32, weights 300-700). Configured in `index.html` with `preconnect` + `display=swap`. Applied globally in `index.css` with `font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11'` (alternate glyphs for a/i/l/1) and antialiased rendering. Fallback: `system-ui, -apple-system, sans-serif`.
 - **Typography**: `tracking-tight` (names), `text-[10px] font-bold uppercase tracking-wider` (labels).
 - **Hierarchy**: Semantic tokens + 20% opacity (`bg-success/20 border-success/20`).
 - **Geometry**: `rounded-xl` (containers), `rounded-lg` (actions), `rounded-md` (badges).
@@ -89,7 +90,7 @@
 - **Namespace Filtering**: Promoted to the `PageLayout` header using `IndustrialTabs`, synchronized with the `namespace` search parameter. Per-table filter bars are removed for high-density consistency.
 - **Grouping**: Favorites are grouped by `context` (Boxes icon). Projects are grouped by `project.id` (Folder icon).
 - **Deployment Status**: Badges use semantic tokens (success/info/destructive/muted) with 20% opacity and `rounded-md`. Labels are localized (Saludable, Procesando, Degradado, Desconocido).
-- **Search UI**: High-density dropdown with technical metadata (Namespace, Context, Ready/Up-to-date/Available counts) and keyboard-centric navigation hints.
+- **Search UI**: On-demand namespace search with 400ms debounce. Queries `searchDeploymentsByNamespace` across all contexts in parallel. High-density dropdown with technical metadata (Namespace, Context, Ready/Up-to-date/Available counts) and keyboard-centric navigation hints. No hardcoded namespace list.
 
 ### GitHub UI Resonance
 - **Dashboard Layout**: Primary collection navigation (`IndustrialTabs`) and project management actions reside in the `PageLayout` header.

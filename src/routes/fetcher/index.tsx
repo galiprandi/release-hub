@@ -215,7 +215,7 @@ function FetcherPage() {
 					value={curlInput}
 					onChange={(e) => setCurlInput(e.target.value)}
 					placeholder="Importar cURL... (curl -X GET...)"
-					className="w-80 px-3 py-1.5 text-sm border border-border/60 bg-muted/40 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono transition-shadow"
+					className="w-80 px-3 py-1.5 text-sm border border-border/60 bg-muted/40 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono transition-shadow placeholder:text-muted-foreground/40"
 				/>
 			</div>
 			<ActionButton
@@ -228,48 +228,50 @@ function FetcherPage() {
 		</form>
 	);
 
+	const searchComponent = (
+		<div className="flex items-center gap-4">
+			<div className="flex items-center gap-2">
+				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Método</span>
+				<IndustrialTabs
+					options={[
+						{ id: 'ALL', label: 'Todos' },
+						{ id: 'GET', label: 'GET' },
+						{ id: 'POST', label: 'POST' },
+						{ id: 'PUT', label: 'PUT' },
+						{ id: 'DELETE', label: 'DELETE' },
+						{ id: 'PATCH', label: 'PATCH' },
+					]}
+					activeId={search.method || 'ALL'}
+					onChange={handleFilterChange}
+					className="w-[320px]"
+				/>
+			</div>
+			<div className="flex items-center gap-2">
+				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Orden</span>
+				<IndustrialTabs
+					options={[
+						{ id: 'recent', label: 'Recientes' },
+						{ id: 'method', label: 'Método' },
+						{ id: 'status', label: 'Status' },
+						{ id: 'duration', label: 'Duración' },
+					]}
+					activeId={search.sortBy || 'recent'}
+					onChange={handleSortChange}
+					className="w-[280px]"
+				/>
+			</div>
+		</div>
+	);
+
 	return (
 		<PageLayout 
-			header={{ title: "Fetcher" }}
-			actions={[headerActions]}
+			header={{
+				title: "Fetcher",
+				searchComponent: access?.hasAccess && history.length > 0 ? searchComponent : undefined
+			}}
+			actions={access?.hasAccess ? [headerActions] : []}
 		>
 			<div className="space-y-6">
-			{/* Navigation & Controls */}
-			{access?.hasAccess && history.length > 0 && (
-				<div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-muted/10 p-4 rounded-xl border border-border/40">
-					<div className="flex flex-col gap-2 w-full sm:w-auto">
-						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Filtrar por Método</span>
-						<IndustrialTabs
-							options={[
-								{ id: 'ALL', label: 'Todos' },
-								{ id: 'GET', label: 'GET' },
-								{ id: 'POST', label: 'POST' },
-								{ id: 'PUT', label: 'PUT' },
-								{ id: 'DELETE', label: 'DELETE' },
-								{ id: 'PATCH', label: 'PATCH' },
-							]}
-							activeId={search.method || 'ALL'}
-							onChange={handleFilterChange}
-							className="w-full sm:w-[480px]"
-						/>
-					</div>
-					<div className="flex flex-col gap-2 w-full sm:w-auto">
-						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Ordenar por</span>
-						<IndustrialTabs
-							options={[
-								{ id: 'recent', label: 'Recientes' },
-								{ id: 'method', label: 'Método' },
-								{ id: 'status', label: 'Status' },
-								{ id: 'duration', label: 'Duración' },
-							]}
-							activeId={search.sortBy || 'recent'}
-							onChange={handleSortChange}
-							className="w-full sm:w-[400px]"
-						/>
-					</div>
-				</div>
-			)}
-
 			{/* Content */}
 			{checkingAccess ? (
 				<StatusCard type="loading" message="Verificando acceso a curl..." />

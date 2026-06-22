@@ -395,12 +395,19 @@ function HealthMonitorPage() {
   const sortBy = (search.sortBy as 'default' | 'errors' | 'recent') || 'default';
   const environment = search.environment || 'all';
 
+  const handleSortChange = useCallback((newSort: string) => {
+    navigate({
+      to: '.',
+      search: (prev: Record<string, unknown>) => ({ ...prev, sortBy: newSort }),
+    });
+  }, [navigate]);
+
   const handleEnvironmentChange = useCallback((newEnv: string) => {
     navigate({
       to: '.',
       search: (prev: Record<string, unknown>) => ({
         ...prev,
-        sortBy: newSort === 'default' ? undefined : (newSort as 'errors' | 'recent')
+        environment: newEnv === 'all' ? undefined : newEnv
       }),
     });
   }, [navigate]);
@@ -416,16 +423,6 @@ function HealthMonitorPage() {
     }
     return null;
   }, [search.environment]);
-
-  const handleFilterChange = useCallback((filter: { id: string; value: string } | null) => {
-    navigate({
-      to: '.',
-      search: (prev: Record<string, unknown>) => ({
-        ...prev,
-        environment: filter ? (filter.value === 'false' ? 'unhealthy' : filter.value) : undefined
-      }),
-    });
-  }, [navigate]);
 
   // Filtrar endpoints según el filtro seleccionado
   const filteredEndpoints = endpoints.filter((ep) => {

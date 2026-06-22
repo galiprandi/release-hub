@@ -344,3 +344,16 @@
   - [x] Documentación: Actualización de `AGENTS.md` y `DESIGN.md` con los nuevos estándares de higiene técnica.
   - [x] Verificación Global: Zero-warning build log y lint audit exitoso.
 - **Resultado**: Higiene del repositorio elevada mediante la eliminación de entropía técnica y código huérfano, manteniendo el estándar AAA.
+
+### 2026-06-23: Surgical Hygiene & Resonance V2 Alignment V10
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-audit-v10`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] Restauración del Build: Exportación de `SAFE_COMMANDS` desde `src/utils/security.ts` corrigiendo errores de referencia en el middleware de Vite y suites de tests.
+  - [x] Alineación Resonance V2: Implementación de `handleSortChange` y corrección de `handleEnvironmentChange` en `src/routes/health/index.tsx`, asegurando sincronización de parámetros de búsqueda.
+  - [x] Blindaje SSRF: Fortalecimiento de `isInternalAddress` para detectar y bloquear bypasses mediante representaciones decimales y hexadecimales de IPs.
+  - [x] Higiene Técnica: Refinamiento de suites de tests reemplazando casts inseguros por directivas `@ts-expect-error` y eliminación de código muerto.
+  - [x] Verificación Global: Zero-warning build log, lint audit impecable y 227 tests unitarios exitosos.
+- **Resultado**: Integridad del repositorio restaurada y blindaje de seguridad expandido, manteniendo el estándar de ingeniería AAA y la consistencia estética Industrial Resonance V2.

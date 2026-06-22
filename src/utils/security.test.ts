@@ -14,7 +14,8 @@ vi.mock('node:child_process', async (importOriginal) => {
 describe('security utils', () => {
   describe('spawnAsync', () => {
     it('should succeed when process closes before timeout', async () => {
-      const mockProcess = {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockProcess: any = {
         stdout: { on: vi.fn() },
         stderr: { on: vi.fn() },
         on: vi.fn((event: string, handler: (code: number) => void) => {

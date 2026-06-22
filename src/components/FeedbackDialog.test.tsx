@@ -111,6 +111,7 @@ describe("FeedbackDialog", () => {
 		fireEvent.click(screen.getByRole("button", { name: /feedback/i }))
 
 		const textarea = screen.getByLabelText(/descripción/i)
-		expect(textarea).toHaveClass("focus:ring-2", "focus:ring-primary")
+		// Updated to match Industrial Resonance V2 focus standard with 20% opacity
+		expect(textarea).toHaveClass("focus:ring-2", "focus:ring-primary/20")
 	})
 })

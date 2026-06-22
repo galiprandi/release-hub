@@ -125,7 +125,7 @@ const execHandler: Connect.NextHandleFunction = async (req, res) => {
 			}),
 		);
 	} else {
-		console.error(`ERROR executing command:`, result.error || "Command failed");
+		console.error(`ERROR executing command:`, result.error || "Command failed", result.stderr ? `\nstderr: ${result.stderr.trim()}` : '');
 		res.setHeader("Content-Type", "application/json");
 		res.end(
 			JSON.stringify({

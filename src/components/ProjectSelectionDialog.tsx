@@ -33,7 +33,7 @@ export function ProjectSelectionDialog({ isOpen, onOpenChange, repoFullName }: P
 								<button
 									key={project.id}
 									onClick={() => toggleRepoInProject(project.id, repoFullName)}
-									className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-left group ${
+									className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-left group focus:outline-none focus:ring-2 focus:ring-primary/20 ${
 										isInProject
 											? "bg-primary/5 border-primary/20 hover:bg-primary/10"
 											: "bg-muted/10 border-border/20 hover:bg-muted/20"
@@ -65,7 +65,7 @@ export function ProjectSelectionDialog({ isOpen, onOpenChange, repoFullName }: P
 				<div className="pt-2 border-t border-border/20 flex justify-end">
 					<button
 						onClick={() => onOpenChange(false)}
-						className="px-6 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted/20 text-foreground rounded-lg hover:bg-muted/30 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						className="px-6 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted/20 text-foreground rounded-lg hover:bg-muted/30 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
 					>
 						Cerrar
 					</button>

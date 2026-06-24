@@ -4,6 +4,7 @@ import { useDockerAccess } from '@/hooks/useDockerAccess';
 import { useQuery } from '@tanstack/react-query';
 import { Boxes } from 'lucide-react';
 import { ContainerList, type ContainerListRef } from '@/docker/components/ContainerList';
+import { ContainerSearch } from '@/docker/components/ContainerSearch';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
 import { getContainers } from '@/api/docker';
@@ -28,7 +29,7 @@ function DockerManagerPage() {
   const navigate = useNavigate({ from: '/docker' });
   const search = useSearch({ from: '/docker' });
   const routerState = useRouterState();
-  const [searchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Only redirect if we're on the parent route and not on a child route
   const isParentRoute = routerState.location.pathname === '/docker';
@@ -95,19 +96,23 @@ function DockerManagerPage() {
           </div>
         ),
         searchComponent: access?.hasAccess ? (
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Estado:</span>
-            <IndustrialTabs
-              options={[
-                { id: 'all', label: `Todos (${filterCounts.all})` },
-                { id: 'running', label: `Ejecutando (${filterCounts.running})` },
-                { id: 'stopped', label: `Detenido (${filterCounts.stopped})` },
-                { id: 'exited', label: `Finalizado (${filterCounts.exited})` },
-              ]}
-              activeId={search.status || 'all'}
-              onChange={(id) => handleFilterChange({ id: 'status', value: id })}
-              className="w-full sm:w-[520px]"
-            />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Estado:</span>
+              <IndustrialTabs
+                options={[
+                  { id: 'all', label: `Todos (${filterCounts.all})` },
+                  { id: 'running', label: `Ejecutando (${filterCounts.running})` },
+                  { id: 'stopped', label: `Detenido (${filterCounts.stopped})` },
+                  { id: 'exited', label: `Finalizado (${filterCounts.exited})` },
+                ]}
+                activeId={search.status || 'all'}
+                onChange={(id) => handleFilterChange({ id: 'status', value: id })}
+                className="w-full sm:w-[520px]"
+              />
+            </div>
+            <div className="w-px h-6 bg-border/40 mx-1" />
+            <ContainerSearch query={searchQuery} setQuery={setSearchQuery} />
           </div>
         ) : undefined
       }}

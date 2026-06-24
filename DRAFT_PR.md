@@ -16,4 +16,5 @@ Esta misión se enfoca en la erradicación de la entropía técnica mediante la 
 - `src/utils/`
 - `AGENTS.md`
 - `DESIGN.md`
+- `AGENTS.md`
 - `CROMA.md`

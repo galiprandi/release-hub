@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { Send } from 'lucide-react';
+import { Send, Search, X } from 'lucide-react';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
 import { StatusCard } from '@/components/ui/StatusCard';
@@ -22,6 +22,7 @@ type FetcherMethod = 'ALL' | 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 interface FetcherSearch {
 	method?: FetcherMethod;
 	sortBy?: FetcherSortBy;
+	q?: string;
 }
 
 export const Route = createFileRoute('/fetcher/')({
@@ -30,6 +31,7 @@ export const Route = createFileRoute('/fetcher/')({
 		return {
 			method: (search.method as FetcherMethod) || 'ALL',
 			sortBy: (search.sortBy as FetcherSortBy) || 'recent',
+			q: typeof search.q === 'string' ? search.q : undefined,
 		};
 	},
 });
@@ -40,6 +42,7 @@ function FetcherPage() {
 	const navigate = useNavigate({ from: '/fetcher' });
 	const search = useSearch({ from: '/fetcher' });
 	const [activeQuery, setActiveQuery] = useState<QueryRecord | undefined>();
+	const [localSearch, setLocalSearch] = useState(search.q || '');
 	const [editingQuery, setEditingQuery] = useState<QueryRecord | undefined>();
 	const [curlInput, setCurlInput] = useState('');
 	const lastClipboardContent = useRef<string | null>(null);
@@ -99,11 +102,41 @@ function FetcherPage() {
 		});
 	}, [navigate]);
 
+	const handleQuerySearch = useCallback((q: string) => {
+		navigate({
+			to: '.',
+			search: (prev: Record<string, unknown>) => ({
+				...prev,
+				q: q || undefined
+			}),
+		});
+	}, [navigate]);
+
+	// Sync local search with query param
+	useEffect(() => {
+		setLocalSearch(search.q || '');
+	}, [search.q]);
+
 	// Filter and sort history based on search parameters
 	const filteredAndSortedHistory = useMemo(() => {
 		let result = [...history];
 
-		// Filter
+		// Text search filter
+		if (search.q) {
+			const q = search.q.toLowerCase();
+			result = result.filter(query => {
+				const parsed = parseCurlForDisplay(query.curl);
+				return (
+					query.curl.toLowerCase().includes(q) ||
+					(parsed && (
+						parsed.domain.toLowerCase().includes(q) ||
+						parsed.path.toLowerCase().includes(q)
+					))
+				);
+			});
+		}
+
+		// Method Filter
 		if (search.method && search.method !== 'ALL') {
 			result = result.filter(query => {
 				const parsed = parseCurlForDisplay(query.curl);
@@ -230,6 +263,35 @@ function FetcherPage() {
 
 	const searchComponent = (
 		<div className="flex items-center gap-4">
+			<div className="flex items-center gap-2">
+				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Búsqueda</span>
+				<div className="relative">
+					<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground/60" />
+					<input
+						type="text"
+						value={localSearch}
+						onChange={(e) => {
+							setLocalSearch(e.target.value);
+							handleQuerySearch(e.target.value);
+						}}
+						placeholder="Buscar en historial..."
+						className="w-48 pl-8 pr-3 py-1.5 bg-muted/40 border border-border/60 rounded-lg text-[11px] focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/40 font-medium uppercase tracking-tight"
+					/>
+					{localSearch && (
+						<button
+							type="button"
+							onClick={() => {
+								setLocalSearch('');
+								handleQuerySearch('');
+							}}
+							className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground transition-all"
+						>
+							<X className="w-2.5 h-2.5" />
+						</button>
+					)}
+				</div>
+			</div>
+			<div className="w-px h-6 bg-border/40 mx-1" />
 			<div className="flex items-center gap-2">
 				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Método</span>
 				<IndustrialTabs

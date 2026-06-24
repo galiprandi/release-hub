@@ -54,11 +54,21 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 		if (container) setSelectedContainer(container)
 	}
 
-	// Ordenar contenedores por nombre
-	const sortedContainers = useMemo(() => {
+	// Filtrar y ordenar contenedores
+	const filteredContainers = useMemo(() => {
 		if (!containers) return []
-		return containers.sort((a, b) => a.name.localeCompare(b.name))
-	}, [containers])
+		let result = [...containers]
+
+		if (searchQuery) {
+			const lowerQuery = searchQuery.toLowerCase()
+			result = result.filter(c =>
+				c.name.toLowerCase().includes(lowerQuery) ||
+				c.image.toLowerCase().includes(lowerQuery)
+			)
+		}
+
+		return result.sort((a, b) => a.name.localeCompare(b.name))
+	}, [containers, searchQuery])
 
 	// Expose refetch to parent
 	useImperativeHandle(ref, () => ({
@@ -94,7 +104,7 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 		return <StatusCard type="loading" message="Cargando contenedores..." />
 	}
 
-	if (!Array.isArray(sortedContainers) || sortedContainers.length === 0) {
+	if (!Array.isArray(filteredContainers) || filteredContainers.length === 0) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
 				<div className="p-4 rounded-full bg-muted/20 border border-border/40 mb-4">
@@ -113,7 +123,7 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 	return (
 		<>
 			<ContainersTable
-				containers={sortedContainers}
+				containers={filteredContainers}
 				onStart={handleStart}
 				onRestart={handleRestart}
 				onStop={handleStop}

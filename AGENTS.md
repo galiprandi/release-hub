@@ -125,18 +125,21 @@
 
 - **Tokens**: Solo de `DESIGN.md`. Nunca hardcodeados (`text-zinc-500`, `bg-red-500`).
 - **Health Monitor**: Status dots (`w-1.5 h-1.5`), semantic badges (/20 opacity), double-line URLs. Header-based filtering and sorting (IndustrialTabs) with dynamic status counts, help ActionButton with technical dialog, and bg-muted/10 containers for ProductSections.
-- **Foco**: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1`.
+- **Foco**: Administrative dialogs and interactive elements must use `focus:ring-primary/20` for focus-visible states.
 - **Navigation**: Prefer `IndustrialTabs` over legacy `FilterBar` or `select` for sorting/filtering. State must be synced with search params.
 - **Type Hygiene**: Prohibido `any`. Interfaces explícitas o `unknown` + validación. Casts de tipo en handlers deben usar `id as typeof stateVariable`. Mocks de test deben sincronizarse con firmas reales mediante casts de interfaces (`as ExecResponse`).
 - **Dashboard Data**: Usar `useRepoDashboardDetails` para acceder a datos de repositorios en el dashboard de GitHub. Prohibido duplicar tipos de `RepoDetails` o realizar casts manuales en los componentes de celda.
 - **Build Log**: Zero-warning build is mandatory. Outdated hook signatures in mocks/tests must be synchronized immediately.
 - **Dead Code Elimination**: Components and hooks identified as orphans must be removed immediately. Legacy hooks `usePipeline.ts`, `usePipelineDetector.ts`, `useKubectlNamespaceAccess.ts`, and `useGitHubActions.ts` have been eradicated.
 - **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Use localized status labels (Saludable, Procesando, etc.). Deployment search is on-demand by namespace across all contexts in parallel (no hardcoded namespace list).
+- **Dead Code Elimination**: Components and hooks identified as orphans must be removed immediately. Legacy hooks `usePipeline.ts`, `usePipelineDetector.ts`, and `useKubectlNamespaceAccess.ts` have been eradicated.
+- **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Use localized status labels (Saludable, Procesando, etc.). Deployment search is on-demand by namespace across all contexts in parallel (no hardcoded namespace list). Setup page aligned with V2 standard using high-density badges, semantic tokens with 20% opacity, and technical command containers.
 - **Mutaciones**: Optimistic update + revalidación selectiva. Nunca `window.location.reload()`.
 - **Resiliencia**: Si CLI falla (`kubectl`, `docker`), redirigir a `<module>/setup`.
 - **Novedades**: Technical header with Newspaper icon. Content encapsulated in bg-muted/10 containers with rounded-xl and p-8 padding.
-- **Docker UI**: Status filtering is promoted to the `PageLayout` header using `IndustrialTabs` synced with the `status` search param. High-density cells use semantic dots (`StatusCell`) and hover-to-reveal patterns (`ActionsCell`). Typography: `text-[10px] font-bold uppercase tracking-wider`.
-- **Fetcher UI**: Filtering and sorting must be implemented via dual `IndustrialTabs` in the route, persisting state in `method` and `sortBy` search parameters. `UrlCell` uses a double-line pattern: Muted Domain (`text-[10px] font-bold uppercase`) and Foreground Path (`text-sm medium`).
+- **Docker UI**: Status filtering and `ContainerSearch` are promoted to the `PageLayout` header using `IndustrialTabs` and a dedicated search input. High-density cells use semantic dots (`StatusCell`) and hover-to-reveal patterns (`ActionsCell`).
+- **Fetcher UI**: Filtering, sorting, and text search (`q` param) are implemented via `IndustrialTabs` and a header search input. `UrlCell` uses a double-line pattern: Muted Domain and Foreground Path.
+- **Omnisearch (RepoSearch)**: Standardized to `bg-muted/40` with `border-border/60` and `focus:ring-primary/20`. Results must include high-density technical badges (`REPO`, `FILE`).
 - **Diff Viewer**: Mode selection uses `IndustrialTabs`, synchronized with the `mode` search parameter. Technical metadata headers and comparison results use `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`. Containers use `bg-muted/10` and `border-border/60`. Empty states use `tracking-widest` placeholders.
 - **GitHub UI**: Collection navigation and management actions are in the `PageLayout` header. Dashboard-level filtering uses `IndustrialTabs` synced with `filter` search parameter. Technical metadata cels use high-density typography (`text-[10px] font-bold uppercase tracking-wider`).
 - **Health Monitor V2**: Primary environment filtering (Production, Staging, Unhealthy) is moved to the PageLayout header using IndustrialTabs. Product sections use `bg-muted/10` containers with `rounded-xl` geometry and technical Box icons.
@@ -153,6 +156,12 @@
 - **Entropy Reduction**: Eradicated duplicated test blocks in the security suite to maintain a lean and efficient test pipeline.
 - **Dead Code Removal**: Deleted the orphaned hook `src/hooks/useGitHubActions.ts` after confirming it had no external dependencies or imports.
 - **Build Integrity**: Verified zero-warning build state and global test pass (227 tests) following refactor.
+### Mejora #11: Kubernetes Setup Resonance V2 Refactor
+- **Setup Page Resonance**: Refactored `src/routes/kubernetes/setup.tsx` to align with Industrial Resonance V2 aesthetic.
+- **Typography**: Applied `text-[10px] font-bold uppercase tracking-wider` to technical labels and badges.
+- **Geometry**: Standardized to `rounded-xl` for cards and `rounded-md` for badges.
+- **Visuals**: Used semantic tokens with 20% opacity (`bg-success/10`, `bg-destructive/10`) and technical command containers (`bg-muted/10`).
+- **Hygiene**: Verified zero-warning build and lint, and implemented Playwright E2E verification.
 
 ### Mejora #10: Surgical Hygiene & Resonance V2 Alignment
 - **Restore SAFE_COMMANDS**: Exported `SAFE_COMMANDS` from `src/utils/security.ts` and updated consumers to maintain strict allow-listing for local execution.

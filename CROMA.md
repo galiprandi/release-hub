@@ -101,6 +101,21 @@
   - [x] Zero-warning build y validación de higiene técnica AAA.
 - **Resultado**: Interfaz de GitHub alineada con Industrial Resonance V2, optimizando la jerarquía de información y la consistencia técnica.
 
+### 2026-06-23: Refactor Kubernetes Setup Resonance V2
+- **Agente**: Carol 🐜
+- **Rama**: `🐜-Carol-refactor-kubernetes-setup-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] Refactor de Kubernetes Setup: alineación estética con Industrial Resonance V2.
+  - [x] Typography: Implementación de alta densidad (`text-[10px] font-bold uppercase tracking-wider`) en etiquetas técnicas.
+  - [x] Semantic Tokens: Uso de fondos semánticos al 10% y bordes al 20% para estados `success` y `destructive`.
+  - [x] Geometry: Estandarización de contenedores a `rounded-xl` y badges a `rounded-md`.
+  - [x] Technical Containers: Refactor de bloques de comandos con `bg-muted/10` y `border-border/40`.
+  - [x] Hygiene: Erradicación de `any` en `src/api/security.test.ts` y mantenimiento de zero-warning build.
+  - [x] Verificación: Implementación de test Playwright `e2e/kubernetes-setup.spec.ts` y captura de screenshot.
+- **Resultado**: Página de configuración de Kubernetes elevada al estándar Industrial Resonance V2, garantizando consistencia visual con el resto del ecosistema.
+
 ### 2026-06-15: Refactor Docker UI Resonance
 - **Rama**: `🐜-Carol-refactor-docker-ui-resonance`
 - **Estado**: Finalizado ✅
@@ -369,3 +384,16 @@
   - [x] Eliminación de Código Muerto: Remoción del hook huérfano `src/hooks/useGitHubActions.ts` tras confirmar ausencia de importaciones externas.
   - [x] Verificación Global: Zero-warning build log, lint audit impecable y 227 tests unitarios exitosos.
 - **Resultado**: Higiene del repositorio optimizada mediante la eliminación de redundancias y código muerto, asegurando un entorno de desarrollo limpio y eficiente bajo el estándar AAA.
+### 2026-06-24: Omnisearch Evolution & Resonance V2 Search
+- **Agente**: Uma 🐜
+- **Rama**: `🐜-Uma-refactor-search-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block & Mission Draft.
+  - [x] Docker Search Implementation: Creación de `ContainerSearch` e integración en el header de la ruta Docker para filtrado en tiempo real.
+  - [x] Fetcher Search Evolution: Implementación de búsqueda persistente (`q` param) en el historial de Fetcher integrada en el header.
+  - [x] Omnisearch Refinement: Estandarización de `RepoSearch` y `GenericSearch` con el estándar V2 (`bg-muted/40`, `border-border/60`, `focus:ring-primary/20`).
+  - [x] Metadata Badges: Integración de badges técnicos de alta densidad (`REPO`, `FILE`) en los resultados de búsqueda.
+  - [x] Build & Hygiene: Restauración de imports faltantes, zero-warning build logrado y 233 tests exitosos.
+  - [x] Documentación: Actualización de `DESIGN.md` y `AGENTS.md` con los nuevos estándares de búsqueda.
+- **Resultado**: Experiencia de búsqueda unificada y expandida a todos los módulos críticos, eliminando silos de información y alineando la interfaz con el estándar Industrial Resonance V2.

@@ -1,20 +1,17 @@
-# Draft PR: Surgical Hygiene & Entropy Audit V11 - Fiona 🐜
+# Draft PR: GitHub Setup Resonance V2 Refactor - Uma 🐜
 
 ## Descripción
-Esta misión se enfoca en la erradicación de la entropía técnica mediante la eliminación de código muerto, la resolución de advertencias del linter y la consolidación de la suite de pruebas de seguridad. Se busca mantener el estándar AAA de ingeniería y una higiene absoluta del repositorio.
+Esta misión se enfoca en la evolución de la página de configuración de GitHub para alinearla con el estándar Industrial Resonance V2. Se busca optimizar la jerarquía de información, mejorar la densidad visual y garantizar la consistencia estética con el resto del ecosistema de la aplicación.
 
 ## Objetivos
-- [x] **Technical Hygiene**: Resolución de advertencias de `eslint` en `src/api/security.test.ts` (erradicación de `any`).
-- [x] **Entropy Reduction**: Eliminación de bloques de tests duplicados y auditoría de componentes/hooks huérfanos.
-- [x] **Dead Code Elimination**: Remoción de archivos sin importaciones externas confirmadas.
-- [x] **Build Integrity**: Verificación de zero-warning build log y validación global de tests.
+- [ ] **Resonance V2 Alignment**: Refactorizar `src/routes/github/setup.tsx` aplicando tipografía de alta densidad y geometría estandarizada.
+- [ ] **Visual Hierarchy**: Implementar tokens semánticos con opacidad del 20% para estados de instalación y autenticación.
+- [ ] **Command Containers**: Rediseñar los bloques de comandos con contenedores técnicos `bg-muted/10` y bordes `border-border/40`.
+- [ ] **Technical Hygiene**: Asegurar un build de cero advertencias y la ausencia de código muerto o tipos inseguros.
+- [ ] **Documentation**: Actualizar `AGENTS.md`, `DESIGN.md` y `CROMA.md` con los nuevos estándares aplicados.
 
 ## Zona de Trabajo
-- `src/api/security.test.ts`
-- `src/hooks/`
-- `src/components/`
-- `src/utils/`
+- `src/routes/github/setup.tsx`
 - `AGENTS.md`
 - `DESIGN.md`
-- `AGENTS.md`
 - `CROMA.md`

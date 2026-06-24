@@ -103,6 +103,7 @@
   - `PRsCell` & `ActionsStatusCell`: Use semantic backgrounds with 20% opacity and technical borders.
   - `OperationsCell`: Implements hover-to-reveal (`opacity-0 group-hover:opacity-100`) to maintain layout focus.
 - **Detail View**: Navigation (Commits/Tags), external links (PRs, Actions), and `ProjectSelector` are promoted to the `PageLayout` header and actions array. Links use `bg-muted/40` and high-density technical typography.
+- **Setup Page**: Aligned with Industrial Resonance V2 aesthetic. Features high-density technical badges (`REQUERIDO`, `INSTALADO`), semantic tokens with 20% opacity, and command containers utilizing `bg-muted/10` backgrounds with `border-border/40` borders. Cards use `rounded-xl` geometry.
 
 ### Novedades Page Resonance
 - **Header**: High-density technical header with the 'Newspaper' icon.

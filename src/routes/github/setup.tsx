@@ -54,29 +54,40 @@ function GitHubSetupPage() {
 
 	const allOk = allRequiredInstalled && isAuthenticated;
 
-	// useEffect(() => {
-		// if (allOk && !isLoading) {
-		// 	navigate({ to: "/github" });
-		// }
-	// }, [allOk, isLoading, navigate]);
-
 	return (
-		<div className="max-w-2xl mx-auto py-12 px-4">
-			<h1 className="text-3xl font-bold mb-2">Configuración de GitHub</h1>
-			<p className="text-muted-foreground mb-8">
-				El módulo GitHub requiere la instalación y configuración previa de GitHub CLI y jq.
-			</p>
+		<div className="max-w-2xl mx-auto py-12 px-4 space-y-8">
+			<div>
+				<h1 className="text-2xl font-bold tracking-tight mb-2">Configuración de GitHub</h1>
+				<p className="text-muted-foreground text-sm">
+					El módulo GitHub requiere la instalación y configuración previa de GitHub CLI y jq.
+				</p>
+			</div>
 
-			<div className="space-y-3">
+			{allOk && !isLoading && (
+				<div className="flex items-center justify-end">
+					<button
+						onClick={() => navigate({ to: "/github" })}
+						className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-[10px] font-bold uppercase tracking-wider focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+					>
+						Ir a GitHub
+						<ArrowRight className="w-4 h-4" />
+					</button>
+				</div>
+			)}
+
+			<div className="space-y-4">
 				{results.map((result) => (
 					<div key={result.name}>
 						{result.isInstalled ? (
-							<div className="flex items-start gap-2 text-green-600 text-sm border border-green-200 rounded-lg p-4 bg-green-50/50">
+							<div className="flex items-start gap-3 text-success text-sm border border-success/20 rounded-xl p-4 bg-success/10 shadow-sm transition-all hover:bg-success/20">
 								<CheckCircle className="w-5 h-5 mt-0.5" />
 								<div className="flex-1">
-									<p className="font-medium">{result.name}</p>
-									<p className="text-muted-foreground text-xs">{result.description}</p>
-									{result.version && <p className="text-xs text-muted-foreground mt-1">Versión: {result.version}</p>}
+									<div className="flex items-center gap-2">
+										<p className="text-[10px] font-bold uppercase tracking-wider">{result.name}</p>
+										<span className="px-1.5 py-0.5 rounded-md bg-success/20 border border-success/20 text-[8px] font-bold uppercase">Instalado</span>
+									</div>
+									<p className="text-muted-foreground text-xs mt-1 leading-relaxed">{result.description}</p>
+									{result.version && <p className="text-[10px] font-mono text-muted-foreground/60 mt-2">Versión: {result.version}</p>}
 								</div>
 							</div>
 						) : (
@@ -102,31 +113,20 @@ function GitHubSetupPage() {
 						icon={<LogIn className="w-5 h-5" />}
 						title="Autenticación con GitHub"
 						description="Autentica tu cuenta de GitHub en la CLI para que ReleaseHub pueda acceder a tus repositorios y organizaciones. Este paso abre un flujo OAuth en tu navegador."
-						commands={[{ label: "", cmd: "gh auth login", os: null }]}
+						commands={[{ label: "Auth Flow", cmd: "gh auth login", os: null }]}
 						detectedOS={detectedOS}
 					/>
 				)}
 			</div>
 
-			<div className="flex justify-center mt-8">
+			<div className="flex justify-center pt-4">
 				<button
 					onClick={() => window.location.reload()}
-					className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+					className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-[10px] font-bold uppercase tracking-wider focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 				>
 					Verificar configuración
 				</button>
 			</div>
-
-			{allOk && !isLoading && (
-				<div className="flex justify-center mt-8">
-					<button
-						onClick={() => navigate({ to: "/github" })}
-						className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 flex items-center gap-2"
-					>
-						Ir a GitHub <ArrowRight className="w-4 h-4" />
-					</button>
-				</div>
-			)}
 		</div>
 	);
 }
@@ -154,23 +154,26 @@ function MissingCard({
 	}, [commands, detectedOS]);
 
 	return (
-		<div className="border border-red-200 rounded-lg p-4 bg-red-50/50">
+		<div className="border border-destructive/20 rounded-xl p-4 bg-destructive/10 shadow-sm text-destructive transition-all hover:bg-destructive/15">
 			<button
 				onClick={() => setOpen(!open)}
-				className="w-full flex items-center gap-3 text-left"
+				className="w-full flex items-center gap-3 text-left focus-visible:outline-none"
 			>
-				<XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+				<XCircle className="w-5 h-5 flex-shrink-0" />
 				<div className="flex-1">
-					<h2 className="font-semibold flex items-center gap-2">
-						{icon}
-						{title}
-					</h2>
-					<p className="text-sm text-muted-foreground">{description}</p>
+					<div className="flex items-center gap-2">
+						<h2 className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 text-destructive">
+							{icon}
+							{title}
+						</h2>
+						<span className="px-1.5 py-0.5 rounded-md bg-destructive/20 border border-destructive/20 text-[8px] font-bold uppercase">Requerido</span>
+					</div>
+					<p className="text-xs text-muted-foreground/60 mt-1 leading-relaxed">{description}</p>
 				</div>
-				{open ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+				{open ? <ChevronDown className="w-4 h-4 text-muted-foreground/60" /> : <ChevronRight className="w-4 h-4 text-muted-foreground/60" />}
 			</button>
 			{open && (
-				<div className="mt-3 bg-muted p-4 rounded-md text-sm font-mono space-y-3">
+				<div className="mt-4 bg-muted/10 border border-border/40 p-4 rounded-lg text-sm font-mono space-y-3 text-foreground">
 					{filteredCommands.map((c) => (
 						<div key={c.cmd}>
 							{c.label && <p className="text-muted-foreground"># {c.label}</p>}
@@ -214,10 +217,10 @@ function CopyButton({ text }: { text: string }) {
 		<button
 			onClick={handleCopy}
 			title="Copiar al portapapeles"
-			className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted-foreground/20"
+			className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-accent focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-none"
 		>
 			{copied ? (
-				<ClipboardCheck className="w-4 h-4 text-green-600" />
+				<ClipboardCheck className="w-4 h-4 text-success" />
 			) : (
 				<Clipboard className="w-4 h-4 text-muted-foreground" />
 			)}

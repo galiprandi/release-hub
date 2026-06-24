@@ -7,12 +7,13 @@
 - **Geometry**: `rounded-xl` (containers), `rounded-lg` (actions), `rounded-md` (badges).
 - **Hardening**: Middleware `spawn` con `shell: false` y timeout obligatorio de 30s (`spawnAsync`). Centralización de seguridad en `src/utils/security.ts`. Allow-list estricto en `/local/exec` (shells y node prohibidos). Validación estricta de recursos Kubernetes (RFC 1123) en todos los middlewares locales. Allow-list de scripts autorizados en `/local/script`. SSRF protection bloqueando 127.0.0.0/8, 169.254.0.0/16, CGNAT y IPv6 local, incluyendo representaciones decimales y hexadecimales de IPs para prevenir bypasses por normalización. DNS Rebinding protection mediante pre-resolución de hostnames en el proxy. Sanitización de inputs para CLI. Escapado HTML obligatorio en componentes que utilicen `dangerouslySetInnerHTML` (XSS Hardening).
 - **Standard Cells**: Health (semantic dots), PRs (primary badge), Workflows (status badge + pulse), Operations (high-density actions).
-- **Focus**: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1`.
+- **Focus**: Administrative dialogs and interactive elements use `focus:ring-primary/20` for a refined technical aesthetic.
 - **ARIA**: Explicit `aria-label` for icon buttons.
 
 ## Component Patterns
 - **Table**: `bg-muted/40` headers, technical metadata, vertical dividers. Internal filter bar uses `bg-muted/40` with a nested segmented-control layout for a professional aesthetic.
 - **Search Inputs**: Standardized to `bg-muted/40` with `border-border/60`. Focus state uses `focus:ring-primary/20`. Technical search results in dropdowns include high-density badges (`REPO`, `FILE`, `CONT`) with 10% opacity backgrounds.
+- **EmptyState**: Centered layout featuring an icon in a `p-4 rounded-full bg-muted/20 border border-border/40` container. Typography for labels is strictly `text-[10px] font-bold uppercase tracking-[0.2em]`.
 - **StatusCard**: Loading/error/offline states.
 - **ActionButton**: Iconographic with tooltip.
 - **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering.
@@ -87,6 +88,7 @@
 - **Content**: Encapsulated in `bg-muted/10` container with `rounded-xl` and `p-8` for optimal readability.
 
 ### Kubernetes UI Resonance
+- **Setup Page**: Aligned with Industrial Resonance V2 aesthetic. Features high-density technical badges for status (uppercase metadata), and command containers utilizing `bg-muted/10` backgrounds and `border-border/40` borders. Cards utilize `rounded-xl` geometry and semantic tokens with 20% opacity for backgrounds (`bg-success/10`, `bg-destructive/10`).
 - **Dashboard Navigation**: Uses `IndustrialTabs` for switching between 'Favoritos' and 'Proyectos'. State is persisted via `tab` search parameter.
 - **Namespace Filtering**: Promoted to the `PageLayout` header using `IndustrialTabs`, synchronized with the `namespace` search parameter. Per-table filter bars are removed for high-density consistency.
 - **Grouping**: Favorites are grouped by `context` (Boxes icon). Projects are grouped by `project.id` (Folder icon).

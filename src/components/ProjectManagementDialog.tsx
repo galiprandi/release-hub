@@ -89,7 +89,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 												type="text"
 												value={editName}
 												onChange={(e) => setEditName(e.target.value)}
-												className="w-full px-3 py-1.5 text-xs bg-background border border-border/60 rounded-md focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+												className="w-full px-3 py-1.5 text-xs bg-background border border-border/60 rounded-lg focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
 												placeholder="Nombre del proyecto"
 											/>
 										</div>
@@ -98,21 +98,21 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 											<textarea
 												value={editDescription}
 												onChange={(e) => setEditDescription(e.target.value)}
-												className="w-full px-3 py-1.5 text-xs bg-background border border-border/60 rounded-md focus:ring-2 focus:ring-primary/20 focus:outline-none h-20 resize-none transition-all"
+												className="w-full px-3 py-1.5 text-xs bg-background border border-border/60 rounded-lg focus:ring-2 focus:ring-primary/20 focus:outline-none h-20 resize-none transition-all"
 												placeholder="Descripción (opcional)"
 											/>
 										</div>
 										<div className="flex items-center gap-2">
 											<button
 												onClick={() => handleSaveEdit(project.id)}
-												className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm"
+												className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
 											>
 												<Save className="w-3.5 h-3.5" />
 												Guardar
 											</button>
 											<button
 												onClick={() => setEditingProject(null)}
-												className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all"
+												className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
 											>
 												<X className="w-3.5 h-3.5" />
 												Cancelar
@@ -178,7 +178,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 										required
 										value={newName}
 										onChange={(e) => setNewName(e.target.value)}
-										className="w-full px-3 py-1.5 text-xs bg-background border border-border/60 rounded-md focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+										className="w-full px-3 py-1.5 text-xs bg-background border border-border/60 rounded-lg focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
 										placeholder="Ej: Microservicios Core"
 									/>
 								</div>
@@ -190,7 +190,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 										id="projectDesc"
 										value={newDescription}
 										onChange={(e) => setNewDescription(e.target.value)}
-										className="w-full px-3 py-1.5 text-xs bg-background border border-border/60 rounded-md focus:ring-2 focus:ring-primary/20 focus:outline-none h-20 resize-none transition-all"
+										className="w-full px-3 py-1.5 text-xs bg-background border border-border/60 rounded-lg focus:ring-2 focus:ring-primary/20 focus:outline-none h-20 resize-none transition-all"
 										placeholder="Breve descripción del propósito de esta colección..."
 									/>
 								</div>
@@ -198,14 +198,14 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 							<div className="flex items-center gap-3">
 								<button
 									type="submit"
-									className="flex-1 py-2 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm"
+									className="flex-1 py-2 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
 								>
 									Crear Proyecto
 								</button>
 								<button
 									type="button"
 									onClick={() => setIsCreating(false)}
-									className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all"
+									className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
 								>
 									Cancelar
 								</button>
@@ -216,7 +216,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 					<div className="pt-4 border-t border-border/40 flex justify-end">
 						<button
 							onClick={() => onOpenChange(false)}
-							className="px-6 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all"
+							className="px-6 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
 						>
 							Listo
 						</button>

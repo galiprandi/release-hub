@@ -11,7 +11,6 @@ test('Kubernetes Setup page should have Industrial Resonance V2 styling', async 
 
   // Verify cards have rounded-xl and semantic styling
   // Assuming kubectl is not installed in the test environment, it should show MissingCard (destructive)
-  const kubectlCard = page.locator('div:has-text("kubectl")').first();
   // We expect it to be a MissingCard if kubectl is missing
   const isInstalled = await page.locator('text=Instalado').count() > 0;
 

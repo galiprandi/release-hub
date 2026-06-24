@@ -67,7 +67,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 			{showTrigger && (
 				<button
 					type="button"
-					className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2 rounded-md"
+					className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-lg"
 					title="Configuración"
 					aria-label="Configuración"
 					onClick={(e) => {
@@ -144,13 +144,13 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 											value={sekiTokenInput}
 											onChange={(e) => setSekiTokenInput(e.target.value)}
 											placeholder="eyJhbGciOiJSUzUxMiIsInR5cCI6IkJlYXJlciJ9..."
-											className="flex-1 px-3 py-2 text-xs bg-background border border-border/60 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+											className="flex-1 px-3 py-2 text-xs bg-background border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
 										/>
 										<button
 											type="button"
 											onClick={handleSaveSekiToken}
 											disabled={!sekiTokenInput.trim() || isUpdating}
-											className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-sm"
+											className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
 										>
 											<Save className="w-3.5 h-3.5" />
 											Guardar
@@ -203,13 +203,13 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 										value={discordWebhookInput}
 										onChange={(e) => setDiscordWebhookInput(e.target.value)}
 										placeholder="https://discord.com/api/webhooks/..."
-										className="flex-1 px-3 py-2 text-xs bg-background border border-border/60 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+										className="flex-1 px-3 py-2 text-xs bg-background border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
 									/>
 									<button
 										type="button"
 										onClick={handleSaveDiscordWebhook}
 										disabled={!discordWebhookInput.trim() || isUpdating}
-										className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-sm"
+										className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
 									>
 										<Save className="w-3.5 h-3.5" />
 										Guardar
@@ -232,7 +232,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 							type="button"
 							onClick={handleClearCache}
 							disabled={isClearingCache}
-							className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-wider bg-muted hover:bg-muted/80 px-4 py-3 rounded-xl border border-border/40 transition-all w-full disabled:opacity-50 group"
+							className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-wider bg-muted hover:bg-muted/80 px-4 py-3 rounded-xl border border-border/40 transition-all w-full disabled:opacity-50 group focus:outline-none focus:ring-2 focus:ring-primary/20"
 						>
 							{isClearingCache ? (
 								<>
@@ -252,7 +252,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 				{/* Footer */}
 				<div className="mt-8 pt-4 border-t border-border/40 flex-shrink-0">
 					<Dialog.Close asChild>
-						<button className="w-full px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all border border-border/40 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none">
+						<button className="w-full px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all border border-border/40 focus:outline-none focus:ring-2 focus:ring-primary/20">
 							Finalizar
 						</button>
 					</Dialog.Close>

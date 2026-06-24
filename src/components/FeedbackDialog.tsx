@@ -285,7 +285,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 													: s.id === step 
 														? "bg-primary text-primary-foreground shadow-[0_0_10px_rgba(var(--primary),0.3)] cursor-pointer"
 														: "bg-muted/40 text-muted-foreground/40 border border-border/20 cursor-default"
-											} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2`}
+											} focus:outline-none focus:ring-2 focus:ring-primary/20`}
 										>
 											{isCompleted(s.id) ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
 										</button>
@@ -342,7 +342,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									onClick={handleNext}
 									disabled={isGenerating || isEnhancing || !description.trim()}
-									className="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm"
+									className="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
 								>
 									{(isGenerating || isEnhancing) ? (
 										<>
@@ -410,7 +410,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									onClick={handleSend}
 									disabled={!aiTitle.trim() || !aiBody.trim()}
-									className="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm"
+									className="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
 								>
 									<Send className="w-3.5 h-3.5" />
 									Enviar Feedback
@@ -463,7 +463,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 							<button
 								type="button"
 								onClick={() => handleOpenChange(false)}
-								className="w-full mt-4 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm"
+								className="w-full mt-4 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
 							>
 								Finalizar
 							</button>
@@ -524,14 +524,14 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									type="button"
 									onClick={() => handleOpenChange(false)}
-									className="flex-1 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider border border-border/60 rounded-lg hover:bg-muted/20 transition-all"
+									className="flex-1 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider border border-border/60 rounded-lg hover:bg-muted/20 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
 								>
 									Cerrar
 								</button>
 								<button
 									type="button"
 									onClick={() => setStep("review")}
-									className="flex-1 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm"
+									className="flex-1 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
 								>
 									Reintentar
 								</button>

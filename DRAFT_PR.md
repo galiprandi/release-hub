@@ -1,18 +1,20 @@
-# Draft PR: Kubernetes Setup Resonance V2 Refactor - Carol 🐜
+# Draft PR: Omnisearch Evolution & Resonance V2 Search - Uma 🐜
 
 ## Descripción
-Esta misión se enfoca en elevar la interfaz de configuración de Kubernetes al estándar Industrial Resonance V2, priorizando la densidad visual, la consistencia técnica y una estética profesional y curada.
+Esta misión evoluciona la experiencia de búsqueda en la plataforma, unificando el estándar Industrial Resonance V2 y extendiendo la capacidad de filtrado a los módulos de Docker y Fetcher para minimizar la fricción operativa.
 
 ## Objetivos
-- [ ] **High-Density Typography**: Aplicación de `text-[10px] font-bold uppercase tracking-wider` en etiquetas y metadatos técnicos.
-- [ ] **Semantic Consistency**: Uso de tokens semánticos con 20% de opacidad para estados de éxito (`success`) y error/requerido (`destructive`).
-- [ ] **Industrial Geometry**: Estandarización de contenedores a `rounded-xl` y badges técnicos a `rounded-md`.
-- [ ] **Technical Containers**: Refactorización de bloques de comandos con fondos `bg-muted/10` y bordes `border-border/40`.
-- [ ] **Zero-warning Build**: Mantenimiento del estándar AAA de build y lint sin advertencias.
+- [ ] **Docker Search Integration**: Implementación de `ContainerSearch` en el header de la ruta Docker.
+- [ ] **Fetcher Search Evolution**: Integración de búsqueda persistente en el historial de Fetcher.
+- [ ] **Omnisearch Refinement**: Estandarización de `RepoSearch` con inputs V2 (`bg-muted/40`) y badges técnicos de alta densidad.
+- [ ] **Visual Consistency**: Sincronización de todos los inputs de búsqueda con el estándar de focus y bordes de `DESIGN.md`.
+- [ ] **Zero-warning Build**: Mantener el estándar AAA de build y lint.
 
 ## Zona de Trabajo
-- `src/routes/kubernetes/setup.tsx`
-- `e2e/kubernetes-setup.spec.ts`
+- `src/docker/components/ContainerSearch.tsx`
+- `src/routes/docker/index.tsx`
+- `src/routes/fetcher/index.tsx`
+- `src/components/RepoSearch.tsx`
 - `DESIGN.md`
 - `AGENTS.md`
 - `CROMA.md`

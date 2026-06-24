@@ -187,7 +187,7 @@ export function RepoSearch() {
             ? 'Buscar archivo: file:AGENTS.md'
             : `Búsqueda en ${summaryData?.total || 0} repositorios... (Cmd+K)`}
           aria-label="Búsqueda de repositorios"
-          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/20 border border-border/20 rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
+          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/40 border border-border/60 rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/40`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -264,6 +264,9 @@ export function RepoSearch() {
                               <span className="font-medium text-sm truncate">
                                 {item.name}
                               </span>
+                              <span className="px-1.5 py-0.5 rounded bg-warning/10 text-warning border border-warning/20 text-[9px] font-bold uppercase tracking-wider">
+                                FILE
+                              </span>
                             </div>
                             <p className="text-xs text-muted-foreground mt-1 truncate">
                               {item.path}
@@ -311,6 +314,9 @@ export function RepoSearch() {
                             <GitBranch className="w-4 h-4 text-primary" />
                             <span className="font-medium text-sm truncate">
                               {item.fullName}
+                            </span>
+                            <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 text-[9px] font-bold uppercase tracking-wider">
+                              REPO
                             </span>
                           </div>
                           {item.description && (

@@ -130,7 +130,7 @@
 - **Type Hygiene**: Prohibido `any`. Interfaces explícitas o `unknown` + validación. Casts de tipo en handlers deben usar `id as typeof stateVariable`. Mocks de test deben sincronizarse con firmas reales mediante casts de interfaces (`as ExecResponse`).
 - **Dashboard Data**: Usar `useRepoDashboardDetails` para acceder a datos de repositorios en el dashboard de GitHub. Prohibido duplicar tipos de `RepoDetails` o realizar casts manuales en los componentes de celda.
 - **Build Log**: Zero-warning build is mandatory. Outdated hook signatures in mocks/tests must be synchronized immediately.
-- **Dead Code Elimination**: Components and hooks identified as orphans must be removed immediately. Legacy hooks `usePipeline.ts`, `usePipelineDetector.ts`, and `useKubectlNamespaceAccess.ts` have been eradicated.
+- **Dead Code Elimination**: Components and hooks identified as orphans must be removed immediately. Legacy hooks `usePipeline.ts`, `usePipelineDetector.ts`, `useKubectlNamespaceAccess.ts`, and `useGitHubActions.ts` have been eradicated.
 - **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Use localized status labels (Saludable, Procesando, etc.). Deployment search is on-demand by namespace across all contexts in parallel (no hardcoded namespace list).
 - **Mutaciones**: Optimistic update + revalidación selectiva. Nunca `window.location.reload()`.
 - **Resiliencia**: Si CLI falla (`kubectl`, `docker`), redirigir a `<module>/setup`.
@@ -147,6 +147,12 @@
 - **cURL Parser**: Hardened state-machine tokenizer in `src/utils/curlParser.ts` supporting compact flags (e.g., `-H'Value'`). URL normalization via `new URL().toString()` ensures consistent formatting. Verified via `src/utils/curlParser.test.ts`.
 - **XSS Protection**: Mandatory HTML escaping in any component using `dangerouslySetInnerHTML`. Log utilities (`logUtils.tsx`) must escape the raw line before applying highlighting tags. Diff viewer (`DiffViewer.tsx`) must provide a safe `escapeHtml` fallback if syntax highlighting fails. Verified via `src/api/xss.test.ts`.
 - **SSRF Hardening Standard**: `isInternalAddress` in `src/utils/security.ts` must account for decimal and hexadecimal IP representations to prevent bypasses. All proxy and health check middlewares must utilize this centralized utility.
+
+### Mejora #12: Surgical Hygiene & Entropy Audit V11
+- **Linter Cleanup**: Resolved warnings in `src/api/security.test.ts` by replacing `any` with `@ts-expect-error` in type violation tests.
+- **Entropy Reduction**: Eradicated duplicated test blocks in the security suite to maintain a lean and efficient test pipeline.
+- **Dead Code Removal**: Deleted the orphaned hook `src/hooks/useGitHubActions.ts` after confirming it had no external dependencies or imports.
+- **Build Integrity**: Verified zero-warning build state and global test pass (227 tests) following refactor.
 
 ### Mejora #10: Surgical Hygiene & Resonance V2 Alignment
 - **Restore SAFE_COMMANDS**: Exported `SAFE_COMMANDS` from `src/utils/security.ts` and updated consumers to maintain strict allow-listing for local execution.

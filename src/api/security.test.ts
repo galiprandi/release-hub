@@ -78,7 +78,8 @@ describe('Security Hardening', () => {
 
     it('should throw error if command is not an array (runtime enforcement)', async () => {
       // testing runtime check for non-array input
-      await expect(runCommand('ls -la' as any)).rejects.toThrow('Security violation: runCommand requires an array of arguments')
+      // @ts-expect-error - Testing runtime enforcement for invalid input type
+      await expect(runCommand('ls -la')).rejects.toThrow('Security violation: runCommand requires an array of arguments')
     })
   })
 
@@ -258,52 +259,6 @@ describe('Security Hardening', () => {
       const result = await lookupAndValidate(legitHostname, mockLookup);
       expect(result.allowed).toBe(true);
       expect(result.resolvedIp).toBe('8.8.8.8');
-    });
-  })
-
-  describe('curl SSRF Hardening (Simulation)', () => {
-    const validateCurlArgs = async (args: string[], mockLookup: (h: string) => Promise<string>) => {
-      const command = args[0];
-      if (command !== 'curl') return { allowed: true };
-
-      const urls = args.filter(arg => arg.startsWith('http://') || arg.startsWith('https://'));
-      for (const targetUrl of urls) {
-        try {
-          const urlObj = new URL(targetUrl);
-          const hostname = urlObj.hostname;
-
-          if (isInternalAddress(hostname)) return { allowed: false, error: `Access to internal target "${hostname}" is forbidden` };
-
-          const resolvedIp = await mockLookup(hostname);
-          if (isInternalAddress(resolvedIp)) return { allowed: false, error: `Resolved IP "${resolvedIp}" for "${hostname}" is internal` };
-        } catch {
-          return { allowed: false, error: 'Invalid URL or DNS failure' };
-        }
-      }
-      return { allowed: true };
-    };
-
-    it('should block curl to internal hostname', async () => {
-      const args = ['curl', 'http://localhost/api'];
-      const mockLookup = vi.fn();
-      const result = await validateCurlArgs(args, mockLookup);
-      expect(result.allowed).toBe(false);
-      expect(result.error).toContain('Access to internal target "localhost" is forbidden');
-    });
-
-    it('should block curl to external hostname resolving to internal IP (Rebinding)', async () => {
-      const args = ['curl', 'http://malicious.com/payload'];
-      const mockLookup = vi.fn().mockResolvedValue('10.0.0.1');
-      const result = await validateCurlArgs(args, mockLookup);
-      expect(result.allowed).toBe(false);
-      expect(result.error).toContain('Resolved IP "10.0.0.1" for "malicious.com" is internal');
-    });
-
-    it('should allow curl to legitimate external URL', async () => {
-      const args = ['curl', 'https://api.github.com/repos/org/repo'];
-      const mockLookup = vi.fn().mockResolvedValue('140.82.121.4');
-      const result = await validateCurlArgs(args, mockLookup);
-      expect(result.allowed).toBe(true);
     });
   })
 

@@ -78,6 +78,7 @@ describe('Security Hardening', () => {
 
     it('should throw error if command is not an array (runtime enforcement)', async () => {
       // testing runtime check for non-array input
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(runCommand('ls -la' as any)).rejects.toThrow('Security violation: runCommand requires an array of arguments')
     })
   })

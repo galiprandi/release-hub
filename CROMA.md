@@ -397,3 +397,17 @@
   - [x] Build & Hygiene: Restauración de imports faltantes, zero-warning build logrado y 233 tests exitosos.
   - [x] Documentación: Actualización de `DESIGN.md` y `AGENTS.md` con los nuevos estándares de búsqueda.
 - **Resultado**: Experiencia de búsqueda unificada y expandida a todos los módulos críticos, eliminando silos de información y alineando la interfaz con el estándar Industrial Resonance V2.
+
+### 2026-06-25: AI Components Refactor & Resonance V2 Alignment
+- **Agente**: Carol 🐜
+- **Rama**: `🐜-Carol-refactor-ai-components-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block & Mission Draft.
+  - [x] AI Chat Refinement: Refactor de `AIChatModal` con burbujas de mensaje de alta densidad, sombras técnicas y alineación a `rounded-xl`.
+  - [x] Feedback Dialog Evolution: Rediseño del stepper visual con sombras semánticas y estandarización de inputs a `bg-muted/40`.
+  - [x] Typography Standard: Aplicación de `text-[10px] font-bold uppercase tracking-wider` en todas las etiquetas técnicas de los módulos de IA.
+  - [x] Technical Hygiene: Estandarización de estados de éxito/error con fondos semánticos al 20% y bordes técnicos.
+  - [x] Documentación: Actualización de `DESIGN.md` y `AGENTS.md` con los nuevos estándares de componentes de IA.
+  - [x] Verificación: Zero-warning build logrado y validación de integridad técnica.
+- **Resultado**: Componentes impulsados por IA elevados al estándar Industrial Resonance V2, garantizando una experiencia de usuario curada, profesional y visualmente coherente.

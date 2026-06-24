@@ -75,14 +75,6 @@
 - should prevent XSS in search filters
 - should prevent XSS when highlighting log levels
 
-## Module: terminalMiddleware
-- should register upgrade handler
-- should reject invalid context
-- should reject invalid docker container name
-- should reject invalid k8s resource name
-- should reject invalid namespace
-- should reject invalid terminal type
-
 ## Module: AIChatModal
 - calls prompt with multimodal signature when send button is clicked
 - calls reset when clear button is clicked
@@ -117,6 +109,14 @@
 - should render trigger button
 - should suggest next version correctly
 - should toggle commits list with accessibility attributes
+
+## Module: terminalMiddleware
+- should register upgrade handler
+- should reject invalid context
+- should reject invalid docker container name
+- should reject invalid k8s resource name
+- should reject invalid namespace
+- should reject invalid terminal type
 
 ## Module: usePortForward
 - connects successfully
@@ -248,6 +248,11 @@
 - renders loading state correctly
 - renders offline state correctly
 - renders warn state with retry button
+
+## Module: ContainerSearch
+- calls setQuery on change
+- renders correctly with placeholder
+- shows clear button when query is present and clears on click
 
 ## Module: Pipeline Adapters
 - should handle errors gracefully

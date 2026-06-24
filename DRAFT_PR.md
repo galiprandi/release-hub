@@ -1,20 +1,20 @@
-# Draft PR: Omnisearch Evolution & Resonance V2 Search - Uma 🐜
+# Draft PR: Surgical Hygiene & Entropy Audit V11 - Fiona 🐜
 
 ## Descripción
-Esta misión evoluciona la experiencia de búsqueda en la plataforma, unificando el estándar Industrial Resonance V2 y extendiendo la capacidad de filtrado a los módulos de Docker y Fetcher para minimizar la fricción operativa.
+Esta misión se enfoca en la erradicación de la entropía técnica mediante la eliminación de código muerto, la resolución de advertencias del linter y la consolidación de la suite de pruebas de seguridad. Se busca mantener el estándar AAA de ingeniería y una higiene absoluta del repositorio.
 
 ## Objetivos
-- [ ] **Docker Search Integration**: Implementación de `ContainerSearch` en el header de la ruta Docker.
-- [ ] **Fetcher Search Evolution**: Integración de búsqueda persistente en el historial de Fetcher.
-- [ ] **Omnisearch Refinement**: Estandarización de `RepoSearch` con inputs V2 (`bg-muted/40`) y badges técnicos de alta densidad.
-- [ ] **Visual Consistency**: Sincronización de todos los inputs de búsqueda con el estándar de focus y bordes de `DESIGN.md`.
-- [ ] **Zero-warning Build**: Mantener el estándar AAA de build y lint.
+- [x] **Technical Hygiene**: Resolución de advertencias de `eslint` en `src/api/security.test.ts` (erradicación de `any`).
+- [x] **Entropy Reduction**: Eliminación de bloques de tests duplicados y auditoría de componentes/hooks huérfanos.
+- [x] **Dead Code Elimination**: Remoción de archivos sin importaciones externas confirmadas.
+- [x] **Build Integrity**: Verificación de zero-warning build log y validación global de tests.
 
 ## Zona de Trabajo
-- `src/docker/components/ContainerSearch.tsx`
-- `src/routes/docker/index.tsx`
-- `src/routes/fetcher/index.tsx`
-- `src/components/RepoSearch.tsx`
+- `src/api/security.test.ts`
+- `src/hooks/`
+- `src/components/`
+- `src/utils/`
+- `AGENTS.md`
 - `DESIGN.md`
 - `AGENTS.md`
 - `CROMA.md`

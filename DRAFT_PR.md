@@ -1,21 +1,24 @@
-# Draft PR: Security Hardening V7 - Vesper 🐜
+# Draft PR: Surgical Hygiene Audit V11 - Fiona 🐜
 
 ## Descripción
-Esta misión se centra en elevar el umbral de seguridad y robustez del sistema mediante una auditoría profunda de superficies de ataque y la implementación de controles de validación más estrictos.
+Esta misión se centra en la erradicación de la entropía técnica, el saneamiento de tipos y la reorganización arquitectónica de componentes para cumplir con los estándares AAA y la directriz de localidad de módulos.
 
 ## Objetivos
-- [ ] **Technical Hygiene & Type Resilience**: Erradicación total de `any` en los tests de seguridad, migrando a tipos estrictos o casts seguros (`ChildProcess`).
-- [ ] **SSRF Protection Expansion**: Fortalecimiento de `isInternalAddress` contra bypasses avanzados (decimal/hex IPs) y expansión de la suite de pruebas.
-- [ ] **Terminal Middleware Validation**: Creación de una suite de tests dedicada para `terminalMiddleware.ts` para garantizar la integridad de los parámetros de sesión.
-- [ ] **Script Handler Hardening**: Refuerzo de la validación de repositorios en el middleware de ejecución de scripts para prevenir inyecciones colaterales.
-- [ ] **Zero-warning Build**: Mantener el estándar AAA de build y lint sin advertencias.
+- [ ] **Type Hygiene**: Erradicación total de `any` en suites de tests (`security.test.ts`, `terminalMiddleware.test.ts`).
+- [ ] **Component Locality**: Reubicación de componentes desde `src/components/` a sus respectivos módulos (`src/github/components/`, `src/diff/components/`).
+- [ ] **Entropy Cleanup**: Identificación y remoción de componentes huérfanos en `src/components/`.
+- [ ] **Build Integrity**: Mantener el estándar AAA de build y lint sin advertencias.
+- [ ] **Test Resilience**: Verificación global de la suite de pruebas tras la reorganización.
 
 ## Zona de Trabajo
-- `src/utils/security.ts`
+- `src/components/`
+- `src/github/components/`
+- `src/diff/components/`
+- `src/api/security.test.ts`
 - `src/utils/security.test.ts`
-- `src/config/terminalMiddleware.ts`
 - `src/config/terminalMiddleware.test.ts`
-- `vite.config.ts`
+- `src/routes/github/`
+- `src/routes/diff.tsx`
 - `AGENTS.md`
 - `DESIGN.md`
 - `CROMA.md`

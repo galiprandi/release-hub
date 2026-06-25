@@ -2,7 +2,7 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Send, AlertTriangle, Plus } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
-import { JsonEditor } from '@/components/JsonEditor';
+import { JsonEditor } from './JsonEditor';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
 import { parseCurlCommand, minifyJSON } from '@/utils/curlParser';

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setupTerminalMiddleware } from './terminalMiddleware';
-import { WebSocketServer } from 'ws';
+import { WebSocketServer, WebSocket } from 'ws';
+import type { Server } from 'node:http';
 
 // Mock ws and node-pty
 vi.mock('ws', () => {
@@ -23,14 +24,13 @@ vi.mock('node-pty', () => ({
 }));
 
 describe('terminalMiddleware', () => {
-  let mockServer: { on: ReturnType<typeof vi.fn> };
-  let wssInstance: { on: ReturnType<typeof vi.fn> };
+  let mockServer: Server;
+  let wssInstance: WebSocketServer;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockServer = { on: vi.fn() };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setupTerminalMiddleware(mockServer as any);
+    mockServer = { on: vi.fn() } as unknown as Server;
+    setupTerminalMiddleware(mockServer);
     wssInstance = vi.mocked(WebSocketServer).mock.results[0].value;
   });
 
@@ -39,19 +39,17 @@ describe('terminalMiddleware', () => {
   });
 
   describe('Connection Validation', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let connectionHandler: (ws: any, req: any) => Promise<void>;
-    let mockWs: { send: ReturnType<typeof vi.fn>; close: ReturnType<typeof vi.fn>; on: ReturnType<typeof vi.fn>; readyState: number };
+    let connectionHandler: (ws: WebSocket, req: unknown) => Promise<void>;
+    let mockWs: WebSocket;
 
     beforeEach(() => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      connectionHandler = wssInstance.on.mock.calls.find((call: any[]) => call[0] === 'connection')![1];
+      connectionHandler = vi.mocked(wssInstance.on).mock.calls.find((call) => call[0] === 'connection')![1] as unknown as (ws: WebSocket, req: unknown) => Promise<void>;
       mockWs = {
         send: vi.fn(),
         close: vi.fn(),
         on: vi.fn(),
         readyState: 1
-      };
+      } as unknown as WebSocket;
     });
 
     it('should reject invalid terminal type', async () => {

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { FolderPlus, FolderEdit, Save, X, FolderKanban } from "lucide-react";
-import { BaseDialog } from "./ui/BaseDialog";
-import { ActionButton, ACTION_DEFINITIONS } from "./ui/ActionButton";
+import { BaseDialog } from "@/components/ui/BaseDialog";
+import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
 import { useUserCollections, type Project } from "@/hooks/useUserCollections";
-import { ConfirmDialog } from "./ui/ConfirmDialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface ProjectManagementDialogProps {
 	isOpen: boolean;

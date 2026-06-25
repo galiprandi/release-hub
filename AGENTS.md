@@ -148,13 +148,14 @@
 - **XSS Protection**: Mandatory HTML escaping in any component using `dangerouslySetInnerHTML`. Log utilities (`logUtils.tsx`) must escape the raw line before applying highlighting tags. Diff viewer (`DiffViewer.tsx`) must provide a safe `escapeHtml` fallback if syntax highlighting fails. Verified via `src/api/xss.test.ts`.
 - **SSRF Hardening Standard**: `isInternalAddress` in `src/utils/security.ts` must account for decimal and hexadecimal IP representations to prevent bypasses. All proxy and health check middlewares must utilize this centralized utility.
 
-### Mejora #10: Surgical Hygiene & Resonance V2 Alignment
-- **Restore SAFE_COMMANDS**: Exported `SAFE_COMMANDS` from `src/utils/security.ts` and updated consumers to maintain strict allow-listing for local execution.
-- **Health Monitor Alignment**: Implemented `handleSortChange` and fixed `handleEnvironmentChange` in `src/routes/health/index.tsx`, ensuring proper search parameter synchronization and removing orphan handlers.
-- **SSRF Robustness**: Hardened `isInternalAddress` to detect and block IPv4 bypasses using decimal and hexadecimal notations.
-- **Technical Hygiene**: Erradicated unused `@ts-expect-error` and refined type safety in test suites.
+### Mejora #12: Surgical Hygiene Audit & Component Relocation
+- **Type Hygiene**: Eradicated `any` in test suites (`security.test.ts`, `terminalMiddleware.test.ts`, `security.test.ts`) using strict types and safe casts.
+- **Component Relocation**: Migrated module-specific components to `src/github/components/`, `src/diff/components/`, and `src/fetcher/components/`.
+- **Shared Components**: Promoted `AISummaryCard`, `DisplayInfo`, `AIChatModal`, `FeedbackDialog`, `SettingsDialog`, and `GenericSearch` to `src/components/shared/`.
+- **Entropy Cleanup**: Eradicated orphaned hook `useGitHubActions.ts` and maintained zero-warning build/lint state.
+- **Build Integrity**: Verified AAA standard with 230 passing tests and zero-warning build log.
 
-### Mejora #7: Refactor Kubernetes & Terminal Resonance V2
+### Mejora #10: Surgical Hygiene & Resonance V2 Alignment
 - **Kubernetes Dashboard**: Promoted Namespace filtering to the `PageLayout` header using `IndustrialTabs`, synchronized with search parameters. Removed redundant local filter bars.
 - **Terminal Route**: Aligned with Industrial Resonance V2, adding a high-density technical header with session metadata (Shell, Connection Status).
 - **Deployment Search**: Enhanced results with technical metadata (Ready, Up-to-date, Available counts) using standard badges.

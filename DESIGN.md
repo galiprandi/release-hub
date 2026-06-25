@@ -57,7 +57,8 @@
 ## Layout V2
 - Sidebar fijo (50px). Sticky header with backdrop-blur.
 - Contenido `px-8`, `gap-6`.
-- **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente. La eliminación de código muerto (`useKubectlNamespaceAccess.ts`) es mandatoria para mantener la higiene.
+- **Component Locality**: Module-specific components must reside in `src/<module>/components/`. Global or multi-module components reside in `src/components/shared/` or `src/components/ui/`.
+- **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente. La eliminación de código muerto (`useKubectlNamespaceAccess.ts`, `useGitHubActions.ts`) es mandatoria para mantener la higiene.
 
 ## Specific Module Standards
 

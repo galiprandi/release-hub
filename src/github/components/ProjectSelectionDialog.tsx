@@ -1,5 +1,5 @@
 import { Check, Plus } from "lucide-react";
-import { BaseDialog } from "./ui/BaseDialog";
+import { BaseDialog } from "@/components/ui/BaseDialog";
 import { useUserCollections } from "@/hooks/useUserCollections";
 
 interface ProjectSelectionDialogProps {

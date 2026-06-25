@@ -333,19 +333,21 @@
   - [x] Auditoría AAA: Verificación de build y lint sin advertencias (zero-warning state).
   - [x] Validación Global: Ejecución exitosa de 212 tests unitarios y de integración.
 - **Resultado**: Repositorio refinado con mayor integridad de tipos y libre de componentes huérfanos, manteniendo el estándar de ingeniería AAA.
-### 2026-06-23: Surgical Hygiene Audit V9
+### 2026-06-23: Surgical Hygiene Audit & Component Relocation V11
 - **Agente**: Fiona 🐜
-- **Rama**: `🐜-Fiona-refactor-hygiene-audit-v9`
+- **Rama**: `🐜-Fiona-refactor-hygiene-audit-v11`
 - **Estado**: Finalizado ✅
 - **Cambios**:
-  - [x] Phase 0: Territory Block & PR Audit.
-  - [x] Saneamiento de Linter: Erradicación de `any` en `src/utils/security.test.ts` mediante casts seguros a `childProcess.ChildProcess`.
-  - [x] Eliminación de Código Muerto: Remoción del hook huérfano `src/hooks/useKubectlNamespaceAccess.ts`.
-  - [x] Documentación: Actualización de `AGENTS.md` y `DESIGN.md` con los nuevos estándares de higiene técnica.
-  - [x] Verificación Global: Zero-warning build log y lint audit exitoso.
-- **Resultado**: Higiene del repositorio elevada mediante la eliminación de entropía técnica y código huérfano, manteniendo el estándar AAA.
+  - [x] Phase 0: Territory Block.
+  - [x] Type Hygiene: Erradicación total de `any` en test suites (`security.test.ts`, `terminalMiddleware.test.ts`).
+  - [x] Component Relocation: Migración de componentes a sus respectivos módulos (`src/github/components/`, `src/diff/components/`, `src/fetcher/components/`).
+  - [x] Architecture Standard: Promoción de componentes multi-módulo a `src/components/shared/`.
+  - [x] Entropy Cleanup: Remoción del hook huérfano `src/hooks/useGitHubActions.ts`.
+  - [x] Build Restoration: Zero-warning build y lint state garantizado.
+  - [x] Verificación Global: 230 tests exitosos.
+- **Resultado**: Repositorio alineado con el estándar de localidad de componentes y libre de entropía técnica, elevando la mantenibilidad al estándar AAA.
 
-### 2026-06-23: Surgical Hygiene & Resonance V2 Alignment V10
+### 2026-06-23: Surgical Hygiene Audit V9
 - **Agente**: Fiona 🐜
 - **Rama**: `🐜-Fiona-refactor-hygiene-audit-v10`
 - **Estado**: Finalizado ✅

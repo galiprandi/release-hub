@@ -4,7 +4,7 @@ import { Activity, ExternalLink, Box, HelpCircle } from 'lucide-react';
 import { useHealthMonitor } from '@/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
 import { Table } from '@/components/ui/Table';
-import { EmptyState } from '@/components/EmptyState';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PageLayout } from '../../layouts/PageLayout';

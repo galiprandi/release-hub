@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Copy, Check, Code, Search, X } from 'lucide-react';
-import { formatJSON } from '../utils/curlParser';
+import { formatJSON } from '@/utils/curlParser';
 
 interface JsonEditorProps {
 	value: string;
@@ -77,7 +77,7 @@ export function JsonEditor({
 			const formatted = formatJSON(displayValue);
 			return formatted
 				.split('\n')
-				.filter((line) => line.toLowerCase().includes(searchQuery.toLowerCase()))
+				.filter((line: string) => line.toLowerCase().includes(searchQuery.toLowerCase()))
 				.join('\n') || '(Sin coincidencias)';
 		}
 		

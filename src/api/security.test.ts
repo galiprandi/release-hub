@@ -78,7 +78,8 @@ describe('Security Hardening', () => {
 
     it('should throw error if command is not an array (runtime enforcement)', async () => {
       // testing runtime check for non-array input
-      await expect(runCommand('ls -la' as any)).rejects.toThrow('Security violation: runCommand requires an array of arguments')
+      // @ts-expect-error - testing runtime protection against invalid types
+      await expect(runCommand('ls -la')).rejects.toThrow('Security violation: runCommand requires an array of arguments')
     })
   })
 

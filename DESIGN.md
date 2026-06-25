@@ -16,6 +16,8 @@
 - **EmptyState**: Centered layout featuring an icon in a `p-4 rounded-full bg-muted/20 border border-border/40` container. Typography for labels is strictly `text-[10px] font-bold uppercase tracking-[0.2em]`.
 - **StatusCard**: Loading/error/offline states.
 - **ActionButton**: Iconographic with tooltip.
+- **AI Chat Bubble**: High-density typography with `rounded-xl` geometry. User messages utilize `shadow-[0_0_15px_rgba(var(--primary),0.1)]`. Assistant messages use `bg-ai/5` and `border-ai/10` for subtle technical contrast.
+- **Feedback Stepper**: Technical step indicators with `shadow-[0_0_15px_rgba(var(--primary),0.2)]` for active states and `border-border/60` for inactive states.
 - **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering.
 - **Terminal**: High-density technical header with session metadata (e.g., 'Sesión Local Activa', '/bin/bash'). Semantic status dots (OK/Error) with technical shadows. Viewport uses `bg-zinc-950` background.
 - **BaseDialog**: Modal consistency.
@@ -107,6 +109,7 @@
   - `PRsCell` & `ActionsStatusCell`: Use semantic backgrounds with 20% opacity and technical borders.
   - `OperationsCell`: Implements hover-to-reveal (`opacity-0 group-hover:opacity-100`) to maintain layout focus.
 - **Detail View**: Navigation (Commits/Tags), external links (PRs, Actions), and `ProjectSelector` are promoted to the `PageLayout` header and actions array. Links use `bg-muted/40` and high-density technical typography.
+- **Setup Page**: Aligned with Industrial Resonance V2 aesthetic. Features high-density technical badges (`REQUERIDO`, `INSTALADO`), semantic tokens with 20% opacity, and command containers utilizing `bg-muted/10` backgrounds with `border-border/40` borders. Cards use `rounded-xl` geometry.
 
 ### Novedades Page Resonance
 - **Header**: High-density technical header with the 'Newspaper' icon.

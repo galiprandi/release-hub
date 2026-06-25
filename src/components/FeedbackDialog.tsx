@@ -281,10 +281,10 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 											aria-disabled={idx > currentStepIndex}
 											className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${
 												isCompleted(s.id) 
-													? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_10px_rgba(var(--primary),0.3)] cursor-pointer"
+												? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(var(--primary),0.2)] cursor-pointer"
 													: s.id === step 
-														? "bg-primary text-primary-foreground shadow-[0_0_10px_rgba(var(--primary),0.3)] cursor-pointer"
-														: "bg-muted/40 text-muted-foreground/40 border border-border/20 cursor-default"
+													? "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--primary),0.2)] cursor-pointer"
+													: "bg-muted/40 text-muted-foreground/40 border border-border/60 cursor-default"
 											} focus:outline-none focus:ring-2 focus:ring-primary/20`}
 										>
 											{isCompleted(s.id) ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
@@ -320,7 +320,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 										onChange={(e) => setDescription(e.target.value)}
 										placeholder="Explica en detalle tu idea, problema o sugerencia. El sistema utilizará IA para normalizar el reporte..."
 										rows={8}
-										className="w-full px-4 py-3 text-xs bg-muted/10 border border-border/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-all duration-200 leading-relaxed font-mono"
+										className="w-full px-4 py-3 text-xs bg-muted/40 border border-border/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-all duration-200 leading-relaxed font-mono placeholder:text-muted-foreground/40"
 									/>
 								</div>
 
@@ -373,7 +373,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 										type="text"
 										value={aiTitle}
 										onChange={(e) => setAiTitle(e.target.value)}
-										className="w-full px-4 py-3 text-xs bg-muted/10 border border-border/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold uppercase tracking-tight"
+										className="w-full px-4 py-3 text-xs bg-muted/40 border border-border/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold uppercase tracking-tight"
 									/>
 								</div>
 
@@ -386,7 +386,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 										value={aiBody}
 										onChange={(e) => setAiBody(e.target.value)}
 										rows={8}
-										className="w-full px-4 py-3 text-xs bg-muted/10 border border-border/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-all duration-200 leading-relaxed"
+										className="w-full px-4 py-3 text-xs bg-muted/40 border border-border/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-all duration-200 leading-relaxed"
 									/>
 								</div>
 
@@ -429,7 +429,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 							<div className="space-y-2">
 								<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground">Sincronizando con GitHub</p>
 								<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">
-									Creando registro técnico en galiprandi/release-hub
+									Creando registro técnico en <span className="text-foreground/60">galiprandi/release-hub</span>
 								</p>
 							</div>
 						</div>
@@ -438,7 +438,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 					{/* Step: Success */}
 					{step === "success" && (
 						<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-6">
-							<div className="w-16 h-16 rounded-full bg-success/10 border border-success/20 flex items-center justify-center shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+							<div className="w-16 h-16 rounded-full bg-success/20 border border-success/20 flex items-center justify-center shadow-[0_0_20px_rgba(var(--success),0.1)]">
 								<CheckCircle2 className="w-8 h-8 text-success" />
 							</div>
 							<div className="space-y-4">
@@ -480,14 +480,14 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 											<div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
 											<Loader2 className="w-16 h-16 animate-spin text-primary relative z-10" />
 										</div>
-										<div className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
+										<div className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40">
 											<Sparkles className="w-4 h-4" />
 											<span>Análisis IA en curso</span>
 										</div>
 									</div>
 								) : (
 									<div className="space-y-4">
-										<div className="w-16 h-16 rounded-full bg-destructive/10 border border-destructive/20 flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+										<div className="w-16 h-16 rounded-full bg-destructive/20 border border-destructive/20 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(var(--destructive),0.1)]">
 											<AlertCircle className="w-8 h-8 text-destructive" />
 										</div>
 										<div className="flex items-center justify-center gap-2">
@@ -512,8 +512,8 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 												)}
 											</button>
 										</div>
-										<div className="bg-muted/10 border border-border/40 rounded-xl p-4 text-[11px] font-medium leading-relaxed text-left">
-											<div className={showOriginalError ? "text-destructive font-mono" : "text-foreground"}>
+										<div className="bg-muted/10 border border-border/40 rounded-xl p-4 text-xs font-medium leading-relaxed text-left">
+											<div className={showOriginalError ? "text-destructive font-mono" : "text-foreground/90"}>
 												{showOriginalError ? originalError : error}
 											</div>
 										</div>

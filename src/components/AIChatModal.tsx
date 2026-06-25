@@ -239,19 +239,19 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							key={i}
 							className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
 						>
-							<div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border shadow-sm ${
+							<div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border ${
 								msg.role === "user"
 									? "bg-primary/10 border-primary/20 text-primary"
 									: "bg-ai/10 border-ai/20 text-ai"
 							}`}>
 								{msg.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
 							</div>
-							<div className={`max-w-[85%] p-3 rounded-2xl text-sm shadow-sm ${
+							<div className={`max-w-[85%] p-3 rounded-xl text-sm ${
 								msg.role === "user"
-									? "bg-primary text-primary-foreground rounded-tr-none"
-									: "bg-muted/50 border border-border/40 rounded-tl-none"
+									? "bg-primary text-primary-foreground rounded-tr-none shadow-[0_0_15px_rgba(var(--primary),0.1)]"
+									: "bg-ai/5 border border-ai/10 rounded-tl-none text-foreground/90"
 							}`}>
-								<div className="prose prose-sm dark:prose-invert max-w-none break-words">
+								<div className="prose prose-sm dark:prose-invert max-w-none break-words leading-relaxed">
 									<Streamdown>{typeof msg.content === 'string' ? msg.content : "Contenido no soportado"}</Streamdown>
 								</div>
 							</div>
@@ -303,7 +303,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							)}
 							<div className="flex-1 min-w-0">
 								<p className="text-[10px] font-bold truncate text-foreground/80 uppercase tracking-wider">{attachedFile.name}</p>
-								<p className="text-[10px] text-muted-foreground/60">{(attachedFile.size / 1024).toFixed(1)} KB</p>
+								<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{(attachedFile.size / 1024).toFixed(1)} KB</p>
 							</div>
 							<button
 								onClick={removeFile}
@@ -315,7 +315,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 						</div>
 					)}
 
-					<div className="relative flex items-end gap-2 bg-muted/30 border border-border/60 rounded-xl p-2 focus-within:ring-2 focus-within:ring-ai/30 focus-within:border-ai/40 transition-all">
+					<div className="relative flex items-end gap-2 bg-muted/40 border border-border/60 rounded-xl p-2 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-ai/40 transition-all">
 						<input
 							type="file"
 							ref={fileInputRef}
@@ -336,12 +336,12 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							onChange={(e) => setInput(e.target.value)}
 							onKeyDown={handleKeyDown}
 							placeholder="Pregunta algo sobre ReleaseHub..."
-							className="w-full bg-transparent border-none focus:ring-0 text-sm resize-none py-2 px-1 max-h-32 min-h-[40px] placeholder:text-muted-foreground/60"
+							className="w-full bg-transparent border-none focus:ring-0 text-sm resize-none py-2 px-1 max-h-32 min-h-[40px] placeholder:text-muted-foreground/60 font-medium"
 							rows={1}
 						/>
 						<div className="flex items-center gap-2">
 							{contextUsage !== undefined && contextUsage > 0 && (
-								<span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-tighter">
+								<span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">
 									CTX: {contextUsage}
 								</span>
 							)}
@@ -349,7 +349,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							<button
 								onClick={() => reset()}
 								aria-label="Detener respuesta"
-								className="p-2 rounded-lg bg-destructive text-destructive-foreground shadow-md hover:opacity-90 transition-all"
+								className="p-2 rounded-lg bg-destructive text-destructive-foreground shadow-sm hover:opacity-90 transition-all focus:ring-2 focus:ring-destructive/20"
 							>
 								<StopCircle className="w-4 h-4" />
 							</button>
@@ -358,10 +358,10 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 									onClick={handleSend}
 									aria-label="Enviar mensaje"
 									disabled={!input.trim() || status === "initializing" || status === "downloading"}
-									className={`p-2 rounded-lg transition-all ${
+									className={`p-2 rounded-lg transition-all focus:ring-2 focus:ring-primary/20 ${
 										input.trim()
-											? "bg-ai text-ai-foreground shadow-md hover:opacity-90"
-											: "bg-muted text-muted-foreground cursor-not-allowed"
+											? "bg-ai text-ai-foreground shadow-sm hover:opacity-90"
+											: "bg-muted text-muted-foreground/40 cursor-not-allowed"
 									}`}
 								>
 									<Send className="w-4 h-4" />
@@ -369,7 +369,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							)}
 						</div>
 					</div>
-					<p className="mt-2 text-[10px] text-center text-muted-foreground/60">
+					<p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-center text-muted-foreground/40">
 						La IA puede cometer errores. El procesamiento ocurre localmente en tu navegador.
 					</p>
 				</div>

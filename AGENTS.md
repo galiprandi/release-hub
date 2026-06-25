@@ -134,6 +134,7 @@
 - **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Use localized status labels (Saludable, Procesando, etc.). Deployment search is on-demand by namespace across all contexts in parallel (no hardcoded namespace list).
 - **Dead Code Elimination**: Components and hooks identified as orphans must be removed immediately. Legacy hooks `usePipeline.ts`, `usePipelineDetector.ts`, and `useKubectlNamespaceAccess.ts` have been eradicated.
 - **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Use localized status labels (Saludable, Procesando, etc.). Deployment search is on-demand by namespace across all contexts in parallel (no hardcoded namespace list). Setup page aligned with V2 standard using high-density badges, semantic tokens with 20% opacity, and technical command containers.
+- **GitHub Setup**: Aligned with Industrial Resonance V2 aesthetic. Features high-density technical badges (`REQUERIDO`, `INSTALADO`), semantic tokens with 20% opacity, and command containers utilizing `bg-muted/10` backgrounds with `border-border/40` borders. Cards use `rounded-xl` geometry.
 - **Mutaciones**: Optimistic update + revalidación selectiva. Nunca `window.location.reload()`.
 - **Resiliencia**: Si CLI falla (`kubectl`, `docker`), redirigir a `<module>/setup`.
 - **Novedades**: Technical header with Newspaper icon. Content encapsulated in bg-muted/10 containers with rounded-xl and p-8 padding.
@@ -164,6 +165,12 @@
 - **Geometry**: Standardized to `rounded-xl` for cards and `rounded-md` for badges.
 - **Visuals**: Used semantic tokens with 20% opacity (`bg-success/10`, `bg-destructive/10`) and technical command containers (`bg-muted/10`).
 - **Hygiene**: Verified zero-warning build and lint, and implemented Playwright E2E verification.
+
+### Mejora #13: GitHub Setup Resonance V2 Refactor
+- **Setup Page Resonance**: Refactored `src/routes/github/setup.tsx` to align with Industrial Resonance V2 aesthetic.
+- **Visual Hierarchy**: Implemented high-density technical badges (`REQUERIDO`, `INSTALADO`) and semantic tokens with 20% opacity.
+- **Command Blocks**: Redesigned command containers with `bg-muted/10` and `border-border/40`.
+- **Hygiene**: Maintained zero-warning build and verified via Playwright E2E.
 
 ### Mejora #10: Surgical Hygiene & Resonance V2 Alignment
 - **Restore SAFE_COMMANDS**: Exported `SAFE_COMMANDS` from `src/utils/security.ts` and updated consumers to maintain strict allow-listing for local execution.

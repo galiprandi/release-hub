@@ -1,17 +1,17 @@
-# Draft PR: AI Components Refactor & Resonance V2 Alignment - Carol 🐜
+# Draft PR: GitHub Setup Resonance V2 Refactor - Uma 🐜
 
 ## Descripción
-Esta misión se enfoca en el refinamiento estético y funcional de los componentes impulsados por IA (`AIChatModal`, `FeedbackDialog`) para alinearlos con el estándar **Industrial Resonance V2**. Se busca elevar la densidad de información, mejorar la jerarquía visual y asegurar una consistencia absoluta en el uso de tipografía técnica y tokens semánticos.
+Esta misión se enfoca en la evolución de la página de configuración de GitHub para alinearla con el estándar Industrial Resonance V2. Se busca optimizar la jerarquía de información, mejorar la densidad visual y garantizar la consistencia estética con el resto del ecosistema de la aplicación.
 
 ## Objetivos
-- [ ] **AIChatModal Refinement**: Optimización de la burbuja de chat y la jerarquía de mensajes. Implementación de patrones de alta densidad y alineación de botones de acción con el estándar V2.
-- [ ] **FeedbackDialog Evolution**: Refactor del stepper visual y de los contenedores de formulario para mayor sobriedad técnica. Mejora de los estados de error y éxito con fondos semánticos al 20%.
-- [ ] **Technical Consistency**: Aplicación estricta de `text-[10px] font-bold uppercase tracking-wider` en metadatos y etiquetas.
-- [ ] **Hygiene & Build**: Asegurar un estado zero-warning en el build y eliminar cualquier redundancia visual o de código.
+- [ ] **Resonance V2 Alignment**: Refactorizar `src/routes/github/setup.tsx` aplicando tipografía de alta densidad y geometría estandarizada.
+- [ ] **Visual Hierarchy**: Implementar tokens semánticos con opacidad del 20% para estados de instalación y autenticación.
+- [ ] **Command Containers**: Rediseñar los bloques de comandos con contenedores técnicos `bg-muted/10` y bordes `border-border/40`.
+- [ ] **Technical Hygiene**: Asegurar un build de cero advertencias y la ausencia de código muerto o tipos inseguros.
+- [ ] **Documentation**: Actualizar `AGENTS.md`, `DESIGN.md` y `CROMA.md` con los nuevos estándares aplicados.
 
 ## Zona de Trabajo
-- `src/components/AIChatModal.tsx`
-- `src/components/FeedbackDialog.tsx`
+- `src/routes/github/setup.tsx`
 - `AGENTS.md`
 - `DESIGN.md`
 - `CROMA.md`

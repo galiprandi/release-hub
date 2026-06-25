@@ -398,6 +398,18 @@
   - [x] Documentación: Actualización de `DESIGN.md` y `AGENTS.md` con los nuevos estándares de búsqueda.
 - **Resultado**: Experiencia de búsqueda unificada y expandida a todos los módulos críticos, eliminando silos de información y alineando la interfaz con el estándar Industrial Resonance V2.
 
+### 2026-06-25: Refactor GitHub Setup Resonance V2
+- **Agente**: Uma 🐜
+- **Rama**: `🐜-Uma-refactor-github-setup-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block & Mission Draft.
+  - [x] GitHub Setup Resonance V2: Refactorización de la página de configuración aplicando tipografía de alta densidad (`text-[10px] font-bold uppercase tracking-wider`) y geometría `rounded-xl`.
+  - [x] Visual Consistency: Implementación de badges técnicos (`REQUERIDO`, `INSTALADO`) con opacidad del 20% y colores semánticos.
+  - [x] Command Containers: Rediseño de bloques de comandos con contenedores técnicos `bg-muted/10` y bordes `border-border/40`.
+  - [x] Technical Hygiene: Verificación de build zero-warning y ausencia de código muerto o tipos inseguros.
+  - [x] E2E Verification: Validación funcional y estética mediante Playwright (`e2e/verify-github-setup.spec.ts`).
+- **Resultado**: Página de configuración de GitHub elevada al estándar Industrial Resonance V2, garantizando consistencia visual y profesionalismo técnico en el flujo de onboarding.
 ### 2026-06-25: AI Components Refactor & Resonance V2 Alignment
 - **Agente**: Carol 🐜
 - **Rama**: `🐜-Carol-refactor-ai-components-resonance-v2`

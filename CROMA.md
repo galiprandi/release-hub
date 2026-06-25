@@ -398,6 +398,18 @@
   - [x] Documentación: Actualización de `DESIGN.md` y `AGENTS.md` con los nuevos estándares de búsqueda.
 - **Resultado**: Experiencia de búsqueda unificada y expandida a todos los módulos críticos, eliminando silos de información y alineando la interfaz con el estándar Industrial Resonance V2.
 
+### 2026-06-24: Surgical Hygiene & Linter Audit V12
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-audit-v12`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] Saneamiento de Linter: Erradicación de error "setState in effect" en `src/routes/fetcher/index.tsx` mediante la eliminación del estado redundante `localSearch`.
+  - [x] Sincronización de Estado: Vinculación directa de inputs de búsqueda a URL search params (Single Source of Truth).
+  - [x] Higiene de Dependencias: Resolución de advertencia `exhaustive-deps` en `FetcherPage` sincronizando `useMemo` con el parámetro `q`.
+  - [x] Reducción de Entropía: Eliminación de variable no utilizada `kubectlCard` en `e2e/kubernetes-setup.spec.ts`.
+  - [x] Verificación Global: Zero-warning build log, lint audit impecable y 230 tests unitarios exitosos.
+- **Resultado**: Higiene del repositorio elevada al estándar AAA, eliminando redundancias de estado y asegurando un build sin advertencias.
 ### 2026-06-25: Refactor GitHub Setup Resonance V2
 - **Agente**: Uma 🐜
 - **Rama**: `🐜-Uma-refactor-github-setup-resonance-v2`

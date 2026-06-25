@@ -42,7 +42,6 @@ function FetcherPage() {
 	const navigate = useNavigate({ from: '/fetcher' });
 	const search = useSearch({ from: '/fetcher' });
 	const [activeQuery, setActiveQuery] = useState<QueryRecord | undefined>();
-	const [localSearch, setLocalSearch] = useState(search.q || '');
 	const [editingQuery, setEditingQuery] = useState<QueryRecord | undefined>();
 	const [curlInput, setCurlInput] = useState('');
 	const lastClipboardContent = useRef<string | null>(null);
@@ -112,11 +111,6 @@ function FetcherPage() {
 		});
 	}, [navigate]);
 
-	// Sync local search with query param
-	useEffect(() => {
-		setLocalSearch(search.q || '');
-	}, [search.q]);
-
 	// Filter and sort history based on search parameters
 	const filteredAndSortedHistory = useMemo(() => {
 		let result = [...history];
@@ -168,7 +162,7 @@ function FetcherPage() {
 		});
 
 		return result;
-	}, [history, search.method, search.sortBy]);
+	}, [history, search.method, search.sortBy, search.q]);
 
 	// Validate curl in real-time
 	const isCurlValid = useMemo(() => {
@@ -269,19 +263,17 @@ function FetcherPage() {
 					<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground/60" />
 					<input
 						type="text"
-						value={localSearch}
+						value={search.q || ''}
 						onChange={(e) => {
-							setLocalSearch(e.target.value);
 							handleQuerySearch(e.target.value);
 						}}
 						placeholder="Buscar en historial..."
 						className="w-48 pl-8 pr-3 py-1.5 bg-muted/40 border border-border/60 rounded-lg text-[11px] focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/40 font-medium uppercase tracking-tight"
 					/>
-					{localSearch && (
+					{search.q && (
 						<button
 							type="button"
 							onClick={() => {
-								setLocalSearch('');
 								handleQuerySearch('');
 							}}
 							className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground transition-all"

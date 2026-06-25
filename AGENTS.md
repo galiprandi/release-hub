@@ -153,6 +153,13 @@
 - **cURL Parser**: Hardened state-machine tokenizer in `src/utils/curlParser.ts` supporting compact flags (e.g., `-H'Value'`). URL normalization via `new URL().toString()` ensures consistent formatting. Verified via `src/utils/curlParser.test.ts`.
 - **XSS Protection**: Mandatory HTML escaping in any component using `dangerouslySetInnerHTML`. Log utilities (`logUtils.tsx`) must escape the raw line before applying highlighting tags. Diff viewer (`DiffViewer.tsx`) must provide a safe `escapeHtml` fallback if syntax highlighting fails. Verified via `src/api/xss.test.ts`.
 - **SSRF Hardening Standard**: `isInternalAddress` in `src/utils/security.ts` must account for decimal and hexadecimal IP representations to prevent bypasses. All proxy and health check middlewares must utilize this centralized utility.
+- **Search State Synchronization**: Redundant local state for search inputs (e.g., `localSearch`) must be avoided. Search inputs should bind directly to URL search parameters to ensure consistency and eliminate "setState in effect" linter warnings.
+
+### Mejora #13: Surgical Hygiene & Linter Audit V12
+- **Linter Saneamiento**: Erradicación de error de "setState in effect" en `src/routes/fetcher/index.tsx` mediante la eliminación de `localSearch` y vinculación directa a search params.
+- **Dependency Hygiene**: Resolución de advertencia `exhaustive-deps` en `FetcherPage` sincronizando el hook `useMemo` con los parámetros de búsqueda.
+- **Test Hygiene**: Remoción de variable no utilizada `kubectlCard` en `e2e/kubernetes-setup.spec.ts`.
+- **Verificación Global**: Zero-warning build log, lint impecable y 230 tests exitosos.
 
 ### Mejora #12: Surgical Hygiene & Entropy Audit V11
 - **Linter Cleanup**: Resolved warnings in `src/api/security.test.ts` by replacing `any` with `@ts-expect-error` in type violation tests.

@@ -22,6 +22,10 @@
 - **Terminal**: High-density technical header with session metadata (e.g., 'Sesión Local Activa', '/bin/bash'). Semantic status dots (OK/Error) with technical shadows. Viewport uses `bg-zinc-950` background.
 - **BaseDialog**: Modal consistency.
 
+## State Management & Search
+- **URL-First**: All filtering and search state must reside in URL search parameters to ensure persistence and shareability.
+- **Single Source of Truth**: Avoid duplicating search parameter state in local component state (`useState`). Inputs should be controlled directly by the search parameters provided by the router to prevent synchronization issues and unnecessary renders.
+
 ## Cache-First Tokens (ADR-001)
 | Estado | Token |
 |---|---|

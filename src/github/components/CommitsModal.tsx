@@ -128,7 +128,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 			title={
 				<div className="flex items-center gap-2">
 					<span>Cambios desde {prodTag || "último deploy"}</span>
-					<span className="text-xs bg-muted px-2 py-0.5 rounded-full font-normal">
+					<span className="text-[10px] bg-muted px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
 						{pendingCommits.length}
 					</span>
 				</div>
@@ -220,7 +220,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 														</div>
 													)}
 												</div>
-												<div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+												<div className="flex items-center gap-3 mt-2 text-[10px] text-muted-foreground">
 													<span className="font-mono bg-muted px-1.5 py-0.5 rounded uppercase tracking-tighter">
 														{commit.shortHash}
 													</span>
@@ -230,7 +230,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 													<span>{commit.date}</span>
 												</div>
 												{expandedCommits.has(commit.hash) && commit.body && (
-													<div className="mt-4 p-3 rounded-lg bg-background/50 border border-border/50 text-xs text-muted-foreground whitespace-pre-wrap animate-in fade-in slide-in-from-top-2 duration-300">
+													<div className="mt-4 p-3 rounded-lg bg-background/50 border border-border/50 text-[10px] text-muted-foreground whitespace-pre-wrap animate-in fade-in slide-in-from-top-2 duration-300">
 														{commit.body}
 													</div>
 												)}

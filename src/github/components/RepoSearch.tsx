@@ -268,10 +268,10 @@ export function RepoSearch() {
                                 FILE
                               </span>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1 truncate">
+                            <p className="text-[10px] text-muted-foreground mt-1 truncate">
                               {item.path}
                             </p>
-                            <p className="text-xs text-muted-foreground/60 mt-1">
+                            <p className="text-[10px] text-muted-foreground/60 mt-1">
                               {item.fullName}
                             </p>
                           </button>
@@ -320,12 +320,12 @@ export function RepoSearch() {
                             </span>
                           </div>
                           {item.description && (
-                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                            <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2">
                               {item.description}
                             </p>
                           )}
                           {item.updatedAt && (
-                            <p className="text-xs text-muted-foreground mt-1">
+                            <p className="text-[10px] text-muted-foreground mt-1">
                               Actualización:{' '}
                               {new Date(item.updatedAt).toLocaleDateString()}
                             </p>

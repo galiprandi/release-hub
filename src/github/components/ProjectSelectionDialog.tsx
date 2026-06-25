@@ -1,5 +1,5 @@
 import { Check, Plus } from "lucide-react";
-import { BaseDialog } from "./ui/BaseDialog";
+import { BaseDialog } from "@/components/ui/BaseDialog";
 import { useUserCollections } from "@/hooks/useUserCollections";
 
 interface ProjectSelectionDialogProps {
@@ -40,7 +40,7 @@ export function ProjectSelectionDialog({ isOpen, onOpenChange, repoFullName }: P
 									}`}
 								>
 									<div className="flex-1 min-w-0">
-										<h4 className={`text-xs font-bold uppercase tracking-wider ${isInProject ? "text-primary" : "text-foreground"}`}>
+										<h4 className={`text-[10px] font-bold uppercase tracking-wider ${isInProject ? "text-primary" : "text-foreground"}`}>
 											{project.name}
 										</h4>
 										{project.description && (

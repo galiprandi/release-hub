@@ -4,14 +4,14 @@ import * as Tooltip from "@radix-ui/react-tooltip"
 import { Rocket, Loader2, CheckCircle2, ChevronRight, ChevronLeft, GitCommit, Sparkles } from "lucide-react"
 import axios from "axios"
 import { runCommand } from "@/api/exec"
-import { useRepoPermission } from "../hooks/useRepoPermission"
+import { useRepoPermission } from "@/hooks/useRepoPermission"
 import { useDiscordChannel } from "@/hooks/useDiscordChannel"
 import { useGitUser } from "@/hooks/useGitUser"
 import { useGitCommits } from "@/hooks/useGitCommits"
 import { useGitTags } from "@/hooks/useGitTags"
 import { useCommitSummary } from "@/hooks/useCommitSummary"
 import { DiscordNotification } from "@/components/ui/DiscordNotification"
-import { CommitLink } from "@/components/CommitLink"
+import { CommitLink } from "@/github/components/CommitLink"
 import { BaseDialog } from "@/components/ui/BaseDialog"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
 
@@ -260,7 +260,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 												type="button"
 												onClick={() => generateCommitSummary(pendingCommits)}
 												disabled={isGeneratingSummary || !summaryAvailable || !hasPendingCommits}
-												className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold uppercase tracking-wider text-ai hover:bg-ai/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+												className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-ai hover:bg-ai/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
 												title="Regenerar descripción con IA"
 											>
 												{isGeneratingSummary ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
@@ -308,7 +308,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 									{error && <p className="text-sm text-destructive">{error}</p>}
 
 									{!canCreateTags && !isLoadingPerms && (
-										<p className="text-xs text-warning bg-warning/10 p-2 rounded-lg border border-warning/20">
+										<p className="text-[10px] text-warning bg-warning/10 p-2 rounded-lg border border-warning/20">
 											No tienes permisos de escritura en este repositorio para crear tags.
 										</p>
 									)}
@@ -332,9 +332,9 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 										<div className="flex items-center gap-2">
 											<GitCommit className="w-4 h-4 text-muted-foreground" />
 											<span className="font-medium text-sm">Cambios desde {latestTag}</span>
-											<span className="text-xs bg-muted px-2 py-0.5 rounded-full">{pendingCommits.length}</span>
+											<span className="text-[10px] bg-muted px-2 py-0.5 rounded-full">{pendingCommits.length}</span>
 										</div>
-										<p className="text-xs text-muted-foreground mt-1 pl-6">
+										<p className="text-[10px] text-muted-foreground mt-1 pl-6">
 											Commits que se incluirán en este release
 										</p>
 									</div>
@@ -350,7 +350,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 														{commit.message.split('\n')[0]}
 													</span>
 												</div>
-												<div className="text-xs text-muted-foreground mt-0.5 pl-6">
+												<div className="text-[10px] text-muted-foreground mt-0.5 pl-6">
 													{new Date(commit.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
 													<span className="mx-1">•</span>
 													{commit.author}
@@ -371,7 +371,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 								<p className="text-lg font-semibold">Tag <span className="font-mono">{tagName}</span> creado</p>
 								<p className="text-sm text-muted-foreground mt-1">El lanzamiento fue publicado correctamente en <strong>{repo}</strong>.</p>
 								{webhookUrl && (
-									<p className="text-xs text-muted-foreground mt-2">
+									<p className="text-[10px] text-muted-foreground mt-2">
 										Notificación enviada al canal de Discord
 									</p>
 								)}

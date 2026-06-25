@@ -1,20 +1,17 @@
-# Draft PR: Surgical Hygiene & Entropy Audit V11 - Fiona 🐜
+# Draft PR: AI Components Refactor & Resonance V2 Alignment - Carol 🐜
 
 ## Descripción
-Esta misión se enfoca en la erradicación de la entropía técnica mediante la eliminación de código muerto, la resolución de advertencias del linter y la consolidación de la suite de pruebas de seguridad. Se busca mantener el estándar AAA de ingeniería y una higiene absoluta del repositorio.
+Esta misión se enfoca en el refinamiento estético y funcional de los componentes impulsados por IA (`AIChatModal`, `FeedbackDialog`) para alinearlos con el estándar **Industrial Resonance V2**. Se busca elevar la densidad de información, mejorar la jerarquía visual y asegurar una consistencia absoluta en el uso de tipografía técnica y tokens semánticos.
 
 ## Objetivos
-- [x] **Technical Hygiene**: Resolución de advertencias de `eslint` en `src/api/security.test.ts` (erradicación de `any`).
-- [x] **Entropy Reduction**: Eliminación de bloques de tests duplicados y auditoría de componentes/hooks huérfanos.
-- [x] **Dead Code Elimination**: Remoción de archivos sin importaciones externas confirmadas.
-- [x] **Build Integrity**: Verificación de zero-warning build log y validación global de tests.
+- [ ] **AIChatModal Refinement**: Optimización de la burbuja de chat y la jerarquía de mensajes. Implementación de patrones de alta densidad y alineación de botones de acción con el estándar V2.
+- [ ] **FeedbackDialog Evolution**: Refactor del stepper visual y de los contenedores de formulario para mayor sobriedad técnica. Mejora de los estados de error y éxito con fondos semánticos al 20%.
+- [ ] **Technical Consistency**: Aplicación estricta de `text-[10px] font-bold uppercase tracking-wider` en metadatos y etiquetas.
+- [ ] **Hygiene & Build**: Asegurar un estado zero-warning en el build y eliminar cualquier redundancia visual o de código.
 
 ## Zona de Trabajo
-- `src/api/security.test.ts`
-- `src/hooks/`
-- `src/components/`
-- `src/utils/`
+- `src/components/AIChatModal.tsx`
+- `src/components/FeedbackDialog.tsx`
 - `AGENTS.md`
 - `DESIGN.md`
-- `AGENTS.md`
 - `CROMA.md`

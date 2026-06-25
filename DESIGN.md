@@ -14,6 +14,7 @@
 - **Table**: `bg-muted/40` headers, technical metadata, vertical dividers. Internal filter bar uses `bg-muted/40` with a nested segmented-control layout for a professional aesthetic.
 - **Search Inputs**: Standardized to `bg-muted/40` with `border-border/60`. Focus state uses `focus:ring-primary/20`. Technical search results in dropdowns include high-density badges (`REPO`, `FILE`, `CONT`) with 10% opacity backgrounds.
 - **EmptyState**: Centered layout featuring an icon in a `p-4 rounded-full bg-muted/20 border border-border/40` container. Typography for labels is strictly `text-[10px] font-bold uppercase tracking-[0.2em]`.
+- **SetupCard**: Unified component for onboarding and configuration states. Features a dual-state design for "Installed" (success tokens, high-density metadata) and "Missing" (destructive/warning tokens, collapsible command containers). Uses `text-[10px] font-bold uppercase tracking-wider` for labels.
 - **StatusCard**: Loading/error/offline states.
 - **ActionButton**: Iconographic with tooltip.
 - **AI Chat Bubble**: High-density typography with `rounded-xl` geometry. User messages utilize `shadow-[0_0_15px_rgba(var(--primary),0.1)]`. Assistant messages use `bg-ai/5` and `border-ai/10` for subtle technical contrast.
@@ -94,7 +95,7 @@
 - **Content**: Encapsulated in `bg-muted/10` container with `rounded-xl` and `p-8` for optimal readability.
 
 ### Kubernetes UI Resonance
-- **Setup Page**: Aligned with Industrial Resonance V2 aesthetic. Features high-density technical badges for status (uppercase metadata), and command containers utilizing `bg-muted/10` backgrounds and `border-border/40` borders. Cards utilize `rounded-xl` geometry and semantic tokens with 20% opacity for backgrounds (`bg-success/10`, `bg-destructive/10`).
+- **Setup Page**: Aligned with Industrial Resonance V2 aesthetic using `SetupCard`. Features high-density technical badges for OS detection and status, and command containers utilizing `bg-muted/10` backgrounds. Cards utilize `rounded-xl` geometry and semantic tokens with 20% opacity.
 - **Dashboard Navigation**: Uses `IndustrialTabs` for switching between 'Favoritos' and 'Proyectos'. State is persisted via `tab` search parameter.
 - **Namespace Filtering**: Promoted to the `PageLayout` header using `IndustrialTabs`, synchronized with the `namespace` search parameter. Per-table filter bars are removed for high-density consistency.
 - **Grouping**: Favorites are grouped by `context` (Boxes icon). Projects are grouped by `project.id` (Folder icon).
@@ -109,7 +110,7 @@
   - `PRsCell` & `ActionsStatusCell`: Use semantic backgrounds with 20% opacity and technical borders.
   - `OperationsCell`: Implements hover-to-reveal (`opacity-0 group-hover:opacity-100`) to maintain layout focus.
 - **Detail View**: Navigation (Commits/Tags), external links (PRs, Actions), and `ProjectSelector` are promoted to the `PageLayout` header and actions array. Links use `bg-muted/40` and high-density technical typography.
-- **Setup Page**: Aligned with Industrial Resonance V2 aesthetic. Features high-density technical badges (`REQUERIDO`, `INSTALADO`), semantic tokens with 20% opacity, and command containers utilizing `bg-muted/10` backgrounds with `border-border/40` borders. Cards use `rounded-xl` geometry.
+- **Setup Page**: Aligned with Industrial Resonance V2 aesthetic using `SetupCard`. Features high-density technical badges (`REQUERIDO`, `INSTALADO`), semantic tokens with 20% opacity, and centralized OS detection.
 
 ### Novedades Page Resonance
 - **Header**: High-density technical header with the 'Newspaper' icon.

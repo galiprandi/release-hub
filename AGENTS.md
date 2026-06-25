@@ -134,7 +134,7 @@
 - **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Use localized status labels (Saludable, Procesando, etc.). Deployment search is on-demand by namespace across all contexts in parallel (no hardcoded namespace list).
 - **Dead Code Elimination**: Components and hooks identified as orphans must be removed immediately. Legacy hooks `usePipeline.ts`, `usePipelineDetector.ts`, and `useKubectlNamespaceAccess.ts` have been eradicated.
 - **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Use localized status labels (Saludable, Procesando, etc.). Deployment search is on-demand by namespace across all contexts in parallel (no hardcoded namespace list). Setup page aligned with V2 standard using high-density badges, semantic tokens with 20% opacity, and technical command containers.
-- **GitHub Setup**: Aligned with Industrial Resonance V2 aesthetic. Features high-density technical badges (`REQUERIDO`, `INSTALADO`), semantic tokens with 20% opacity, and command containers utilizing `bg-muted/10` backgrounds with `border-border/40` borders. Cards use `rounded-xl` geometry.
+- **Setup Unification Standard**: Setup pages (Docker, Fetcher, GitHub, Kubernetes) must use the centralized `SetupCard` component (`src/components/shared/SetupCard.tsx`) and `detectOS` utility (`src/utils/os.ts`). Navigation buttons in setup flows must use `rounded-lg` geometry and `text-[10px]` typography. OS detection badges must be displayed in the header of each setup page using `bg-muted/40` backgrounds.
 - **Mutaciones**: Optimistic update + revalidación selectiva. Nunca `window.location.reload()`.
 - **Resiliencia**: Si CLI falla (`kubectl`, `docker`), redirigir a `<module>/setup`.
 - **Novedades**: Technical header with Newspaper icon. Content encapsulated in bg-muted/10 containers with rounded-xl and p-8 padding.
@@ -166,18 +166,12 @@
 - **Entropy Reduction**: Eradicated duplicated test blocks in the security suite to maintain a lean and efficient test pipeline.
 - **Dead Code Removal**: Deleted the orphaned hook `src/hooks/useGitHubActions.ts` after confirming it had no external dependencies or imports.
 - **Build Integrity**: Verified zero-warning build state and global test pass (227 tests) following refactor.
-### Mejora #11: Kubernetes Setup Resonance V2 Refactor
-- **Setup Page Resonance**: Refactored `src/routes/kubernetes/setup.tsx` to align with Industrial Resonance V2 aesthetic.
-- **Typography**: Applied `text-[10px] font-bold uppercase tracking-wider` to technical labels and badges.
-- **Geometry**: Standardized to `rounded-xl` for cards and `rounded-md` for badges.
-- **Visuals**: Used semantic tokens with 20% opacity (`bg-success/10`, `bg-destructive/10`) and technical command containers (`bg-muted/10`).
-- **Hygiene**: Verified zero-warning build and lint, and implemented Playwright E2E verification.
-
-### Mejora #13: GitHub Setup Resonance V2 Refactor
-- **Setup Page Resonance**: Refactored `src/routes/github/setup.tsx` to align with Industrial Resonance V2 aesthetic.
-- **Visual Hierarchy**: Implemented high-density technical badges (`REQUERIDO`, `INSTALADO`) and semantic tokens with 20% opacity.
-- **Command Blocks**: Redesigned command containers with `bg-muted/10` and `border-border/40`.
-- **Hygiene**: Maintained zero-warning build and verified via Playwright E2E.
+### Mejora #14: Setup Unification & Resonance V2 Centralization
+- **Setup Centralization**: Unified setup pages for Docker, Fetcher, GitHub, and Kubernetes using the shared `SetupCard` component.
+- **OS Detection**: Centralized OS detection logic in `src/utils/os.ts` and integrated OS badges in setup headers.
+- **Shared Components**: Created `SetupCard` and `CopyButton` to eliminate code duplication across setup routes.
+- **Resonance V2 Alignment**: Standardized navigation buttons and action buttons to `rounded-lg` with `text-[10px]` typography.
+- **Hygiene**: Verified zero-warning build and passed all unit and E2E tests.
 
 ### Mejora #10: Surgical Hygiene & Resonance V2 Alignment
 - **Restore SAFE_COMMANDS**: Exported `SAFE_COMMANDS` from `src/utils/security.ts` and updated consumers to maintain strict allow-listing for local execution.

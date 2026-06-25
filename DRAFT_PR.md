@@ -1,17 +1,24 @@
-# Draft PR: GitHub Setup Resonance V2 Refactor - Uma 🐜
+# Draft PR: Setup Unification & Resonance V2 Centralization - Uma 🐜
 
 ## Descripción
-Esta misión se enfoca en la evolución de la página de configuración de GitHub para alinearla con el estándar Industrial Resonance V2. Se busca optimizar la jerarquía de información, mejorar la densidad visual y garantizar la consistencia estética con el resto del ecosistema de la aplicación.
+Esta misión tiene como objetivo la unificación y centralización de la lógica y componentes de configuración (setup) de los módulos Docker, Fetcher, GitHub y Kubernetes. Se busca eliminar la redundancia de código, mejorar la mantenibilidad y asegurar que todas las páginas de configuración cumplan estrictamente con el estándar Industrial Resonance V2.
 
 ## Objetivos
-- [ ] **Resonance V2 Alignment**: Refactorizar `src/routes/github/setup.tsx` aplicando tipografía de alta densidad y geometría estandarizada.
-- [ ] **Visual Hierarchy**: Implementar tokens semánticos con opacidad del 20% para estados de instalación y autenticación.
-- [ ] **Command Containers**: Rediseñar los bloques de comandos con contenedores técnicos `bg-muted/10` y bordes `border-border/40`.
-- [ ] **Technical Hygiene**: Asegurar un build de cero advertencias y la ausencia de código muerto o tipos inseguros.
-- [ ] **Documentation**: Actualizar `AGENTS.md`, `DESIGN.md` y `CROMA.md` con los nuevos estándares aplicados.
+- [ ] **Logic Centralization**: Crear utilidades compartidas para la detección de OS y tipos comunes.
+- [ ] **Component Unification**: Desarrollar `SetupCard` y `CopyButton` como componentes compartidos de alta densidad.
+- [ ] **Route Refactoring**: Actualizar las rutas de setup de todos los módulos para consumir los componentes centralizados.
+- [ ] **Resonance V2 Alignment**: Asegurar que toda la iconografía, tipografía y tokens semánticos sigan el estándar V2.
+- [ ] **Technical Hygiene**: Mantener un build de cero advertencias y validar con tests unitarios y E2E.
+- [ ] **Documentation**: Actualizar `AGENTS.md`, `DESIGN.md` y `CROMA.md`.
 
 ## Zona de Trabajo
+- `src/utils/os.ts` (Nuevo)
+- `src/components/shared/SetupCard.tsx` (Nuevo)
+- `src/components/shared/CopyButton.tsx` (Nuevo)
+- `src/routes/docker/setup.tsx`
+- `src/routes/fetcher/setup.tsx`
 - `src/routes/github/setup.tsx`
+- `src/routes/kubernetes/setup.tsx`
 - `AGENTS.md`
 - `DESIGN.md`
 - `CROMA.md`

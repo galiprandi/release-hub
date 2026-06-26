@@ -75,14 +75,6 @@
 - should prevent XSS in search filters
 - should prevent XSS when highlighting log levels
 
-## Module: terminalMiddleware
-- should register upgrade handler
-- should reject invalid context
-- should reject invalid docker container name
-- should reject invalid k8s resource name
-- should reject invalid namespace
-- should reject invalid terminal type
-
 ## Module: AIChatModal
 - calls prompt with multimodal signature when send button is clicked
 - calls reset when clear button is clicked
@@ -90,12 +82,6 @@
 - renders correctly when open
 - shows stop button during prompting and calls reset on click
 - switches profiles and updates messages
-
-## Module: CommitsModal
-- should filter commits
-- should render commits when open
-- should toggle commit expansion
-- should trigger AI summary
 
 ## Module: FeedbackDialog
 - should allow entering description and moving to next step
@@ -111,12 +97,13 @@
 - should render projects when they exist
 - should render trigger button
 
-## Module: PromoteDialog
-- should have focus rings on interactive elements
-- should open dialog when trigger is clicked
-- should render trigger button
-- should suggest next version correctly
-- should toggle commits list with accessibility attributes
+## Module: terminalMiddleware
+- should register upgrade handler
+- should reject invalid context
+- should reject invalid docker container name
+- should reject invalid k8s resource name
+- should reject invalid namespace
+- should reject invalid terminal type
 
 ## Module: usePortForward
 - connects successfully
@@ -253,6 +240,19 @@
 - calls setQuery on change
 - renders correctly with placeholder
 - shows clear button when query is present and clears on click
+
+## Module: CommitsModal
+- should filter commits
+- should render commits when open
+- should toggle commit expansion
+- should trigger AI summary
+
+## Module: PromoteDialog
+- should have focus rings on interactive elements
+- should open dialog when trigger is clicked
+- should render trigger button
+- should suggest next version correctly
+- should toggle commits list with accessibility attributes
 
 ## Module: Pipeline Adapters
 - should handle errors gracefully

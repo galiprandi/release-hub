@@ -4,7 +4,7 @@ import { Send, Search, X } from 'lucide-react';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
 import { StatusCard } from '@/components/ui/StatusCard';
-import { EmptyState } from '@/components/EmptyState';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { QueryModal } from '@/fetcher/components/QueryModal';
 import { Table } from '@/components/ui/Table';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';

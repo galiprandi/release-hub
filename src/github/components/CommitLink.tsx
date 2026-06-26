@@ -1,6 +1,6 @@
 import { GitCommit } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { DeployStatusIndicator } from "./ui/DeployStatusIndicator";
+import { DeployStatusIndicator } from "@/components/ui/DeployStatusIndicator";
 
 interface CommitLinkProps {
 	hash: string;

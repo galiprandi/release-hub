@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { PageLayout } from '@/layouts/PageLayout';
-import { DiffViewer } from '@/components/diff/DiffViewer';
-import { DiffControls } from '@/components/diff/DiffControls';
+import { DiffViewer } from '@/diff/components/DiffViewer';
+import { DiffControls } from '@/diff/components/DiffControls';
 import type { DiffMode } from '@/utils/diffEngine';
 import { GitCompare } from 'lucide-react';
 

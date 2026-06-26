@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Copy, Check, Code, Search, X } from 'lucide-react';
-import { formatJSON } from '../utils/curlParser';
+import { formatJSON } from '@/utils/curlParser';
 
 interface JsonEditorProps {
 	value: string;

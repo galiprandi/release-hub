@@ -552,7 +552,7 @@ function HealthMonitorPage() {
               options={envOptions}
               activeId={environment}
               onChange={handleEnvironmentChange}
-              className="w-96"
+              className="w-full sm:w-[320px]"
             />
             <div className="w-px h-6 bg-border/40 mx-1" />
             <IndustrialTabs
@@ -563,7 +563,7 @@ function HealthMonitorPage() {
               ]}
               activeId={sortBy}
               onChange={handleSortChange}
-              className="w-96"
+              className="w-full sm:w-[320px]"
             />
           </div>
         )

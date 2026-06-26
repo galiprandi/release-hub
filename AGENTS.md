@@ -155,6 +155,12 @@
 - **SSRF Hardening Standard**: `isInternalAddress` in `src/utils/security.ts` must account for decimal and hexadecimal IP representations to prevent bypasses. All proxy and health check middlewares must utilize this centralized utility.
 - **Search State Synchronization**: Redundant local state for search inputs (e.g., `localSearch`) must be avoided. Search inputs should bind directly to URL search parameters to ensure consistency and eliminate "setState in effect" linter warnings.
 
+### Mejora #14: GitHub Resonance V2 Polish & Responsive Tabs
+- **Dashboard Refinement**: Standardized organization grouping with technical headers (`Building2` icon) and `bg-muted/10` containers.
+- **Responsive Navigation**: Updated `IndustrialTabs` to use responsive width classes (`w-full sm:w-[320px]`) in Health, Kubernetes, and GitHub routes, ensuring layout stability across viewports.
+- **High-Density Polish**: Standardized all remaining `text-[9px]` metadata to `text-[10px]` project-wide. Refined `RepoSearch` dropdown with technical shadows and `border-border/40`.
+- **E2E Stability**: Synchronized Playwright tests with new responsive classes and updated search placeholders for Kubernetes.
+
 ### Mejora #13: Surgical Hygiene & Linter Audit V12
 - **Linter Saneamiento**: Erradicación de error de "setState in effect" en `src/routes/fetcher/index.tsx` mediante la eliminación de `localSearch` y vinculación directa a search params.
 - **Dependency Hygiene**: Resolución de advertencia `exhaustive-deps` en `FetcherPage` sincronizando el hook `useMemo` con los parámetros de búsqueda.

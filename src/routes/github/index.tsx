@@ -163,7 +163,7 @@ function Dashboard() {
 											{t.icon && <t.icon className="w-3 h-3" />}
 											<span>{t.label}</span>
 											{t.count !== undefined && t.count > 0 && (
-												<span className="ml-1 px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-[9px]">
+												<span className="ml-1 px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-[10px]">
 													{t.count}
 												</span>
 											)}
@@ -228,23 +228,21 @@ function Dashboard() {
 						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
 							Filtrar:
 						</span>
-						<div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border/40">
-							<IndustrialTabs
-								options={[
-									{ id: "all", label: "Todos" },
-									{ id: "true", label: "Pendientes" },
-								]}
-								activeId={activeFilter || "all"}
-								onChange={(id) =>
-									navigate({
-										search: (prev: Record<string, unknown>) => ({
-											...prev,
-											filter: id === "all" ? undefined : (id as string),
-										}),
-									})
-								}
-							/>
-						</div>
+						<IndustrialTabs
+							options={[
+								{ id: "all", label: "Todos" },
+								{ id: "true", label: "Pendientes" },
+							]}
+							activeId={activeFilter || "all"}
+							onChange={(id) =>
+								navigate({
+									search: (prev: Record<string, unknown>) => ({
+										...prev,
+										filter: id === "all" ? undefined : (id as string),
+									}),
+								})
+							}
+						/>
 					</div>
 				)}
 
@@ -315,15 +313,31 @@ function Dashboard() {
 						}
 					/>
 				) : (
-					<div className="space-y-12">
+					<div className="space-y-8">
 						{sortedOrgs.map((org) => (
-							<section key={org} className="space-y-3">
-								<ReposTable
-									org={org}
-									repos={groupedRepos[org]}
-									favorites={favorites}
-									onToggleFavorite={toggleFavorite}
-								/>
+							<section
+								key={org}
+								className="bg-muted/10 rounded-xl border border-border/40 overflow-hidden shadow-sm"
+							>
+								<div className="flex items-center justify-between bg-muted/20 border-b border-border/40 px-4 py-2">
+									<div className="flex items-center gap-2">
+										<Building2 className="w-4 h-4 text-primary/60" />
+										<span className="text-sm font-medium tracking-tight text-foreground">
+											{org}
+										</span>
+										<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+											({groupedRepos[org].length} {groupedRepos[org].length === 1 ? 'repositorio' : 'repositorios'})
+										</span>
+									</div>
+								</div>
+								<div className="p-4">
+									<ReposTable
+										org={org}
+										repos={groupedRepos[org]}
+										favorites={favorites}
+										onToggleFavorite={toggleFavorite}
+									/>
+								</div>
 							</section>
 						))}
 					</div>
@@ -511,12 +525,9 @@ function ReposTable({
 			{
 				accessorKey: "name",
 				header: () => (
-					<div className="flex items-center gap-2.5">
-						<Building2 className="w-3.5 h-3.5 text-primary/40" />
-						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-							{org}
-						</span>
-					</div>
+					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+						Repositorio
+					</span>
 				),
 				cell: ({ row }) => <RepoNameCell repo={row.original} />,
 			},

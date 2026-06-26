@@ -86,7 +86,7 @@ function ProductIndex() {
 										),
 									},
 								]}
-								className="w-48"
+								className="w-full sm:w-[320px]"
 							/>
 						</div>
 						<div className="w-px h-6 bg-border/40 mx-1" />

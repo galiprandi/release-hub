@@ -32,7 +32,7 @@ function TerminalPage() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">Status</span>
-               <span className="px-1.5 py-0.5 rounded bg-success/20 border border-success/20 text-[9px] font-bold text-success uppercase tracking-widest">Connected</span>
+               <span className="px-1.5 py-0.5 rounded bg-success/20 border border-success/20 text-[10px] font-bold text-success uppercase tracking-widest">Connected</span>
             </div>
           </div>
         </div>

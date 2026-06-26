@@ -212,7 +212,7 @@ export function RepoSearch() {
 
       {/* Dropdown Results */}
       {isOpen && (
-        <div className={`absolute top-full left-0 mt-2 ${searchWidth} bg-popover text-popover-foreground border border-border/20 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100`}>
+        <div className={`absolute top-full left-0 mt-2 ${searchWidth} bg-popover text-popover-foreground border border-border/40 rounded-xl shadow-[0_0_15px_rgba(var(--primary),0.1)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100`}>
           {isLoading ? (
             <div className="p-4 text-center text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
@@ -264,7 +264,7 @@ export function RepoSearch() {
                               <span className="font-medium text-sm truncate">
                                 {item.name}
                               </span>
-                              <span className="px-1.5 py-0.5 rounded bg-warning/10 text-warning border border-warning/20 text-[9px] font-bold uppercase tracking-wider">
+                              <span className="px-1.5 py-0.5 rounded bg-warning/10 text-warning border border-warning/20 text-[10px] font-bold uppercase tracking-wider">
                                 FILE
                               </span>
                             </div>
@@ -315,7 +315,7 @@ export function RepoSearch() {
                             <span className="font-medium text-sm truncate">
                               {item.fullName}
                             </span>
-                            <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 text-[9px] font-bold uppercase tracking-wider">
+                            <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 text-[10px] font-bold uppercase tracking-wider">
                               REPO
                             </span>
                           </div>

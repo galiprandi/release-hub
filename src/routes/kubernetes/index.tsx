@@ -92,7 +92,7 @@ function KubernetesPage() {
 								]}
 								activeId={activeTab}
 								onChange={handleTabChange}
-								className="w-48"
+								className="w-full sm:w-[320px]"
 							/>
 						</div>
 

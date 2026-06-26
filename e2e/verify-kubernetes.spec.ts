@@ -68,7 +68,7 @@ test('Kubernetes Dashboard - Industrial Resonance V2', async ({ page }) => {
   await expect(statusBadge).toHaveClass(/bg-success\/20/);
 
   // Verify Search styling
-  const searchInput = page.getByPlaceholder(/Buscar despliegues/i);
+  const searchInput = page.getByPlaceholder(/Buscar por namespace/i);
   await expect(searchInput).toHaveClass(/bg-muted\/40/);
   await expect(searchInput).toHaveClass(/border-border\/60/);
 

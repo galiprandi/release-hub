@@ -212,6 +212,20 @@
   - [x] Zero-warning build y validación funcional via Playwright.
 - **Resultado**: Interfaces de Salud y Novedades elevadas al estándar Industrial Resonance V2, optimizando el aprovechamiento del espacio y la claridad técnica.
 
+### 2026-06-25: Setup Unification & Resonance V2 Centralization
+- **Agente**: Uma 🐜
+- **Rama**: `🐜-Uma-refactor-setup-centralization`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block & Mission Draft.
+  - [x] Logic Centralization: Creación de `src/utils/os.ts` para detección unificada de OS.
+  - [x] Component Unification: Implementación de `SetupCard.tsx` y `CopyButton.tsx` como componentes compartidos de alta densidad.
+  - [x] Route Refactoring: Refactorización de las rutas de setup de Docker, Fetcher, GitHub y Kubernetes eliminando duplicación masiva.
+  - [x] Resonance V2 Alignment: Estandarización de botones de navegación (`rounded-lg`, `text-[10px]`) e integración de badges de OS en headers.
+  - [x] Technical Hygiene: Zero-warning build log, lint audit impecable y validación de tests unitarios (230 pasados) y E2E.
+  - [x] Documentación: Actualización de `DESIGN.md` y `AGENTS.md` con los nuevos estándares de configuración.
+- **Resultado**: Ecosistema de configuración unificado y profesionalizado, reduciendo la deuda técnica y mejorando la consistencia visual bajo el estándar Industrial Resonance V2.
+
 ### 2026-06-18: Security Hygiene & cURL Parser Hardening
 - **Agente**: Vesper 🐜
 - **Rama**: `🐜-Vesper-refactor-security-hygiene-hardening-v4`

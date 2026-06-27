@@ -17,4 +17,3 @@ Esta misión se centra en la evolución de la interfaz de la Terminal y la mejor
 - `src/routes/github/index.tsx`
 - `AGENTS.md`
 - `DESIGN.md`
-- `CROMA.md`

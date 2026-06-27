@@ -108,6 +108,67 @@
 - **Docker UI**: Status filtering and `ContainerSearch` are promoted to the `PageLayout` header using `IndustrialTabs` and a dedicated search input. High-density cells use semantic dots (`StatusCell`) and hover-to-reveal patterns (`ActionsCell`).
 - **Fetcher UI**: Filtering, sorting, and text search (`q` param) are implemented via `IndustrialTabs` and a header search input. `UrlCell` uses a double-line pattern: Muted Domain and Foreground Path.
 - **Omnisearch (RepoSearch)**: Standardized to `bg-muted/40` with `border-border/60` and `focus:ring-primary/20`. Results must include high-density technical badges (`REPO`, `FILE`).
+- **AI Chat Standard**: Message bubbles use `rounded-xl` geometry. User messages: `bg-primary shadow-[0_0_15px_rgba(var(--primary),0.1)]`. Assistant messages: `bg-ai/5 border border-ai/10`. Input area uses `bg-muted/40` with `focus-within:ring-primary/20`.
+- **Feedback Dialog Standard**: Stepper buttons use `shadow-[0_0_15px_rgba(var(--primary),0.2)]` when active/completed. Form inputs use `bg-muted/40` with `border-border/60`. Success/Error states use semantic tokens with 20% opacity and technical shadows.
+- **Diff Viewer**: Mode selection uses `IndustrialTabs`, synchronized with the `mode` search parameter. Technical metadata headers and comparison results use `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`. Containers use `bg-muted/10` and `border-border/60`. Empty states use `tracking-widest` placeholders.
+- **GitHub UI**: Collection navigation and management actions are in the `PageLayout` header. Dashboard-level filtering uses `IndustrialTabs` synced with `filter` search parameter. Technical metadata cels use high-density typography (`text-[10px] font-bold uppercase tracking-wider`). Organization groups are collapsible and support bulk "Expand/Collapse All" actions.
+- **Health Monitor V2**: Primary environment filtering (Production, Staging, Unhealthy) is moved to the PageLayout header using IndustrialTabs. Product sections use `bg-muted/10` containers with `rounded-xl` geometry and technical Box icons.
+- **Novedades Page**: Implements a high-density technical header with the 'Newspaper' icon. Content is encapsulated in a 'bg-muted/10' container with 'border-border/40' and 'rounded-xl' geometry.
+- **Estructura**: Los componentes de módulo viven siempre en `src/<modulo>/components/`. Prohibido usar `componentes/`.
+- **Hardening**: Middleware `spawn` con `shell: false` y timeout obligatorio de 30s (`spawnAsync`). Centralización de seguridad en `src/utils/security.ts`. Allow-list estricto en `/local/exec` (shells y node prohibidos) y `/local/script`. Validación estricta de recursos Kubernetes (RFC 1123) en todos los middlewares locales. SSRF protection con DNS Rebinding protection (pre-resolución obligatoria) bloqueando 127.0.0.0/8, 169.254.0.0/16, CGNAT y IPv6 local. Proxy de salud requiere `servername` (SNI) al usar IPs resueltas.
+- **Pipeline Standards**: Obligatorio usar `useUnifiedPipeline` (`src/pipeline-core`). Las interfaces de eventos (`PipelineEvent`) deben incluir `markdown` para extracción de rutas y detalles de error. El monitor de salud (`useHealthMonitor`) consume nativamente `PipelineEvent[]`, eliminando la necesidad de puentes de mapeo legacy. La nomenclatura de metadatos es estrictamente camelCase (`updatedAt`).
+- **cURL Parser**: Hardened state-machine tokenizer in `src/utils/curlParser.ts` supporting compact flags (e.g., `-H'Value'`). URL normalization via `new URL().toString()` ensures consistent formatting. Verified via `src/utils/curlParser.test.ts`.
+- **XSS Protection**: Mandatory HTML escaping in any component using `dangerouslySetInnerHTML`. Log utilities (`logUtils.tsx`) must escape the raw line before applying highlighting tags. Diff viewer (`DiffViewer.tsx`) must provide a safe `escapeHtml` fallback if syntax highlighting fails. Verified via `src/api/xss.test.ts`.
+- **SSRF Hardening Standard**: `isInternalAddress` in `src/utils/security.ts` must account for decimal and hexadecimal IP representations to prevent bypasses. All proxy and health check middlewares must utilize this centralized utility.
+- **Search State Synchronization**: Redundant local state for search inputs (e.g., `localSearch`) must be avoided. Search inputs should bind directly to URL search parameters to ensure consistency and eliminate "setState in effect" linter warnings.
+
+### Mejora #13: Surgical Hygiene & Linter Audit V12
+- **Linter Saneamiento**: Erradicación de error de "setState in effect" en `src/routes/fetcher/index.tsx` mediante la eliminación de `localSearch` y vinculación directa a search params.
+- **Dependency Hygiene**: Resolución de advertencia `exhaustive-deps` en `FetcherPage` sincronizando el hook `useMemo` con los parámetros de búsqueda.
+- **Test Hygiene**: Remoción de variable no utilizada `kubectlCard` en `e2e/kubernetes-setup.spec.ts`.
+- **Verificación Global**: Zero-warning build log, lint impecable y 230 tests exitosos.
+
+### Mejora #12: Surgical Hygiene & Entropy Audit V11
+- **Linter Cleanup**: Resolved warnings in `src/api/security.test.ts` by replacing `any` with `@ts-expect-error` in type violation tests.
+- **Entropy Reduction**: Eradicated duplicated test blocks in the security suite to maintain a lean and efficient test pipeline.
+- **Dead Code Removal**: Deleted the orphaned hook `src/hooks/useGitHubActions.ts` after confirming it had no external dependencies or imports.
+- **Build Integrity**: Verified zero-warning build state and global test pass (227 tests) following refactor.
+### Mejora #14: Setup Unification & Resonance V2 Centralization
+- **Setup Centralization**: Unified setup pages for Docker, Fetcher, GitHub, and Kubernetes using the shared `SetupCard` component.
+- **OS Detection**: Centralized OS detection logic in `src/utils/os.ts` and integrated OS badges in setup headers.
+- **Shared Components**: Created `SetupCard` and `CopyButton` to eliminate code duplication across setup routes.
+- **Resonance V2 Alignment**: Standardized navigation buttons and action buttons to `rounded-lg` with `text-[10px]` typography.
+- **Hygiene**: Verified zero-warning build and passed all unit and E2E tests.
+
+### Mejora #10: Surgical Hygiene & Resonance V2 Alignment
+- **Restore SAFE_COMMANDS**: Exported `SAFE_COMMANDS` from `src/utils/security.ts` and updated consumers to maintain strict allow-listing for local execution.
+- **Health Monitor Alignment**: Implemented `handleSortChange` and fixed `handleEnvironmentChange` in `src/routes/health/index.tsx`, ensuring proper search parameter synchronization and removing orphan handlers.
+- **SSRF Robustness**: Hardened `isInternalAddress` to detect and block IPv4 bypasses using decimal and hexadecimal notations.
+- **Technical Hygiene**: Erradicated unused `@ts-expect-error` and refined type safety in test suites.
+
+### Mejora #7: Refactor Kubernetes & Terminal Resonance V2
+- **Kubernetes Dashboard**: Promoted Namespace filtering to the `PageLayout` header using `IndustrialTabs`, synchronized with search parameters. Removed redundant local filter bars.
+- **Terminal Route**: Aligned with Industrial Resonance V2, adding a high-density technical header with session metadata (Shell, Connection Status, OS detection). Aligned with V2 typography (`text-[10px] font-bold uppercase tracking-wider`).
+- **Deployment Search**: Enhanced results with technical metadata (Ready, Up-to-date, Available counts) using standard badges.
+- **Health Monitor**: Corrected `HealthHelpDialog` implementation to use `BaseDialog` correctly.
+
+### Mejora #8: Technical Hygiene & Entropy Cleanup
+- **Entropy Removal**: Eradicated orphan hook `useKubectlNamespaceAccess.ts` to reduce codebase complexity and maintain AAA standards.
+- **Type Safety**: Replaced `: any` with explicit `ChildProcess` mock typing in `security.test.ts`, ensuring full linter compliance and type resilience.
+- **Build Integrity**: Maintained zero-warning build and lint state across the entire repository.
+### Mejora #8: Refactor Docker Resonance V2
+- **Header Promotion**: Promoted container status filtering to the `PageLayout` header using `IndustrialTabs` (synchronized with `status` search param). Integrated technical `Boxes` icon in the title.
+- **High-Density Cells**: Implemented `StatusCell` with semantic dots/pulse and high-density labels. Refined `StartedCell` and `PortsCell` typography.
+- **Visual Hygiene**: Applied hover-to-reveal pattern in `ActionsCell` to maintain a clean layout.
+- **Empty State**: Updated to Industrial Resonance V2 technical aesthetic with centered layout and bold tracking-wider typography.
+- **Setup Page**: Aligned OS detection badges and command containers with the V2 technical style.
+
+### Mejora #11: Inter Font Adoption
+- **Font**: Replaced default browser font with Inter (Google Fonts, variable opsz 14-32, weights 300-700).
+- **Loading**: `preconnect` to `fonts.googleapis.com` + `fonts.gstatic.com` with `display=swap` in `index.html`.
+- **Rendering**: `font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11'` (alternate glyphs) + antialiased smoothing in `index.css`.
+- **Fallback**: `system-ui, -apple-system, sans-serif`.
+- **DESIGN.md**: Updated Industrial Resonance V2 section with Font standard.
 - **AI Chat Standard**: Message bubbles use `rounded-xl` geometry. Assistant messages: `bg-ai/5 border border-ai/10`. Input area uses `bg-muted/40` with `focus-within:ring-primary/20`.
 - **Feedback Dialog Standard**: Stepper buttons use `shadow-[0_0_15px_rgba(var(--primary),0.2)]` when active/completed. Success/Error states use semantic tokens with 20% opacity and technical shadows.
 - **Diff Viewer**: Mode selection uses `IndustrialTabs`, synchronized with the `mode` search parameter. Technical metadata headers and comparison results use `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`. panel headers include a decorative semantic dot and integrated `CopyButton`. Containers use `bg-muted/10` and `border-border/60`. Integrated `EmptyState` V2 for initial states.

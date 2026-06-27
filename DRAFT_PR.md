@@ -1,21 +1,19 @@
-# Draft PR: Diff Viewer Evolution & Resonance V2 Alignment - Carol 🐜
+# Draft PR: Terminal & GitHub UX Evolution - Uma 🐜
 
 ## Descripción
-Esta misión tiene como objetivo elevar el Comparador Universal (Diff Viewer) al estándar Industrial Resonance V2. Se busca mejorar la consistencia visual, optimizar la jerarquía de información y aplicar los últimos estándares de diseño del ecosistema, incluyendo la relocalización de componentes compartidos para cumplir con la arquitectura de localidad por módulo.
+Esta misión se centra en la evolución de la interfaz de la Terminal y la mejora de la experiencia de usuario (UX) en el dashboard de GitHub. Se busca alinear la Terminal con el estándar Industrial Resonance V2 y optimizar la visualización de repositorios mediante la implementación de grupos colapsables.
 
 ## Objetivos
-- [ ] **Architectural Alignment**: Relocalización de `EmptyState` a `src/components/shared/` siguiendo el estándar de componentes compartidos.
-- [ ] **DiffPanel Refinement**: Integración de `CopyButton` compartido, actualización tipográfica a alta densidad y aplicación del Focus Ring Standard.
-- [ ] **DiffViewer Evolution**: Integración de `EmptyState` V2, estandarización de badges de expiración y metadatos técnicos.
-- [ ] **DiffControls Optimization**: Asegurar responsividad y consistencia de iconos en `IndustrialTabs`.
-- [ ] **Technical Hygiene**: Zero-warning build, cumplimiento de indentación de 2 espacios y validación total de tests.
-- [ ] **Documentation**: Actualización de `AGENTS.md` y `DESIGN.md`.
+- [ ] **Terminal V2**: Refactorizar la interfaz de la terminal para cumplir con la tipografía de alta densidad V2 y mejorar los metadatos técnicos mostrados.
+- [ ] **Modal Unification**: Unificar el header del modal de Terminal con la vista principal de la ruta `/terminal`.
+- [ ] **GitHub UX**: Implementar contenedores colapsables por organización en el dashboard de GitHub para reducir el ruido visual.
+- [ ] **Bulk Actions**: Añadir controles globales para expandir/colapsar todas las organizaciones.
+- [ ] **Technical Hygiene**: Mantener un build de cero advertencias, sin `any` y sin `console.log`.
+- [ ] **Documentation**: Actualizar `DESIGN.md`, `AGENTS.md` y `CROMA.md`.
 
 ## Zona de Trabajo
-- `src/components/EmptyState.tsx` -> `src/components/shared/EmptyState.tsx`
-- `src/diff/components/DiffPanel.tsx`
-- `src/diff/components/DiffViewer.tsx`
-- `src/diff/components/DiffControls.tsx`
-- `src/routes/diff.tsx`
+- `src/routes/terminal.tsx`
+- `src/layouts/PageLayout.tsx`
+- `src/routes/github/index.tsx`
 - `AGENTS.md`
 - `DESIGN.md`

@@ -20,7 +20,7 @@
 - **AI Chat Bubble**: High-density typography with `rounded-xl` geometry. User messages utilize `shadow-[0_0_15px_rgba(var(--primary),0.1)]`. Assistant messages use `bg-ai/5` and `border-ai/10` for subtle technical contrast.
 - **Feedback Stepper**: Technical step indicators with `shadow-[0_0_15px_rgba(var(--primary),0.2)]` for active states and `border-border/60` for inactive states.
 - **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering.
-- **Terminal**: High-density technical header with session metadata (e.g., 'Sesión Local Activa', '/bin/bash'). Semantic status dots (OK/Error) with technical shadows. Viewport uses `bg-zinc-950` background.
+- **Terminal**: High-density technical header with session metadata (e.g., 'Sesión Local Activa', '/bin/bash'). Aligned with V2 typography (`text-[10px] font-bold uppercase tracking-wider`). Includes dynamic OS detection badges and connection status with semantic dots. Viewport uses `bg-zinc-950` background.
 - **BaseDialog**: Modal consistency.
 
 ## State Management & Search
@@ -104,6 +104,7 @@
 
 ### GitHub UI Resonance
 - **Dashboard Layout**: Primary collection navigation (`IndustrialTabs`) and project management actions reside in the `PageLayout` header.
+- **Organization Grouping**: Repositories are grouped by organization in collapsible containers (`bg-muted/10`, `rounded-xl`). Headers include high-density typography, organization icons, and repository counts. Supports bulk "Expand/Collapse All" functionality.
 - **Global Filtering**: Dashboard-level filtering (e.g., 'Pendientes') uses `IndustrialTabs` enclosed in `bg-muted/40` containers with `border-border/40` to match technical standards.
 - **Table Cells**:
   - `HealthCell`: Includes semantic dots (OK pulse) and high-density technical labels ('OK'/'ERROR') with semantic colors.

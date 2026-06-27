@@ -13,8 +13,8 @@
 ## Component Patterns
 - **Table**: `bg-muted/40` headers, technical metadata, vertical dividers. Internal filter bar uses `bg-muted/40` with a nested segmented-control layout for a professional aesthetic.
 - **Search Inputs**: Standardized to `bg-muted/40` with `border-border/60`. Focus state uses `focus:ring-primary/20`. Technical search results in dropdowns include high-density badges (`REPO`, `FILE`, `CONT`) with 10% opacity backgrounds.
-- **EmptyState**: Centered layout featuring an icon in a `p-4 rounded-full bg-muted/20 border border-border/40` container. Typography for labels is strictly `text-[10px] font-bold uppercase tracking-[0.2em]`.
-- **SetupCard**: Unified component for onboarding and configuration states. Features a dual-state design for "Installed" (success tokens, high-density metadata) and "Missing" (destructive/warning tokens, collapsible command containers). Uses `text-[10px] font-bold uppercase tracking-wider` for labels.
+- **EmptyState**: Centered layout featuring an icon in a `p-4 rounded-full bg-muted/20 border border-border/40` container. Typography for labels is strictly `text-[10px] font-bold uppercase tracking-[0.2em]`. Component resides in `src/components/shared/`.
+- **SetupCard**: Unified component for onboarding and configuration states. Features a dual-state design for "Installed" (success tokens, high-density metadata) and "Missing" (destructive/warning tokens, collapsible command containers). Uses `text-[10px] font-bold uppercase tracking-wider` for labels. Component resides in `src/components/shared/`.
 - **StatusCard**: Loading/error/offline states.
 - **ActionButton**: Iconographic with tooltip.
 - **AI Chat Bubble**: High-density typography with `rounded-xl` geometry. User messages utilize `shadow-[0_0_15px_rgba(var(--primary),0.1)]`. Assistant messages use `bg-ai/5` and `border-ai/10` for subtle technical contrast.
@@ -26,6 +26,7 @@
 ## State Management & Search
 - **URL-First**: All filtering and search state must reside in URL search parameters to ensure persistence and shareability.
 - **Single Source of Truth**: Avoid duplicating search parameter state in local component state (`useState`). Inputs should be controlled directly by the search parameters provided by the router to prevent synchronization issues and unnecessary renders.
+- **Pipeline Health Dashboard Migration**: In the GitHub Dashboard (src/routes/github/index.tsx), the legacy 'usePipelineWithHealth' hook was replaced by 'useUnifiedPipeline'. Health endpoint extraction is now handled manually via an effect that calls 'extractEndpointsFromEvents' from 'useHealthMonitor' when pipeline data updates, maintaining AAA hygiene standards.
 
 ## Cache-First Tokens (ADR-001)
 | Estado | Token |
@@ -66,7 +67,8 @@
 ## Layout V2
 - Sidebar fijo (50px). Sticky header with backdrop-blur.
 - Contenido `px-8`, `gap-6`.
-- **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente. La eliminación de código muerto (`useKubectlNamespaceAccess.ts`, `useGitHubActions.ts`) es mandatoria para mantener la higiene.
+- **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente. La eliminación de código muerto (`useKubectlNamespaceAccess.ts`, `useGitHubActions.ts`, `usePipelineWithHealth.ts`) es mandatoria para mantener la higiene.
+- **Component Locality**: Los componentes deben residir en directorios específicos de módulo (ej. `src/admin/components/`, `src/ai/components/`). El directorio raíz `src/components/` queda reservado exclusivamente para subdirectorios estructurales (`shared/`, `ui/`).
 
 ## Specific Module Standards
 

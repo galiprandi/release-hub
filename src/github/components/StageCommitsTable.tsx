@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { type GitCommit, useGitCommits } from "@/hooks/useGitCommits";
 import { type GitTag, useGitTags } from "@/hooks/useGitTags";
-import { DisplayInfo } from "@/components/DisplayInfo";
+import { DisplayInfo } from "@/github/components/DisplayInfo";
 import { CommitLink } from "./CommitLink";
 import { TagLink } from "./TagLink";
 import { Table } from "@/components/ui/Table";

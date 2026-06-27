@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { clsx } from "clsx"
 import { useQueryClient } from "@tanstack/react-query"
 import * as Dialog from "@radix-ui/react-dialog"
 import * as Tooltip from "@radix-ui/react-tooltip"
@@ -174,30 +175,75 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 			<BaseDialog
 				open={open}
 				onOpenChange={handleOpenChange}
-				title={step === 'config' ? <>{isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />} {isLocked ? "Desbloquear Branch" : "Bloquear Branch"}</> : <><CheckCircle2 className="w-4 h-4 text-success" /> {isLocked ? "Branch Desbloqueado" : "Branch Bloqueado"}</>}
-				description="Gestión de bloqueo"
+				title={
+					<div className="flex items-center gap-2">
+						{step === "config" ? (
+							<>
+								{isLocked ? (
+									<Lock className="w-4 h-4 text-primary" />
+								) : (
+									<Unlock className="w-4 h-4 text-primary" />
+								)}
+								<span>{isLocked ? "Desbloquear Branch" : "Bloquear Branch"}</span>
+							</>
+						) : (
+							<>
+								<CheckCircle2 className="w-4 h-4 text-success" />
+								<span>{isLocked ? "Branch Desbloqueado" : "Branch Bloqueado"}</span>
+							</>
+						)}
+					</div>
+				}
+				description="Gestión de bloqueo preventivo de ramas."
 				maxWidth={dialogWidth}
 			>
 				{/* Step 1: Config */}
-				{step === 'config' && (
-					<div className="flex flex-col flex-1 overflow-y-auto">
-						<div className="space-y-4">
-							<div className="space-y-3">
-								<div>
-									<label className="block text-sm font-medium mb-1.5">Branch</label>
+				{step === "config" && (
+					<div className="flex flex-col flex-1 overflow-y-auto scrollbar-hide">
+						<div className="space-y-6">
+							<div className="space-y-4">
+								<div className="space-y-2">
+									<label
+										htmlFor="branch-name"
+										className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1"
+									>
+										Branch
+									</label>
 									<input
+										id="branch-name"
 										type="text"
 										value={branch}
 										onChange={(e) => setBranch(e.target.value)}
-										className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+										className="w-full px-4 py-3 text-xs bg-muted/40 border border-border/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono"
 										placeholder="main"
 									/>
 								</div>
-								<div className="text-sm">
+								<div className="bg-muted/10 border border-border/40 rounded-xl p-4 text-xs leading-relaxed text-muted-foreground">
 									{isLocked ? (
-										<p>Vas a <strong>desbloquear</strong> el branch <code className="font-mono bg-muted px-1 rounded">{branch}</code> de <code className="font-mono bg-muted px-1 rounded">{repo}</code>. Esto permitirá merges y pushes nuevamente.</p>
+										<p>
+											Vas a <strong>desbloquear</strong> el branch{" "}
+											<code className="font-mono bg-muted/20 px-1.5 py-0.5 rounded border border-border/40">
+												{branch}
+											</code>{" "}
+											de{" "}
+											<code className="font-mono bg-muted/20 px-1.5 py-0.5 rounded border border-border/40">
+												{repo}
+											</code>
+											. Esto permitirá merges y pushes nuevamente.
+										</p>
 									) : (
-										<p>Vas a <strong>bloquear</strong> el branch <code className="font-mono bg-muted px-1 rounded">{branch}</code> de <code className="font-mono bg-muted px-1 rounded">{repo}</code>. Esto bloqueará todos los merges y pushes hasta que lo desbloquees.</p>
+										<p>
+											Vas a <strong>bloquear</strong> el branch{" "}
+											<code className="font-mono bg-muted/20 px-1.5 py-0.5 rounded border border-border/40">
+												{branch}
+											</code>{" "}
+											de{" "}
+											<code className="font-mono bg-muted/20 px-1.5 py-0.5 rounded border border-border/40">
+												{repo}
+											</code>
+											. Esto bloqueará todos los merges y pushes hasta que lo
+											desbloquees.
+										</p>
 									)}
 								</div>
 							</div>
@@ -209,43 +255,72 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 								readonly
 							/>
 
-							{error && <p className="text-sm text-destructive">{error}</p>}
+							{error && (
+								<div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center gap-2">
+									<p className="text-[10px] font-bold uppercase tracking-wider text-destructive">
+										{error}
+									</p>
+								</div>
+							)}
 						</div>
 
-						<div className="mt-4 pt-4 border-t border-border/60 flex justify-end flex-shrink-0">
+						<div className="mt-8 pt-4 border-t border-border/40 flex justify-end flex-shrink-0">
 							<button
 								onClick={handleToggleFreeze}
 								disabled={isToggling}
-								className={`px-4 py-2 text-sm font-bold uppercase tracking-wider text-white rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none ${
-									isLocked ? "bg-info hover:bg-info/90" : "bg-muted-foreground hover:bg-muted-foreground/90"
-								}`}
+								className={clsx(
+									"px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white rounded-lg transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/20",
+									isLocked
+										? "bg-info hover:opacity-90"
+										: "bg-muted-foreground hover:opacity-90",
+								)}
 							>
-								{isToggling ? <><Loader2 className="w-4 h-4 animate-spin" /> Procesando...</> : <>{isLocked ? <><Lock className="w-4 h-4" /> Desbloquear</> : <><Lock className="w-4 h-4" /> Bloquear</>}</>}
+								{isToggling ? (
+									<>
+										<Loader2 className="w-3.5 h-3.5 animate-spin" />
+										Procesando...
+									</>
+								) : (
+									<>
+										<Lock className="w-3.5 h-3.5" />
+										{isLocked ? "Desbloquear" : "Bloquear"}
+									</>
+								)}
 							</button>
 						</div>
 					</div>
 				)}
 
 				{/* Step 2: Success */}
-				{step === 'success' && (
-					<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
-						<CheckCircle2 className="w-12 h-12 text-success" />
-						<div>
-							<p className="text-lg font-semibold">{isLocked ? "Branch Desbloqueado" : "Branch Bloqueado"}</p>
-							<p className="text-sm text-muted-foreground mt-1">
-								{isLocked ? "El branch" : "El branch"} <strong>{branch}</strong> de <strong>{repo}</strong> {isLocked ? "ya permite merges y pushes." : "ha sido bloqueado temporalmente."}
-							</p>
-							{webhookUrl && (
-								<p className="text-xs text-muted-foreground mt-2">
-									Notificación enviada al canal de Discord
+				{step === "success" && (
+					<div className="flex flex-col items-center justify-center flex-1 py-12 text-center space-y-6">
+						<div className="w-16 h-16 rounded-full bg-success/20 border border-success/20 flex items-center justify-center shadow-[0_0_20px_rgba(var(--success),0.1)]">
+							<CheckCircle2 className="w-8 h-8 text-success" />
+						</div>
+						<div className="space-y-4">
+							<div className="space-y-1">
+								<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-success">
+									{isLocked ? "Branch Desbloqueado" : "Branch Bloqueado"}
 								</p>
+								<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 leading-relaxed">
+									El branch <strong>{branch}</strong> de <strong>{repo}</strong>{" "}
+									{isLocked
+										? "ya permite merges y pushes."
+										: "ha sido bloqueado temporalmente."}
+								</p>
+							</div>
+							{webhookUrl && (
+								<div className="inline-flex items-center gap-2 px-3 py-1 bg-muted/20 border border-border/40 rounded text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+									Notificación enviada a Discord
+								</div>
 							)}
 						</div>
-						<Dialog.Close asChild>
-							<button className="mt-4 px-4 py-2 text-sm font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all shadow-sm">
-								Cerrar
-							</button>
-						</Dialog.Close>
+						<button
+							onClick={() => handleOpenChange(false)}
+							className="w-full mt-4 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+						>
+							Listo
+						</button>
 					</div>
 				)}
 			</BaseDialog>

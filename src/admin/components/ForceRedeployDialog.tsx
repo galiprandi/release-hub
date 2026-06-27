@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { clsx } from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { RefreshCw, Loader2, CheckCircle2, ExternalLink, Circle, AlertCircle } from "lucide-react";
-import { usePrStatus } from "../hooks/usePrStatus";
+import { usePrStatus } from "@/hooks/usePrStatus";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
 
@@ -158,64 +159,98 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 				open={open}
 				onOpenChange={handleOpenChange}
 				title={
-					<>
-						{step === "config" && <><RefreshCw className="w-4 h-4" /> Trigger Staging Redeploy</>}
-						{step === "executing" && <><Loader2 className="w-4 h-4 animate-spin" /> Ejecutando...</>}
-						{step === "success" && <><CheckCircle2 className="w-4 h-4 text-green-600" /> Redeploy Iniciado</>}
-						{step === "error" && <><RefreshCw className="w-4 h-4 text-red-600" /> Error</>}
-					</>
+					<div className="flex items-center gap-2">
+						{step === "config" && (
+							<>
+								<RefreshCw className="w-4 h-4 text-primary" />
+								<span>Trigger Staging Redeploy</span>
+							</>
+						)}
+						{step === "executing" && (
+							<>
+								<Loader2 className="w-4 h-4 animate-spin text-primary" />
+								<span>Ejecutando...</span>
+							</>
+						)}
+						{step === "success" && (
+							<>
+								<CheckCircle2 className="w-4 h-4 text-success" />
+								<span>Redeploy Iniciado</span>
+							</>
+						)}
+						{step === "error" && (
+							<>
+								<AlertCircle className="w-4 h-4 text-destructive" />
+								<span>Error</span>
+							</>
+						)}
+					</div>
 				}
 				description="Proceso de forzar redeploy a staging"
 				maxWidth={dialogWidth}
 			>
 				{/* Step 1: Config */}
 				{step === "config" && (
-					<div className="flex flex-col flex-1 overflow-y-auto">
+					<div className="flex flex-col flex-1 overflow-y-auto scrollbar-hide">
 						<div className="space-y-4">
-							<p className="text-sm text-muted-foreground">
+							<p className="text-xs text-muted-foreground leading-relaxed">
 								Se creará un PR para forzar redeploy de staging. El PR se mergeará
 								automáticamente cuando pasen los checks de seguridad y las reglas del
 								repositorio lo permiten.
 							</p>
-							<p className="text-sm text-muted-foreground">
+							<p className="text-xs text-muted-foreground leading-relaxed">
 								En algunos casos, deberás hacer merge manual si el repo no permite auto
 								merge.
 							</p>
 
-							<div className="border rounded-md p-4 space-y-2">
-								<div className="text-sm font-medium">Pasos:</div>
-								<ul className="text-sm space-y-1 text-muted-foreground list-disc list-inside">
-									<li>Crear rama temporal</li>
-									<li>Modificar archivo dedicado</li>
-									<li>Crear PR con auto merge</li>
-									<li>Esperar checks de seguridad</li>
-									<li>Merge automático o manual</li>
+							<div className="bg-muted/10 border border-border/40 rounded-xl p-4 space-y-3">
+								<div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Pasos del Proceso:</div>
+								<ul className="text-[11px] space-y-2 text-muted-foreground">
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+										Crear rama temporal
+									</li>
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+										Modificar archivo dedicado
+									</li>
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+										Crear PR con auto merge
+									</li>
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+										Esperar checks de seguridad
+									</li>
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+										Merge automático o manual
+									</li>
 								</ul>
 							</div>
 						</div>
 
-						<div className="mt-4 pt-4 border-t flex justify-end gap-2 flex-shrink-0">
-							<Dialog.Close asChild>
-								<button
-									type="button"
-									className="px-4 py-2 text-sm font-medium border rounded-md hover:bg-accent transition-colors"
-								>
-									Cancelar
-								</button>
-							</Dialog.Close>
+						<div className="mt-8 pt-4 border-t border-border/40 flex justify-end gap-3 flex-shrink-0">
+							<button
+								type="button"
+								onClick={() => handleOpenChange(false)}
+								className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+							>
+								Cancelar
+							</button>
 							<button
 								onClick={handleForceRedeploy}
 								disabled={isExecuting}
-								className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+								className="px-6 py-2 text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 inline-flex items-center gap-2"
 							>
 								{isExecuting ? (
 									<>
-										<Loader2 className="w-4 h-4 animate-spin" />
+										<Loader2 className="w-3.5 h-3.5 animate-spin" />
 										Ejecutando...
 									</>
 								) : (
 									<>
-										<RefreshCw className="w-4 h-4" />
+										<RefreshCw className="w-3.5 h-3.5" />
 										Comenzar
 									</>
 								)}
@@ -239,57 +274,63 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 
 				{/* Step 3: Success */}
 				{step === "success" && (
-					<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
-						<div className="text-5xl">
+					<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-6">
+						<div className="w-16 h-16 rounded-full bg-success/20 border border-success/20 flex items-center justify-center shadow-[0_0_20px_rgba(var(--success),0.1)]">
 							{getStatusIcon()}
 						</div>
-						<div className="space-y-2">
-							<p className="text-lg font-semibold">
-								PR #{prNumber} creado
-							</p>
-							<div className={`text-lg font-medium ${getStatusColor()}`}>
-								{getStatusText()}
+						<div className="space-y-4">
+							<div className="space-y-1">
+								<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground">PR #{prNumber} Creado</p>
+								<p className={clsx("text-[10px] font-bold uppercase tracking-wider", getStatusColor())}>
+									{getStatusText()}
+								</p>
 							</div>
 							{prUrl && (
 								<a
 									href={prUrl}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
+									className="inline-flex items-center gap-2 px-4 py-2 bg-muted/20 border border-border/40 rounded-lg text-[10px] font-bold uppercase tracking-wider text-primary hover:bg-muted/40 transition-all"
 								>
-									Ver PR en GitHub
-									<ExternalLink className="w-3 h-3" />
+									<span>Ver PR en GitHub</span>
+									<ExternalLink className="w-3.5 h-3.5" />
 								</a>
 							)}
 						</div>
-						<Dialog.Close asChild>
-							<button className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
-								Cerrar
-							</button>
-						</Dialog.Close>
+						<button
+							onClick={() => handleOpenChange(false)}
+							className="w-full mt-4 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+						>
+							Finalizar
+						</button>
 					</div>
 				)}
 
 				{/* Step 4: Error */}
 				{step === "error" && (
-					<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
-						<RefreshCw className="w-12 h-12 text-red-600" />
-						<div className="space-y-2">
-							<p className="text-lg font-semibold">Error</p>
-							<p className="text-sm text-red-600">{error}</p>
+					<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-6">
+						<div className="w-16 h-16 rounded-full bg-destructive/20 border border-destructive/20 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(var(--destructive),0.1)]">
+							<AlertCircle className="w-8 h-8 text-destructive" />
 						</div>
-						<div className="flex gap-2">
-							<Dialog.Close asChild>
-								<button className="px-4 py-2 text-sm font-medium border rounded-md hover:bg-accent transition-colors">
-									Cerrar
-								</button>
-							</Dialog.Close>
+						<div className="space-y-2">
+							<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-destructive">Error en la ejecución</p>
+							<div className="bg-muted/10 border border-border/40 rounded-xl p-4 text-xs font-mono text-destructive leading-relaxed text-left">
+								{error}
+							</div>
+						</div>
+						<div className="flex gap-3 w-full">
+							<button
+								onClick={() => handleOpenChange(false)}
+								className="flex-1 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider border border-border/60 rounded-lg hover:bg-muted/20 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+							>
+								Cerrar
+							</button>
 							<button
 								onClick={() => {
 									setStep("config");
 									setError("");
 								}}
-								className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+								className="flex-1 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
 							>
 								Reintentar
 							</button>

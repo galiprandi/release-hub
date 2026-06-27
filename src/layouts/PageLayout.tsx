@@ -22,12 +22,12 @@ import {
 	Terminal as TerminalIcon,
 	Send,
 } from "lucide-react";
-import { FeedbackDialog } from "@/components/FeedbackDialog";
-import { SettingsDialog } from "@/components/SettingsDialog";
-import { AIChatModal } from "@/components/AIChatModal";
+import { FeedbackDialog } from "@/admin/components/FeedbackDialog";
+import { SettingsDialog } from "@/admin/components/SettingsDialog";
+import { AIChatModal } from "@/ai/components/AIChatModal";
 import { GenericSearch } from "@/fetcher/components/GenericSearch";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { EmptyState } from "@/components/EmptyState";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { Terminal } from "@/components/shared/Terminal";
 import { useGitUser } from "@/hooks/useGitUser";

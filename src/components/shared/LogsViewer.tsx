@@ -5,7 +5,7 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import { useAISummarize } from "@galiprandi/react-tools";
 import { useAIErrorProcessor } from "@/hooks/useAIErrorProcessor";
 import { useLogsAccumulator } from "@/hooks/useLogsAccumulator";
-import { AISummaryCard } from "@/components/AISummaryCard";
+import { AISummaryCard } from "@/components/shared/AISummaryCard";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { XTermLogs, type XTermLogsHandle } from "./XTermLogs";
 import { groupLogs, logLevelPattern } from "./logUtils";

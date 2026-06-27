@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { clsx } from "clsx";
 import { z } from "zod";
 import {
@@ -30,18 +30,18 @@ import { Table } from "@/components/ui/Table";
 import { CommitLink } from "@/github/components/CommitLink";
 import { TagLink } from "@/github/components/TagLink";
 import { PromoteDialog } from "@/github/components/PromoteDialog";
-import { ForceRedeployDialog } from "@/components/ForceRedeployDialog";
-import { FreezeDialog } from "@/components/FreezeDialog";
+import { ForceRedeployDialog } from "@/admin/components/ForceRedeployDialog";
+import { FreezeDialog } from "@/admin/components/FreezeDialog";
 import { CommitsModal } from "@/github/components/CommitsModal";
 import { PageLayout } from "@/layouts/PageLayout";
 import { RepoSearch } from "@/github/components/RepoSearch";
 import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
-import { ProjectManagementDialog } from "@/components/ProjectManagementDialog";
+import { ProjectManagementDialog } from "@/admin/components/ProjectManagementDialog";
 import { ProjectSelectionDialog } from "@/github/components/ProjectSelectionDialog";
-import { EmptyState } from "@/components/EmptyState";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
-import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
+import { useUnifiedPipeline } from "@/pipeline-core/hooks/useUnifiedPipeline";
 import { useHealthMonitor } from "@/hooks/useHealthMonitor";
 import {
 	useRepoDashboardDetails,
@@ -712,12 +712,28 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 	const { data: queryData, isLoading } = useRepoDashboardDetails(repo.fullName);
 	const latestTag = queryData?.latestTag;
 	const commits = queryData?.commits;
-	const prodPipeline = usePipelineWithHealth({
-		product: repo.fullName,
-		commit: latestTag?.commit ?? "",
-		tag: latestTag?.name ?? "",
+	const { extractEndpointsFromEvents } = useHealthMonitor();
+
+	const prodPipeline = useUnifiedPipeline({
+		org,
+		repo: name,
+		viewMode: "tags",
+		ref: latestTag?.name ?? "",
+		commit: latestTag?.commit,
 		enabled: !!latestTag?.commit && !!latestTag?.name,
 	});
+
+	// Register endpoints for health monitor
+	useEffect(() => {
+		if (prodPipeline.data?.events && repo.fullName) {
+			extractEndpointsFromEvents(
+				repo.fullName,
+				prodPipeline.data.events,
+				"production",
+			);
+		}
+	}, [prodPipeline.data?.events, repo.fullName, extractEndpointsFromEvents]);
+
 	const productionStatus = useMemo(
 		() =>
 			getPipelineStatusInfo(
@@ -768,11 +784,27 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 	const [org, name] = repo.fullName.split("/");
 	const { data: queryData, isLoading } = useRepoDashboardDetails(repo.fullName);
 	const latestCommit = queryData?.commits?.[0];
-	const stagingPipeline = usePipelineWithHealth({
-		product: repo.fullName,
-		commit: latestCommit?.hash ?? "",
+	const { extractEndpointsFromEvents } = useHealthMonitor();
+
+	const stagingPipeline = useUnifiedPipeline({
+		org,
+		repo: name,
+		viewMode: "commits",
+		ref: latestCommit?.hash ?? "",
 		enabled: !!latestCommit?.hash,
 	});
+
+	// Register endpoints for health monitor
+	useEffect(() => {
+		if (stagingPipeline.data?.events && repo.fullName) {
+			extractEndpointsFromEvents(
+				repo.fullName,
+				stagingPipeline.data.events,
+				"staging",
+			);
+		}
+	}, [stagingPipeline.data?.events, repo.fullName, extractEndpointsFromEvents]);
+
 	const stagingStatus = useMemo(
 		() =>
 			getPipelineStatusInfo(

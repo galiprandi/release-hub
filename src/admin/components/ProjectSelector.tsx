@@ -1,0 +1,197 @@
+import { useState, useRef, useEffect } from "react";
+import { FolderPlus, FolderOpen, X, Check, ChevronDown, Plus } from "lucide-react";
+import { useUserCollections } from "@/hooks/useUserCollections";
+import { BaseDialog } from "@/components/ui/BaseDialog";
+
+export function ProjectSelector({ repo }: { repo: string }) {
+	const {
+		projects,
+		createProject,
+		addRepoToProject,
+		removeRepoFromProject,
+		isRepoInProject,
+		getProjectsForRepo,
+	} = useUserCollections();
+	const [isOpen, setIsOpen] = useState(false);
+	const [isCreating, setIsCreating] = useState(false);
+	const [newName, setNewName] = useState("");
+	const [newDesc, setNewDesc] = useState("");
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const handleClick = (e: MouseEvent) => {
+			if (containerRef.current && !containerRef.current.contains(e.target as Node))
+				setIsOpen(false);
+		};
+		const handleEsc = (e: KeyboardEvent) => {
+			if (e.key === "Escape") setIsOpen(false);
+		};
+		if (isOpen) {
+			document.addEventListener("mousedown", handleClick);
+			document.addEventListener("keydown", handleEsc);
+		}
+		return () => {
+			document.removeEventListener("mousedown", handleClick);
+			document.removeEventListener("keydown", handleEsc);
+		};
+	}, [isOpen]);
+
+	const repoProjects = getProjectsForRepo(repo);
+	const hasProjects = repoProjects.length > 0;
+
+	function handleCreate(e: React.FormEvent) {
+		e.preventDefault();
+		if (!newName.trim()) return;
+		createProject(newName.trim(), newDesc.trim() || "", [repo]);
+		setNewName("");
+		setNewDesc("");
+		setIsCreating(false);
+		setIsOpen(false);
+	}
+
+	return (
+		<div className="relative" ref={containerRef}>
+			<button
+				type="button"
+				onClick={() => setIsOpen(!isOpen)}
+				aria-expanded={isOpen}
+				aria-haspopup="listbox"
+				aria-label="Asignar a proyecto"
+				className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-all focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-lg px-2 py-1"
+			>
+				{hasProjects ? (
+					<>
+						<FolderOpen className="w-3.5 h-3.5 text-primary" />
+						<span>
+							{repoProjects.length === 1
+								? repoProjects[0].name
+								: `${repoProjects.length} PROYECTOS`}
+						</span>
+					</>
+				) : (
+					<>
+						<FolderPlus className="w-3.5 h-3.5" />
+						<span>AGREGAR A PROYECTO</span>
+					</>
+				)}
+				<ChevronDown
+					className={`w-3 h-3 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+				/>
+			</button>
+			{isOpen && (
+				<div
+					role="listbox"
+					className="absolute top-full right-0 mt-1 w-72 bg-background border border-border/60 rounded-xl shadow-[0_0_15px_rgba(var(--primary),0.1)] z-50 py-1.5 animate-in fade-in zoom-in-95 duration-150"
+				>
+					{projects.length === 0 && !isCreating && (
+						<div className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">
+							Sin proyectos. Crea el primero.
+						</div>
+					)}
+					<div className="max-h-60 overflow-y-auto scrollbar-hide">
+						{projects.map((p) => {
+							const inP = isRepoInProject(p.id, repo);
+							return (
+								<button
+									key={p.id}
+									type="button"
+									role="option"
+									aria-selected={inP}
+									onClick={() => {
+										void (inP
+											? removeRepoFromProject(p.id, repo)
+											: addRepoToProject(p.id, repo));
+									}}
+									className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-muted/40 transition-colors text-left focus:outline-none focus:bg-muted/60 group"
+								>
+									<div
+										className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${inP ? "bg-primary border-primary shadow-[0_0_8px_rgba(var(--primary),0.3)]" : "border-border/60"}`}
+									>
+										{inP && <Check className="w-3 h-3 text-primary-foreground" />}
+									</div>
+									<div className="flex-1 min-w-0">
+										<div className="text-[11px] font-bold uppercase tracking-tight truncate text-foreground/80 group-hover:text-foreground">
+											{p.name}
+										</div>
+										{p.description && (
+											<div className="text-[10px] text-muted-foreground/60 truncate leading-tight">
+												{p.description}
+											</div>
+										)}
+									</div>
+									{inP && <X className="w-3 h-3 text-muted-foreground/40 hover:text-destructive transition-colors" />}
+								</button>
+							);
+						})}
+					</div>
+					<div className="border-t border-border/40 mt-1.5 pt-1.5 px-1">
+						<button
+							type="button"
+							onClick={() => {
+								setIsCreating(true);
+								setIsOpen(false);
+							}}
+							className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-primary hover:bg-primary/5 transition-all text-left rounded-lg focus:outline-none"
+						>
+							<Plus className="w-3.5 h-3.5" />
+							NUEVO PROYECTO
+						</button>
+					</div>
+				</div>
+			)}
+			<BaseDialog
+				open={isCreating}
+				onOpenChange={setIsCreating}
+				title="Crear nuevo proyecto"
+				description="Crea un nuevo proyecto para organizar tus repositorios."
+				maxWidth="max-w-md"
+			>
+				<form onSubmit={handleCreate} className="space-y-4">
+					<div>
+						<label htmlFor="project-name" className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">
+							Nombre del proyecto
+						</label>
+						<input
+							id="project-name"
+							type="text"
+							value={newName}
+							onChange={e => setNewName(e.target.value)}
+							placeholder="Ej: Frontend, Backend, Infraestructura"
+							className="w-full px-3 py-2 text-sm border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background transition-all"
+							autoFocus
+						/>
+					</div>
+					<div>
+						<label htmlFor="project-desc" className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">
+							Descripción (opcional)
+						</label>
+						<input
+							id="project-desc"
+							type="text"
+							value={newDesc}
+							onChange={e => setNewDesc(e.target.value)}
+							placeholder="Descripción breve del proyecto"
+							className="w-full px-3 py-2 text-sm border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background transition-all"
+						/>
+					</div>
+					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+						<button
+							type="button"
+							onClick={() => setIsCreating(false)}
+							className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider border border-border/60 rounded-lg hover:bg-muted/40 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+						>
+							Cancelar
+						</button>
+						<button
+							type="submit"
+							disabled={!newName.trim()}
+							className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary/20"
+						>
+							Crear proyecto
+						</button>
+					</div>
+				</form>
+			</BaseDialog>
+		</div>
+	);
+}

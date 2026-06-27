@@ -33,7 +33,7 @@ vi.mock("@/components/ui/BaseDialog", () => ({
 		) : null
 }))
 
-vi.mock("@/components/AISummaryCard", () => ({
+vi.mock("@/components/shared/AISummaryCard", () => ({
 	AISummaryCard: ({ summary }: { summary: string }) => (
 		<div data-testid="ai-summary-card">{summary}</div>
 	)

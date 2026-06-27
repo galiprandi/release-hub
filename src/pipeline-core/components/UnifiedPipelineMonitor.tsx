@@ -15,7 +15,7 @@ import {
 	HoverCardTrigger,
 } from '@/components/ui/hover-card'
 import { StatusCard } from '@/components/ui/StatusCard'
-import { AISummaryCard } from '@/components/AISummaryCard'
+import { AISummaryCard } from '@/components/shared/AISummaryCard'
 import { BaseDialog } from '@/components/ui/BaseDialog'
 import { useAISummarize } from '@galiprandi/react-tools'
 

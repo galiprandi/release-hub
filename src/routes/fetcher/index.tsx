@@ -8,7 +8,7 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { QueryModal } from '@/fetcher/components/QueryModal';
 import { Table } from '@/components/ui/Table';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
-import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
 import type { ColumnDef } from '@tanstack/react-table';
 import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';

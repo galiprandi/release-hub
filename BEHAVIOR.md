@@ -75,28 +75,6 @@
 - should prevent XSS in search filters
 - should prevent XSS when highlighting log levels
 
-## Module: AIChatModal
-- calls prompt with multimodal signature when send button is clicked
-- calls reset when clear button is clicked
-- handles file selection and shows preview
-- renders correctly when open
-- shows stop button during prompting and calls reset on click
-- switches profiles and updates messages
-
-## Module: FeedbackDialog
-- should allow entering description and moving to next step
-- should have focus rings on inputs for accessibility
-- should open dialog when trigger is clicked
-- should render trigger button
-- should show stepper with proper accessibility
-
-## Module: ProjectSelector
-- should call createProject when form is submitted
-- should open create project dialog
-- should open projects list when clicked
-- should render projects when they exist
-- should render trigger button
-
 ## Module: terminalMiddleware
 - should register upgrade handler
 - should reject invalid context
@@ -178,6 +156,21 @@
 - retorna false si storage es nulo o JSON inválido
 - retorna true si el token existe
 
+## Module: AIChatModal
+- calls prompt with multimodal signature when send button is clicked
+- calls reset when clear button is clicked
+- handles file selection and shows preview
+- renders correctly when open
+- shows stop button during prompting and calls reset on click
+- switches profiles and updates messages
+
+## Module: FeedbackDialog
+- should allow entering description and moving to next step
+- should have focus rings on inputs for accessibility
+- should open dialog when trigger is clicked
+- should render trigger button
+- should show stepper with proper accessibility
+
 ## Module: LogsViewer
 - calls onResourceChange when resource is selected
 - copies logs to clipboard
@@ -246,6 +239,13 @@
 - should render commits when open
 - should toggle commit expansion
 - should trigger AI summary
+
+## Module: ProjectSelector
+- should call createProject when form is submitted
+- should open create project dialog
+- should open projects list when clicked
+- should render projects when they exist
+- should render trigger button
 
 ## Module: PromoteDialog
 - should have focus rings on interactive elements

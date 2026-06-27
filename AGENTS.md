@@ -114,7 +114,7 @@
 - **GitHub UI**: Collection navigation and management actions are in the `PageLayout` header. Dashboard-level filtering uses `IndustrialTabs` synced with `filter` search parameter. Technical metadata cels use high-density typography (`text-[10px] font-bold uppercase tracking-wider`). Organization groups are collapsible and support bulk "Expand/Collapse All" actions.
 - **Health Monitor V2**: Primary environment filtering (Production, Staging, Unhealthy) is moved to the PageLayout header using IndustrialTabs. Product sections use `bg-muted/10` containers with `rounded-xl` geometry and technical Box icons.
 - **Novedades Page**: Implements a high-density technical header with the 'Newspaper' icon. Content is encapsulated in a 'bg-muted/10' container with 'border-border/40' and 'rounded-xl' geometry.
-- **Estructura**: Los componentes de módulo viven siempre en `src/<modulo>/components/`. Prohibido usar `componentes/`.
+- **Estructura**: Los componentes de módulo viven siempre en `src/<modulo>/components/`. Globales en `src/components/shared/` o `src/components/ui/`. El directorio raíz `src/components/` debe permanecer libre de archivos `.tsx` directos.
 - **Hardening**: Middleware `spawn` con `shell: false` y timeout obligatorio de 30s (`spawnAsync`). Centralización de seguridad en `src/utils/security.ts`. Allow-list estricto en `/local/exec` (shells y node prohibidos) y `/local/script`. Validación estricta de recursos Kubernetes (RFC 1123) en todos los middlewares locales. SSRF protection con DNS Rebinding protection (pre-resolución obligatoria) bloqueando 127.0.0.0/8, 169.254.0.0/16, CGNAT y IPv6 local. Proxy de salud requiere `servername` (SNI) al usar IPs resueltas.
 - **Pipeline Standards**: Obligatorio usar `useUnifiedPipeline` (`src/pipeline-core`). Las interfaces de eventos (`PipelineEvent`) deben incluir `markdown` para extracción de rutas y detalles de error. El monitor de salud (`useHealthMonitor`) consume nativamente `PipelineEvent[]`, eliminando la necesidad de puentes de mapeo legacy. La nomenclatura de metadatos es estrictamente camelCase (`updatedAt`).
 - **cURL Parser**: Hardened state-machine tokenizer in `src/utils/curlParser.ts` supporting compact flags (e.g., `-H'Value'`). URL normalization via `new URL().toString()` ensures consistent formatting. Verified via `src/utils/curlParser.test.ts`.
@@ -122,13 +122,14 @@
 - **SSRF Hardening Standard**: `isInternalAddress` in `src/utils/security.ts` must account for decimal and hexadecimal IP representations to prevent bypasses. All proxy and health check middlewares must utilize this centralized utility.
 - **Search State Synchronization**: Redundant local state for search inputs (e.g., `localSearch`) must be avoided. Search inputs should bind directly to URL search parameters to ensure consistency and eliminate "setState in effect" linter warnings.
 
-### Mejora #13: Surgical Hygiene & Linter Audit V12
-- **Linter Saneamiento**: Erradicación de error de "setState in effect" en `src/routes/fetcher/index.tsx` mediante la eliminación de `localSearch` y vinculación directa a search params.
-- **Dependency Hygiene**: Resolución de advertencia `exhaustive-deps` en `FetcherPage` sincronizando el hook `useMemo` con los parámetros de búsqueda.
-- **Test Hygiene**: Remoción de variable no utilizada `kubectlCard` en `e2e/kubernetes-setup.spec.ts`.
-- **Verificación Global**: Zero-warning build log, lint impecable y 230 tests exitosos.
+### Mejora #15: Architecture Realignment & Type System Hardening V14
+- **Architecture Realignment**: Consolidación total de la localidad de componentes. Relocación de componentes compartidos (`EmptyState`, `LoadingSpinner`, `DisplayInfo`, `SettingsDialog`, `FeedbackDialog`, `AIChatModal`, `AISummaryCard`, `DeleteConfirmDialog`) a `src/components/shared/`.
+- **Module Locality**: Migración de componentes específicos de GitHub (`FreezeDialog`, `ForceRedeployDialog`, `ProjectSelector`, `ProjectManagementDialog`) a `src/github/components/`.
+- **Type Hardening**: Erradicación de `any` en suites de tests críticas (`security.test.ts`, `terminalMiddleware.test.ts`) mediante tipado técnico estricto y casts seguros.
+- **Hygiene AAA**: Eliminación de código muerto y mantenimiento de estado zero-warning en build y lint.
+- **Verificación**: Zero-warning build log, lint impecable y 230 tests exitosos.
 
-### Mejora #12: Surgical Hygiene & Entropy Audit V11
+### Mejora #13: Surgical Hygiene & Linter Audit V12
 - **Linter Cleanup**: Resolved warnings in `src/api/security.test.ts` by replacing `any` with `@ts-expect-error` in type violation tests.
 - **Entropy Reduction**: Eradicated duplicated test blocks in the security suite to maintain a lean and efficient test pipeline.
 - **Dead Code Removal**: Deleted the orphaned hook `src/hooks/useGitHubActions.ts` after confirming it had no external dependencies or imports.

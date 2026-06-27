@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setupTerminalMiddleware } from './terminalMiddleware';
-import { WebSocketServer } from 'ws';
+import { WebSocketServer, WebSocket } from 'ws';
+import type { IncomingMessage, Server } from 'node:http';
 
 // Mock ws and node-pty
 vi.mock('ws', () => {
@@ -29,8 +30,7 @@ describe('terminalMiddleware', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockServer = { on: vi.fn() };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setupTerminalMiddleware(mockServer as any);
+    setupTerminalMiddleware(mockServer as unknown as Server);
     wssInstance = vi.mocked(WebSocketServer).mock.results[0].value;
   });
 
@@ -39,13 +39,12 @@ describe('terminalMiddleware', () => {
   });
 
   describe('Connection Validation', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let connectionHandler: (ws: any, req: any) => Promise<void>;
+    let connectionHandler: (ws: WebSocket, req: IncomingMessage) => Promise<void>;
     let mockWs: { send: ReturnType<typeof vi.fn>; close: ReturnType<typeof vi.fn>; on: ReturnType<typeof vi.fn>; readyState: number };
 
     beforeEach(() => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      connectionHandler = wssInstance.on.mock.calls.find((call: any[]) => call[0] === 'connection')![1];
+      connectionHandler = (wssInstance as any).on.mock.calls.find((call: any[]) => call[0] === 'connection')![1];
       mockWs = {
         send: vi.fn(),
         close: vi.fn(),
@@ -58,9 +57,9 @@ describe('terminalMiddleware', () => {
       const mockReq = {
         url: '/terminal?type=invalid',
         headers: { host: 'localhost' }
-      };
+      } as IncomingMessage;
 
-      await connectionHandler(mockWs, mockReq);
+      await connectionHandler(mockWs as unknown as WebSocket, mockReq);
       expect(mockWs.send).toHaveBeenCalledWith(expect.stringContaining('Invalid terminal type'));
       expect(mockWs.close).toHaveBeenCalled();
     });
@@ -69,9 +68,9 @@ describe('terminalMiddleware', () => {
       const mockReq = {
         url: '/terminal?type=k8s&name=invalid_name;rm -rf /',
         headers: { host: 'localhost' }
-      };
+      } as IncomingMessage;
 
-      await connectionHandler(mockWs, mockReq);
+      await connectionHandler(mockWs as unknown as WebSocket, mockReq);
       expect(mockWs.send).toHaveBeenCalledWith(expect.stringContaining('Invalid resource name format'));
       expect(mockWs.close).toHaveBeenCalled();
     });
@@ -80,9 +79,9 @@ describe('terminalMiddleware', () => {
       const mockReq = {
         url: '/terminal?type=k8s&name=valid-pod&namespace=invalid_ns',
         headers: { host: 'localhost' }
-      };
+      } as IncomingMessage;
 
-      await connectionHandler(mockWs, mockReq);
+      await connectionHandler(mockWs as unknown as WebSocket, mockReq);
       expect(mockWs.send).toHaveBeenCalledWith(expect.stringContaining('Invalid namespace format'));
       expect(mockWs.close).toHaveBeenCalled();
     });
@@ -91,9 +90,9 @@ describe('terminalMiddleware', () => {
       const mockReq = {
         url: '/terminal?type=k8s&name=valid-pod&context=invalid;context',
         headers: { host: 'localhost' }
-      };
+      } as IncomingMessage;
 
-      await connectionHandler(mockWs, mockReq);
+      await connectionHandler(mockWs as unknown as WebSocket, mockReq);
       expect(mockWs.send).toHaveBeenCalledWith(expect.stringContaining('Invalid context format'));
       expect(mockWs.close).toHaveBeenCalled();
     });
@@ -102,9 +101,9 @@ describe('terminalMiddleware', () => {
       const mockReq = {
         url: '/terminal?type=docker&name=invalid;name',
         headers: { host: 'localhost' }
-      };
+      } as IncomingMessage;
 
-      await connectionHandler(mockWs, mockReq);
+      await connectionHandler(mockWs as unknown as WebSocket, mockReq);
       expect(mockWs.send).toHaveBeenCalledWith(expect.stringContaining('Invalid container name format'));
       expect(mockWs.close).toHaveBeenCalled();
     });

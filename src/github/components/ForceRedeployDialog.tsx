@@ -2,7 +2,7 @@ import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { RefreshCw, Loader2, CheckCircle2, ExternalLink, Circle, AlertCircle } from "lucide-react";
-import { usePrStatus } from "../hooks/usePrStatus";
+import { usePrStatus } from "@/hooks/usePrStatus";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
 

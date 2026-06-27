@@ -52,14 +52,37 @@ ensure_deps() {
     return 0
 }
 
+# Function to check if build is stale (commit hash changed since last build)
+is_build_stale() {
+    local current_hash
+    current_hash=$(git rev-parse HEAD 2>/dev/null || echo "")
+    local built_hash=""
+    if [ -f "dist/.build-hash" ]; then
+        built_hash=$(cat dist/.build-hash 2>/dev/null || echo "")
+    fi
+    # Stale if: no dist, no hash file, or hash differs from current commit
+    if [ ! -d "dist" ] || [ ! -f "dist/index.html" ] || [ -z "$built_hash" ] || [ "$built_hash" != "$current_hash" ]; then
+        return 0  # true = stale
+    fi
+    return 1  # false = fresh
+}
+
+# Function to run build and stamp the commit hash
+do_build() {
+    if ! retry "npm run build" npm run build; then
+        log_error "Failed to build application after $MAX_RETRIES attempts."
+        return 1
+    fi
+    # Stamp the build with current commit hash
+    git rev-parse HEAD > dist/.build-hash 2>/dev/null || true
+    return 0
+}
+
 # Function to ensure build is up to date
 ensure_build() {
-    if [ ! -d "dist" ] || [ ! -f "dist/index.html" ]; then
+    if is_build_stale; then
         log_info "Building application..."
-        if ! retry "npm run build" npm run build; then
-            log_error "Failed to build application after $MAX_RETRIES attempts."
-            return 1
-        fi
+        do_build || return 1
     fi
     return 0
 }
@@ -84,29 +107,25 @@ else
         if ! git rev-parse @{u} &>/dev/null; then
             git branch --set-upstream-to=origin/main main &>/dev/null || true
         fi
+        # Capture hash before pull to detect actual changes
+        LOCAL_HASH=$(git rev-parse HEAD 2>/dev/null || echo "")
         # Pull latest changes (non-fatal)
-        UPDATED=false
         if git pull --ff-only &>/dev/null; then
-            # Check if anything actually changed
-            if [ -n "$(git log -1 --format='%H' 2>/dev/null)" ]; then
-                echo "✨ Latest changes pulled successfully."
-                UPDATED=true
+            NEW_HASH=$(git rev-parse HEAD 2>/dev/null || echo "")
+            if [ "$LOCAL_HASH" != "$NEW_HASH" ] && [ -n "$NEW_HASH" ]; then
+                echo "✨ Updates pulled: $LOCAL_HASH → $NEW_HASH"
+                log_info "Reinstalling dependencies..."
+                retry "npm install" npm install || log_warn "npm install failed, using existing node_modules."
+            else
+                echo "✓ Already up to date ($NEW_HASH)"
             fi
         else
             log_warn "Could not pull updates (offline or network issue). Continuing with local version."
         fi
 
-        # Always ensure deps and build are valid, even if pull failed
-        # If updated, force reinstall+rebuild; if not, only if missing
-        if [ "$UPDATED" = true ]; then
-            log_info "Updates detected. Reinstalling dependencies..."
-            retry "npm install" npm install || log_warn "npm install failed, using existing node_modules."
-            log_info "Rebuilding application..."
-            retry "npm run build" npm run build || log_error "Build failed!"
-        else
-            ensure_deps || exit 1
-            ensure_build || exit 1
-        fi
+        # Always ensure deps and build are valid
+        ensure_deps || exit 1
+        ensure_build || exit 1
     else
         # Not a git repo — just ensure deps and build
         ensure_deps || exit 1
@@ -124,7 +143,7 @@ else
     # Final validation: ensure dist exists and is valid
     if [ ! -f "dist/index.html" ]; then
         log_warn "Build output missing. Attempting rebuild..."
-        if ! retry "npm run build" npm run build; then
+        if ! do_build; then
             log_error "Build failed. Cannot start server."
             exit 1
         fi

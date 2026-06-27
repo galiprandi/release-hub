@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { PromoteDialog } from "./PromoteDialog"
 
 // Mock hooks
-vi.mock("../hooks/useRepoPermission", () => ({
+vi.mock("@/hooks/useRepoPermission", () => ({
 	useRepoPermission: () => ({
 		data: { viewerPermission: 'ADMIN', permissions: { push: true } },
 		isLoading: false

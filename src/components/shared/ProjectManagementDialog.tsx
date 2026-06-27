@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { FolderPlus, FolderEdit, Save, X, FolderKanban } from "lucide-react";
-import { BaseDialog } from "./ui/BaseDialog";
-import { ActionButton, ACTION_DEFINITIONS } from "./ui/ActionButton";
+import { BaseDialog } from "@/components/ui/BaseDialog";
+import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
 import { useUserCollections, type Project } from "@/hooks/useUserCollections";
-import { ConfirmDialog } from "./ui/ConfirmDialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface ProjectManagementDialogProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
 }
 
-export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagementDialogProps) {
-	const { projects, createProject, deleteProject, updateProject } = useUserCollections();
+export function ProjectManagementDialog({
+	isOpen,
+	onOpenChange,
+}: ProjectManagementDialogProps) {
+	const { projects, createProject, deleteProject, updateProject } =
+		useUserCollections();
 	const [isCreating, setIsCreating] = useState(false);
 	const [newName, setNewName] = useState("");
 	const [newDescription, setNewDescription] = useState("");
@@ -40,7 +44,10 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 
 	const handleSaveEdit = (id: string) => {
 		if (editName.trim()) {
-			updateProject(id, { name: editName.trim(), description: editDescription.trim() });
+			updateProject(id, {
+				name: editName.trim(),
+				description: editDescription.trim(),
+			});
 			setEditingProject(null);
 		}
 	};
@@ -70,8 +77,10 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 					{/* List Projects */}
 					<div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-hide">
 						{projects.length === 0 && !isCreating && (
-							<div className="text-center py-12 bg-muted/10 rounded-xl border border-dashed border-border/60">
-								<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40">No tienes proyectos creados</p>
+							<div className="text-center py-12 bg-muted/10 rounded-xl border border-dashed border-border/40">
+								<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40">
+									No tienes proyectos creados
+								</p>
 							</div>
 						)}
 
@@ -83,7 +92,9 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 								{editingProject === project.id ? (
 									<div className="flex-1 space-y-3 mr-4">
 										<div className="space-y-1">
-											<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Nombre</label>
+											<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+												Nombre
+											</label>
 											<input
 												autoFocus
 												type="text"
@@ -94,7 +105,9 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 											/>
 										</div>
 										<div className="space-y-1">
-											<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Descripción</label>
+											<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+												Descripción
+											</label>
 											<textarea
 												value={editDescription}
 												onChange={(e) => setEditDescription(e.target.value)}
@@ -138,12 +151,19 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 										</div>
 										<div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
 											<ActionButton
-												action={{ icon: FolderEdit, label: "Editar", color: "default" }}
+												action={{
+													icon: FolderEdit,
+													label: "Editar",
+													color: "default",
+												}}
 												onClick={() => handleStartEdit(project)}
 												size="sm"
 											/>
 											<ActionButton
-												action={{ ...ACTION_DEFINITIONS.delete, label: "Eliminar" }}
+												action={{
+													...ACTION_DEFINITIONS.delete,
+													label: "Eliminar",
+												}}
 												onClick={() => setProjectToDelete(project)}
 												size="sm"
 											/>
@@ -164,11 +184,19 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 							Nuevo Proyecto
 						</button>
 					) : (
-						<form onSubmit={handleCreate} className="p-5 bg-primary/5 rounded-xl border border-primary/20 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-							<h4 className="text-[10px] font-bold uppercase tracking-wider text-primary">Crear nuevo proyecto</h4>
+						<form
+							onSubmit={handleCreate}
+							className="p-5 bg-primary/5 rounded-xl border border-primary/20 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300"
+						>
+							<h4 className="text-[10px] font-bold uppercase tracking-wider text-primary">
+								Crear nuevo proyecto
+							</h4>
 							<div className="space-y-4">
 								<div className="space-y-1.5">
-									<label htmlFor="projectName" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+									<label
+										htmlFor="projectName"
+										className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1"
+									>
 										Nombre
 									</label>
 									<input
@@ -183,7 +211,10 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 									/>
 								</div>
 								<div className="space-y-1.5">
-									<label htmlFor="projectDesc" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+									<label
+										htmlFor="projectDesc"
+										className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1"
+									>
 										Descripción
 									</label>
 									<textarea

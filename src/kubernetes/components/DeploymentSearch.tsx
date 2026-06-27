@@ -5,7 +5,7 @@ import { applyCachePolicy } from '@/lib/queryKeys'
 import { useUserCollections } from '@/hooks/useUserCollections'
 import type { DeploymentInfo } from '@/api/kubectl'
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton'
-import { DeploymentProjectSelectionDialog } from './DeploymentProjectSelectionDialog'
+import { ItemProjectSelectionDialog as DeploymentProjectSelectionDialog } from '@/components/shared/ItemProjectSelectionDialog'
 
 type DeploymentWithContext = DeploymentInfo & { context: string }
 
@@ -284,7 +284,7 @@ export function DeploymentSearch() {
         <DeploymentProjectSelectionDialog
           isOpen={isProjectSelectionOpen}
           onOpenChange={setIsProjectSelectionOpen}
-          deploymentId={deploymentToAssign}
+          itemId={deploymentToAssign} type="deployment"
         />
       )}
     </div>

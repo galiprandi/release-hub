@@ -22,7 +22,7 @@ vi.mock('@/hooks/useAIErrorProcessor', () => ({
 	}),
 }));
 
-vi.mock('@/components/AISummaryCard', () => ({
+vi.mock('@/components/shared/AISummaryCard', () => ({
 	AISummaryCard: () => <div data-testid="ai-summary-card" />,
 }));
 

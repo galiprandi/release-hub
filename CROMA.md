@@ -462,3 +462,16 @@
   - [x] Resonance V2 Typographic Audit: Aplicación de tipografía técnica de alta densidad (`text-[10px] font-bold uppercase tracking-wider`) en etiquetas y metadatos de los componentes relocalizados.
   - [x] Verificación Global: Zero-warning build log, lint audit impecable y 230 tests unitarios exitosos.
 - **Resultado**: Estructura de componentes optimizada siguiendo el estándar de localidad por módulo, higiene técnica elevada al nivel AAA y consistencia visual Resonance V2 garantizada en componentes críticos.
+
+### 2026-06-25: Architecture Realignment & Project Selection Unification
+- **Agente**: Uma 🐜
+- **Rama**: `🐜-Uma-refactor-architecture-resonance-v2`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] Architecture Realignment: Relocalización de componentes globales (`EmptyState`, `LoadingSpinner`, `Settings`, `Feedback`, `AI`, `ProjectManagement`) a `src/components/shared/` y componentes operativos (`ForceRedeploy`, `Freeze`) a `src/github/components/`.
+  - [x] Logic Unification: Creación de `ItemProjectSelectionDialog` para centralizar la selección de colecciones, eliminando implementaciones duplicadas en GitHub y Kubernetes.
+  - [x] Resonance V2 Typography: Auditoría tipográfica aplicada a todos los componentes compartidos, forzando el estándar de alta densidad (`text-[10px] font-bold uppercase`).
+  - [x] Refactor de ProjectSelector: Evolución estética del trigger de proyectos a `bg-muted/40` con geometría `rounded-lg`.
+  - [x] Verificación Global: Zero-warning build log y ejecución exitosa de 229 tests unitarios y de integración.
+- **Resultado**: Arquitectura de componentes purificada siguiendo el estándar AAA, con lógica de negocio compartida unificada y alineación visual absoluta con Industrial Resonance V2.

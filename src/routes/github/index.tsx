@@ -30,15 +30,15 @@ import { Table } from "@/components/ui/Table";
 import { CommitLink } from "@/github/components/CommitLink";
 import { TagLink } from "@/github/components/TagLink";
 import { PromoteDialog } from "@/github/components/PromoteDialog";
-import { ForceRedeployDialog } from "@/components/ForceRedeployDialog";
-import { FreezeDialog } from "@/components/FreezeDialog";
+import { ForceRedeployDialog } from "@/github/components/ForceRedeployDialog";
+import { FreezeDialog } from "@/github/components/FreezeDialog";
 import { CommitsModal } from "@/github/components/CommitsModal";
 import { PageLayout } from "@/layouts/PageLayout";
 import { RepoSearch } from "@/github/components/RepoSearch";
 import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
-import { ProjectManagementDialog } from "@/components/ProjectManagementDialog";
-import { ProjectSelectionDialog } from "@/github/components/ProjectSelectionDialog";
-import { EmptyState } from "@/components/EmptyState";
+import { ProjectManagementDialog } from "@/components/shared/ProjectManagementDialog";
+import { ItemProjectSelectionDialog as ProjectSelectionDialog } from "@/components/shared/ItemProjectSelectionDialog";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
 import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
@@ -1105,7 +1105,7 @@ function OperationsCell({
 			<ProjectSelectionDialog
 				isOpen={isProjectSelectionOpen}
 				onOpenChange={setIsProjectSelectionOpen}
-				repoFullName={repo.fullName}
+				itemId={repo.fullName} type="repo"
 			/>
 		</div>
 	);

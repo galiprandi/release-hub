@@ -15,6 +15,8 @@ const mockUpdateProject = vi.fn()
 const mockDeleteProject = vi.fn()
 const mockToggleRepoInProject = vi.fn()
 const mockSetActiveTab = vi.fn()
+const mockToggleDeploymentInProject = vi.fn()
+const mockIsDeploymentInProject = vi.fn().mockReturnValue(false)
 
 vi.mock("@/hooks/useUserCollections", () => ({
 	useUserCollections: vi.fn(() => ({
@@ -36,9 +38,9 @@ vi.mock("@/hooks/useUserCollections", () => ({
 		isRepoInProject: mockIsRepoInProject,
 		addDeploymentToProject: vi.fn(),
 		removeDeploymentFromProject: vi.fn(),
-		toggleDeploymentInProject: vi.fn(),
+		toggleDeploymentInProject: mockToggleDeploymentInProject,
 		getProjectsForDeployment: vi.fn(),
-		isDeploymentInProject: vi.fn(),
+		isDeploymentInProject: mockIsDeploymentInProject,
 		setActiveTab: mockSetActiveTab,
 	})),
 }))
@@ -82,9 +84,9 @@ describe("ProjectSelector", () => {
 			isRepoInProject: mockIsRepoInProject,
 			addDeploymentToProject: vi.fn(),
 			removeDeploymentFromProject: vi.fn(),
-			toggleDeploymentInProject: vi.fn(),
+			toggleDeploymentInProject: mockToggleDeploymentInProject,
 			getProjectsForDeployment: vi.fn(),
-			isDeploymentInProject: vi.fn(),
+			isDeploymentInProject: mockIsDeploymentInProject,
 			setActiveTab: mockSetActiveTab,
 		})
 	})
@@ -92,18 +94,18 @@ describe("ProjectSelector", () => {
 	it("should render trigger button", () => {
 		render(<ProjectSelector repo="test-repo" />)
 		expect(screen.getByRole("button", { name: /asignar a proyecto/i })).toBeInTheDocument()
-		expect(screen.getByText(/agregar a proyecto/i)).toBeInTheDocument()
+		expect(screen.getByText(/PROYECTOS/i)).toBeInTheDocument()
 	})
 
-	it("should open projects list when clicked", () => {
+	it("should open unified projects dialog when clicked", () => {
 		render(<ProjectSelector repo="test-repo" />)
 		const trigger = screen.getByRole("button", { name: /asignar a proyecto/i })
 		fireEvent.click(trigger)
-		expect(screen.getByRole("listbox")).toBeInTheDocument()
-		expect(screen.getByText(/sin proyectos/i)).toBeInTheDocument()
+		expect(screen.getByTestId("base-dialog")).toBeInTheDocument()
+		expect(screen.getByText(/No tienes proyectos creados/i)).toBeInTheDocument()
 	})
 
-	it("should render projects when they exist", () => {
+	it("should render projects in dialog when they exist", () => {
 		const mockProjects = [
 			{ id: "1", name: "Project 1", description: "Desc 1", repos: [], deployments: [] },
 			{ id: "2", name: "Project 2", description: "Desc 2", repos: [], deployments: [] }
@@ -127,9 +129,9 @@ describe("ProjectSelector", () => {
 			isRepoInProject: mockIsRepoInProject,
 			addDeploymentToProject: vi.fn(),
 			removeDeploymentFromProject: vi.fn(),
-			toggleDeploymentInProject: vi.fn(),
+			toggleDeploymentInProject: mockToggleDeploymentInProject,
 			getProjectsForDeployment: vi.fn(),
-			isDeploymentInProject: vi.fn(),
+			isDeploymentInProject: mockIsDeploymentInProject,
 			setActiveTab: mockSetActiveTab,
 		})
 
@@ -140,31 +142,19 @@ describe("ProjectSelector", () => {
 		expect(screen.getByText("Project 2")).toBeInTheDocument()
 	})
 
-	it("should open create project dialog", () => {
+	it("should call toggleRepoInProject when a project is clicked", () => {
+		const mockProjects = [
+			{ id: "p1", name: "Project 1", description: "Desc 1", repos: [], deployments: [] }
+		]
+		vi.mocked(useUserCollections).mockReturnValue({
+			...vi.mocked(useUserCollections)(),
+			projects: mockProjects,
+		})
+
 		render(<ProjectSelector repo="test-repo" />)
 		fireEvent.click(screen.getByRole("button", { name: /asignar a proyecto/i }))
 
-		const newProjectButton = screen.getByRole("button", { name: /nuevo proyecto/i })
-		fireEvent.click(newProjectButton)
-
-		expect(screen.getByTestId("base-dialog")).toBeInTheDocument()
-		expect(screen.getByText("Crear nuevo proyecto")).toBeInTheDocument()
-		expect(screen.getByLabelText(/nombre del proyecto/i)).toBeInTheDocument()
-	})
-
-	it("should call createProject when form is submitted", () => {
-		render(<ProjectSelector repo="test-repo" />)
-		fireEvent.click(screen.getByRole("button", { name: /asignar a proyecto/i }))
-		fireEvent.click(screen.getByRole("button", { name: /nuevo proyecto/i }))
-
-		const nameInput = screen.getByLabelText(/nombre del proyecto/i)
-		const descInput = screen.getByLabelText(/descripción \(opcional\)/i)
-
-		fireEvent.change(nameInput, { target: { value: "New Project" } })
-		fireEvent.change(descInput, { target: { value: "A new description" } })
-
-		fireEvent.submit(screen.getByRole("button", { name: /crear proyecto/i }))
-
-		expect(mockCreateProject).toHaveBeenCalledWith("New Project", "A new description", ["test-repo"])
+		fireEvent.click(screen.getByText("Project 1"))
+		expect(mockToggleRepoInProject).toHaveBeenCalledWith("p1", "test-repo")
 	})
 })

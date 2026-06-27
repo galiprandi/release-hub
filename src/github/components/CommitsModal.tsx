@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Search, GitCommit, Sparkles, Loader2, ChevronDown, ChevronRight } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAISummarize } from "@galiprandi/react-tools";
-import { AISummaryCard } from "@/components/AISummaryCard";
+import { AISummaryCard } from "@/components/shared/AISummaryCard";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 
 interface CommitsModalProps {

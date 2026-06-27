@@ -13,4 +13,4 @@ export { extractRoutes, getPipelineStatusInfo, type SekiPipelineStatusInfo } fro
 export { useSekiPipelinesByEnv } from './hooks/useSekiPipelinesByEnv'
 export { useHealthMonitor, type Environment, type HealthEndpoint, type UseHealthMonitorReturn } from './hooks/useHealthMonitor'
 export { usePipelineWithHealth } from './hooks/usePipelineWithHealth'
-export { SekiPipelineMonitor, SekiPipelineCard, SekiTimeline, type SekiPipelineCardProps } from './components'
+export { SekiPipelineMonitor, SekiPipelineMonitorData } from './components'

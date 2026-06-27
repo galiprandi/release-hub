@@ -15,13 +15,28 @@ export type SekiPipelineState =
 
 export interface SekiPipelineEvent {
 	id: string
-	name: string
+	/** Nombre completo del evento (ej: "validation: jira") */
+	name?: string
+	/** Label corto para display (ej: "bff", "jira") */
+	label?: string
 	state: SekiPipelineState
 	startedAt?: string
 	completedAt?: string
 	duration?: number
 	markdown?: string
 	subevents?: SekiPipelineEvent[]
+	/** URL del deploy extraída del markdown (si existe) */
+	deployUrl?: string
+}
+
+/** Stage del pipeline con jerarquía preservada (events → subevents) */
+export interface SekiStage {
+	id: string
+	label: string
+	state: SekiPipelineState
+	startedAt?: string
+	completedAt?: string
+	subevents: SekiPipelineEvent[]
 }
 
 export interface SekiPipelineData {
@@ -37,8 +52,10 @@ export interface SekiPipelineData {
 	startedAt?: string
 	/** Cuando completó el pipeline */
 	completedAt?: string
-	/** Eventos/steps del pipeline */
+	/** Eventos/steps del pipeline (legacy, aplanado) */
 	events: SekiPipelineEvent[]
+	/** Stages del pipeline con jerarquía preservada */
+	stages?: SekiStage[]
 	/** URL externa para ver el pipeline en la UI del provider */
 	externalUrl?: string
 	/** Metadata del commit */
@@ -51,6 +68,10 @@ export interface SekiPipelineData {
 	updatedAt: string
 	/** Markdown de error del pipeline fallido (si state es FAILED) */
 	errorMarkdown?: string
+	/** Causa raíz del fallo extraída (1-2 líneas, para mostrar inline) */
+	failureSummary?: string
+	/** Acción correctiva sugerida (1 línea) */
+	failureAction?: string
 }
 
 // UI Component Types

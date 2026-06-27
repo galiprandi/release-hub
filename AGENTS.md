@@ -99,7 +99,7 @@
 - **Type Hygiene**: Prohibido `any`. Interfaces explícitas o `unknown` + validación. Casts de tipo en handlers deben usar `id as typeof stateVariable`. Mocks de test deben sincronizarse con firmas reales mediante casts de interfaces (`as ExecResponse`).
 - **Dashboard Data**: Usar `useRepoDashboardDetails` para acceder a datos de repositorios en el dashboard de GitHub.
 - **Build Log**: Zero-warning build is mandatory. Outdated hook signatures in mocks/tests must be synchronized immediately.
-- **Dead Code Elimination**: Components and hooks identified as orphans must be removed immediately. Legacy hooks `usePipeline.ts`, `usePipelineDetector.ts`, `useKubectlNamespaceAccess.ts`, and `useGitHubActions.ts` have been eradicated.
+- **Dead Code Elimination**: Components and hooks identified as orphans must be removed immediately. Legacy hooks `usePipeline.ts`, `usePipelineDetector.ts`, `useKubectlNamespaceAccess.ts`, and `useGitHubActions.ts` have been eradicated. Excepción: la ruta `/dev/seki-preview` y sus archivos en `src/plugins/pipeline/seki/dev/` son un sandbox permanente de iteración visual y NO deben ser borrados.
 - **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Setup page aligned with V2 standard using high-density badges, semantic tokens with 20% opacity, and technical command containers.
 - **Setup Unification Standard**: Setup pages must use the centralized `SetupCard` component (`src/components/shared/SetupCard.tsx`) and `detectOS` utility (`src/utils/os.ts`). Navigation buttons in setup flows must use `rounded-lg` geometry and `text-[10px]` typography.
 - **Mutaciones**: Optimistic update + revalidación selectiva. Nunca `window.location.reload()`.

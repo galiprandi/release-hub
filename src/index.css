@@ -146,3 +146,11 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

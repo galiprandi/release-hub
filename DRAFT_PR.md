@@ -1,24 +1,21 @@
-# Draft PR: Setup Unification & Resonance V2 Centralization - Uma 🐜
+# Draft PR: Diff Viewer Evolution & Resonance V2 Alignment - Carol 🐜
 
 ## Descripción
-Esta misión tiene como objetivo la unificación y centralización de la lógica y componentes de configuración (setup) de los módulos Docker, Fetcher, GitHub y Kubernetes. Se busca eliminar la redundancia de código, mejorar la mantenibilidad y asegurar que todas las páginas de configuración cumplan estrictamente con el estándar Industrial Resonance V2.
+Esta misión tiene como objetivo elevar el Comparador Universal (Diff Viewer) al estándar Industrial Resonance V2. Se busca mejorar la consistencia visual, optimizar la jerarquía de información y aplicar los últimos estándares de diseño del ecosistema, incluyendo la relocalización de componentes compartidos para cumplir con la arquitectura de localidad por módulo.
 
 ## Objetivos
-- [ ] **Logic Centralization**: Crear utilidades compartidas para la detección de OS y tipos comunes.
-- [ ] **Component Unification**: Desarrollar `SetupCard` y `CopyButton` como componentes compartidos de alta densidad.
-- [ ] **Route Refactoring**: Actualizar las rutas de setup de todos los módulos para consumir los componentes centralizados.
-- [ ] **Resonance V2 Alignment**: Asegurar que toda la iconografía, tipografía y tokens semánticos sigan el estándar V2.
-- [ ] **Technical Hygiene**: Mantener un build de cero advertencias y validar con tests unitarios y E2E.
-- [ ] **Documentation**: Actualizar `AGENTS.md`, `DESIGN.md` y `CROMA.md`.
+- [ ] **Architectural Alignment**: Relocalización de `EmptyState` a `src/components/shared/` siguiendo el estándar de componentes compartidos.
+- [ ] **DiffPanel Refinement**: Integración de `CopyButton` compartido, actualización tipográfica a alta densidad y aplicación del Focus Ring Standard.
+- [ ] **DiffViewer Evolution**: Integración de `EmptyState` V2, estandarización de badges de expiración y metadatos técnicos.
+- [ ] **DiffControls Optimization**: Asegurar responsividad y consistencia de iconos en `IndustrialTabs`.
+- [ ] **Technical Hygiene**: Zero-warning build, cumplimiento de indentación de 2 espacios y validación total de tests.
+- [ ] **Documentation**: Actualización de `AGENTS.md` y `DESIGN.md`.
 
 ## Zona de Trabajo
-- `src/utils/os.ts` (Nuevo)
-- `src/components/shared/SetupCard.tsx` (Nuevo)
-- `src/components/shared/CopyButton.tsx` (Nuevo)
-- `src/routes/docker/setup.tsx`
-- `src/routes/fetcher/setup.tsx`
-- `src/routes/github/setup.tsx`
-- `src/routes/kubernetes/setup.tsx`
+- `src/components/EmptyState.tsx` -> `src/components/shared/EmptyState.tsx`
+- `src/diff/components/DiffPanel.tsx`
+- `src/diff/components/DiffViewer.tsx`
+- `src/diff/components/DiffControls.tsx`
+- `src/routes/diff.tsx`
 - `AGENTS.md`
 - `DESIGN.md`
-- `CROMA.md`

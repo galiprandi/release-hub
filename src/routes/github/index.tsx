@@ -38,7 +38,7 @@ import { RepoSearch } from "@/github/components/RepoSearch";
 import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
 import { ProjectManagementDialog } from "@/components/ProjectManagementDialog";
 import { ProjectSelectionDialog } from "@/github/components/ProjectSelectionDialog";
-import { EmptyState } from "@/components/EmptyState";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
 import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";

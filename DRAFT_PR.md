@@ -1,24 +1,20 @@
-# Draft PR: Setup Unification & Resonance V2 Centralization - Uma 🐜
+# Draft PR: Terminal & GitHub UX Evolution - Uma 🐜
 
 ## Descripción
-Esta misión tiene como objetivo la unificación y centralización de la lógica y componentes de configuración (setup) de los módulos Docker, Fetcher, GitHub y Kubernetes. Se busca eliminar la redundancia de código, mejorar la mantenibilidad y asegurar que todas las páginas de configuración cumplan estrictamente con el estándar Industrial Resonance V2.
+Esta misión se centra en la evolución de la interfaz de la Terminal y la mejora de la experiencia de usuario (UX) en el dashboard de GitHub. Se busca alinear la Terminal con el estándar Industrial Resonance V2 y optimizar la visualización de repositorios mediante la implementación de grupos colapsables.
 
 ## Objetivos
-- [ ] **Logic Centralization**: Crear utilidades compartidas para la detección de OS y tipos comunes.
-- [ ] **Component Unification**: Desarrollar `SetupCard` y `CopyButton` como componentes compartidos de alta densidad.
-- [ ] **Route Refactoring**: Actualizar las rutas de setup de todos los módulos para consumir los componentes centralizados.
-- [ ] **Resonance V2 Alignment**: Asegurar que toda la iconografía, tipografía y tokens semánticos sigan el estándar V2.
-- [ ] **Technical Hygiene**: Mantener un build de cero advertencias y validar con tests unitarios y E2E.
-- [ ] **Documentation**: Actualizar `AGENTS.md`, `DESIGN.md` y `CROMA.md`.
+- [ ] **Terminal V2**: Refactorizar la interfaz de la terminal para cumplir con la tipografía de alta densidad V2 y mejorar los metadatos técnicos mostrados.
+- [ ] **Modal Unification**: Unificar el header del modal de Terminal con la vista principal de la ruta `/terminal`.
+- [ ] **GitHub UX**: Implementar contenedores colapsables por organización en el dashboard de GitHub para reducir el ruido visual.
+- [ ] **Bulk Actions**: Añadir controles globales para expandir/colapsar todas las organizaciones.
+- [ ] **Technical Hygiene**: Mantener un build de cero advertencias, sin `any` y sin `console.log`.
+- [ ] **Documentation**: Actualizar `DESIGN.md`, `AGENTS.md` y `CROMA.md`.
 
 ## Zona de Trabajo
-- `src/utils/os.ts` (Nuevo)
-- `src/components/shared/SetupCard.tsx` (Nuevo)
-- `src/components/shared/CopyButton.tsx` (Nuevo)
-- `src/routes/docker/setup.tsx`
-- `src/routes/fetcher/setup.tsx`
-- `src/routes/github/setup.tsx`
-- `src/routes/kubernetes/setup.tsx`
+- `src/routes/terminal.tsx`
+- `src/layouts/PageLayout.tsx`
+- `src/routes/github/index.tsx`
 - `AGENTS.md`
 - `DESIGN.md`
 - `CROMA.md`

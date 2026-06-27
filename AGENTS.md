@@ -144,7 +144,7 @@
 - **AI Chat Standard**: Message bubbles use `rounded-xl` geometry. User messages: `bg-primary shadow-[0_0_15px_rgba(var(--primary),0.1)]`. Assistant messages: `bg-ai/5 border border-ai/10`. Input area uses `bg-muted/40` with `focus-within:ring-primary/20`.
 - **Feedback Dialog Standard**: Stepper buttons use `shadow-[0_0_15px_rgba(var(--primary),0.2)]` when active/completed. Form inputs use `bg-muted/40` with `border-border/60`. Success/Error states use semantic tokens with 20% opacity and technical shadows.
 - **Diff Viewer**: Mode selection uses `IndustrialTabs`, synchronized with the `mode` search parameter. Technical metadata headers and comparison results use `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`. Containers use `bg-muted/10` and `border-border/60`. Empty states use `tracking-widest` placeholders.
-- **GitHub UI**: Collection navigation and management actions are in the `PageLayout` header. Dashboard-level filtering uses `IndustrialTabs` synced with `filter` search parameter. Technical metadata cels use high-density typography (`text-[10px] font-bold uppercase tracking-wider`).
+- **GitHub UI**: Collection navigation and management actions are in the `PageLayout` header. Dashboard-level filtering uses `IndustrialTabs` synced with `filter` search parameter. Technical metadata cels use high-density typography (`text-[10px] font-bold uppercase tracking-wider`). Organization groups are collapsible and support bulk "Expand/Collapse All" actions.
 - **Health Monitor V2**: Primary environment filtering (Production, Staging, Unhealthy) is moved to the PageLayout header using IndustrialTabs. Product sections use `bg-muted/10` containers with `rounded-xl` geometry and technical Box icons.
 - **Novedades Page**: Implements a high-density technical header with the 'Newspaper' icon. Content is encapsulated in a 'bg-muted/10' container with 'border-border/40' and 'rounded-xl' geometry.
 - **Estructura**: Los componentes de módulo viven siempre en `src/<modulo>/components/`. Prohibido usar `componentes/`.
@@ -181,7 +181,7 @@
 
 ### Mejora #7: Refactor Kubernetes & Terminal Resonance V2
 - **Kubernetes Dashboard**: Promoted Namespace filtering to the `PageLayout` header using `IndustrialTabs`, synchronized with search parameters. Removed redundant local filter bars.
-- **Terminal Route**: Aligned with Industrial Resonance V2, adding a high-density technical header with session metadata (Shell, Connection Status).
+- **Terminal Route**: Aligned with Industrial Resonance V2, adding a high-density technical header with session metadata (Shell, Connection Status, OS detection). Aligned with V2 typography (`text-[10px] font-bold uppercase tracking-wider`).
 - **Deployment Search**: Enhanced results with technical metadata (Ready, Up-to-date, Available counts) using standard badges.
 - **Health Monitor**: Corrected `HealthHelpDialog` implementation to use `BaseDialog` correctly.
 

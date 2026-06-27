@@ -462,3 +462,17 @@
   - [x] Resonance V2 Typographic Audit: Aplicación de tipografía técnica de alta densidad (`text-[10px] font-bold uppercase tracking-wider`) en etiquetas y metadatos de los componentes relocalizados.
   - [x] Verificación Global: Zero-warning build log, lint audit impecable y 230 tests unitarios exitosos.
 - **Resultado**: Estructura de componentes optimizada siguiendo el estándar de localidad por módulo, higiene técnica elevada al nivel AAA y consistencia visual Resonance V2 garantizada en componentes críticos.
+
+### 2026-06-25: Terminal & GitHub UX Evolution
+- **Agente**: Uma 🐜
+- **Rama**: `🐜-Uma-refactor-terminal-github-ux`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block & Mission Draft.
+  - [x] Terminal V2 Evolution: Refactorización de `src/routes/terminal.tsx` alineada con tipografía de alta densidad V2 y metadatos técnicos (Shell, Status, OS).
+  - [x] Modal Unification: Unificación del header del modal de Terminal en `src/layouts/PageLayout.tsx` con el estándar técnico de la ruta principal.
+  - [x] GitHub UX Evolution: Implementación de contenedores colapsables por organización en el dashboard de GitHub para reducir el ruido visual.
+  - [x] Bulk UX Actions: Incorporación de controles globales de expansión/colapso para grupos de organizaciones.
+  - [x] Technical Hygiene: Erradicación de `text-[9px]`, build zero-warning y 230 tests exitosos.
+  - [x] Documentación: Actualización de `DESIGN.md` y `AGENTS.md` con los nuevos estándares de Terminal y GitHub UX.
+- **Resultado**: Experiencia de usuario optimizada mediante la reducción de carga cognitiva en el dashboard y profesionalización técnica de la interfaz de terminal.

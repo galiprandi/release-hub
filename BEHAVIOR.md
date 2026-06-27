@@ -103,14 +103,6 @@
 - registers all tools on mount
 - search_repositories tool calls runCommand correctly
 
-## Module: Pipeline Core Types
-- should accept valid provider values
-- should accept valid state values
-- should accept valid view mode values
-- should create a valid pipeline event
-- should create valid pipeline data structure
-- should support minimal pipeline data
-
 ## Module: curlParser
 - should handle encoded brackets in Seki URLs
 - should handle escaped characters in quotes
@@ -260,6 +252,25 @@
 - should handle null environments in response
 - should return null on API errors
 - should transform events and subevents correctly
+
+## Module: Seki Types
+- should accept valid state values
+- should create a valid pipeline event
+- should create valid pipeline data structure
+- should support TAG refType
+
+## Module: extractRoutes
+- deduplicates URLs
+- extracts URLs from DEPLOY events markdown
+- filters out internal Kubernetes URLs
+- returns empty array for non-DEPLOY events
+
+## Module: getPipelineStatusInfo
+- detects FAILED from deploy events
+- detects SUCCESS when all deploy events succeed
+- falls back to last event state
+- returns undefined status for empty events
+- returns undefined status for undefined events
 
 ## Module: SekiPipelineCard
 - applies custom className

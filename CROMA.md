@@ -488,3 +488,35 @@
   - [x] Technical Hygiene: Erradicación de `text-[9px]`, build zero-warning y 230 tests exitosos.
   - [x] Documentación: Actualización de `DESIGN.md` y `AGENTS.md` con los nuevos estándares de Terminal y GitHub UX.
 - **Resultado**: Experiencia de usuario optimizada mediante la reducción de carga cognitiva en el dashboard y profesionalización técnica de la interfaz de terminal.
+
+### 2026-06-27: Seki Pipeline Separation & Unified Pipeline Elimination
+- **Agente**: Devin
+- **Rama**: main
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Separación de Seki del sistema unificado de pipelines: eliminación completa de `src/pipeline-core/` (types, adapters, hooks, components, utils).
+  - [x] Eliminación de Pulsar/GitHub Actions adapter y `usePipelineDetection` (multi-provider abstraction).
+  - [x] Creación de módulo autónomo `src/plugins/pipeline/seki/` con tipos propios (`SekiPipelineData`, `SekiPipelineEvent`), adapter directo, hook `useSekiPipeline` (sin detección de provider), y componentes propios (`SekiPipelineMonitor`, `SekiPipelineCard`, `SekiTimeline`).
+  - [x] Migración de `useHealthMonitor` y `usePipelineWithHealth` desde `src/hooks/` a `src/plugins/pipeline/seki/hooks/`.
+  - [x] Migración de `getPipelineStatusInfo` y `extractRoutes` a `src/plugins/pipeline/seki/utils.ts`.
+  - [x] `SekiPipelineMonitor` silencioso total: renderiza `null` si no hay token, loading, error, o sin datos. Sólo renderiza la card cuando hay datos válidos.
+  - [x] Actualización de consumidores: `src/routes/github/$org.$repo.tsx`, `src/routes/github/index.tsx`, `src/routes/health/index.tsx`.
+  - [x] Tests: 222 tests unitarios exitosos (adapter, types, utils, card, timeline).
+  - [x] Documentación: actualización de `AGENTS.md`, `BEHAVIOR.md`, `src/api/AGENTS.md`.
+- **Resultado**: Seki aislado como módulo autónomo y agnóstico. Sin abstracción multi-provider. Componente silencioso que sólo aparece cuando hay datos válidos.
+
+### 2026-06-27: Seki Latest-By-Environment Endpoint Migration
+- **Agente**: Devin
+- **Rama**: main
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Migración al endpoint `/pipelines/latest-by-environment` que devuelve staging + production en una sola llamada, sin necesidad de conocer commit o tag de antemano.
+  - [x] Eliminación de `fetchPipeline` y `fetchPipelineWithTag` (per-ref fetching). Reemplazados por `fetchPipelinesByEnvironment`.
+  - [x] Eliminación de `useSekiPipeline` hook. Reemplazado por `useSekiPipelinesByEnv` que retorna `{ staging, production }`.
+  - [x] Eliminación de `ViewMode` de los tipos del módulo Seki. El `refType` (COMMIT/TAG) se infiere automáticamente de `git.event` ('tag' → TAG, resto → COMMIT).
+  - [x] `SekiPipelineMonitor` refactorizado para mostrar ambos ambientes en paralelo (staging card + production card) con sub-componente `SekiEnvPipeline`.
+  - [x] `usePipelineWithHealth` simplificado: ya no requiere `commit` ni `tag` parameters. Extrae endpoints de ambos ambientes automáticamente.
+  - [x] Consumidores actualizados: `$org.$repo.tsx` (sin ref/viewMode/commit props), `github/index.tsx` (TagCell y CommitCell usan `data?.production` y `data?.staging` respectivamente).
+  - [x] Tests: 222 tests unitarios exitosos (adapter, types, utils, card, timeline, api/seki).
+  - [x] Documentación: actualización de AGENTS.md, BEHAVIOR.md, CROMA.md, src/api/AGENTS.md.
+- **Resultado**: Una sola llamada API obtiene el último pipeline de staging y production. Ambos ambientes se muestran en paralelo. Sin necesidad de ref específico. Componente silencioso que sólo aparece cuando hay datos válidos.

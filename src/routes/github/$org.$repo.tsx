@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es";
-import { UnifiedPipelineMonitor } from "@/pipeline-core/components/UnifiedPipelineMonitor";
+import { SekiPipelineMonitor } from "@/plugins/pipeline/seki/components";
 import { StageCommitsTable } from "@/github/components/StageCommitsTable";
 import { PromoteDialog } from "@/github/components/PromoteDialog";
 import { ForceRedeployDialog } from "@/github/components/ForceRedeployDialog";
@@ -35,7 +35,7 @@ function ProductIndex() {
 	const fullProduct = `${org}/${repo}`;
 	const isCommits = viewMode === "commits";
 
-	const { latestCommit, refetch: refreshCommits } = useGitCommits({ repo: fullProduct });
+	const { refetch: refreshCommits } = useGitCommits({ repo: fullProduct });
 	const { latestTag, refetch: refreshTags } = useGitTags({ repo: fullProduct });
 	const { data: openPRs, refetch: refreshOpenPRs } = useOpenPullRequests(fullProduct);
 	const { data: actionsSummary, refetch: refreshActionsSummary } = useGitHubActionsSummary(fullProduct);
@@ -48,8 +48,6 @@ function ProductIndex() {
 			refreshActionsSummary(),
 		]);
 	};
-
-	const monitorRef = isCommits ? (latestCommit?.hash ?? "") : (latestTag?.name ?? "");
 
 	return (
 		<PageLayout
@@ -146,12 +144,9 @@ function ProductIndex() {
 			refreshFn={handleRefetchPipeline}
 		>
 			<div className="space-y-4 mb-4">
-				<UnifiedPipelineMonitor
+				<SekiPipelineMonitor
 					org={org}
 					repo={repo}
-					viewMode={viewMode}
-					ref={monitorRef}
-					commit={!isCommits ? latestTag?.commit : undefined}
 				/>
 			</div>
 

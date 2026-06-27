@@ -1,18 +1,16 @@
 /**
- * Pipeline Card Component
- * Reusable card for displaying pipeline status from any provider
+ * Seki Pipeline Card Component
+ * Card para mostrar el estado del pipeline de Seki.
  */
 
 import { Loader2, AlertTriangle } from 'lucide-react'
-import type { ViewMode } from '../types'
+import type { MetaPart } from '../types'
 
-export type MetaPart = {
-	id: string
-	node: React.ReactNode
-}
+/** Visual style mode for the card, derived from refType */
+type CardViewMode = 'commits' | 'tags'
 
-export interface PipelineCardProps {
-	viewMode: ViewMode
+export interface SekiPipelineCardProps {
+	viewMode: CardViewMode
 	displayRef: string
 	refType: 'COMMIT' | 'TAG'
 	isRunning?: boolean
@@ -23,7 +21,7 @@ export interface PipelineCardProps {
 	className?: string
 }
 
-const viewModeStyles: Record<ViewMode, { badge: string; accent: string }> = {
+const viewModeStyles: Record<CardViewMode, { badge: string; accent: string }> = {
 	tags: {
 		badge: "bg-purple-50 text-purple-700 border border-purple-100",
 		accent: "bg-purple-500",
@@ -34,7 +32,7 @@ const viewModeStyles: Record<ViewMode, { badge: string; accent: string }> = {
 	},
 }
 
-export function PipelineCard({
+export function SekiPipelineCard({
 	viewMode,
 	displayRef,
 	refType,
@@ -44,7 +42,7 @@ export function PipelineCard({
 	metaParts,
 	children,
 	className = '',
-}: PipelineCardProps) {
+}: SekiPipelineCardProps) {
 	const style = viewModeStyles[viewMode]
 
 	return (

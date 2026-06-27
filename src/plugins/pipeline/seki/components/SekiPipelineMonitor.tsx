@@ -1,51 +1,48 @@
 /**
- * Unified Pipeline Monitor Component
- * Displays pipeline status from any provider (Seki, Pulsar, etc.)
+ * Seki Pipeline Monitor Component
+ * Componente que muestra el pipeline de Seki para ambos ambientes
+ * (staging + production) en paralelo.
+ * Silencioso total: renderiza null si no hay token, si está loading,
+ * si hay error, o si no hay datos en ningún ambiente.
  */
 
 import { useState, useEffect, useCallback } from 'react'
-import { GitCommit, ExternalLink, AlertTriangle, Sparkles, Loader2 } from 'lucide-react'
+import { GitCommit, AlertTriangle, Sparkles, Loader2, Rocket, FlaskConical } from 'lucide-react'
 import DayJS from '@/lib/dayjs'
 import { useQueryClient } from '@tanstack/react-query'
-import { useUnifiedPipeline, type ViewMode } from '../index'
-import { PipelineCard, type MetaPart, SimpleTimeline } from './index'
+import { useSekiPipelinesByEnv } from '../hooks/useSekiPipelinesByEnv'
+import type { SekiPipelineData, MetaPart } from '../types'
+import { SekiPipelineCard } from './SekiPipelineCard'
+import { SekiTimeline } from './SekiTimeline'
+import { sekiAdapter } from '../adapter'
 import {
 	HoverCard,
 	HoverCardContent,
 	HoverCardTrigger,
 } from '@/components/ui/hover-card'
-import { StatusCard } from '@/components/ui/StatusCard'
 import { AISummaryCard } from '@/components/shared/AISummaryCard'
 import { BaseDialog } from '@/components/ui/BaseDialog'
 import { useAISummarize } from '@galiprandi/react-tools'
 
-interface UnifiedPipelineMonitorProps {
+interface SekiPipelineMonitorProps {
 	org: string
 	repo: string
-	viewMode: ViewMode
-	/** Commit hash for commits view, tag name for tags view */
-	ref: string
-	/**
-	 * Full 40-character commit hash associated with the tag.
-	 * REQUIRED when viewMode is 'tags' — the Seki API endpoint is
-	 * `/pipelines/:commit/:tag`, so passing an empty string produces
-	 * a double-slash URL and a 404. Must come from the tag object
-	 * (e.g. latestTag?.commit), NOT from the latest staging commit.
-	 */
-	commit?: string
 }
 
-export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: UnifiedPipelineMonitorProps) {
+/**
+ * Renders a single environment's pipeline card with timeline,
+ * error handling, and AI summarization.
+ */
+function SekiEnvPipeline({
+	envLabel,
+	envIcon: EnvIcon,
+	data,
+}: {
+	envLabel: string
+	envIcon: typeof Rocket
+	data: SekiPipelineData
+}) {
 	const queryClient = useQueryClient()
-	const { data, provider, isLoading, error, refetch } = useUnifiedPipeline({
-		org,
-		repo,
-		viewMode,
-		ref,
-		commit,
-	})
-
-	// Error card state
 	const [isErrorCardCollapsed, setIsErrorCardCollapsed] = useState(false)
 	const [isErrorModalOpen, setIsErrorModalOpen] = useState(false)
 	const [isAiSummaryCopied, setIsAiSummaryCopied] = useState(false)
@@ -75,16 +72,8 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: Uni
 	const isGenerating = aiStatus === 'summarizing' || aiStatus === 'initializing' || aiStatus === 'downloading'
 	const isModalGenerating = modalAiStatus === 'summarizing' || modalAiStatus === 'initializing' || modalAiStatus === 'downloading'
 
-	const handleRetry = () => {
-		// Invalidate pipeline detection cache to force re-detection
-		queryClient.invalidateQueries({ queryKey: ['pipeline-detection', org, repo] })
-		// Also invalidate any pipeline data cache
-		queryClient.invalidateQueries({ queryKey: ['pipeline'] })
-	}
-
-	// Generate AI summary of error
 	const handleSummarizeError = async () => {
-		if (!data?.errorMarkdown) return
+		if (!data.errorMarkdown) return
 
 		const context = 'Analiza este error de pipeline de Seki. Extrae: 1) La causa raíz del fallo, 2) Qué validación falló, 3) Qué acción se necesita para corregirlo. Sé conciso (máximo 4 líneas).'
 		const textWithContext = `INSTRUCCIÓN: ${context}\n\n${data.errorMarkdown}`
@@ -92,7 +81,7 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: Uni
 		try {
 			await summarize(textWithContext, context)
 		} catch (err) {
-			console.error('[UnifiedPipelineMonitor] Error generating summary:', err)
+			console.error('[SekiEnvPipeline] Error generating summary:', err)
 		}
 	}
 
@@ -109,9 +98,8 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: Uni
 		setTimeout(() => setIsAiSummaryCopied(false), 2000)
 	}
 
-	// Generate AI summary for modal when it opens
 	const handleSummarizeModalError = useCallback(async () => {
-		if (!data?.errorMarkdown) return
+		if (!data.errorMarkdown) return
 
 		const context = 'Resume este error de pipeline de Seki en UN SOLO PÁRRAFO. Sé conciso y directo. Identifica: 1) La causa raíz, 2) Qué falló, 3) Qué acción se necesita.'
 		const textWithContext = `INSTRUCCIÓN: ${context}\n\n${data.errorMarkdown}`
@@ -119,51 +107,29 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: Uni
 		try {
 			await summarizeModal(textWithContext, context)
 		} catch (err) {
-			console.error('[UnifiedPipelineMonitor] Error generating modal summary:', err)
+			console.error('[SekiEnvPipeline] Error generating modal summary:', err)
 		}
 	}, [data, summarizeModal])
 
-	// Generate modal summary when modal opens
 	useEffect(() => {
-		if (isErrorModalOpen && data?.errorMarkdown && !modalAiSummary) {
+		if (isErrorModalOpen && data.errorMarkdown && !modalAiSummary) {
 			handleSummarizeModalError()
 		}
-	}, [isErrorModalOpen, data?.errorMarkdown, modalAiSummary, handleSummarizeModalError])
-
-	// Loading state
-	if (isLoading) {
-		return <StatusCard type="loading" message="Cargando información del pipeline..." />
-	}
-
-	// Error state
-	if (error) {
-		return <StatusCard type="error" message={error.message} onRetry={refetch} />
-	}
-
-	// No provider detected
-	if (!provider) {
-		return (
-			<StatusCard
-				type="warn"
-				message={`No se detectó un pipeline compatible (${org}/${repo})`}
-				onRetry={handleRetry}
-			/>
-		)
-	}
-
-	// Provider detected but no data available
-	if (!data) {
-		return (
-			<StatusCard
-				type="warn"
-				message={`No hay datos de pipeline disponibles para ${viewMode === 'tags' ? `el tag ${ref}` : 'este stage'} (${org}/${repo})`}
-				onRetry={refetch}
-			/>
-		)
-	}
+	}, [isErrorModalOpen, data.errorMarkdown, modalAiSummary, handleSummarizeModalError])
 
 	// Build metadata parts
 	const metaParts: MetaPart[] = []
+
+	// Environment label as first meta part
+	metaParts.push({
+		id: 'env',
+		node: (
+			<span className="inline-flex items-center gap-1 font-medium text-foreground">
+				<EnvIcon className="w-3.5 h-3.5" />
+				{envLabel}
+			</span>
+		),
+	})
 
 	if (data.commit?.author) {
 		metaParts.push({
@@ -210,8 +176,8 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: Uni
 					variant="compact"
 				/>
 			)}
-			<PipelineCard
-				viewMode={viewMode}
+			<SekiPipelineCard
+				viewMode={data.refType === 'TAG' ? 'tags' : 'commits'}
 				displayRef={data.ref}
 				refType={data.refType}
 				isRunning={isRunning}
@@ -221,7 +187,7 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: Uni
 			>
 				<div className="flex items-center gap-2">
 					{data.events.length > 0 ? (
-						<SimpleTimeline events={data.events} />
+						<SekiTimeline events={data.events} />
 					) : data.externalUrl ? (
 						<HoverCard openDelay={100} closeDelay={100}>
 							<HoverCardTrigger asChild>
@@ -231,14 +197,13 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: Uni
 									rel="noopener noreferrer"
 									className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
 								>
-									<ExternalLink className="w-3 h-3" />
-									Ver en {provider === 'pulsar' ? 'GitHub Actions' : 'Seki'}
+									Ver en Seki
 								</a>
 							</HoverCardTrigger>
 							<HoverCardContent align="center" sideOffset={6} className="p-4 w-fit min-w-[280px]">
 								<div className="space-y-2">
 									<div className="flex items-center justify-between gap-2">
-										<span className="text-sm font-semibold">{provider === 'pulsar' ? 'GitHub Actions' : 'Seki Pipeline'}</span>
+										<span className="text-sm font-semibold">Seki Pipeline</span>
 										<span className="text-xs text-muted-foreground">
 											{DayJS(data.updatedAt).fromNow()}
 										</span>
@@ -256,7 +221,7 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: Uni
 						</HoverCard>
 					) : null}
 				</div>
-			</PipelineCard>
+			</SekiPipelineCard>
 			{hasError && isErrorModalOpen && (
 				<BaseDialog
 					open={isErrorModalOpen}
@@ -264,7 +229,7 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: Uni
 					title={
 						<div className="flex items-center gap-2">
 							<AlertTriangle className="w-5 h-5 text-destructive" />
-							<span>Error del Pipeline</span>
+							<span>Error del Pipeline - {envLabel}</span>
 						</div>
 					}
 					maxWidth="max-w-4xl"
@@ -300,6 +265,54 @@ export function UnifiedPipelineMonitor({ org, repo, viewMode, ref, commit }: Uni
 						</div>
 					</div>
 				</BaseDialog>
+			)}
+		</div>
+	)
+}
+
+export function SekiPipelineMonitor({ org, repo }: SekiPipelineMonitorProps) {
+	const { data, isLoading, error } = useSekiPipelinesByEnv({
+		org,
+		repo,
+	})
+
+	// === SILENCIOSO TOTAL ===
+	if (!sekiAdapter.hasToken()) {
+		return null
+	}
+
+	if (isLoading) {
+		return null
+	}
+
+	if (error) {
+		return null
+	}
+
+	if (!data) {
+		return null
+	}
+
+	// Si no hay datos en ningún ambiente, no renderizar nada
+	if (!data.staging && !data.production) {
+		return null
+	}
+
+	return (
+		<div className="space-y-3">
+			{data.staging && (
+				<SekiEnvPipeline
+					envLabel="Staging"
+					envIcon={FlaskConical}
+					data={data.staging}
+				/>
+			)}
+			{data.production && (
+				<SekiEnvPipeline
+					envLabel="Production"
+					envIcon={Rocket}
+					data={data.production}
+				/>
 			)}
 		</div>
 	)

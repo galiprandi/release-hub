@@ -67,7 +67,7 @@
 - should validate Kubernetes resource names correctly
 
 ## Module: api/seki
-- fetchPipeline retorna el pipeline
+- fetchPipelinesByEnvironment retorna pipelines por ambiente
 
 ## Module: XSS Vulnerability Audit
 - should escape HTML in highlighted code
@@ -254,42 +254,24 @@
 - should suggest next version correctly
 - should toggle commits list with accessibility attributes
 
-## Module: Pipeline Adapters
-- should handle errors gracefully
-- should handle invalid JSON in settings gracefully
-- should have correct name
-- should have required properties
-- should not support when Nx Build workflow does not exist
-- should not support when no token exists
-- should support when Nx Build workflow exists
-- should support when token exists
-
-## Module: pulsarAdapter
-- should fetch and transform pulsar data correctly
-- should return null when no workflow runs are found
-- should support repos with Nx Build workflow
-
 ## Module: sekiAdapter
-- should fetch and transform commit data
-- should fetch and transform tag data
-- should return null for short refs or API errors
-- should return null for tag data without commit
+- should extract error markdown from failed subevents
+- should fetch and transform both environments
+- should handle null environments in response
+- should return null on API errors
 - should transform events and subevents correctly
 
-## Module: PipelineCard
+## Module: SekiPipelineCard
 - applies custom className
 - does not show running indicator when isRunning is false
-- has different styling for commits vs tags
 - renders children when provided
 - renders meta parts correctly
 - renders tag ref type for tags
 - renders with basic props
 - shows running indicator when isRunning is true
 
-## Module: SimpleTimeline
-- displays duration in tooltip for completed events
+## Module: SekiTimeline
 - limits display to first 6 events
 - renders empty timeline with no events
 - renders timeline with events
-- shows different states with different styling
 - shows tooltip on hover

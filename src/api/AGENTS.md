@@ -144,106 +144,111 @@ The pipeline data returned by Seki includes:
 - `/products/:organization/:name/pipelines` endpoint throws `PIPELINES_EXCEPTION` when attempting to list pipelines
 - This prevents using the list endpoint to verify if a product is compatible with Seki
 
-## Unified Pipeline Architecture
+## Seki Pipeline Architecture
 
-**Created**: April 2025
+**Created**: April 2025 · **Refactored**: June 2026 (latest-by-environment endpoint)
 
 ### Overview
 
-New unified pipeline monitoring architecture introduced to simplify and make the system more extensible:
+Seki pipeline monitoring module, autónomo y agnóstico. Sin abstracción multi-provider.
+Usa el endpoint `/pipelines/latest-by-environment` que devuelve staging + production
+en una sola llamada, sin necesidad de conocer el commit o tag de antemano.
 
-**Location**: `src/pipeline-core/`
+**Location**: `src/plugins/pipeline/seki/`
 
-### Architecture Components
+### API Endpoint
 
-#### 1. Types (`src/pipeline-core/types.ts`)
-Unified types that work with any pipeline provider:
-- `PipelineData` - Common data structure for all pipelines
-- `PipelineEvent` - Standardized event representation
-- `PipelineState` - Unified state machine (IDLE, STARTED, RUNNING, COMPLETED, FAILED, CANCELLED)
-- `PipelineProvider` - 'seki' | 'pulsar' | null
-- `PipelineAdapter` - Interface for implementing new providers
+```
+GET /products/:org/:repo/pipelines/latest-by-environment
+```
 
-#### 2. Adapters (`src/pipeline-core/adapters/`)
-Adapter pattern for different pipeline providers:
-
-**SekiAdapter** (`sekiAdapter.ts`):
-- Transforms Seki API responses to unified format
-- Supports token-based authentication
-- Handles staging (commit) and production (tag) pipelines
-
-**PulsarAdapter** (`pulsarAdapter.ts`):
-- Transforms GitHub Actions workflow data
-- Detects Nx Build workflow
-- Fetches runs, jobs, and commit info
-
-**Adding a new adapter**:
-```typescript
-export const myAdapter: PipelineAdapter = {
-  name: 'my-provider',
-  async supports(org: string, repo: string): Promise<boolean> {
-    // Detect if this provider is available
-  },
-  async fetch(org: string, repo: string, stage: StageType, ref: string): Promise<PipelineData | null> {
-    // Fetch and transform data
-  }
+Returns:
+```json
+{
+  "staging": { "state": "...", "events": [...], "git": { "commit": "...", "event": "commit", ... } },
+  "production": { "state": "...", "events": [...], "git": { "commit": "...", "ref": "v1.0.0", "event": "tag", ... } }
 }
 ```
 
-#### 3. Hooks (`src/pipeline-core/hooks/`)
-**useUnifiedPipeline** - Single hook for all providers:
-- Automatically detects the appropriate provider
-- Fetches pipeline data with smart polling
-- Unified error handling
+The `git.event` field determines `refType`: `'tag'` → TAG, anything else → COMMIT.
 
-**usePipelineDetection** - Provider detection:
-- Checks adapters in priority order (Pulsar > Seki)
-- Caches results for 1 hour
+### Architecture Components
 
-#### 4. Components (`src/pipeline-core/components/`)
-**UnifiedPipelineMonitor** - Displays pipeline from any provider
-**PipelineCard** - Reusable card UI
-**SimpleTimeline** - Visual timeline for pipeline events
+#### 1. Types (`src/plugins/pipeline/seki/types.ts`)
+Seki-specific types:
+- `SekiPipelineData` - Data structure for a single environment's pipeline
+- `SekiPipelineEvent` - Event representation with markdown support
+- `SekiPipelineState` - State machine (IDLE, STARTED, RUNNING, COMPLETED, FAILED, CANCELLED, SUCCESS, WARN)
+- `MetaPart` - UI metadata part for card rendering
+
+#### 2. Adapter (`src/plugins/pipeline/seki/adapter.ts`)
+**sekiAdapter**:
+- `hasToken()` - checks if Seki token exists
+- `fetchByEnvironment(org, repo)` - fetches both staging + production pipelines
+  in a single call, returns `SekiPipelinesByEnv | null`
+
+#### 3. Hooks (`src/plugins/pipeline/seki/hooks/`)
+**useSekiPipelinesByEnv** - Direct hook (no provider detection):
+- Fetches both environments in one call
+- If no token → no fetch, returns `data: null`
+- Smart polling: 15s when any pipeline is active (STARTED/RUNNING)
+
+**useHealthMonitor** - Health endpoint management:
+- Extracts URLs from DEPLOY_* events markdown
+- Detects environment (staging/production) from URL patterns or context
+- Health checks with 5s timeout
+- Persists endpoints in localStorage
+
+**usePipelineWithHealth** - Combines pipeline fetching with health extraction:
+- Uses `useSekiPipelinesByEnv` internally
+- Extracts endpoints from both staging and production events
+- No longer requires commit/tag parameters
+
+#### 4. Components (`src/plugins/pipeline/seki/components/`)
+**SekiPipelineMonitor** - Main component, renders both environments in parallel
+  (staging card + production card). Silent total: renders null if no token,
+  loading, error, or no data in either environment.
+**SekiPipelineCard** - Card UI for pipeline status (used per environment)
+**SekiTimeline** - Visual timeline for pipeline events
 
 ### Usage Example
 
 ```typescript
-import { useUnifiedPipeline } from '@/pipeline-core'
+import { SekiPipelineMonitor } from '@/plugins/pipeline/seki/components'
 
 function MyComponent() {
-  const { data, provider, isLoading, error } = useUnifiedPipeline({
-    org: 'my-org',
-    repo: 'my-repo',
-    stage: 'staging',
-    ref: 'abc1234',
-  })
-  
-  // Works with any provider automatically!
+  return (
+    <SekiPipelineMonitor
+      org="my-org"
+      repo="my-repo"
+    />
+  )
+  // Renders staging + production cards in parallel.
+  // Renders null if no token or no data in either environment.
 }
 ```
 
 ### Testing
 
-Added Vitest test suite:
+Vitest test suite:
 - `npm test` - Run tests in watch mode
 - `npm run test:run` - Run tests once
-- `npm run coverage` - Generate coverage report
 
-Test files:
-- `src/pipeline-core/__tests__/types.test.ts`
-- `src/pipeline-core/__tests__/adapters.test.ts`
-- `src/pipeline-core/__tests__/PipelineCard.test.tsx`
-- `src/pipeline-core/__tests__/SimpleTimeline.test.tsx`
+Test files (alongside source code):
+- `src/plugins/pipeline/seki/types.test.ts`
+- `src/plugins/pipeline/seki/adapter.test.ts`
+- `src/plugins/pipeline/seki/utils.test.ts`
+- `src/plugins/pipeline/seki/components/SekiPipelineCard.test.tsx`
+- `src/plugins/pipeline/seki/components/SekiTimeline.test.tsx`
 
-### Migration from Old System (Completed)
+### Migration History
 
-Legacy monitor components (PipelineMonitor, SekiMonitor, PulsarMonitor) have been removed.
-
-Current approach:
-- `UnifiedPipelineMonitor` is the single component for all pipeline monitoring.
-- Adapters in `src/pipeline-core/adapters/` handle provider-specific logic.
-- `useUnifiedPipeline` hook manages data fetching and smart polling.
-- Shared utilities reside in `src/pipeline-core/utils.ts`.
+- **June 2026**: Migrated from per-ref fetching (`/pipelines/:commit` and
+  `/pipelines/:commit/:tag`) to the unified `/pipelines/latest-by-environment`
+  endpoint. Removed `ViewMode`, `fetchPipeline`, `fetchPipelineWithTag`, and
+  `useSekiPipeline`. Both environments now fetched in a single call.
+- **June 2026**: Separated Seki from the unified pipeline architecture
+  (`src/pipeline-core/`). Pulsar/GitHub Actions adapter eliminated.
 
 ## Workflow Preferences
 

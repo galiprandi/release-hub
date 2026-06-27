@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Activity, ExternalLink, Box, HelpCircle } from 'lucide-react';
-import { useHealthMonitor } from '@/hooks/useHealthMonitor';
+import { useHealthMonitor } from '@/plugins/pipeline/seki/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
 import { Table } from '@/components/ui/Table';
 import { EmptyState } from '@/components/shared/EmptyState';

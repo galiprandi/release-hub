@@ -43,8 +43,8 @@ import { ProjectSelectionDialog } from "@/github/components/ProjectSelectionDial
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
-import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
-import { useHealthMonitor } from "@/hooks/useHealthMonitor";
+import { usePipelineWithHealth } from "@/plugins/pipeline/seki/hooks/usePipelineWithHealth";
+import { useHealthMonitor } from "@/plugins/pipeline/seki/hooks/useHealthMonitor";
 import {
 	useRepoDashboardDetails,
 	type RepoDetails,
@@ -54,7 +54,7 @@ import {
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
 import { runCommand } from "@/api/exec";
 import DayJS from "@/lib/dayjs";
-import { getPipelineStatusInfo } from "@/utils/pipelineStatus";
+import { getPipelineStatusInfo } from "@/plugins/pipeline/seki/utils";
 
 const dashboardSearchSchema = z.object({
 	tab: z.string().optional().catch("favorites"),
@@ -811,17 +811,15 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 	const commits = queryData?.commits;
 	const prodPipeline = usePipelineWithHealth({
 		product: repo.fullName,
-		commit: latestTag?.commit ?? "",
-		tag: latestTag?.name ?? "",
 		enabled: !!latestTag?.commit && !!latestTag?.name,
 	});
 	const productionStatus = useMemo(
 		() =>
 			getPipelineStatusInfo(
-				prodPipeline.data?.events,
-				prodPipeline.data?.updatedAt,
+				prodPipeline.data?.production?.events,
+				prodPipeline.data?.production?.updatedAt,
 			),
-		[prodPipeline.data],
+		[prodPipeline.data?.production],
 	);
 	const isProdLoading = prodPipeline.isLoading || isLoading;
 
@@ -867,16 +865,15 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 	const latestCommit = queryData?.commits?.[0];
 	const stagingPipeline = usePipelineWithHealth({
 		product: repo.fullName,
-		commit: latestCommit?.hash ?? "",
 		enabled: !!latestCommit?.hash,
 	});
 	const stagingStatus = useMemo(
 		() =>
 			getPipelineStatusInfo(
-				stagingPipeline.data?.events,
-				stagingPipeline.data?.updatedAt,
+				stagingPipeline.data?.staging?.events,
+				stagingPipeline.data?.staging?.updatedAt,
 			),
-		[stagingPipeline.data],
+		[stagingPipeline.data?.staging],
 	);
 	const isStagingLoading = stagingPipeline.isLoading || isLoading;
 

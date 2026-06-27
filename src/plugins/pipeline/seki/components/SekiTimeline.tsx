@@ -1,7 +1,6 @@
 /**
- * Simple Timeline Component
- * Displays pipeline events as a visual timeline
- * Works with unified PipelineEvent type
+ * Seki Timeline Component
+ * Timeline visual de eventos del pipeline de Seki.
  */
 
 import {
@@ -12,7 +11,7 @@ import {
 	XCircle,
 } from "lucide-react"
 import { useState } from "react"
-import type { PipelineEvent, PipelineState } from '../types'
+import type { SekiPipelineEvent, SekiPipelineState } from '../types'
 import {
 	HoverCard,
 	HoverCardContent,
@@ -20,11 +19,11 @@ import {
 } from "@/components/ui/hover-card"
 import DayJS from "@/lib/dayjs"
 
-interface SimpleTimelineProps {
-	events: PipelineEvent[]
+interface SekiTimelineProps {
+	events: SekiPipelineEvent[]
 }
 
-const timelineStatusTextColor = (state: PipelineState) => {
+const timelineStatusTextColor = (state: SekiPipelineState) => {
 	switch (state) {
 		case "COMPLETED":
 			return "text-emerald-600"
@@ -40,7 +39,7 @@ const timelineStatusTextColor = (state: PipelineState) => {
 	}
 }
 
-const timelineStatusIcon = (state: PipelineState) => {
+const timelineStatusIcon = (state: SekiPipelineState) => {
 	const baseClass = `w-3 h-3 ${timelineStatusTextColor(state)}`
 	switch (state) {
 		case "COMPLETED":
@@ -59,7 +58,7 @@ const timelineStatusIcon = (state: PipelineState) => {
 	}
 }
 
-const timelineStatusColor = (state: PipelineState) => {
+const timelineStatusColor = (state: SekiPipelineState) => {
 	switch (state) {
 		case "COMPLETED":
 			return "bg-green-500"
@@ -85,7 +84,7 @@ const formatDuration = (start?: string, end?: string) => {
 	return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`
 }
 
-export function SimpleTimeline({ events }: SimpleTimelineProps) {
+export function SekiTimeline({ events }: SekiTimelineProps) {
 	const [hoveredEventId, setHoveredEventId] = useState<string | null>(null)
 
 	// Only show first 6 events to avoid overflow
@@ -97,7 +96,7 @@ export function SimpleTimeline({ events }: SimpleTimelineProps) {
 				const isRunning = event.state === "STARTED" || event.state === "RUNNING"
 				const isOpen = hoveredEventId === event.id
 				const duration = formatDuration(event.startedAt, event.completedAt)
-				
+
 				return (
 					<HoverCard
 						key={event.id}

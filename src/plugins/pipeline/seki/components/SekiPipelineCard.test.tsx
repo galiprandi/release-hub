@@ -1,10 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { PipelineCard } from '../components/PipelineCard'
-import type { MetaPart, PipelineCardProps } from '../components/PipelineCard'
+import { SekiPipelineCard } from './SekiPipelineCard'
+import type { SekiPipelineCardProps } from './SekiPipelineCard'
+import type { MetaPart } from '../types'
 
-describe('PipelineCard', () => {
-  const defaultProps: PipelineCardProps = {
+describe('SekiPipelineCard', () => {
+  const defaultProps: SekiPipelineCardProps = {
     viewMode: 'commits',
     displayRef: 'abc1234',
     refType: 'COMMIT',
@@ -13,7 +14,7 @@ describe('PipelineCard', () => {
   }
 
   it('renders with basic props', () => {
-    render(<PipelineCard {...defaultProps} />)
+    render(<SekiPipelineCard {...defaultProps} />)
 
     expect(screen.getByText('abc1234')).toBeInTheDocument()
     expect(screen.getByText('COMMIT')).toBeInTheDocument()
@@ -21,27 +22,27 @@ describe('PipelineCard', () => {
 
   it('renders tag ref type for tags', () => {
     render(
-      <PipelineCard
+      <SekiPipelineCard
         {...defaultProps}
         viewMode="tags"
         displayRef="v1.0.0"
         refType="TAG"
       />
     )
-    
+
     expect(screen.getByText('v1.0.0')).toBeInTheDocument()
     expect(screen.getByText('TAG')).toBeInTheDocument()
   })
 
   it('shows running indicator when isRunning is true', () => {
-    render(<PipelineCard {...defaultProps} isRunning={true} />)
-    
+    render(<SekiPipelineCard {...defaultProps} isRunning={true} />)
+
     expect(screen.getByText('EN PROGRESO')).toBeInTheDocument()
   })
 
   it('does not show running indicator when isRunning is false', () => {
-    render(<PipelineCard {...defaultProps} isRunning={false} />)
-    
+    render(<SekiPipelineCard {...defaultProps} isRunning={false} />)
+
     expect(screen.queryByText('EN PROGRESO')).not.toBeInTheDocument()
   })
 
@@ -50,42 +51,28 @@ describe('PipelineCard', () => {
       { id: 'author', node: <span>John Doe</span> },
       { id: 'time', node: <span>2 hours ago</span> },
     ]
-    
-    render(<PipelineCard {...defaultProps} metaParts={metaParts} />)
-    
+
+    render(<SekiPipelineCard {...defaultProps} metaParts={metaParts} />)
+
     expect(screen.getByText('John Doe')).toBeInTheDocument()
     expect(screen.getByText('2 hours ago')).toBeInTheDocument()
   })
 
   it('renders children when provided', () => {
     render(
-      <PipelineCard {...defaultProps}>
+      <SekiPipelineCard {...defaultProps}>
         <button>View Details</button>
-      </PipelineCard>
+      </SekiPipelineCard>
     )
-    
+
     expect(screen.getByRole('button', { name: /view details/i })).toBeInTheDocument()
   })
 
   it('applies custom className', () => {
     const { container } = render(
-      <PipelineCard {...defaultProps} className="custom-class" />
+      <SekiPipelineCard {...defaultProps} className="custom-class" />
     )
-    
+
     expect(container.firstChild).toHaveClass('custom-class')
-  })
-
-  it('has different styling for commits vs tags', () => {
-    const { container: commitsContainer } = render(
-      <PipelineCard {...defaultProps} viewMode="commits" />
-    )
-
-    const { container: tagsContainer } = render(
-      <PipelineCard {...defaultProps} viewMode="tags" />
-    )
-
-    // Both should render successfully with different accent colors
-    expect(commitsContainer.firstChild).toBeInTheDocument()
-    expect(tagsContainer.firstChild).toBeInTheDocument()
   })
 })

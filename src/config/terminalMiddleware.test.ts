@@ -25,7 +25,14 @@ vi.mock('node-pty', () => ({
 
 describe('terminalMiddleware', () => {
   let mockServer: { on: ReturnType<typeof vi.fn> };
-  let wssInstance: { on: ReturnType<typeof vi.fn> };
+  interface MockWebSocketServer {
+    on: {
+      mock: {
+        calls: [string, ...unknown[]][];
+      };
+    };
+  }
+  let wssInstance: MockWebSocketServer;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -43,8 +50,8 @@ describe('terminalMiddleware', () => {
     let mockWs: { send: ReturnType<typeof vi.fn>; close: ReturnType<typeof vi.fn>; on: ReturnType<typeof vi.fn>; readyState: number };
 
     beforeEach(() => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      connectionHandler = (wssInstance as any).on.mock.calls.find((call: any[]) => call[0] === 'connection')![1];
+      // @ts-expect-error - Accessing internal vitest mock structure for event handler extraction
+      connectionHandler = wssInstance.on.mock.calls.find((call) => call[0] === 'connection')![1];
       mockWs = {
         send: vi.fn(),
         close: vi.fn(),

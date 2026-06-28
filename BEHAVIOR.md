@@ -221,11 +221,6 @@
 - renders offline state correctly
 - renders warn state with retry button
 
-## Module: ContainerSearch
-- calls setQuery on change
-- renders correctly with placeholder
-- shows clear button when query is present and clears on click
-
 ## Module: CommitsModal
 - should filter commits
 - should render commits when open
@@ -245,6 +240,11 @@
 - should render trigger button
 - should suggest next version correctly
 - should toggle commits list with accessibility attributes
+
+## Module: ContainerSearch
+- calls setQuery on change
+- renders correctly with placeholder
+- shows clear button when query is present and clears on click
 
 ## Module: sekiAdapter
 - should extract error markdown from failed subevents

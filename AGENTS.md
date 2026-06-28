@@ -180,3 +180,9 @@
 - **cURL Parser**: Hardened state-machine tokenizer in `src/utils/curlParser.ts` supporting compact flags.
 - **XSS Protection**: Mandatory HTML escaping in any component using `dangerouslySetInnerHTML`. Log utilities (`logUtils.tsx`) must escape the raw line. Diff viewer (`DiffViewer.tsx`) must provide a safe `escapeHtml` fallback.
 - **Search State Synchronization**: Redundant local state for search inputs must be avoided. Bind directly to URL search parameters.
+
+### Mejora #16: Surgical Hygiene Audit V15
+- **Linter Saneamiento**: Erradicación de advertencia `exhaustive-deps` en `SekiPipelineMonitor.tsx` mediante el uso de dependencias desestructuradas en `useEffect`.
+- **Type Hardening**: Eliminación total de `as any` en `src/config/terminalMiddleware.test.ts`, migrando a tipado estricto con `ReturnType<typeof vi.fn>` y directivas `@ts-expect-error` para acceso a mocks internos.
+- **Hygiene AAA**: Auditoría de entropía técnica confirmando la ausencia de código muerto y statements de depuración en el núcleo del sistema.
+- **Verificación Global**: Zero-warning build log, lint audit impecable y 230 tests exitosos.

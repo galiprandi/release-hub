@@ -125,9 +125,10 @@
   - Headers: Standard high-density `span` pattern (`text-[10px] font-bold uppercase tracking-wider`).
   - Actions: 20% opacity backgrounds on hover for `ActionButton` components.
 
-### Diff Viewer Resonance
-- **Navigation**: Uses `IndustrialTabs` in `DiffControls` for mode selection (JSON, JWT, cURL, JS, TS, etc.), synchronized with the `mode` search parameter in `src/routes/diff.tsx`.
+### Diff Viewer Resonance V2
+- **Navigation**: Uses `IndustrialTabs` in `DiffControls` for mode selection (JSON, JWT, cURL, JS, TS, etc.), synchronized with the `mode` search parameter in `src/routes/diff.tsx`. Supports responsive widths (`w-full sm:w-[620px]`).
 - **Typography**: High-density technical metadata (`text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`) for panel headers and comparison results.
-- **Visual Containers**: Main view and panels use `bg-muted/10` background and `border-border/60` for refined hierarchy. Panel headers include a decorative semantic dot for visual anchoring.
-- **Empty State**: Uses `bg-muted/10` and `border-border/40` geometry with `tracking-widest` typography for technical placeholders.
-- **Controls**: Action buttons (Solo diffs, Expand, Copy) use semantic shadows and 20% opacity backgrounds on hover/active states.
+- **Visual Containers**: Main view and panels use `bg-muted/5` background and `border-border/40` for refined hierarchy. Panel headers include pulsating semantic dots with shadows for visual anchoring and `bg-zinc-950/20` for code viewports.
+- **Empty State**: Uses `bg-muted/10` and `border-border/40` geometry with high-density V2 labels and primary-colored icons.
+- **Line Highlighting**: Implements semantic backgrounds (added/removed/changed) at 20% opacity with inset visual markers and high-density line numbering.
+- **Controls**: Action buttons (Solo diffs, Expand, Copy) use semantic shadows, 20% opacity backgrounds, and `rounded-lg` geometry.

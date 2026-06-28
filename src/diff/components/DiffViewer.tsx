@@ -133,25 +133,25 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
         />
       </div>
 
-      <div className="flex-1 flex flex-col border rounded-xl bg-muted/10 shadow-sm overflow-hidden border-border/60 min-h-0">
-        <div className="px-4 py-2 border-b bg-muted/20 border-border/60 flex items-center justify-between">
+      <div className="flex-1 flex flex-col border rounded-xl bg-muted/5 shadow-sm overflow-hidden border-border/40 min-h-0 transition-all duration-300 hover:border-border/60">
+        <div className="px-4 py-2 border-b bg-muted/20 border-border/40 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <GitCompare className="w-3.5 h-3.5 text-primary/60" />
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.3)]" />
               <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
                 Resultado de Comparación
               </h3>
             </div>
             {mode === 'jwt' && (expirationA || expirationB) && (
-              <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider">
+              <div className="flex items-center gap-3">
                 {expirationA && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-warning/10 text-warning border border-warning/20">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-warning/10 text-warning border border-warning/20 text-[10px] font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(var(--warning),0.05)]">
                     <Clock className="w-3 h-3" />
                     <span>A: {expirationA}</span>
                   </span>
                 )}
                 {expirationB && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-warning/10 text-warning border border-warning/20">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-warning/10 text-warning border border-warning/20 text-[10px] font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(var(--warning),0.05)]">
                     <Clock className="w-3 h-3" />
                     <span>B: {expirationB}</span>
                   </span>
@@ -163,10 +163,10 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
             <button
               onClick={() => setShowOnlyDiffs(!showOnlyDiffs)}
               className={clsx(
-                "p-1.5 rounded-md transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider border",
+                "px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider border",
                 showOnlyDiffs
-                  ? "bg-primary/20 text-primary border-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.1)]"
-                  : "text-muted-foreground/60 hover:text-foreground hover:bg-muted/20 border-transparent"
+                  ? "bg-primary/20 text-primary border-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.1)] ring-1 ring-primary/10"
+                  : "text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 border-transparent"
               )}
               title={showOnlyDiffs ? "Mostrar todas las líneas" : "Mostrar solo diferencias"}
             >
@@ -176,23 +176,23 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
             <div className="w-px h-4 bg-border/40 mx-1" />
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-1.5 rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted/20 transition-all border border-transparent"
+              className="p-1.5 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 transition-all border border-transparent active:scale-95"
               title={isExpanded ? "Restaurar" : "Expandir"}
             >
-              {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+              {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </button>
           </div>
         </div>
         <div
           ref={diffScrollRef}
           onScroll={handleDiffScroll}
-          className="flex-1 overflow-auto p-4 font-mono text-xs scrollbar-hide flex flex-col"
+          className="flex-1 overflow-auto p-4 font-mono text-[13px] scrollbar-hide flex flex-col bg-zinc-950/20"
         >
           {!textA && !textB ? (
             <EmptyState
-              icon={<GitCompare className="w-8 h-8 text-muted-foreground/20" />}
+              icon={<GitCompare className="w-8 h-8 text-primary/20" />}
               label="Esperando entrada técnica"
-              caption="Pega contenido en los paneles superiores para iniciar la comparación."
+              caption="Pega contenido en los paneles superiores para iniciar la comparación binaria."
               className="min-h-0 flex-1"
             />
           ) : (
@@ -243,27 +243,27 @@ function DiffLineRow({ line, mode }: { line: DiffLine; mode: DiffMode }) {
   }, [rightValue, mode]);
 
   return (
-    <div className="flex w-full group">
+    <div className="flex w-full group transition-colors duration-100 hover:bg-muted/5">
       {/* Left side */}
       <div className={clsx(
-        "flex-1 flex border-r border-border/20",
-        line.left?.type === 'removed' && "bg-destructive/10 text-destructive",
-        line.left?.type === 'changed' && "bg-warning/10 text-warning",
-        !line.left && "bg-muted/5 opacity-50"
+        "flex-1 flex border-r border-border/10 transition-colors",
+        line.left?.type === 'removed' && "bg-destructive/20 text-destructive/90 shadow-[inset_4px_0_0_0_theme(colors.destructive.DEFAULT/0.4)]",
+        line.left?.type === 'changed' && "bg-warning/20 text-warning/90 shadow-[inset_4px_0_0_0_theme(colors.warning.DEFAULT/0.4)]",
+        !line.left && "bg-muted/5 opacity-40"
       )}>
-        <span className="w-8 shrink-0 text-right pr-2 text-muted-foreground/50 select-none">
+        <span className="w-10 shrink-0 text-right pr-3 text-muted-foreground/30 select-none text-[10px] pt-0.5">
           {line.left?.lineNumber || ''}
         </span>
-        <span className="w-4 shrink-0 flex justify-center select-none font-bold">
+        <span className="w-4 shrink-0 flex justify-center select-none font-bold text-[11px] pt-0.5">
           {line.left?.type === 'removed' ? '-' : line.left?.type === 'changed' ? '!' : ''}
         </span>
         {mode !== 'text' && line.left?.value ? (
           <span
-            className="whitespace-pre break-all px-1"
+            className="whitespace-pre break-all px-2 leading-relaxed"
             dangerouslySetInnerHTML={{ __html: highlightedLeft }}
           />
         ) : (
-          <span className="whitespace-pre break-all px-1">
+          <span className="whitespace-pre break-all px-2 leading-relaxed">
             {line.left?.value || ' '}
           </span>
         )}
@@ -271,24 +271,24 @@ function DiffLineRow({ line, mode }: { line: DiffLine; mode: DiffMode }) {
 
       {/* Right side */}
       <div className={clsx(
-        "flex-1 flex",
-        line.right?.type === 'added' && "bg-success/10 text-success",
-        line.right?.type === 'changed' && "bg-warning/10 text-warning",
-        !line.right && "bg-muted/5 opacity-50"
+        "flex-1 flex transition-colors",
+        line.right?.type === 'added' && "bg-success/20 text-success/90 shadow-[inset_4px_0_0_0_theme(colors.success.DEFAULT/0.4)]",
+        line.right?.type === 'changed' && "bg-warning/20 text-warning/90 shadow-[inset_4px_0_0_0_theme(colors.warning.DEFAULT/0.4)]",
+        !line.right && "bg-muted/5 opacity-40"
       )}>
-        <span className="w-8 shrink-0 text-right pr-2 text-muted-foreground/50 select-none">
+        <span className="w-10 shrink-0 text-right pr-3 text-muted-foreground/30 select-none text-[10px] pt-0.5">
           {line.right?.lineNumber || ''}
         </span>
-        <span className="w-4 shrink-0 flex justify-center select-none font-bold">
+        <span className="w-4 shrink-0 flex justify-center select-none font-bold text-[11px] pt-0.5">
           {line.right?.type === 'added' ? '+' : line.right?.type === 'changed' ? '!' : ''}
         </span>
         {mode !== 'text' && line.right?.value ? (
           <span
-            className="whitespace-pre break-all px-1"
+            className="whitespace-pre break-all px-2 leading-relaxed"
             dangerouslySetInnerHTML={{ __html: highlightedRight }}
           />
         ) : (
-          <span className="whitespace-pre break-all px-1">
+          <span className="whitespace-pre break-all px-2 leading-relaxed">
             {line.right?.value || ' '}
           </span>
         )}

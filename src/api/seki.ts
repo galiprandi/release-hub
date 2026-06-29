@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { PipelineStatusResponse } from './seki.type'
+import type { PipelinesByEnvResponse } from './seki.type'
 import { getSekiToken } from '@/utils/sekiToken'
 
 // Helper to serialize params with bracket notation for nested objects
@@ -93,27 +93,15 @@ apiSeki.interceptors.request.use((config) => {
 // )
 
 /**
- * Fetch pipeline status for specific commit
+ * Fetch latest pipelines for both environments (staging + production)
+ * in a single call. Does not require a specific commit or tag.
  */
-export const fetchPipeline = (product: string, commit: string) => {
-  const [org, name] = product.split('/')
-  return apiSeki.get<PipelineStatusResponse>(
-    `/products/${org}/${name}/pipelines/${commit}`
-  )
-}
-
-/**
- * Fetch pipeline status for specific commit with optional tag
- * Used for production pipelines that have both commit and tag
- */
-export const fetchPipelineWithTag = (
-  product: string, // organization/product
-  commit: string,
-  tag: string
+export const fetchPipelinesByEnvironment = (
+  product: string // organization/product
 ) => {
   const [org, name] = product.split('/')
-  return apiSeki.get<PipelineStatusResponse>(
-    `/products/${org}/${name}/pipelines/${commit}/${tag}`
+  return apiSeki.get<PipelinesByEnvResponse>(
+    `/products/${org}/${name}/pipelines/latest-by-environment`
   )
 }
 

@@ -1,15 +1,17 @@
 import { type ReactNode } from "react";
+import { clsx } from 'clsx';
 
 interface EmptyStateProps {
 	icon?: ReactNode;
 	label?: ReactNode;
 	caption?: ReactNode;
 	action?: ReactNode;
+	className?: string;
 }
 
-export function EmptyState({ icon, label, caption, action }: EmptyStateProps) {
+export function EmptyState({ icon, label, caption, action, className }: EmptyStateProps) {
 	return (
-		<div className="flex items-center justify-center w-full min-h-[400px]">
+		<div className={clsx("flex items-center justify-center w-full min-h-[400px]", className)}>
 			<div className="w-full border border-border/40 rounded-xl p-12 text-center text-muted-foreground bg-muted/5 border-dashed">
 				{icon && (
 					<div className="flex justify-center mb-6">

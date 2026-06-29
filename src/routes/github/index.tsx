@@ -14,6 +14,8 @@ import type { ColumnDef } from "@tanstack/react-table";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import {
 	Building2,
+	ChevronDown,
+	ChevronRight,
 	FolderOpen,
 	FolderPlus,
 	Github,
@@ -41,8 +43,8 @@ import { ItemProjectSelectionDialog as ProjectSelectionDialog } from "@/componen
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
-import { usePipelineWithHealth } from "@/hooks/usePipelineWithHealth";
-import { useHealthMonitor } from "@/hooks/useHealthMonitor";
+import { usePipelineWithHealth } from "@/plugins/pipeline/seki/hooks/usePipelineWithHealth";
+import { useHealthMonitor } from "@/plugins/pipeline/seki/hooks/useHealthMonitor";
 import {
 	useRepoDashboardDetails,
 	type RepoDetails,
@@ -52,7 +54,7 @@ import {
 import { queryKeys, applyCachePolicy } from "@/lib/queryKeys";
 import { runCommand } from "@/api/exec";
 import DayJS from "@/lib/dayjs";
-import { getPipelineStatusInfo } from "@/utils/pipelineStatus";
+import { getPipelineStatusInfo } from "@/plugins/pipeline/seki/utils";
 
 const dashboardSearchSchema = z.object({
 	tab: z.string().optional().catch("favorites"),
@@ -75,6 +77,10 @@ function Dashboard() {
 	const { location } = useRouterState();
 	const isIndexRoute = location.pathname === "/github";
 	const [isManageProjectsOpen, setIsManageProjectsOpen] = useState(false);
+
+	const [collapsedOrgs, setCollapsedOrgs] = useState<Record<string, boolean>>(
+		{},
+	);
 
 	const tabs = useMemo(
 		() => [
@@ -136,6 +142,28 @@ function Dashboard() {
 		[groupedRepos],
 	);
 	const isEmpty = displayRepos.length === 0;
+
+	const isAllCollapsed = useMemo(
+		() =>
+			sortedOrgs.length > 0 && sortedOrgs.every((org) => collapsedOrgs[org]),
+		[sortedOrgs, collapsedOrgs],
+	);
+
+	const toggleOrgCollapse = useCallback((org: string) => {
+		setCollapsedOrgs((prev) => ({
+			...prev,
+			[org]: !prev[org],
+		}));
+	}, []);
+
+	const toggleAllCollapse = useCallback(() => {
+		const newState = !isAllCollapsed;
+		const nextCollapsed: Record<string, boolean> = {};
+		for (const org of sortedOrgs) {
+			nextCollapsed[org] = newState;
+		}
+		setCollapsedOrgs(nextCollapsed);
+	}, [isAllCollapsed, sortedOrgs]);
 
 	const handleManageProjects = useCallback(() => {
 		setIsManageProjectsOpen(true);
@@ -222,29 +250,51 @@ function Dashboard() {
 			}
 		>
 			<div className="space-y-6">
-				{/* Global Filters */}
+				{/* Global Filters & Bulk Actions */}
 				{!isEmpty && (
-					<div className="flex items-center gap-2 px-1">
-						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-							Filtrar:
-						</span>
-						<div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border/40">
-							<IndustrialTabs
-								options={[
-									{ id: "all", label: "Todos" },
-									{ id: "true", label: "Pendientes" },
-								]}
-								activeId={activeFilter || "all"}
-								onChange={(id) =>
-									navigate({
-										search: (prev: Record<string, unknown>) => ({
-											...prev,
-											filter: id === "all" ? undefined : (id as string),
-										}),
-									})
-								}
-							/>
+					<div className="flex items-center justify-between px-1">
+						<div className="flex items-center gap-2">
+							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+								Filtrar:
+							</span>
+							<div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border/40">
+								<IndustrialTabs
+									options={[
+										{ id: "all", label: "Todos" },
+										{ id: "true", label: "Pendientes" },
+									]}
+									activeId={activeFilter || "all"}
+									onChange={(id) =>
+										navigate({
+											search: (prev: Record<string, unknown>) => ({
+												...prev,
+												filter: id === "all" ? undefined : (id as string),
+											}),
+										})
+									}
+								/>
+							</div>
 						</div>
+
+						{sortedOrgs.length > 1 && (
+							<button
+								type="button"
+								onClick={toggleAllCollapse}
+								className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all border border-transparent hover:border-border/40"
+							>
+								{isAllCollapsed ? (
+									<>
+										<ChevronDown className="w-3.5 h-3.5" />
+										Expandir Todo
+									</>
+								) : (
+									<>
+										<ChevronRight className="w-3.5 h-3.5" />
+										Colapsar Todo
+									</>
+								)}
+							</button>
+						)}
 					</div>
 				)}
 
@@ -315,17 +365,70 @@ function Dashboard() {
 						}
 					/>
 				) : (
-					<div className="space-y-12">
-						{sortedOrgs.map((org) => (
-							<section key={org} className="space-y-3">
-								<ReposTable
-									org={org}
-									repos={groupedRepos[org]}
-									favorites={favorites}
-									onToggleFavorite={toggleFavorite}
-								/>
-							</section>
-						))}
+					<div className="space-y-6">
+						{sortedOrgs.map((org) => {
+							const isCollapsed = collapsedOrgs[org];
+							const repoCount = groupedRepos[org].length;
+
+							return (
+								<section
+									key={org}
+									className={clsx(
+										"rounded-xl border border-border/40 overflow-hidden transition-all duration-300",
+										isCollapsed ? "bg-muted/5" : "bg-muted/10 space-y-3 pb-4",
+									)}
+								>
+									<header
+										onClick={() => toggleOrgCollapse(org)}
+										onKeyDown={(e) => {
+											if (e.key === "Enter" || e.key === " ") {
+												toggleOrgCollapse(org);
+											}
+										}}
+										tabIndex={0}
+										className={clsx(
+											"flex items-center justify-between px-4 py-2 bg-muted/20 cursor-pointer hover:bg-muted/30 transition-colors group",
+											!isCollapsed && "border-b border-border/40 mb-3",
+										)}
+									>
+										<div className="flex items-center gap-3">
+											{isCollapsed ? (
+												<ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:text-primary transition-colors" />
+											) : (
+												<ChevronDown className="w-4 h-4 text-muted-foreground/60 group-hover:text-primary transition-colors" />
+											)}
+											<div className="flex items-center gap-2">
+												<Building2 className="w-4 h-4 text-primary/60" />
+												<h2 className="text-[10px] font-bold uppercase tracking-widest text-foreground">
+													{org}
+												</h2>
+												<span className="px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-[9px] font-bold text-muted-foreground/60">
+													{repoCount}
+												</span>
+											</div>
+										</div>
+
+										{isCollapsed && (
+											<div className="flex items-center gap-4">
+												<span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/40 italic">
+													Click para expandir
+												</span>
+											</div>
+										)}
+									</header>
+
+									{!isCollapsed && (
+										<div className="px-4">
+											<ReposTable
+												repos={groupedRepos[org]}
+												favorites={favorites}
+												onToggleFavorite={toggleFavorite}
+											/>
+										</div>
+									)}
+								</section>
+							);
+						})}
 					</div>
 				)}
 			</div>
@@ -339,7 +442,6 @@ function Dashboard() {
 }
 
 function ReposTable({
-	org,
 	repos,
 	favorites,
 	onToggleFavorite,
@@ -511,12 +613,9 @@ function ReposTable({
 			{
 				accessorKey: "name",
 				header: () => (
-					<div className="flex items-center gap-2.5">
-						<Building2 className="w-3.5 h-3.5 text-primary/40" />
-						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-							{org}
-						</span>
-					</div>
+					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+						Repositorio
+					</span>
 				),
 				cell: ({ row }) => <RepoNameCell repo={row.original} />,
 			},
@@ -622,19 +721,17 @@ function ReposTable({
 				),
 			},
 		],
-		[org, favorites, onToggleFavorite, reposWithPending, repoDetailsQueries],
+		[favorites, onToggleFavorite, reposWithPending, repoDetailsQueries],
 	);
 
 	return (
-		<div className="space-y-4">
-			<Table
-				columns={columns}
-				data={sortedRepos}
-				activeFilter={
-					activeFilter ? { id: "pending_filter", value: activeFilter } : null
-				}
-			/>
-		</div>
+		<Table
+			columns={columns}
+			data={sortedRepos}
+			activeFilter={
+				activeFilter ? { id: "pending_filter", value: activeFilter } : null
+			}
+		/>
 	);
 }
 
@@ -714,17 +811,15 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 	const commits = queryData?.commits;
 	const prodPipeline = usePipelineWithHealth({
 		product: repo.fullName,
-		commit: latestTag?.commit ?? "",
-		tag: latestTag?.name ?? "",
 		enabled: !!latestTag?.commit && !!latestTag?.name,
 	});
 	const productionStatus = useMemo(
 		() =>
 			getPipelineStatusInfo(
-				prodPipeline.data?.events,
-				prodPipeline.data?.updatedAt,
+				prodPipeline.data?.production?.events,
+				prodPipeline.data?.production?.updatedAt,
 			),
-		[prodPipeline.data],
+		[prodPipeline.data?.production],
 	);
 	const isProdLoading = prodPipeline.isLoading || isLoading;
 
@@ -770,16 +865,15 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 	const latestCommit = queryData?.commits?.[0];
 	const stagingPipeline = usePipelineWithHealth({
 		product: repo.fullName,
-		commit: latestCommit?.hash ?? "",
 		enabled: !!latestCommit?.hash,
 	});
 	const stagingStatus = useMemo(
 		() =>
 			getPipelineStatusInfo(
-				stagingPipeline.data?.events,
-				stagingPipeline.data?.updatedAt,
+				stagingPipeline.data?.staging?.events,
+				stagingPipeline.data?.staging?.updatedAt,
 			),
-		[stagingPipeline.data],
+		[stagingPipeline.data?.staging],
 	);
 	const isStagingLoading = stagingPipeline.isLoading || isLoading;
 
@@ -1120,7 +1214,6 @@ type RepoInfo = {
 	updatedAt: string;
 };
 type ReposTableProps = {
-	org: string;
 	repos: RepoInfo[];
 	favorites: string[];
 	onToggleFavorite: (product: string) => void;

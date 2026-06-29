@@ -86,6 +86,7 @@
   - [x] Migración total de `FilterBar` a `IndustrialTabs` en el dashboard de GitHub.
   - [x] Eliminación de `FilterBar.tsx` (código muerto).
   - [x] Validación E2E con Playwright y capturas de pantalla.
+
 ## Historial de Carol
 
 ### 2026-06-22: Refactor GitHub Detail & Dashboard Resonance V2
@@ -141,7 +142,6 @@
   - [x] Zero-warning build verificado.
 - **Resultado**: Elevación del umbral de seguridad contra RCE y ataques de inyección, garantizando integridad técnica absoluta.
 
-### 2026-06-07: Refactor Kubernetes UI Resonance
 ### 2026-06-16: Refactor Kubernetes UI Resonance
 - **Rama**: `🐜-Carol-refactor-kubernetes-ui-resonance`
 - **Estado**: Finalizado ✅
@@ -179,18 +179,13 @@
   - [x] Sincronización de nomenclatura de metadatos (camelCase `updatedAt`).
   - [x] Zero-warning build logrado.
 - **Resultado**: Repositorio libre de entropía técnica en el núcleo de pipelines y build impecable.
+
 ### 2026-06-16: Refactor GitHub UI Resonance V2
 - **Rama**: `🐜-Uma-refactor-github-resonance-v2`
 - **Estado**: Finalizado ✅
 - **Cambios**:
   - [x] Evolución del layout: integración de navegación de colecciones and gestión de proyectos en el header de `PageLayout`.
   - [x] Promoción del filtro "Pendientes" a nivel global (dashboard) sincronizado con el search param `filter`.
-  - [x] Refactorización de cabeceras de tabla and celdas de metadatos técnicos a alta densidad (`text-[10px] font-bold uppercase tracking-wider`).
-  - [x] Estandarización de `HealthCell` con sombras semánticas and animaciones pulse para estados OK.
-  - [x] Eliminación de filtros locales redundantes and código muerto.
-  - [x] Validación E2E con Playwright (`e2e/verify-github-ui.spec.ts`) and screenshots.
-  - [x] Zero-warning build and lint log.
-- **Resultado**: Dashboard de GitHub alineado con Industrial Resonance V2, optimizando el Time to Value and la consistencia visual.
   - [x] Refactorización de cabeceras de tabla y celdas de metadatos técnicos a alta densidad (`text-[10px] font-bold uppercase tracking-wider`).
   - [x] Estandarización de `HealthCell` con sombras semánticas y animaciones pulse para estados OK.
   - [x] Eliminación de filtros locales redundantes y código muerto.
@@ -282,7 +277,7 @@
 - **Cambios**:
   - [x] Refactorización de la página de Novedades: cabecera de alta densidad y contenedor de contenido estilizado.
   - [x] Evolución de Health Monitor: migración de filtros de ambiente a `IndustrialTabs` en el header y estandarización de geometría de `ProductSection`.
-  - [x] Higiene Técnica AAA: erradicación total de statements `console.log` en `Terminal.tsx` y `terminalMiddleware.ts`.
+  - [x] Higiene Técnica AAA: erradicación total de statements `console.log` in `Terminal.tsx` and `terminalMiddleware.ts`.
   - [x] Validación E2E: verificación exitosa de los nuevos componentes de UI con Playwright.
   - [x] Zero-warning build: mantenimiento del estándar de build y lint impecable.
 - **Resultado**: Interfaz de usuario elevada al estándar Industrial Resonance V2 en módulos críticos, optimizando la jerarquía de información y eliminando ruido técnico.
@@ -320,7 +315,7 @@
 - **Estado**: Finalizado ✅
 - **Cambios**:
   - [x] Restauración del Build: Corrección de JSX malformado y variables indefinidas en `src/routes/health/index.tsx`.
-  - [x] Saneamiento de Novedades: Eliminación de imports duplicados (`Newspaper`) en `src/routes/novedades/index.tsx`.
+  - [x] Saneamiento de Novedades: Eliminación de imports duplicados (`Newspaper`) in `src/routes/novedades/index.tsx`.
   - [x] Optimización de Rendimiento: Implementación de `initialData` en `useUserCollections.ts` para eliminar parpadeos de UI y mejorar la hidratación en tests E2E.
   - [x] Higiene Técnica AAA: Remoción de código muerto e imports no utilizados (`ChevronDown`).
   - [x] Validación Global: Zero-warning build log, 210 tests unitarios exitosos y validación funcional via Playwright.
@@ -386,6 +381,18 @@
   - [x] Higiene Técnica: Refinamiento de suites de tests reemplazando casts inseguros por directivas `@ts-expect-error` y eliminación de código muerto.
   - [x] Verificación Global: Zero-warning build log, lint audit impecable y 227 tests unitarios exitosos.
 - **Resultado**: Integridad del repositorio restaurada y blindaje de seguridad expandido, manteniendo el estándar de ingeniería AAA y la consistencia estética Industrial Resonance V2.
+
+### 2026-06-27: Architecture Realignment & Type System Hardening V14
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-audit-v14`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] Architecture Realignment: Relocación total de componentes compartidos a `src/components/shared/` y componentes de GitHub a `src/github/components/`.
+  - [x] Type System Hardening: Erradicación de `any` en `src/utils/security.test.ts` y `src/config/terminalMiddleware.test.ts`.
+  - [x] Hygiene AAA: Saneamiento del build y lint log (zero-warning state).
+  - [x] Verificación Global: 230 tests unitarios exitosos y validación visual con Playwright.
+- **Resultado**: Estructura del repositorio profesionalizada y blindaje de tipos elevado al estándar AAA, eliminando la entropía en el directorio de componentes.
 
 ### 2026-06-23: Surgical Hygiene & Entropy Audit V11
 - **Agente**: Fiona 🐜
@@ -463,6 +470,52 @@
   - [x] Verificación Global: Zero-warning build log, lint audit impecable y 230 tests unitarios exitosos.
 - **Resultado**: Estructura de componentes optimizada siguiendo el estándar de localidad por módulo, higiene técnica elevada al nivel AAA y consistencia visual Resonance V2 garantizada en componentes críticos.
 
+### 2026-06-25: Terminal & GitHub UX Evolution
+- **Agente**: Uma 🐜
+- **Rama**: `🐜-Uma-refactor-terminal-github-ux`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block & Mission Draft.
+  - [x] Terminal V2 Evolution: Refactorización de `src/routes/terminal.tsx` alineada con tipografía de alta densidad V2 y metadatos técnicos (Shell, Status, OS).
+  - [x] Modal Unification: Unificación del header del modal de Terminal en `src/layouts/PageLayout.tsx` con el estándar técnico de la ruta principal.
+  - [x] GitHub UX Evolution: Implementación de contenedores colapsables por organización en el dashboard de GitHub para reducir el ruido visual.
+  - [x] Bulk UX Actions: Incorporación de controles globales de expansión/colapso para grupos de organizaciones.
+  - [x] Technical Hygiene: Erradicación de `text-[9px]`, build zero-warning y 230 tests exitosos.
+  - [x] Documentación: Actualización de `DESIGN.md` y `AGENTS.md` con los nuevos estándares de Terminal y GitHub UX.
+- **Resultado**: Experiencia de usuario optimizada mediante la reducción de carga cognitiva en el dashboard y profesionalización técnica de la interfaz de terminal.
+
+### 2026-06-27: Seki Pipeline Separation & Unified Pipeline Elimination
+- **Agente**: Devin
+- **Rama**: main
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Separación de Seki del sistema unificado de pipelines: eliminación completa de `src/pipeline-core/` (types, adapters, hooks, components, utils).
+  - [x] Eliminación de Pulsar/GitHub Actions adapter y `usePipelineDetection` (multi-provider abstraction).
+  - [x] Creación de módulo autónomo `src/plugins/pipeline/seki/` con tipos propios (`SekiPipelineData`, `SekiPipelineEvent`), adapter directo, hook `useSekiPipeline` (sin detección de provider), y componentes propios (`SekiPipelineMonitor`, `SekiPipelineCard`, `SekiTimeline`).
+  - [x] Migración de `useHealthMonitor` y `usePipelineWithHealth` desde `src/hooks/` a `src/plugins/pipeline/seki/hooks/`.
+  - [x] Migración de `getPipelineStatusInfo` y `extractRoutes` a `src/plugins/pipeline/seki/utils.ts`.
+  - [x] `SekiPipelineMonitor` silencioso total: renderiza `null` si no hay token, loading, error, o sin datos. Sólo renderiza la card cuando hay datos válidos.
+  - [x] Actualización de consumidores: `src/routes/github/$org.$repo.tsx`, `src/routes/github/index.tsx`, `src/routes/health/index.tsx`.
+  - [x] Tests: 222 tests unitarios exitosos (adapter, types, utils, card, timeline).
+  - [x] Documentación: actualización de `AGENTS.md`, `BEHAVIOR.md`, `src/api/AGENTS.md`.
+- **Resultado**: Seki aislado como módulo autónomo y agnóstico. Sin abstracción multi-provider. Componente silencioso que sólo aparece cuando hay datos válidos.
+
+### 2026-06-27: Seki Latest-By-Environment Endpoint Migration
+- **Agente**: Devin
+- **Rama**: main
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Migración al endpoint `/pipelines/latest-by-environment` que devuelve staging + production en una sola llamada, sin necesidad de conocer commit o tag de antemano.
+  - [x] Eliminación de `fetchPipeline` y `fetchPipelineWithTag` (per-ref fetching). Reemplazados por `fetchPipelinesByEnvironment`.
+  - [x] Eliminación de `useSekiPipeline` hook. Reemplazado por `useSekiPipelinesByEnv` que retorna `{ staging, production }`.
+  - [x] Eliminación de `ViewMode` de los tipos del módulo Seki. El `refType` (COMMIT/TAG) se infiere automáticamente de `git.event` ('tag' → TAG, resto → COMMIT).
+  - [x] `SekiPipelineMonitor` refactorizado para mostrar ambos ambientes en paralelo (staging card + production card) con sub-componente `SekiEnvPipeline`.
+  - [x] `usePipelineWithHealth` simplificado: ya no requiere `commit` ni `tag` parameters. Extrae endpoints de ambos ambientes automáticamente.
+  - [x] Consumidores actualizados: `$org.$repo.tsx` (sin ref/viewMode/commit props), `github/index.tsx` (TagCell y CommitCell usan `data?.production` y `data?.staging` respectivamente).
+  - [x] Tests: 222 tests unitarios exitosos (adapter, types, utils, card, timeline, api/seki).
+  - [x] Documentación: actualización de AGENTS.md, BEHAVIOR.md, CROMA.md, src/api/AGENTS.md.
+- **Resultado**: Una sola llamada API obtiene el último pipeline de staging y production. Ambos ambientes se muestran en paralelo. Sin necesidad de ref específico. Componente silencioso que sólo aparece cuando hay datos válidos.
+
 ### 2026-06-25: Architecture Realignment & Project Selection Unification
 - **Agente**: Uma 🐜
 - **Rama**: `🐜-Uma-refactor-architecture-resonance-v2`
@@ -473,5 +526,5 @@
   - [x] Logic Unification: Creación de `ItemProjectSelectionDialog` para centralizar la selección de colecciones, eliminando implementaciones duplicadas en GitHub y Kubernetes.
   - [x] Resonance V2 Typography: Auditoría tipográfica aplicada a todos los componentes compartidos, forzando el estándar de alta densidad (`text-[10px] font-bold uppercase`).
   - [x] Refactor de ProjectSelector: Evolución estética del trigger de proyectos a `bg-muted/40` con geometría `rounded-lg`.
-  - [x] Verificación Global: Zero-warning build log y ejecución exitosa de 229 tests unitarios y de integración.
+  - [x] Verificación Global: Zero-warning build log y ejecución exitosa de 210 tests unitarios y de integración.
 - **Resultado**: Arquitectura de componentes purificada siguiendo el estándar AAA, con lógica de negocio compartida unificada y alineación visual absoluta con Industrial Resonance V2.

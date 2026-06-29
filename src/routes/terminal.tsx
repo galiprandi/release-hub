@@ -2,12 +2,16 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Terminal } from '@/components/shared/Terminal';
 import { PageLayout } from '@/layouts/PageLayout';
 import { Terminal as TerminalIcon } from 'lucide-react';
+import { detectOS } from '@/utils/os';
 
 export const Route = createFileRoute('/terminal')({
   component: TerminalPage,
 });
 
 function TerminalPage() {
+  const os = detectOS();
+  const shell = os === 'Windows' ? 'powershell.exe' : os === 'macOS' ? 'zsh' : 'bash';
+
   return (
     <PageLayout
       header={{
@@ -27,12 +31,17 @@ function TerminalPage() {
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">Sesión Local Activa</span>
             </div>
             <div className="w-px h-3 bg-border/40" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 font-mono">/bin/bash</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 font-mono">/bin/{shell}</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">Status</span>
-               <span className="px-1.5 py-0.5 rounded bg-success/20 border border-success/20 text-[9px] font-bold text-success uppercase tracking-widest">Connected</span>
+               <span className="px-1.5 py-0.5 rounded bg-success/20 border border-success/20 text-[10px] font-bold text-success uppercase tracking-wider">Connected</span>
+            </div>
+            <div className="w-px h-3 bg-border/40" />
+            <div className="flex items-center gap-1.5">
+               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">OS</span>
+               <span className="px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 text-[10px] font-bold text-primary uppercase tracking-wider">{os}</span>
             </div>
           </div>
         </div>

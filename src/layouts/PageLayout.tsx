@@ -632,15 +632,29 @@ function TerminalIconModal() {
 				open={open}
 				onOpenChange={setOpen}
 				title={
-					<div className="flex items-center gap-2">
-						<TerminalIcon className="w-4 h-4 text-primary" />
-						<span>Terminal del Sistema</span>
+					<div className="flex items-center justify-between w-full pr-8">
+						<div className="flex items-center gap-2">
+							<TerminalIcon className="w-4 h-4 text-primary" />
+							<span>Terminal del Sistema</span>
+						</div>
+						<div className="flex items-center gap-3">
+							<div className="flex items-center gap-1.5">
+								<div className="w-1 h-1 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+								<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+									Active Session
+								</span>
+							</div>
+							<div className="w-px h-3 bg-border/40" />
+							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 font-mono">
+								Local
+							</span>
+						</div>
 					</div>
 				}
 				maxWidth="max-w-6xl"
 				className="w-[90vw] h-[80vh] !p-0"
 			>
-				<div className="flex-1 min-h-0 bg-black rounded-b-lg overflow-hidden">
+				<div className="flex-1 min-h-0 bg-zinc-950 rounded-b-xl overflow-hidden border-t border-border/40">
 					<Terminal type="local" className="border-none rounded-none h-full" />
 				</div>
 			</BaseDialog>

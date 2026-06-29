@@ -41,3 +41,12 @@ export interface PipelineStatusResponse {
   events: Event[]
   git: GitInfo
 }
+
+/**
+ * Response from /products/:org/:repo/pipelines/latest-by-environment
+ * Contains the latest pipeline for staging and production environments.
+ */
+export interface PipelinesByEnvResponse {
+  staging: PipelineStatusResponse | null
+  production: PipelineStatusResponse | null
+}

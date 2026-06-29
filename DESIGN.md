@@ -48,12 +48,12 @@ Este documento detalla los principios y tokens visuales que rigen la interfaz de
 
 ### GitHub UI
 - **Promoción de Header**: Navegación de colecciones y gestión de proyectos en el header de `PageLayout`.
+- **Organization Grouping**: Repositorios agrupados por organización en contenedores colapsables (`bg-muted/10`, `rounded-xl`).
 - **Filtrado Global**: Filtros (ej: 'Pendientes') sincronizados con search params.
 - **Operaciones**: Patrón `hover-to-reveal` (`opacity-0 group-hover:opacity-100`) para reducir ruido visual.
 
 ### Kubernetes UI
 - **Namespace Filtering**: Promovido al header mediante `IndustrialTabs`.
-- **Búsqueda Omnipresente**: `DeploymentSearch` con metadatos técnicos (Ready/Available) en tiempo real.
 - **Grouping**: Favoritos agrupados por contexto (`Boxes`), Proyectos por ID (`Folder`).
 
 ### Docker UI

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
-import { extractRoutes } from '@/pipeline-core/utils';
-import type { PipelineEvent } from '@/pipeline-core/types';
+import { extractRoutes } from '@/plugins/pipeline/seki/utils';
+import type { SekiPipelineEvent } from '@/plugins/pipeline/seki/types';
 
 const HEALTH_STORAGE_KEY = 'seki:health:endpoints:v1';
 const HEALTH_CHECK_TIMEOUT = 5000; // 5 segundos
@@ -172,7 +172,7 @@ export function useHealthMonitor() {
   }, [endpoints]);
 
   // Extraer endpoints de eventos de pipeline
-  const extractEndpointsFromEvents = useCallback((product: string, events: PipelineEvent[], environment?: Environment) => {
+  const extractEndpointsFromEvents = useCallback((product: string, events: SekiPipelineEvent[], environment?: Environment) => {
     // extractRoutes ya filtra solo URLs externas accesibles desde el navegador
     const urls = extractRoutes(events);
 

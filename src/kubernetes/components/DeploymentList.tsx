@@ -11,7 +11,7 @@ import { Table } from "@/components/ui/Table"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useUserCollections, type Project } from "@/hooks/useUserCollections"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
-import { DeploymentProjectSelectionDialog } from "./DeploymentProjectSelectionDialog"
+import { ItemProjectSelectionDialog } from "@/components/shared/ItemProjectSelectionDialog"
 import { PortForwardControl } from "@/components/ui/PortForwardControl"
 import { usePortForward } from "@/hooks/usePortForward"
 import { usePortFree } from "@/hooks/usePortFree"
@@ -376,10 +376,11 @@ export const DeploymentList = ({
 			}
 
 			{isProjectSelectionOpen && deploymentToAssign && (
-				<DeploymentProjectSelectionDialog
+				<ItemProjectSelectionDialog
 					isOpen={isProjectSelectionOpen}
 					onOpenChange={setIsProjectSelectionOpen}
-					deploymentId={deploymentToAssign}
+					type="deployment"
+					itemId={deploymentToAssign}
 				/>
 			)}
 		</>

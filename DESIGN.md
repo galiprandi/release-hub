@@ -11,10 +11,11 @@
 - **ARIA**: Explicit `aria-label` for icon buttons.
 
 ## Component Patterns
-- **Table**: `bg-muted/40` headers, technical metadata, vertical dividers. Internal filter bar uses `bg-muted/40` with a nested segmented-control layout for a professional aesthetic.
+- **Table**: `bg-muted/40` headers, technical metadata, and explicit vertical dividers between columns (`bg-border/20` in headers, `bg-border/5` in rows). Row hover utilizes `bg-muted/10` for subtle visual feedback. Internal filter bar uses `bg-muted/40` with a nested segmented-control layout for a professional aesthetic.
 - **Search Inputs**: Standardized to `bg-muted/40` with `border-border/60`. Focus state uses `focus:ring-primary/20`. Technical search results in dropdowns include high-density badges (`REPO`, `FILE`, `CONT`) with 10% opacity backgrounds.
 - **EmptyState**: Centered layout featuring an icon in a `p-4 rounded-full bg-muted/20 border border-border/40` container. Typography for labels is strictly `text-[10px] font-bold uppercase tracking-[0.2em]`.
 - **SetupCard**: Unified component for onboarding and configuration states. Features a dual-state design for "Installed" (success tokens, high-density metadata) and "Missing" (destructive/warning tokens, collapsible command containers). Uses `text-[10px] font-bold uppercase tracking-wider` for labels.
+- **Unified Project Management Architecture**: Replaced module-specific dialogs with `ItemProjectSelectionDialog.tsx` in `src/components/shared/`. It supports both `repo` and `deployment` types, utilizes V2 typography and `rounded-xl` geometry, and includes a quick-create project action to minimize friction.
 - **StatusCard**: Loading/error/offline states.
 - **ActionButton**: Iconographic with tooltip.
 - **AI Chat Bubble**: High-density typography with `rounded-xl` geometry. User messages utilize `shadow-[0_0_15px_rgba(var(--primary),0.1)]`. Assistant messages use `bg-ai/5` and `border-ai/10` for subtle technical contrast.

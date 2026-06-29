@@ -183,7 +183,7 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 													key={header.id}
 													scope="col"
 													className={clsx(
-														"text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 border-b border-border/60",
+														"text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 border-b border-border/60 relative",
 														isFirstColumn && "w-full",
 														!isFirstColumn && !columnWidth && "whitespace-nowrap",
 														columnWidth && "overflow-hidden text-ellipsis whitespace-nowrap",
@@ -215,6 +215,9 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 															</span>
 														)}
 													</div>
+													{index < headerGroup.headers.length - 1 && (
+														<div className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-px bg-border/20" aria-hidden="true" />
+													)}
 												</th>
 											)
 										})}
@@ -223,19 +226,25 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 							</thead>
 							<tbody className="divide-y divide-border/40">
 								{table.getRowModel().rows.map((row) => (
-									<tr key={row.id} className="hover:bg-muted/20 transition-colors group">
+									<tr key={row.id} className="hover:bg-muted/10 transition-colors group">
 										{row.getVisibleCells().map((cell, index) => {
 											const isFirstColumn = index === 0
+											const columnWidth = cell.column.columnDef.meta?.width
 											return (
 												<td
 													key={cell.id}
 													className={clsx(
-														"px-4 py-3 text-sm",
+														"px-4 py-3 text-sm relative",
 														isFirstColumn && "w-full font-medium",
-														!isFirstColumn && "whitespace-nowrap"
+														!isFirstColumn && !columnWidth && "whitespace-nowrap",
+														columnWidth && "overflow-hidden text-ellipsis whitespace-nowrap"
 													)}
+													style={columnWidth ? { width: columnWidth, minWidth: columnWidth, maxWidth: columnWidth } : undefined}
 												>
 													{flexRender(cell.column.columnDef.cell, cell.getContext())}
+													{index < row.getVisibleCells().length - 1 && (
+														<div className="absolute right-0 top-1/2 -translate-y-1/2 h-6 w-px bg-border/5" aria-hidden="true" />
+													)}
 												</td>
 											)
 										})}

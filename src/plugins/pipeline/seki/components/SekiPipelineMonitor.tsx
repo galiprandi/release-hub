@@ -376,7 +376,7 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 				<div className="flex items-center gap-2">
 					<config.icon className={`w-4 h-4 ${config.color}`} />
 					<span className="text-xs font-bold text-foreground">{stage.label}</span>
-					<span className={`px-1.5 py-0 text-[9px] rounded uppercase tracking-wider ${config.badge}`}>
+					<span className={`px-1.5 py-0 text-[10px] rounded uppercase tracking-wider ${config.badge}`}>
 						{config.label}
 					</span>
 				</div>
@@ -442,7 +442,7 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 						<div className="space-y-2">
 							{ai.diagnosis && (
 								<div className="space-y-0.5">
-									<span className="text-[9px] font-bold uppercase tracking-wider text-destructive/70 dark:text-destructive/60">
+									<span className="text-[10px] font-bold uppercase tracking-wider text-destructive/70 dark:text-destructive/60">
 										Diagnóstico
 									</span>
 									<p className="text-xs text-foreground/90 font-medium leading-relaxed">{ai.diagnosis}</p>
@@ -450,7 +450,7 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 							)}
 							{ai.command && (
 								<div className="space-y-0.5">
-									<span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60">
+									<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
 										Comando
 									</span>
 									<code className="block text-[11px] font-mono text-primary bg-primary/5 px-2 py-1.5 rounded break-all">
@@ -460,7 +460,7 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 							)}
 							{ai.correction && (
 								<div className="space-y-0.5">
-									<span className="text-[9px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+									<span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
 										Corrección
 									</span>
 									<p className="text-xs text-foreground/80 leading-relaxed">{ai.correction}</p>
@@ -523,7 +523,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 					<div className="flex items-center gap-2 flex-wrap">
 						<RefTypeIcon className="w-3.5 h-3.5 text-muted-foreground" />
 						<span className="font-mono text-sm font-semibold text-foreground">{filteredData.ref}</span>
-						<span className={`px-1.5 py-0 text-[9px] rounded uppercase tracking-wider ${
+						<span className={`px-1.5 py-0 text-[10px] rounded uppercase tracking-wider ${
 							filteredData.refType === 'TAG'
 								? 'bg-purple-50 text-purple-700 border border-purple-100 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800'
 								: 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800'

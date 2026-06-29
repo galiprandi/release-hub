@@ -266,13 +266,13 @@ export function DeploymentSearch() {
           <div className="px-3 py-2 bg-muted/60 border-t border-border/60 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[9px]">↑↓</kbd> NAVEGAR
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[10px]">↑↓</kbd> NAVEGAR
               </span>
               <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[9px]">↵</kbd> SELECCIONAR
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[10px]">↵</kbd> SELECCIONAR
               </span>
               <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[9px]">ESC</kbd> CERRAR
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[10px]">ESC</kbd> CERRAR
               </span>
             </div>
             <span className="opacity-60">{results.length} RESULTADOS</span>

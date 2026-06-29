@@ -4,14 +4,7 @@ import { useUserCollections } from "@/hooks/useUserCollections";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 
 export function ProjectSelector({ repo }: { repo: string }) {
-	const {
-		projects,
-		createProject,
-		addRepoToProject,
-		removeRepoFromProject,
-		isRepoInProject,
-		getProjectsForRepo,
-	} = useUserCollections();
+	const { projects, createProject, addRepoToProject, removeRepoFromProject, isRepoInProject, getProjectsForRepo } = useUserCollections();
 	const [isOpen, setIsOpen] = useState(false);
 	const [isCreating, setIsCreating] = useState(false);
 	const [newName, setNewName] = useState("");
@@ -19,21 +12,13 @@ export function ProjectSelector({ repo }: { repo: string }) {
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		const handleClick = (e: MouseEvent) => {
-			if (containerRef.current && !containerRef.current.contains(e.target as Node))
-				setIsOpen(false);
-		};
-		const handleEsc = (e: KeyboardEvent) => {
-			if (e.key === "Escape") setIsOpen(false);
-		};
+		const handleClick = (e: MouseEvent) => { if (containerRef.current && !containerRef.current.contains(e.target as Node)) setIsOpen(false); };
+		const handleEsc = (e: KeyboardEvent) => { if (e.key === "Escape") setIsOpen(false); };
 		if (isOpen) {
 			document.addEventListener("mousedown", handleClick);
 			document.addEventListener("keydown", handleEsc);
 		}
-		return () => {
-			document.removeEventListener("mousedown", handleClick);
-			document.removeEventListener("keydown", handleEsc);
-		};
+		return () => { document.removeEventListener("mousedown", handleClick); document.removeEventListener("keydown", handleEsc); };
 	}, [isOpen]);
 
 	const repoProjects = getProjectsForRepo(repo);
@@ -51,90 +36,34 @@ export function ProjectSelector({ repo }: { repo: string }) {
 
 	return (
 		<div className="relative" ref={containerRef}>
-			<button
-				type="button"
-				onClick={() => setIsOpen(!isOpen)}
-				aria-expanded={isOpen}
-				aria-haspopup="listbox"
-				aria-label="Asignar a proyecto"
-				className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-all focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-lg px-2 py-1"
-			>
-				{hasProjects ? (
-					<>
-						<FolderOpen className="w-3.5 h-3.5 text-primary" />
-						<span>
-							{repoProjects.length === 1
-								? repoProjects[0].name
-								: `${repoProjects.length} PROYECTOS`}
-						</span>
-					</>
-				) : (
-					<>
-						<FolderPlus className="w-3.5 h-3.5" />
-						<span>AGREGAR A PROYECTO</span>
-					</>
-				)}
-				<ChevronDown
-					className={`w-3 h-3 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-				/>
+			<button type="button" onClick={() => setIsOpen(!isOpen)} aria-expanded={isOpen} aria-haspopup="listbox" aria-label="Asignar a proyecto" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm">
+				{hasProjects ? <><FolderOpen className="w-4 h-4 text-primary" /><span>{repoProjects.length === 1 ? repoProjects[0].name : `${repoProjects.length} proyectos`}</span></> : <><FolderPlus className="w-4 h-4" /><span>Agregar a proyecto</span></>}
+				<ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
 			</button>
 			{isOpen && (
-				<div
-					role="listbox"
-					className="absolute top-full right-0 mt-1 w-72 bg-background border border-border/60 rounded-xl shadow-[0_0_15px_rgba(var(--primary),0.1)] z-50 py-1.5 animate-in fade-in zoom-in-95 duration-150"
-				>
-					{projects.length === 0 && !isCreating && (
-						<div className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">
-							Sin proyectos. Crea el primero.
-						</div>
-					)}
-					<div className="max-h-60 overflow-y-auto scrollbar-hide">
-						{projects.map((p) => {
-							const inP = isRepoInProject(p.id, repo);
-							return (
-								<button
-									key={p.id}
-									type="button"
-									role="option"
-									aria-selected={inP}
-									onClick={() => {
-										void (inP
-											? removeRepoFromProject(p.id, repo)
-											: addRepoToProject(p.id, repo));
-									}}
-									className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-muted/40 transition-colors text-left focus:outline-none focus:bg-muted/60 group"
-								>
-									<div
-										className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${inP ? "bg-primary border-primary shadow-[0_0_8px_rgba(var(--primary),0.3)]" : "border-border/60"}`}
-									>
-										{inP && <Check className="w-3 h-3 text-primary-foreground" />}
-									</div>
-									<div className="flex-1 min-w-0">
-										<div className="text-[11px] font-bold uppercase tracking-tight truncate text-foreground/80 group-hover:text-foreground">
-											{p.name}
-										</div>
-										{p.description && (
-											<div className="text-[10px] text-muted-foreground/60 truncate leading-tight">
-												{p.description}
-											</div>
-										)}
-									</div>
-									{inP && <X className="w-3 h-3 text-muted-foreground/40 hover:text-destructive transition-colors" />}
-								</button>
-							);
-						})}
-					</div>
-					<div className="border-t border-border/40 mt-1.5 pt-1.5 px-1">
+				<div role="listbox" className="absolute top-full right-0 md:left-0 mt-1 w-72 bg-background border rounded-lg shadow-lg z-50 py-1 animate-in fade-in zoom-in-95 duration-150">
+					{projects.length === 0 && !isCreating && <div className="px-3 py-2 text-sm text-muted-foreground">Sin proyectos. Crea el primero.</div>}
+					{projects.map(p => {
+						const inP = isRepoInProject(p.id, repo);
+						return <button key={p.id} type="button" role="option" aria-selected={inP} onClick={() => { void (inP ? removeRepoFromProject(p.id, repo) : addRepoToProject(p.id, repo)); }} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors text-left focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm">
+							{inP ? <Check className="w-4 h-4 text-primary" /> : <div className="w-4 h-4" />}
+							<div className="flex-1 min-w-0">
+								<div className="font-medium truncate">{p.name}</div>
+								{p.description && <div className="text-xs text-muted-foreground truncate">{p.description}</div>}
+							</div>
+							{inP && <X className="w-3 h-3 text-muted-foreground" />}
+						</button>;
+					})}
+					<div className="border-t mt-1 pt-1">
 						<button
 							type="button"
 							onClick={() => {
 								setIsCreating(true);
 								setIsOpen(false);
 							}}
-							className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-primary hover:bg-primary/5 transition-all text-left rounded-lg focus:outline-none"
+							className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors text-left text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
 						>
-							<Plus className="w-3.5 h-3.5" />
-							NUEVO PROYECTO
+							<Plus className="w-4 h-4" /> Nuevo proyecto
 						</button>
 					</div>
 				</div>

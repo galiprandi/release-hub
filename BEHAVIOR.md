@@ -67,35 +67,13 @@
 - should validate Kubernetes resource names correctly
 
 ## Module: api/seki
-- fetchPipeline retorna el pipeline
+- fetchPipelinesByEnvironment retorna pipelines por ambiente
 
 ## Module: XSS Vulnerability Audit
 - should escape HTML in highlighted code
 - should escape HTML tags to prevent XSS
 - should prevent XSS in search filters
 - should prevent XSS when highlighting log levels
-
-## Module: AIChatModal
-- calls prompt with multimodal signature when send button is clicked
-- calls reset when clear button is clicked
-- handles file selection and shows preview
-- renders correctly when open
-- shows stop button during prompting and calls reset on click
-- switches profiles and updates messages
-
-## Module: FeedbackDialog
-- should allow entering description and moving to next step
-- should have focus rings on inputs for accessibility
-- should open dialog when trigger is clicked
-- should render trigger button
-- should show stepper with proper accessibility
-
-## Module: ProjectSelector
-- should call createProject when form is submitted
-- should open create project dialog
-- should open projects list when clicked
-- should render projects when they exist
-- should render trigger button
 
 ## Module: terminalMiddleware
 - should register upgrade handler
@@ -124,14 +102,6 @@
 - promote_to_production tool calls APIs correctly
 - registers all tools on mount
 - search_repositories tool calls runCommand correctly
-
-## Module: Pipeline Core Types
-- should accept valid provider values
-- should accept valid state values
-- should accept valid view mode values
-- should create a valid pipeline event
-- should create valid pipeline data structure
-- should support minimal pipeline data
 
 ## Module: curlParser
 - should handle encoded brackets in Seki URLs
@@ -177,6 +147,21 @@
 - retorna false si sekiToken es nulo o no existe
 - retorna false si storage es nulo o JSON inválido
 - retorna true si el token existe
+
+## Module: AIChatModal
+- calls prompt with multimodal signature when send button is clicked
+- calls reset when clear button is clicked
+- handles file selection and shows preview
+- renders correctly when open
+- shows stop button during prompting and calls reset on click
+- switches profiles and updates messages
+
+## Module: FeedbackDialog
+- should allow entering description and moving to next step
+- should have focus rings on inputs for accessibility
+- should open dialog when trigger is clicked
+- should render trigger button
+- should show stepper with proper accessibility
 
 ## Module: LogsViewer
 - calls onResourceChange when resource is selected
@@ -247,6 +232,13 @@
 - should toggle commit expansion
 - should trigger AI summary
 
+## Module: ProjectSelector
+- should call createProject when form is submitted
+- should open create project dialog
+- should open projects list when clicked
+- should render projects when they exist
+- should render trigger button
+
 ## Module: PromoteDialog
 - should have focus rings on interactive elements
 - should open dialog when trigger is clicked
@@ -254,42 +246,28 @@
 - should suggest next version correctly
 - should toggle commits list with accessibility attributes
 
-## Module: PipelineCard
-- applies custom className
-- does not show running indicator when isRunning is false
-- has different styling for commits vs tags
-- renders children when provided
-- renders meta parts correctly
-- renders tag ref type for tags
-- renders with basic props
-- shows running indicator when isRunning is true
-
-## Module: SimpleTimeline
-- displays duration in tooltip for completed events
-- limits display to first 6 events
-- renders empty timeline with no events
-- renders timeline with events
-- shows different states with different styling
-- shows tooltip on hover
-
-## Module: Pipeline Adapters
-- should handle errors gracefully
-- should handle invalid JSON in settings gracefully
-- should have correct name
-- should have required properties
-- should not support when Nx Build workflow does not exist
-- should not support when no token exists
-- should support when Nx Build workflow exists
-- should support when token exists
-
-## Module: pulsarAdapter
-- should fetch and transform pulsar data correctly
-- should return null when no workflow runs are found
-- should support repos with Nx Build workflow
-
 ## Module: sekiAdapter
-- should fetch and transform commit data
-- should fetch and transform tag data
-- should return null for short refs or API errors
-- should return null for tag data without commit
+- should extract error markdown from failed subevents
+- should fetch and transform both environments
+- should handle null environments in response
+- should return null on API errors
 - should transform events and subevents correctly
+
+## Module: Seki Types
+- should accept valid state values
+- should create a valid pipeline event
+- should create valid pipeline data structure
+- should support TAG refType
+
+## Module: extractRoutes
+- deduplicates URLs
+- extracts URLs from DEPLOY events markdown
+- filters out internal Kubernetes URLs
+- returns empty array for non-DEPLOY events
+
+## Module: getPipelineStatusInfo
+- detects FAILED from deploy events
+- detects SUCCESS when all deploy events succeed
+- falls back to last event state
+- returns undefined status for empty events
+- returns undefined status for undefined events

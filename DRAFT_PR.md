@@ -1,22 +1,19 @@
-# Draft PR: Surgical Hygiene & Resonance V2 Architecture Realignment - Fiona 🐜
+# Draft PR: Terminal & GitHub UX Evolution - Uma 🐜
 
 ## Descripción
-Esta misión se enfoca en la reestructuración arquitectónica del repositorio para cumplir con el estándar de localidad por módulo y la eliminación de entropía técnica residual. Se busca erradicar el código muerto, unificar la lógica de pipelines y asegurar un sistema de tipos resiliente (AAA).
+Esta misión se centra en la evolución de la interfaz de la Terminal y la mejora de la experiencia de usuario (UX) en el dashboard de GitHub. Se busca alinear la Terminal con el estándar Industrial Resonance V2 y optimizar la visualización de repositorios mediante la implementación de grupos colapsables.
 
 ## Objetivos
-- [ ] **Architecture Realignment**: Relocalizar componentes de la raíz `src/components/` a directorios específicos de módulo (`src/ai/`, `src/admin/`) o compartidos (`src/components/shared/`, `src/components/ui/`).
-- [ ] **Legacy Hook Erradication**: Evaluar y eliminar `usePipelineWithHealth.ts` en favor de `useUnifiedPipeline`.
-- [ ] **Technical Hygiene**: Eliminación total de usos de `any` en el código de producción y tests.
-- [ ] **Resonance V2 Alignment**: Auditoría de tipografía de alta densidad y estándares de focus ring en componentes administrativos.
-- [ ] **Build Integrity**: Garantizar un log de build zero-warning y 100% de tests exitosos.
-- [ ] **Documentation**: Actualizar `AGENTS.md`, `DESIGN.md` y `CROMA.md`.
+- [ ] **Terminal V2**: Refactorizar la interfaz de la terminal para cumplir con la tipografía de alta densidad V2 y mejorar los metadatos técnicos mostrados.
+- [ ] **Modal Unification**: Unificar el header del modal de Terminal con la vista principal de la ruta `/terminal`.
+- [ ] **GitHub UX**: Implementar contenedores colapsables por organización en el dashboard de GitHub para reducir el ruido visual.
+- [ ] **Bulk Actions**: Añadir controles globales para expandir/colapsar todas las organizaciones.
+- [ ] **Technical Hygiene**: Mantener un build de cero advertencias, sin `any` y sin `console.log`.
+- [ ] **Documentation**: Actualizar `DESIGN.md`, `AGENTS.md` y `CROMA.md`.
 
 ## Zona de Trabajo
-- `src/components/*` (Relocalización)
-- `src/hooks/usePipelineWithHealth.ts` (Evaluación/Eliminación)
-- `src/ai/components/` (Nuevo)
-- `src/admin/components/` (Nuevo)
+- `src/routes/terminal.tsx`
+- `src/layouts/PageLayout.tsx`
 - `src/routes/github/index.tsx`
 - `AGENTS.md`
 - `DESIGN.md`
-- `CROMA.md`

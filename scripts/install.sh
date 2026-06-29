@@ -4,8 +4,37 @@
 INSTALL_DIR="$HOME/.release-hub"
 REPO_URL="https://github.com/galiprandi/release-hub.git"
 BINARY_NAME="rhub"
+MAX_RETRIES=3
 
-set -e
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+log_info()  { echo -e "${GREEN}ℹ️  $1${NC}"; }
+log_warn()  { echo -e "${YELLOW}⚠️  $1${NC}"; }
+log_error() { echo -e "${RED}❌ $1${NC}"; }
+
+# Retry function: runs a command up to MAX_RETRIES times
+# Usage: retry "description" command args...
+retry() {
+    local desc="$1"
+    shift
+    local attempt=1
+    while [ $attempt -le $MAX_RETRIES ]; do
+        echo "   Attempt $attempt/$MAX_RETRIES: $desc"
+        if "$@"; then
+            return 0
+        fi
+        attempt=$((attempt + 1))
+        if [ $attempt -le $MAX_RETRIES ]; then
+            echo "   Retrying in 3s..."
+            sleep 3
+        fi
+    done
+    return 1
+}
 
 echo "🛠️  Starting ReleaseHub Installation..."
 
@@ -13,24 +42,42 @@ echo "🛠️  Starting ReleaseHub Installation..."
 if [ -d "$INSTALL_DIR" ]; then
     echo "🔄 Repository exists at $INSTALL_DIR. Updating..."
     cd "$INSTALL_DIR"
-    git fetch origin main
-    git reset --hard origin/main || echo "⚠️  Could not update to latest changes. Continuing with local version."
+    if ! git fetch origin main 2>/dev/null; then
+        log_warn "Could not fetch from remote. Continuing with local version."
+    else
+        git reset --hard origin/main 2>/dev/null || log_warn "Could not reset to origin/main. Continuing with local version."
+    fi
 else
     echo "📥 Cloning ReleaseHub to $INSTALL_DIR..."
-    git clone "$REPO_URL" "$INSTALL_DIR"
+    if ! retry "git clone" git clone "$REPO_URL" "$INSTALL_DIR"; then
+        log_error "Failed to clone repository after $MAX_RETRIES attempts."
+        log_error "Please check your network connection and try again."
+        exit 1
+    fi
     cd "$INSTALL_DIR"
 fi
 
 # 2. Check for dependencies
-./scripts/healthcheck.sh || exit 1
+if ! ./scripts/healthcheck.sh; then
+    log_error "Healthcheck failed. Please ensure Node.js and npm are installed."
+    exit 1
+fi
 
-# 3. Install Dependencies
+# 3. Install Dependencies (with retry)
 echo "📦 Installing dependencies..."
-npm install
+if ! retry "npm install" npm install; then
+    log_error "Failed to install dependencies after $MAX_RETRIES attempts."
+    log_error "Try removing node_modules and running 'npm install' manually."
+    exit 1
+fi
 
-# 4. Build Application
+# 4. Build Application (with retry)
 echo "🏗️  Building application..."
-npm run build
+if ! retry "npm run build" npm run build; then
+    log_error "Failed to build application after $MAX_RETRIES attempts."
+    log_error "Try running 'npm run build' manually to see the full error."
+    exit 1
+fi
 
 # 5. Setup Permissions
 chmod +x scripts/start.sh
@@ -66,7 +113,7 @@ if [ -f "$SHELL_CONFIG" ]; then
         echo "✅ Alias already exists in $SHELL_CONFIG"
     fi
 else
-    echo "⚠️  Could not find shell config. Please add this manually:"
+    log_warn "Could not find shell config. Please add this manually:"
     echo "alias $BINARY_NAME=\"$INSTALL_DIR/bin/$BINARY_NAME\""
 fi
 

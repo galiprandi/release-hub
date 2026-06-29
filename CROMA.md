@@ -387,6 +387,18 @@
   - [x] Verificación Global: Zero-warning build log, lint audit impecable y 227 tests unitarios exitosos.
 - **Resultado**: Integridad del repositorio restaurada y blindaje de seguridad expandido, manteniendo el estándar de ingeniería AAA y la consistencia estética Industrial Resonance V2.
 
+### 2026-06-27: Architecture Realignment & Type System Hardening V14
+- **Agente**: Fiona 🐜
+- **Rama**: `🐜-Fiona-refactor-hygiene-audit-v14`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block.
+  - [x] Architecture Realignment: Relocación total de componentes compartidos a `src/components/shared/` y componentes de GitHub a `src/github/components/`.
+  - [x] Type System Hardening: Erradicación de `any` en `src/utils/security.test.ts` y `src/config/terminalMiddleware.test.ts`.
+  - [x] Hygiene AAA: Saneamiento del build y lint log (zero-warning state).
+  - [x] Verificación Global: 230 tests unitarios exitosos y validación visual con Playwright.
+- **Resultado**: Estructura del repositorio profesionalizada y blindaje de tipos elevado al estándar AAA, eliminando la entropía en el directorio de componentes.
+
 ### 2026-06-23: Surgical Hygiene & Entropy Audit V11
 - **Agente**: Fiona 🐜
 - **Rama**: `🐜-Fiona-refactor-hygiene-audit-v11`
@@ -450,15 +462,61 @@
   - [x] Verificación: Zero-warning build logrado y validación de integridad técnica.
 - **Resultado**: Componentes impulsados por IA elevados al estándar Industrial Resonance V2, garantizando una experiencia de usuario curada, profesional y visualmente coherente.
 
-### 2026-06-25: Architecture Realignment & Resonance V2 Hygiene Audit V14
+### 2026-06-25: Architecture Realignment & Resonance V2 Hygiene Audit V13
 - **Agente**: Fiona 🐜
-- **Rama**: `🐜-Fiona-refactor-hygiene-resonance-v14`
+- **Rama**: `🐜-Fiona-refactor-hygiene-resonance-v13`
 - **Estado**: Finalizado ✅
 - **Cambios**:
   - [x] Phase 0: Territory Block.
-  - [x] Architecture Realignment: Relocación de componentes raíz (`AIChatModal`, `FeedbackDialog`, `ForceRedeployDialog`, `FreezeDialog`, `ProjectManagementDialog`, `ProjectSelector`, `SettingsDialog`, `DisplayInfo`, `AISummaryCard`, `EmptyState`, `LoadingSpinner`, `DeleteConfirmDialog`) a módulos específicos (`src/ai/`, `src/admin/`, `src/github/`) o compartidos (`shared/`, `ui/`).
-  - [x] Legacy Hook Erradication: Eliminación del hook `usePipelineWithHealth.ts` tras migrar el dashboard de GitHub a la arquitectura `useUnifiedPipeline` con registro manual de endpoints de salud.
-  - [x] Resonance V2 Audit: Refactorización de diálogos administrativos aplicando tipografía de alta densidad (`text-[10px]`), tokens semánticos al 20% y sombras técnicas.
-  - [x] Technical Hygiene: Erradicación final de usos de `any` en tests mediante tipado estricto de mocks de Vitest.
+  - [x] Architecture Realignment: Relocación de componentes específicos de módulo (`github`, `diff`, `fetcher`) desde `src/components/` a sus respectivos subdirectorios de componentes de módulo.
+  - [x] Import Path Restoration: Actualización global de referencias de importación (usando `@/` aliases) y corrección de imports relativos rotos.
+  - [x] Entropy Removal: Eliminación del componente huérfano `src/components/ui/breadcrumb.tsx`.
+  - [x] Resonance V2 Typographic Audit: Aplicación de tipografía técnica de alta densidad (`text-[10px] font-bold uppercase tracking-wider`) en etiquetas y metadatos de los componentes relocalizados.
   - [x] Verificación Global: Zero-warning build log, lint audit impecable y 230 tests unitarios exitosos.
-- **Resultado**: Repositorio en estado AAA con arquitectura de componentes optimizada, libre de código legado y alineado visualmente con el estándar Industrial Resonance V2.
+- **Resultado**: Estructura de componentes optimizada siguiendo el estándar de localidad por módulo, higiene técnica elevada al nivel AAA y consistencia visual Resonance V2 garantizada en componentes críticos.
+
+### 2026-06-25: Terminal & GitHub UX Evolution
+- **Agente**: Uma 🐜
+- **Rama**: `🐜-Uma-refactor-terminal-github-ux`
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Phase 0: Territory Block & Mission Draft.
+  - [x] Terminal V2 Evolution: Refactorización de `src/routes/terminal.tsx` alineada con tipografía de alta densidad V2 y metadatos técnicos (Shell, Status, OS).
+  - [x] Modal Unification: Unificación del header del modal de Terminal en `src/layouts/PageLayout.tsx` con el estándar técnico de la ruta principal.
+  - [x] GitHub UX Evolution: Implementación de contenedores colapsables por organización en el dashboard de GitHub para reducir el ruido visual.
+  - [x] Bulk UX Actions: Incorporación de controles globales de expansión/colapso para grupos de organizaciones.
+  - [x] Technical Hygiene: Erradicación de `text-[9px]`, build zero-warning y 230 tests exitosos.
+  - [x] Documentación: Actualización de `DESIGN.md` y `AGENTS.md` con los nuevos estándares de Terminal y GitHub UX.
+- **Resultado**: Experiencia de usuario optimizada mediante la reducción de carga cognitiva en el dashboard y profesionalización técnica de la interfaz de terminal.
+
+### 2026-06-27: Seki Pipeline Separation & Unified Pipeline Elimination
+- **Agente**: Devin
+- **Rama**: main
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Separación de Seki del sistema unificado de pipelines: eliminación completa de `src/pipeline-core/` (types, adapters, hooks, components, utils).
+  - [x] Eliminación de Pulsar/GitHub Actions adapter y `usePipelineDetection` (multi-provider abstraction).
+  - [x] Creación de módulo autónomo `src/plugins/pipeline/seki/` con tipos propios (`SekiPipelineData`, `SekiPipelineEvent`), adapter directo, hook `useSekiPipeline` (sin detección de provider), y componentes propios (`SekiPipelineMonitor`, `SekiPipelineCard`, `SekiTimeline`).
+  - [x] Migración de `useHealthMonitor` y `usePipelineWithHealth` desde `src/hooks/` a `src/plugins/pipeline/seki/hooks/`.
+  - [x] Migración de `getPipelineStatusInfo` y `extractRoutes` a `src/plugins/pipeline/seki/utils.ts`.
+  - [x] `SekiPipelineMonitor` silencioso total: renderiza `null` si no hay token, loading, error, o sin datos. Sólo renderiza la card cuando hay datos válidos.
+  - [x] Actualización de consumidores: `src/routes/github/$org.$repo.tsx`, `src/routes/github/index.tsx`, `src/routes/health/index.tsx`.
+  - [x] Tests: 222 tests unitarios exitosos (adapter, types, utils, card, timeline).
+  - [x] Documentación: actualización de `AGENTS.md`, `BEHAVIOR.md`, `src/api/AGENTS.md`.
+- **Resultado**: Seki aislado como módulo autónomo y agnóstico. Sin abstracción multi-provider. Componente silencioso que sólo aparece cuando hay datos válidos.
+
+### 2026-06-27: Seki Latest-By-Environment Endpoint Migration
+- **Agente**: Devin
+- **Rama**: main
+- **Estado**: Finalizado ✅
+- **Cambios**:
+  - [x] Migración al endpoint `/pipelines/latest-by-environment` que devuelve staging + production en una sola llamada, sin necesidad de conocer commit o tag de antemano.
+  - [x] Eliminación de `fetchPipeline` y `fetchPipelineWithTag` (per-ref fetching). Reemplazados por `fetchPipelinesByEnvironment`.
+  - [x] Eliminación de `useSekiPipeline` hook. Reemplazado por `useSekiPipelinesByEnv` que retorna `{ staging, production }`.
+  - [x] Eliminación de `ViewMode` de los tipos del módulo Seki. El `refType` (COMMIT/TAG) se infiere automáticamente de `git.event` ('tag' → TAG, resto → COMMIT).
+  - [x] `SekiPipelineMonitor` refactorizado para mostrar ambos ambientes en paralelo (staging card + production card) con sub-componente `SekiEnvPipeline`.
+  - [x] `usePipelineWithHealth` simplificado: ya no requiere `commit` ni `tag` parameters. Extrae endpoints de ambos ambientes automáticamente.
+  - [x] Consumidores actualizados: `$org.$repo.tsx` (sin ref/viewMode/commit props), `github/index.tsx` (TagCell y CommitCell usan `data?.production` y `data?.staging` respectivamente).
+  - [x] Tests: 222 tests unitarios exitosos (adapter, types, utils, card, timeline, api/seki).
+  - [x] Documentación: actualización de AGENTS.md, BEHAVIOR.md, CROMA.md, src/api/AGENTS.md.
+- **Resultado**: Una sola llamada API obtiene el último pipeline de staging y production. Ambos ambientes se muestran en paralelo. Sin necesidad de ref específico. Componente silencioso que sólo aparece cuando hay datos válidos.

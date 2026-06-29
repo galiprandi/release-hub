@@ -13,20 +13,19 @@
 ## Component Patterns
 - **Table**: `bg-muted/40` headers, technical metadata, vertical dividers. Internal filter bar uses `bg-muted/40` with a nested segmented-control layout for a professional aesthetic.
 - **Search Inputs**: Standardized to `bg-muted/40` with `border-border/60`. Focus state uses `focus:ring-primary/20`. Technical search results in dropdowns include high-density badges (`REPO`, `FILE`, `CONT`) with 10% opacity backgrounds.
-- **EmptyState**: Centered layout featuring an icon in a `p-4 rounded-full bg-muted/20 border border-border/40` container. Typography for labels is strictly `text-[10px] font-bold uppercase tracking-[0.2em]`. Component resides in `src/components/shared/`.
-- **SetupCard**: Unified component for onboarding and configuration states. Features a dual-state design for "Installed" (success tokens, high-density metadata) and "Missing" (destructive/warning tokens, collapsible command containers). Uses `text-[10px] font-bold uppercase tracking-wider` for labels. Component resides in `src/components/shared/`.
+- **EmptyState**: Centered layout featuring an icon in a `p-4 rounded-full bg-muted/20 border border-border/40` container. Typography for labels is strictly `text-[10px] font-bold uppercase tracking-[0.2em]`.
+- **SetupCard**: Unified component for onboarding and configuration states. Features a dual-state design for "Installed" (success tokens, high-density metadata) and "Missing" (destructive/warning tokens, collapsible command containers). Uses `text-[10px] font-bold uppercase tracking-wider` for labels.
 - **StatusCard**: Loading/error/offline states.
 - **ActionButton**: Iconographic with tooltip.
 - **AI Chat Bubble**: High-density typography with `rounded-xl` geometry. User messages utilize `shadow-[0_0_15px_rgba(var(--primary),0.1)]`. Assistant messages use `bg-ai/5` and `border-ai/10` for subtle technical contrast.
 - **Feedback Stepper**: Technical step indicators with `shadow-[0_0_15px_rgba(var(--primary),0.2)]` for active states and `border-border/60` for inactive states.
 - **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering.
-- **Terminal**: High-density technical header with session metadata (e.g., 'Sesión Local Activa', '/bin/bash'). Semantic status dots (OK/Error) with technical shadows. Viewport uses `bg-zinc-950` background.
+- **Terminal**: High-density technical header with session metadata (e.g., 'Sesión Local Activa', '/bin/bash'). Aligned with V2 typography (`text-[10px] font-bold uppercase tracking-wider`). Includes dynamic OS detection badges and connection status with semantic dots. Viewport uses `bg-zinc-950` background.
 - **BaseDialog**: Modal consistency.
 
 ## State Management & Search
 - **URL-First**: All filtering and search state must reside in URL search parameters to ensure persistence and shareability.
 - **Single Source of Truth**: Avoid duplicating search parameter state in local component state (`useState`). Inputs should be controlled directly by the search parameters provided by the router to prevent synchronization issues and unnecessary renders.
-- **Pipeline Health Dashboard Migration**: In the GitHub Dashboard (src/routes/github/index.tsx), the legacy 'usePipelineWithHealth' hook was replaced by 'useUnifiedPipeline'. Health endpoint extraction is now handled manually via an effect that calls 'extractEndpointsFromEvents' from 'useHealthMonitor' when pipeline data updates, maintaining AAA hygiene standards.
 
 ## Cache-First Tokens (ADR-001)
 | Estado | Token |
@@ -67,8 +66,7 @@
 ## Layout V2
 - Sidebar fijo (50px). Sticky header with backdrop-blur.
 - Contenido `px-8`, `gap-6`.
-- **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente. La eliminación de código muerto (`useKubectlNamespaceAccess.ts`, `useGitHubActions.ts`, `usePipelineWithHealth.ts`) es mandatoria para mantener la higiene.
-- **Component Locality**: Los componentes deben residir en directorios específicos de módulo (ej. `src/admin/components/`, `src/ai/components/`). El directorio raíz `src/components/` queda reservado exclusivamente para subdirectorios estructurales (`shared/`, `ui/`).
+- **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente. La eliminación de código muerto (`useKubectlNamespaceAccess.ts`, `useGitHubActions.ts`) es mandatoria para mantener la higiene.
 
 ## Specific Module Standards
 
@@ -106,6 +104,7 @@
 
 ### GitHub UI Resonance
 - **Dashboard Layout**: Primary collection navigation (`IndustrialTabs`) and project management actions reside in the `PageLayout` header.
+- **Organization Grouping**: Repositories are grouped by organization in collapsible containers (`bg-muted/10`, `rounded-xl`). Headers include high-density typography, organization icons, and repository counts. Supports bulk "Expand/Collapse All" functionality.
 - **Global Filtering**: Dashboard-level filtering (e.g., 'Pendientes') uses `IndustrialTabs` enclosed in `bg-muted/40` containers with `border-border/40` to match technical standards.
 - **Table Cells**:
   - `HealthCell`: Includes semantic dots (OK pulse) and high-density technical labels ('OK'/'ERROR') with semantic colors.
@@ -126,9 +125,10 @@
   - Headers: Standard high-density `span` pattern (`text-[10px] font-bold uppercase tracking-wider`).
   - Actions: 20% opacity backgrounds on hover for `ActionButton` components.
 
-### Diff Viewer Resonance
-- **Navigation**: Uses `IndustrialTabs` in `DiffControls` for mode selection (JSON, JWT, cURL, JS, TS, etc.), synchronized with the `mode` search parameter in `src/routes/diff.tsx`.
+### Diff Viewer Resonance V2
+- **Navigation**: Uses `IndustrialTabs` in `DiffControls` for mode selection (JSON, JWT, cURL, JS, TS, etc.), synchronized with the `mode` search parameter in `src/routes/diff.tsx`. Supports responsive widths (`w-full sm:w-[620px]`).
 - **Typography**: High-density technical metadata (`text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`) for panel headers and comparison results.
-- **Visual Containers**: Main view and panels use `bg-muted/10` background and `border-border/60` for refined hierarchy. Panel headers include a decorative semantic dot for visual anchoring.
-- **Empty State**: Uses `bg-muted/10` and `border-border/40` geometry with `tracking-widest` typography for technical placeholders.
-- **Controls**: Action buttons (Solo diffs, Expand, Copy) use semantic shadows and 20% opacity backgrounds on hover/active states.
+- **Visual Containers**: Main view and panels use `bg-muted/5` background and `border-border/40` for refined hierarchy. Panel headers include pulsating semantic dots with shadows for visual anchoring and `bg-zinc-950/20` for code viewports.
+- **Empty State**: Uses `bg-muted/10` and `border-border/40` geometry with high-density V2 labels and primary-colored icons.
+- **Line Highlighting**: Implements semantic backgrounds (added/removed/changed) at 20% opacity with inset visual markers and high-density line numbering.
+- **Controls**: Action buttons (Solo diffs, Expand, Copy) use semantic shadows, 20% opacity backgrounds, and `rounded-lg` geometry.

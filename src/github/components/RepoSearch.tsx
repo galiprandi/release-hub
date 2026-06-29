@@ -264,7 +264,7 @@ export function RepoSearch() {
                               <span className="font-medium text-sm truncate">
                                 {item.name}
                               </span>
-                              <span className="px-1.5 py-0.5 rounded bg-warning/10 text-warning border border-warning/20 text-[9px] font-bold uppercase tracking-wider">
+                              <span className="px-1.5 py-0.5 rounded bg-warning/10 text-warning border border-warning/20 text-[10px] font-bold uppercase tracking-wider">
                                 FILE
                               </span>
                             </div>
@@ -315,7 +315,7 @@ export function RepoSearch() {
                             <span className="font-medium text-sm truncate">
                               {item.fullName}
                             </span>
-                            <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 text-[9px] font-bold uppercase tracking-wider">
+                            <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 text-[10px] font-bold uppercase tracking-wider">
                               REPO
                             </span>
                           </div>

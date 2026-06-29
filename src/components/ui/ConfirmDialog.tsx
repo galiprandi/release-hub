@@ -52,7 +52,7 @@ export interface ConfirmDialogProps {
 const VARIANT_CONFIG = {
 	default: {
 		icon: Info,
-		iconColor: "text-blue-600",
+		iconColor: "text-info",
 		buttonClass: "bg-primary text-primary-foreground hover:bg-primary/90",
 	},
 	destructive: {
@@ -62,13 +62,13 @@ const VARIANT_CONFIG = {
 	},
 	warning: {
 		icon: AlertTriangle,
-		iconColor: "text-yellow-600",
-		buttonClass: "bg-yellow-600 text-white hover:bg-yellow-700",
+		iconColor: "text-warning",
+		buttonClass: "bg-warning text-white hover:bg-warning/90",
 	},
 	success: {
 		icon: CheckCircle,
-		iconColor: "text-green-600",
-		buttonClass: "bg-green-600 text-white hover:bg-green-700",
+		iconColor: "text-success",
+		buttonClass: "bg-success text-white hover:bg-success/90",
 	},
 } as const;
 
@@ -188,14 +188,14 @@ export function ConfirmDialog({
 						type="button"
 						onClick={() => onOpenChange(false)}
 						disabled={disabled}
-						className="px-4 py-2 text-sm font-medium border rounded-md hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+						className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider border rounded-lg hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
 					>
 						{cancelText}
 					</button>
 					<button
 						onClick={handleConfirm}
 						disabled={disabled}
-						className={`px-4 py-2 text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none ${config.buttonClass}`}
+						className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none ${config.buttonClass}`}
 					>
 						{isLoading ? (
 							<>

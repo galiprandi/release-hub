@@ -191,7 +191,7 @@ function Dashboard() {
 											{t.icon && <t.icon className="w-3 h-3" />}
 											<span>{t.label}</span>
 											{t.count !== undefined && t.count > 0 && (
-												<span className="ml-1 px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-[9px]">
+												<span className="ml-1 px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-[10px]">
 													{t.count}
 												</span>
 											)}
@@ -402,7 +402,7 @@ function Dashboard() {
 												<h2 className="text-[10px] font-bold uppercase tracking-widest text-foreground">
 													{org}
 												</h2>
-												<span className="px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-[9px] font-bold text-muted-foreground/60">
+												<span className="px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-[10px] font-bold text-muted-foreground/60">
 													{repoCount}
 												</span>
 											</div>
@@ -410,7 +410,7 @@ function Dashboard() {
 
 										{isCollapsed && (
 											<div className="flex items-center gap-4">
-												<span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/40 italic">
+												<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 italic">
 													Click para expandir
 												</span>
 											</div>

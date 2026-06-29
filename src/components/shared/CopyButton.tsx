@@ -23,7 +23,8 @@ export function CopyButton({ text, className }: CopyButtonProps) {
 		<button
 			onClick={handleCopy}
 			title="Copiar al portapapeles"
-			className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-accent focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-none ${className}`}
+			aria-label="Copiar al portapapeles"
+			className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-accent focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none ${className}`}
 			type="button"
 		>
 			{copied ? (

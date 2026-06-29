@@ -39,7 +39,7 @@ import { PageLayout } from "@/layouts/PageLayout";
 import { RepoSearch } from "@/github/components/RepoSearch";
 import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
 import { ProjectManagementDialog } from "@/github/components/ProjectManagementDialog";
-import { ProjectSelectionDialog } from "@/github/components/ProjectSelectionDialog";
+import { ItemProjectSelectionDialog } from "@/components/shared/ItemProjectSelectionDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
@@ -1196,10 +1196,11 @@ function OperationsCell({
 				onClick={() => onToggleFavorite(repo.fullName)}
 				size="sm"
 			/>
-			<ProjectSelectionDialog
+			<ItemProjectSelectionDialog
 				isOpen={isProjectSelectionOpen}
 				onOpenChange={setIsProjectSelectionOpen}
-				repoFullName={repo.fullName}
+				type="repo"
+				itemId={repo.fullName}
 			/>
 		</div>
 	);

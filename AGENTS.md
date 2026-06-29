@@ -121,6 +121,14 @@
 - **XSS Protection**: Mandatory HTML escaping in any component using `dangerouslySetInnerHTML`. Log utilities (`logUtils.tsx`) must escape the raw line before applying highlighting tags. Diff viewer (`DiffViewer.tsx`) must provide a safe `escapeHtml` fallback if syntax highlighting fails. Verified via `src/api/xss.test.ts`.
 - **SSRF Hardening Standard**: `isInternalAddress` in `src/utils/security.ts` must account for decimal and hexadecimal IP representations to prevent bypasses. All proxy and health check middlewares must utilize this centralized utility.
 - **Search State Synchronization**: Redundant local state for search inputs (e.g., `localSearch`) must be avoided. Search inputs should bind directly to URL search parameters to ensure consistency and eliminate "setState in effect" linter warnings.
+- **Unified Project Management Architecture**: Replaced legacy duplicated dialogs (`ProjectSelectionDialog`, `DeploymentProjectSelectionDialog`) with a single `ItemProjectSelectionDialog.tsx` in `src/components/shared/`. It handles both `repo` and `deployment` types, reducing entropy and ensuring visual consistency across GitHub and Kubernetes flows.
+
+### Mejora #16: Unified Project Management & Table V2 Refinement
+- **Unified Dialog**: Implementation of `ItemProjectSelectionDialog.tsx` in `src/components/shared/` to centralize project assignment logic.
+- **UX Friction Reduction**: Added a quick-create project feature directly within the selection dialog.
+- **Table V2 Refinement**: Implemented explicit vertical dividers between columns and refined hover states in `Table.tsx`.
+- **Entropy Reduction**: Eradication of legacy `ProjectSelectionDialog.tsx` and `DeploymentProjectSelectionDialog.tsx`.
+- **Validation**: Zero-warning build, passing unit tests (211) and successful E2E verification via Playwright.
 
 ### Mejora #15: Architecture Realignment & Type System Hardening V14
 - **Architecture Realignment**: Consolidación total de la localidad de componentes. Relocación de componentes compartidos (`EmptyState`, `LoadingSpinner`, `DisplayInfo`, `SettingsDialog`, `FeedbackDialog`, `AIChatModal`, `AISummaryCard`, `DeleteConfirmDialog`) a `src/components/shared/`.

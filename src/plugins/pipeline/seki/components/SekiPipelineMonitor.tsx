@@ -360,14 +360,15 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 	const hasError = failedSubs.length > 0
 
 	const ai = useFailureSummary(hasError ? pipeline : null, hasError ? stage : null, aiAvailable)
+	const { hasResult, isGenerating, trigger } = ai
 
 	const aiTriggeredRef = useRef(false)
 	useEffect(() => {
-		if (hasError && aiAvailable && !aiTriggeredRef.current && !ai.hasResult && !ai.isGenerating) {
+		if (hasError && aiAvailable && !aiTriggeredRef.current && !hasResult && !isGenerating) {
 			aiTriggeredRef.current = true
-			ai.trigger()
+			trigger()
 		}
-	}, [hasError, aiAvailable, ai.hasResult, ai.isGenerating, ai.trigger])
+	}, [hasError, aiAvailable, hasResult, isGenerating, trigger])
 
 	return (
 		<div className="border border-border/60 rounded-lg overflow-hidden bg-muted/10">

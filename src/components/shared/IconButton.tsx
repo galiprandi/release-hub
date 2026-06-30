@@ -20,7 +20,7 @@ export function IconButton({ icon, onClick, tooltip, disabled = false, active = 
 					aria-label={tooltip}
 					data-active={active || undefined}
 					className={cn(
-						"p-1.5 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1",
+						"p-1.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1",
 						active
 							? "text-primary bg-primary/10 hover:bg-primary/20"
 							: "text-muted-foreground hover:text-foreground hover:bg-muted"

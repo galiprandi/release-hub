@@ -10,7 +10,7 @@ export function DialogCloseButton({ className = "" }: DialogCloseButtonProps) {
 		<Dialog.Close asChild>
 			<button
 				type="button"
-				className={`rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${className}`}
+				className={`rounded-lg opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 ${className}`}
 			>
 				<X className="w-4 h-4" />
 				<span className="sr-only">Cerrar</span>

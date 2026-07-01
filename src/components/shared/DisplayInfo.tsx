@@ -66,7 +66,7 @@ export const DisplayInfo = ({
 				className={cn(
 					"text-sm text-foreground",
 					hasTooltip &&
-						"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm",
+						"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 rounded-md",
 				)}
 				title={hideTooltip ? undefined : tooltip}
 				style={{ cursor: hasTooltip ? "help" : "default" }}

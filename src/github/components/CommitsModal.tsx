@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, GitCommit, Sparkles, Loader2, ChevronDown, ChevronRight } from "lucide-react";
+import { Search, GitCommit, Sparkles, Loader2, ChevronDown, ChevronRight, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAISummarize } from "@galiprandi/react-tools";
 import { AISummaryCard } from "@/components/shared/AISummaryCard";
@@ -128,7 +128,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 			title={
 				<div className="flex items-center gap-2">
 					<span>Cambios desde {prodTag || "último deploy"}</span>
-					<span className="text-[10px] bg-muted px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+					<span className="text-[10px] bg-muted px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
 						{pendingCommits.length}
 					</span>
 				</div>
@@ -146,14 +146,25 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 							value={filter}
 							onChange={(e) => setFilter(e.target.value)}
 							placeholder="Filtrar commits..."
-							className="w-full pl-9 pr-4 py-2 text-sm bg-background border rounded-md focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+							aria-label="Filtrar commits"
+							className="w-full pl-9 pr-10 py-2 text-sm bg-muted/40 border border-border/60 rounded-lg placeholder:text-muted-foreground/40 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
 						/>
+						{filter && (
+							<button
+								type="button"
+								onClick={() => setFilter("")}
+								className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+								aria-label="Limpiar filtro"
+							>
+								<X className="w-3.5 h-3.5" />
+							</button>
+						)}
 					</div>
 					<button
 						type="button"
 						onClick={handleSummarizeWithAI}
 						disabled={isGenerating || availability !== "available" || pendingCommits.length === 0}
-						className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded-md border border-purple-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						className="inline-flex items-center gap-2 px-3 py-2 text-sm font-bold uppercase tracking-wider text-ai bg-ai/10 hover:bg-ai/20 rounded-lg border border-ai/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
 					>
 						{isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
 						{isGenerating ? getStatusMessage : "Resumir con IA"}

@@ -258,7 +258,6 @@ export function LogsViewer({
 	};
 
 	const headerExtra = (
-		<Tooltip.Provider>
 		<div className="flex items-center gap-0">
 			{!isLoading && logs && (
 				<span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-success bg-success/10 rounded">
@@ -391,7 +390,6 @@ export function LogsViewer({
 				/>
 			)}
 		</div>
-		</Tooltip.Provider>
 	);
 
 	const innerContent = (

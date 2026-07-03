@@ -768,7 +768,6 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 					{name}
 				</Link>
 				{pendingCount > 0 && (
-					<Tooltip.Provider>
 						<Tooltip.Root>
 							<Tooltip.Trigger asChild>
 								<button
@@ -782,15 +781,15 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 							</Tooltip.Trigger>
 							<Tooltip.Portal>
 								<Tooltip.Content
-									className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs z-50"
+									className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
 									sideOffset={5}
 								>
 									{pendingCount} commit{pendingCount !== 1 ? "s" : ""}{" "}
-									pendientes de promoción a producción
+									pendientes de promoción
+									<Tooltip.Arrow className="fill-popover" />
 								</Tooltip.Content>
 							</Tooltip.Portal>
 						</Tooltip.Root>
-					</Tooltip.Provider>
 				)}
 			</div>
 			<CommitsModal
@@ -937,8 +936,7 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 	const statusLabel = unhealthyCount > 0 ? "ERROR" : "OK";
 
 	return (
-		<Tooltip.Provider>
-			<Tooltip.Root>
+		<Tooltip.Root>
 				<Tooltip.Trigger asChild>
 					<Link
 						to="/health"
@@ -975,11 +973,11 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 				</Tooltip.Trigger>
 				<Tooltip.Portal>
 					<Tooltip.Content
-						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs z-50"
+						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
 						sideOffset={5}
 					>
 						<div className="space-y-1">
-							<p className="font-bold border-b border-border/40 pb-1 mb-1">
+							<p className="border-b border-border/40 pb-1 mb-1">
 								Estado de Salud
 							</p>
 							{healthyCount > 0 && (
@@ -1001,10 +999,10 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 								</p>
 							)}
 						</div>
+						<Tooltip.Arrow className="fill-popover" />
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
-		</Tooltip.Provider>
 	);
 }
 
@@ -1043,8 +1041,7 @@ function PRsCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
 	const [org, name] = repo.fullName.split("/");
 
 	return (
-		<Tooltip.Provider>
-			<Tooltip.Root>
+		<Tooltip.Root>
 				<Tooltip.Trigger asChild>
 					<a
 						href={`https://github.com/${org}/${name}/pulls`}
@@ -1061,15 +1058,14 @@ function PRsCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
 				</Tooltip.Trigger>
 				<Tooltip.Portal>
 					<Tooltip.Content
-						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs z-50"
+						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
 						sideOffset={5}
 					>
 						{prCount} pull request{prCount !== 1 ? "s" : ""} abierto
-						{prCount !== 1 ? "s" : ""}
+						<Tooltip.Arrow className="fill-popover" />
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
-		</Tooltip.Provider>
 	);
 }
 
@@ -1093,8 +1089,7 @@ function ActionsStatusCell({
 	const isRunning = actions.running > 0;
 
 	return (
-		<Tooltip.Provider>
-			<Tooltip.Root>
+		<Tooltip.Root>
 				<Tooltip.Trigger asChild>
 					<a
 						href={`https://github.com/${org}/${name}/actions`}
@@ -1118,11 +1113,11 @@ function ActionsStatusCell({
 				</Tooltip.Trigger>
 				<Tooltip.Portal>
 					<Tooltip.Content
-						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs z-50"
+						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
 						sideOffset={5}
 					>
 						<div className="space-y-1">
-							<p className="font-bold border-b border-border/40 pb-1 mb-1">
+							<p className="border-b border-border/40 pb-1 mb-1">
 								Últimos 5 runs
 							</p>
 							{actions.failed > 0 && (
@@ -1144,10 +1139,10 @@ function ActionsStatusCell({
 								</p>
 							)}
 						</div>
+						<Tooltip.Arrow className="fill-popover" />
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
-		</Tooltip.Provider>
 	);
 }
 

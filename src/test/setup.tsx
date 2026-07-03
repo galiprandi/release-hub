@@ -1,8 +1,10 @@
 import '@testing-library/jest-dom'
 import 'vitest-canvas-mock'
+import React from 'react'
 import { expect, afterEach, vi } from 'vitest'
-import { cleanup } from '@testing-library/react'
+import { cleanup, render } from '@testing-library/react'
 import * as matchers from '@testing-library/jest-dom/matchers'
+import * as Tooltip from "@radix-ui/react-tooltip"
 
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers)
@@ -76,5 +78,29 @@ vi.mock('@xterm/addon-fit', () => {
 vi.mock('@xterm/addon-web-links', () => {
   return {
     WebLinksAddon: vi.fn(),
+  }
+})
+
+// Re-export everything from RTL
+export * from '@testing-library/react'
+
+// Override render method
+vi.mock('@testing-library/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@testing-library/react')>()
+
+  // Define customRender inside the factory to avoid hoisting issues
+  const customRender = (ui: React.ReactElement, { wrapper: Wrapper, ...options }: any = {}) =>
+    actual.render(ui, {
+      wrapper: ({ children }) => (
+        <Tooltip.Provider delayDuration={0}>
+          {Wrapper ? <Wrapper>{children}</Wrapper> : children}
+        </Tooltip.Provider>
+      ),
+      ...options,
+    })
+
+  return {
+    ...actual,
+    render: customRender,
   }
 })

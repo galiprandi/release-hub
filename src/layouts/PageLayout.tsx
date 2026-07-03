@@ -249,30 +249,58 @@ export function PageLayout({
 									<React.Fragment key={index}>{action}</React.Fragment>
 								))}
 								{refreshFn && (
-									<button
-										onClick={refreshFn}
-										className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-										aria-label="Refrescar"
-										type="button"
-									>
-										<RefreshCw className="w-4 h-4" aria-hidden="true" />
-									</button>
+									<Tooltip.Root>
+										<Tooltip.Trigger asChild>
+											<button
+												onClick={refreshFn}
+												className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+												aria-label="Refrescar"
+												type="button"
+											>
+												<RefreshCw className="w-4 h-4" aria-hidden="true" />
+											</button>
+										</Tooltip.Trigger>
+										<Tooltip.Portal>
+											<Tooltip.Content
+												side="bottom"
+												sideOffset={10}
+												className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+											>
+												Refrescar
+												<Tooltip.Arrow className="fill-popover" />
+											</Tooltip.Content>
+										</Tooltip.Portal>
+									</Tooltip.Root>
 								)}
 								{themeSwitch && (
-									<button
-										onClick={() => setIsDark(!isDark)}
-										className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-										aria-label={
-											isDark ? "Activar modo claro" : "Activar modo oscuro"
-										}
-										type="button"
-									>
-										{isDark ? (
-											<Sun className="w-4 h-4" aria-hidden="true" />
-										) : (
-											<Moon className="w-4 h-4" aria-hidden="true" />
-										)}
-									</button>
+									<Tooltip.Root>
+										<Tooltip.Trigger asChild>
+											<button
+												onClick={() => setIsDark(!isDark)}
+												className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+												aria-label={
+													isDark ? "Activar modo claro" : "Activar modo oscuro"
+												}
+												type="button"
+											>
+												{isDark ? (
+													<Sun className="w-4 h-4" aria-hidden="true" />
+												) : (
+													<Moon className="w-4 h-4" aria-hidden="true" />
+												)}
+											</button>
+										</Tooltip.Trigger>
+										<Tooltip.Portal>
+											<Tooltip.Content
+												side="bottom"
+												sideOffset={10}
+												className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+											>
+												{isDark ? "Modo claro" : "Modo oscuro"}
+												<Tooltip.Arrow className="fill-popover" />
+											</Tooltip.Content>
+										</Tooltip.Portal>
+									</Tooltip.Root>
 								)}
 								<ScreenshotButton />
 							</div>
@@ -352,22 +380,20 @@ function NavIcon({
 	);
 
 	const contentWithTooltip = (
-		<Tooltip.Provider delayDuration={0}>
-			<Tooltip.Root>
-				<Tooltip.Trigger asChild>{buttonContent}</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="right"
-						sideOffset={10}
-						className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
-						role="tooltip"
-					>
-						{label}
-						<Tooltip.Arrow className="fill-popover" />
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
-		</Tooltip.Provider>
+		<Tooltip.Root>
+			<Tooltip.Trigger asChild>{buttonContent}</Tooltip.Trigger>
+			<Tooltip.Portal>
+				<Tooltip.Content
+					side="right"
+					sideOffset={10}
+					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+					role="tooltip"
+				>
+					{label}
+					<Tooltip.Arrow className="fill-popover" />
+				</Tooltip.Content>
+			</Tooltip.Portal>
+		</Tooltip.Root>
 	);
 
 	if (to) {
@@ -396,22 +422,20 @@ function FeedbackIcon() {
 	);
 
 	const contentWithTooltip = (
-		<Tooltip.Provider delayDuration={0}>
-			<Tooltip.Root>
-				<Tooltip.Trigger asChild>{buttonContent}</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="right"
-						sideOffset={10}
-						className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
-						role="tooltip"
-					>
-						Feedback
-						<Tooltip.Arrow className="fill-popover" />
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
-		</Tooltip.Provider>
+		<Tooltip.Root>
+			<Tooltip.Trigger asChild>{buttonContent}</Tooltip.Trigger>
+			<Tooltip.Portal>
+				<Tooltip.Content
+					side="right"
+					sideOffset={10}
+					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+					role="tooltip"
+				>
+					Feedback
+					<Tooltip.Arrow className="fill-popover" />
+				</Tooltip.Content>
+			</Tooltip.Portal>
+		</Tooltip.Root>
 	);
 
 	return (
@@ -457,22 +481,20 @@ function AIChatIcon() {
 	);
 
 	const contentWithTooltip = (
-		<Tooltip.Provider delayDuration={0}>
-			<Tooltip.Root>
-				<Tooltip.Trigger asChild>{buttonContent}</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="right"
-						sideOffset={10}
-						className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
-						role="tooltip"
-					>
-						Asistente AI
-						<Tooltip.Arrow className="fill-popover" />
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
-		</Tooltip.Provider>
+		<Tooltip.Root>
+			<Tooltip.Trigger asChild>{buttonContent}</Tooltip.Trigger>
+			<Tooltip.Portal>
+				<Tooltip.Content
+					side="right"
+					sideOffset={10}
+					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+					role="tooltip"
+				>
+					Asistente AI
+					<Tooltip.Arrow className="fill-popover" />
+				</Tooltip.Content>
+			</Tooltip.Portal>
+		</Tooltip.Root>
 	);
 
 	return (
@@ -519,8 +541,7 @@ function ScreenshotButton() {
 	};
 
 	return (
-		<Tooltip.Provider delayDuration={0}>
-			<Tooltip.Root>
+		<Tooltip.Root>
 				<Tooltip.Trigger asChild>
 					<button
 						onClick={handleCapture}
@@ -540,14 +561,13 @@ function ScreenshotButton() {
 					<Tooltip.Content
 						side="bottom"
 						sideOffset={10}
-						className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
+						className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
 					>
 						Tomar captura y preguntar
 						<Tooltip.Arrow className="fill-popover" />
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
-		</Tooltip.Provider>
 	);
 }
 
@@ -566,22 +586,20 @@ function SettingsIcon() {
 	);
 
 	const contentWithTooltip = (
-		<Tooltip.Provider delayDuration={0}>
-			<Tooltip.Root>
-				<Tooltip.Trigger asChild>{buttonContent}</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="right"
-						sideOffset={10}
-						className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
-						role="tooltip"
-					>
-						Configuración
-						<Tooltip.Arrow className="fill-popover" />
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
-		</Tooltip.Provider>
+		<Tooltip.Root>
+			<Tooltip.Trigger asChild>{buttonContent}</Tooltip.Trigger>
+			<Tooltip.Portal>
+				<Tooltip.Content
+					side="right"
+					sideOffset={10}
+					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+					role="tooltip"
+				>
+					Configuración
+					<Tooltip.Arrow className="fill-popover" />
+				</Tooltip.Content>
+			</Tooltip.Portal>
+		</Tooltip.Root>
 	);
 
 	return (
@@ -607,22 +625,20 @@ function TerminalIconModal() {
 	);
 
 	const contentWithTooltip = (
-		<Tooltip.Provider delayDuration={0}>
-			<Tooltip.Root>
-				<Tooltip.Trigger asChild>{buttonContent}</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="right"
-						sideOffset={10}
-						className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
-						role="tooltip"
-					>
-						Terminal
-						<Tooltip.Arrow className="fill-popover" />
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
-		</Tooltip.Provider>
+		<Tooltip.Root>
+			<Tooltip.Trigger asChild>{buttonContent}</Tooltip.Trigger>
+			<Tooltip.Portal>
+				<Tooltip.Content
+					side="right"
+					sideOffset={10}
+					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+					role="tooltip"
+				>
+					Terminal
+					<Tooltip.Arrow className="fill-popover" />
+				</Tooltip.Content>
+			</Tooltip.Portal>
+		</Tooltip.Root>
 	);
 
 	return (

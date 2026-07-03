@@ -2,6 +2,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import type { ReactNode } from "react";
 import { cachePolicies } from "@/lib/queryKeys";
 
@@ -65,8 +66,10 @@ export function AppProviders({ children }: AppProvidersProps) {
 				},
 			}}
 		>
-			{children}
-			<ReactQueryDevtools />
+			<Tooltip.Provider delayDuration={0}>
+				{children}
+				<ReactQueryDevtools />
+			</Tooltip.Provider>
 		</PersistQueryClientProvider>
 	);
 }

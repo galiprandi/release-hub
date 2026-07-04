@@ -81,8 +81,9 @@ export function ItemProjectSelectionDialog({
 							return (
 								<button
 									key={project.id}
+									type="button"
 									onClick={() => toggleInProject(project.id)}
-									className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-left group focus:outline-none focus:ring-2 focus:ring-primary/20 ${
+									className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 ${
 										active
 											? "bg-primary/5 border-primary/20 hover:bg-primary/10 shadow-[0_0_10px_rgba(var(--primary),0.05)]"
 											: "bg-muted/10 border-border/20 hover:bg-muted/20"
@@ -122,8 +123,9 @@ export function ItemProjectSelectionDialog({
 				{/* Quick Create Section */}
 				{!isCreating ? (
 					<button
+						type="button"
 						onClick={() => setIsCreating(true)}
-						className="w-full flex items-center justify-center gap-2 p-3 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/5 border border-dashed border-primary/30 rounded-xl hover:bg-primary/10 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+						className="w-full flex items-center justify-center gap-2 p-3 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/5 border border-dashed border-primary/30 rounded-xl hover:bg-primary/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
 					>
 						<FolderPlus className="w-4 h-4" />
 						Nuevo Proyecto
@@ -139,19 +141,21 @@ export function ItemProjectSelectionDialog({
 							value={newName}
 							onChange={(e) => setNewName(e.target.value)}
 							placeholder="Nombre del proyecto..."
-							className="flex-1 bg-transparent border-none text-[10px] font-bold uppercase tracking-wider focus:ring-0 placeholder:text-muted-foreground/40 ml-2"
+							className="flex-1 bg-transparent border-none text-[10px] font-bold uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-md placeholder:text-muted-foreground/40 ml-2"
 						/>
 						<button
 							type="submit"
 							disabled={!newName.trim()}
-							className="p-1.5 bg-primary text-primary-foreground rounded-lg disabled:opacity-50 transition-all"
+							aria-label="Guardar proyecto"
+							className="p-1.5 bg-primary text-primary-foreground rounded-lg disabled:opacity-50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
 						>
 							<Save className="w-3.5 h-3.5" />
 						</button>
 						<button
 							type="button"
 							onClick={() => setIsCreating(false)}
-							className="p-1.5 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all"
+							aria-label="Cancelar creación"
+							className="p-1.5 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
 						>
 							<X className="w-3.5 h-3.5" />
 						</button>
@@ -160,8 +164,9 @@ export function ItemProjectSelectionDialog({
 
 				<div className="pt-2 border-t border-border/20 flex justify-end">
 					<button
+						type="button"
 						onClick={() => onOpenChange(false)}
-						className="px-6 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+						className="px-6 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
 					>
 						Listo
 					</button>

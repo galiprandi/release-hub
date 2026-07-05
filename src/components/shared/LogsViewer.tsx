@@ -260,10 +260,23 @@ export function LogsViewer({
 	const headerExtra = (
 		<div className="flex items-center gap-0">
 			{!isLoading && logs && (
-				<span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-success bg-success/10 rounded">
-					<span className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
-					Live
-				</span>
+				<Tooltip.Root>
+					<Tooltip.Trigger asChild>
+						<span className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-success bg-success/10 rounded-md cursor-default">
+							<span className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
+							Live
+						</span>
+					</Tooltip.Trigger>
+					<Tooltip.Portal>
+						<Tooltip.Content
+							className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+							sideOffset={5}
+						>
+							Conexión en vivo activa
+							<Tooltip.Arrow className="fill-popover" />
+						</Tooltip.Content>
+					</Tooltip.Portal>
+				</Tooltip.Root>
 			)}
 			<Tooltip.Root>
 				<Tooltip.Trigger asChild>
@@ -271,7 +284,7 @@ export function LogsViewer({
 						type="button"
 						onClick={handleSummarizeWithAI}
 						disabled={isGenerating || availability !== "available" || !currentLogs}
-						className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+						className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-ai bg-ai/10 border border-ai/20 hover:bg-ai/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
 					>
 						{isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
 						{isGenerating ? getStatusMessage : "Resumir"}
@@ -279,10 +292,11 @@ export function LogsViewer({
 				</Tooltip.Trigger>
 				<Tooltip.Portal>
 					<Tooltip.Content
-						className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+						className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
 						sideOffset={5}
 					>
-						Resumir logs con IA
+						RESUMIR LOGS CON IA
+						<Tooltip.Arrow className="fill-popover" />
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -293,7 +307,7 @@ export function LogsViewer({
 						<select
 							value={logLevelFilter}
 							onChange={(e) => setLogLevelFilter(e.target.value as "all" | "ERROR" | "WARN" | "INFO" | "DEBUG")}
-							className="bg-background border rounded px-2 py-1 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+							className="bg-muted/40 border border-border/60 rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
 							aria-label="Filtrar por nivel de log"
 						>
 							<option value="all">Todos</option>
@@ -305,10 +319,11 @@ export function LogsViewer({
 					</Tooltip.Trigger>
 					<Tooltip.Portal>
 						<Tooltip.Content
-							className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+							className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
 							sideOffset={5}
 						>
-							Filtrar por nivel de log
+							FILTRAR POR NIVEL DE LOG
+							<Tooltip.Arrow className="fill-popover" />
 						</Tooltip.Content>
 					</Tooltip.Portal>
 				</Tooltip.Root>
@@ -324,18 +339,19 @@ export function LogsViewer({
 									setFilter(e.target.value);
 									setCurrentMatchIndex(0);
 								}}
-								placeholder="Buscar (Cmd+F)"
+								placeholder="BUSCAR (CMD+F)"
 								aria-label="Buscar logs"
-								className="pl-7 pr-2 py-1 text-sm bg-background border rounded w-48 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+								className="pl-7 pr-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-muted/40 border border-border/60 rounded-lg w-48 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 placeholder:text-muted-foreground/40"
 							/>
 						</div>
 					</Tooltip.Trigger>
 					<Tooltip.Portal>
 						<Tooltip.Content
-							className="bg-popover text-popover-foreground border px-2 py-1 text-xs rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+							className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
 							sideOffset={5}
 						>
-							Buscar logs por texto
+							BUSCAR LOGS POR TEXTO
+							<Tooltip.Arrow className="fill-popover" />
 						</Tooltip.Content>
 					</Tooltip.Portal>
 				</Tooltip.Root>
@@ -462,7 +478,7 @@ export function LogsViewer({
 							<select
 								value={selectedResourceId || resources[0].id}
 								onChange={(e) => onResourceChange?.(e.target.value)}
-								className="bg-background border rounded px-2 py-1 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm font-normal"
+									className="bg-muted/40 border border-border/60 rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
 								aria-label="Seleccionar recurso"
 							>
 								{resources.map((resource) => (
@@ -500,7 +516,7 @@ export function LogsViewer({
 						<select
 							value={selectedResourceId || resources[0].id}
 							onChange={(e) => onResourceChange?.(e.target.value)}
-							className="bg-background border rounded px-2 py-1 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-sm"
+							className="bg-muted/40 border border-border/60 rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
 							aria-label="Seleccionar recurso"
 						>
 							{resources.map((resource) => (

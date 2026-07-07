@@ -26,6 +26,7 @@ import { Route as GithubSetupRouteImport } from './routes/github/setup'
 import { Route as FetcherSetupRouteImport } from './routes/fetcher/setup'
 import { Route as DockerSetupRouteImport } from './routes/docker/setup'
 import { Route as DevSekiPreviewRouteImport } from './routes/dev/seki-preview'
+import { Route as DevPulsarPreviewRouteImport } from './routes/dev/pulsar-preview'
 import { Route as GithubOrgRepoRouteImport } from './routes/github/$org.$repo'
 
 const TerminalRoute = TerminalRouteImport.update({
@@ -113,6 +114,11 @@ const DevSekiPreviewRoute = DevSekiPreviewRouteImport.update({
   path: '/dev/seki-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DevPulsarPreviewRoute = DevPulsarPreviewRouteImport.update({
+  id: '/dev/pulsar-preview',
+  path: '/dev/pulsar-preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GithubOrgRepoRoute = GithubOrgRepoRouteImport.update({
   id: '/$org/$repo',
   path: '/$org/$repo',
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/github': typeof GithubRouteWithChildren
   '/kubernetes': typeof KubernetesRouteWithChildren
   '/terminal': typeof TerminalRoute
+  '/dev/pulsar-preview': typeof DevPulsarPreviewRoute
   '/dev/seki-preview': typeof DevSekiPreviewRoute
   '/docker/setup': typeof DockerSetupRoute
   '/fetcher/setup': typeof FetcherSetupRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/diff': typeof DiffRoute
   '/terminal': typeof TerminalRoute
+  '/dev/pulsar-preview': typeof DevPulsarPreviewRoute
   '/dev/seki-preview': typeof DevSekiPreviewRoute
   '/docker/setup': typeof DockerSetupRoute
   '/fetcher/setup': typeof FetcherSetupRoute
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/github': typeof GithubRouteWithChildren
   '/kubernetes': typeof KubernetesRouteWithChildren
   '/terminal': typeof TerminalRoute
+  '/dev/pulsar-preview': typeof DevPulsarPreviewRoute
   '/dev/seki-preview': typeof DevSekiPreviewRoute
   '/docker/setup': typeof DockerSetupRoute
   '/fetcher/setup': typeof FetcherSetupRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/github'
     | '/kubernetes'
     | '/terminal'
+    | '/dev/pulsar-preview'
     | '/dev/seki-preview'
     | '/docker/setup'
     | '/fetcher/setup'
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
   to:
     | '/diff'
     | '/terminal'
+    | '/dev/pulsar-preview'
     | '/dev/seki-preview'
     | '/docker/setup'
     | '/fetcher/setup'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/github'
     | '/kubernetes'
     | '/terminal'
+    | '/dev/pulsar-preview'
     | '/dev/seki-preview'
     | '/docker/setup'
     | '/fetcher/setup'
@@ -242,6 +254,7 @@ export interface RootRouteChildren {
   GithubRoute: typeof GithubRouteWithChildren
   KubernetesRoute: typeof KubernetesRouteWithChildren
   TerminalRoute: typeof TerminalRoute
+  DevPulsarPreviewRoute: typeof DevPulsarPreviewRoute
   DevSekiPreviewRoute: typeof DevSekiPreviewRoute
   HealthIndexRoute: typeof HealthIndexRoute
   NovedadesIndexRoute: typeof NovedadesIndexRoute
@@ -368,6 +381,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevSekiPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dev/pulsar-preview': {
+      id: '/dev/pulsar-preview'
+      path: '/dev/pulsar-preview'
+      fullPath: '/dev/pulsar-preview'
+      preLoaderRoute: typeof DevPulsarPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/github/$org/$repo': {
       id: '/github/$org/$repo'
       path: '/$org/$repo'
@@ -440,6 +460,7 @@ const rootRouteChildren: RootRouteChildren = {
   GithubRoute: GithubRouteWithChildren,
   KubernetesRoute: KubernetesRouteWithChildren,
   TerminalRoute: TerminalRoute,
+  DevPulsarPreviewRoute: DevPulsarPreviewRoute,
   DevSekiPreviewRoute: DevSekiPreviewRoute,
   HealthIndexRoute: HealthIndexRoute,
   NovedadesIndexRoute: NovedadesIndexRoute,

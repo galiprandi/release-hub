@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es";
 import { SekiPipelineMonitor } from "@/plugins/pipeline/seki/components";
+import { PulsarBuildMonitor } from "@/plugins/pipeline/pulsar/components";
 import { StageCommitsTable } from "@/github/components/StageCommitsTable";
 import { PromoteDialog } from "@/github/components/PromoteDialog";
 import { ForceRedeployDialog } from "@/github/components/ForceRedeployDialog";
@@ -144,6 +145,10 @@ function ProductIndex() {
 			refreshFn={handleRefetchPipeline}
 		>
 			<div className="space-y-4 mb-4">
+				<PulsarBuildMonitor
+					org={org}
+					repo={repo}
+				/>
 				<SekiPipelineMonitor
 					org={org}
 					repo={repo}

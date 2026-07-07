@@ -250,6 +250,92 @@ Test files (alongside source code):
 - **June 2026**: Separated Seki from the unified pipeline architecture
   (`src/pipeline-core/`). Pulsar/GitHub Actions adapter eliminated.
 
+## Pulsar Build Monitor Architecture
+
+**Created**: July 2026
+
+### Overview
+
+Pulsar es el sistema de despliegue que reemplaza a Seki. El monitor visualiza
+el OK/error al crear imágenes Docker del workflow `pulsar-nx-build.yml`.
+Coexiste con SekiPipelineMonitor: se autodetecta si el repo tiene el workflow.
+
+**Location**: `src/plugins/pipeline/pulsar/`
+
+### Detección
+
+Un repo es "Pulsar" si tiene el workflow `.github/workflows/pulsar-nx-build.yml`.
+Se detecta via `gh api repos/:org/:repo/actions/workflows` y se cachea con
+`staleTime` de 5 min (los workflows cambian raramente).
+
+### Ambiente
+
+- **Tag push** (`v*.*.*` en `head_branch`) → **production**
+- **Commit push** (`main`/`staging` en `head_branch`) → **staging**
+
+### API Calls (via `gh api` + `runCommand`)
+
+1. `GET /repos/:org/:repo/actions/workflows` — detectar Pulsar + obtener workflow ID
+2. `GET /repos/:org/:repo/actions/workflows/:id/runs?per_page=10` — últimos runs
+3. `GET /repos/:org/:repo/actions/runs/:runId/jobs` — jobs del run más reciente por ambiente
+
+Solo se fetchean jobs del run más reciente por ambiente (no de todos los runs)
+para minimizar API calls y rate limiting.
+
+### Architecture Components
+
+#### 1. Types (`src/plugins/pipeline/pulsar/types.ts`)
+- `PulsarBuildState` - IDLE, RUNNING, COMPLETED, FAILED, CANCELLED, SKIPPED
+- `PulsarImageJob` - Imagen Docker (app, appType, state, steps, errorStep)
+- `PulsarBuildData` - Data de un run (ref, refType, environment, images, fallbackJob)
+- `PulsarBuildsByEnv` - staging + production
+
+#### 2. Adapter (`src/plugins/pipeline/pulsar/adapter.ts`)
+**pulsarAdapter**:
+- `isPulsarRepo(org, repo)` - verifica si tiene el workflow
+- `getWorkflowId(org, repo)` - obtiene el ID del workflow
+- `fetchLatestBuilds(org, repo)` - obtiene builds separados por ambiente
+- `fetchJobs(org, repo, runId)` - obtiene jobs de un run
+
+#### 3. Hook (`src/plugins/pipeline/pulsar/hooks/usePulsarBuilds.ts`)
+- Query 1: detección de Pulsar (staleTime 5 min)
+- Query 2: builds (solo si es Pulsar repo)
+- Smart polling: 15s cuando hay runs `in_progress`
+
+#### 4. Component (`src/plugins/pipeline/pulsar/components/PulsarBuildMonitor.tsx`)
+- **PulsarBuildMonitor** - Componente productivo, silencioso total (null si no es Pulsar)
+- **PulsarBuildMonitorData** - Variante para sandbox con data directa
+- Image chips: verde=OK, rojo=FAILED, azul=building, gris=skipped
+- Click en chip fallida → expande panel con steps + link a GitHub Actions
+- Fallback: si todas las imágenes están skipped, muestra el job no-imagen fallido
+
+### Usage
+
+```typescript
+import { PulsarBuildMonitor } from '@/plugins/pipeline/pulsar/components'
+
+function MyComponent() {
+  return (
+    <PulsarBuildMonitor org="Cencosud-Cencommerce" repo="coe-utils-components" />
+  )
+  // Renders staging + production cards if repo uses Pulsar.
+  // Renders null if repo doesn't have pulsar-nx-build.yml.
+}
+```
+
+### Coexistence with Seki
+
+En `/github/$org.$repo`, PulsarBuildMonitor se renderiza ARRIBA de SekiPipelineMonitor.
+Como Pulsar renderiza null si el repo no tiene el workflow, Seki sigue apareciendo
+para repos no-Pulsar. Para repos Pulsar, ambos monitores pueden mostrarse
+(esperable durante la transición).
+
+### Testing
+
+- `src/plugins/pipeline/pulsar/types.test.ts`
+- `src/plugins/pipeline/pulsar/adapter.test.ts`
+- `src/plugins/pipeline/pulsar/utils.test.ts`
+
 ## Workflow Preferences
 
 **Updated**: April 2026

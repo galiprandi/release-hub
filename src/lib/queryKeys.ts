@@ -445,12 +445,12 @@ export const cachePolicies: Record<QueryKeyDomain, CachePolicy> = {
 		retry: 0, // No reintentar si falla
 	},
 
-	// GIT: Cachear medio, no persistir
+	// GIT: Cachear corto, refrescar al volver a la tab
 	git: {
-		staleTime: 5 * 60 * 1000, // 5 minutos
-		gcTime: 10 * 60 * 1000, // 10 minutos
+		staleTime: 60 * 1000, // 1 minuto
+		gcTime: 5 * 60 * 1000, // 5 minutos
 		persistInLocalStorage: false, // No persistir
-		refetchOnWindowFocus: false,
+		refetchOnWindowFocus: true, // Refrescar al volver a la tab
 		refetchInterval: false,
 		retry: 2,
 	},

@@ -9,7 +9,7 @@ import {
 	useRouterState,
 	useSearch,
 } from "@tanstack/react-router";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQueryClient } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import {
@@ -23,6 +23,7 @@ import {
 	GitPullRequestCreateArrow,
 	Loader2,
 	Play,
+	RefreshCw,
 	Search,
 	Settings2,
 	Star,
@@ -77,6 +78,17 @@ function Dashboard() {
 	const { location } = useRouterState();
 	const isIndexRoute = location.pathname === "/github";
 	const [isManageProjectsOpen, setIsManageProjectsOpen] = useState(false);
+	const queryClient = useQueryClient();
+	const [isRefreshing, setIsRefreshing] = useState(false);
+
+	const handleRefresh = useCallback(() => {
+		setIsRefreshing(true);
+		queryClient.invalidateQueries({
+			queryKey: ["git", "dashboard-details"],
+			exact: false,
+		});
+		setTimeout(() => setIsRefreshing(false), 1000);
+	}, [queryClient]);
 
 	const [collapsedOrgs, setCollapsedOrgs] = useState<Record<string, boolean>>(
 		{},
@@ -215,6 +227,19 @@ function Dashboard() {
 				),
 			}}
 			actions={[
+				<ActionButton
+					key="refresh"
+					action={{
+						icon: RefreshCw,
+						label: "Actualizar",
+						color: "default",
+					}}
+					showLabel={true}
+					onClick={handleRefresh}
+					size="md"
+					className="bg-muted/20 hover:bg-muted/30"
+					disabled={isRefreshing}
+				/>,
 				<ActionButton
 					key="manage-projects"
 					action={{

@@ -501,7 +501,7 @@ function ReposTable({
 									}
 								}
 							}
-							defaultBranchRef {
+							ref(qualifiedName: "refs/heads/main") {
 								target {
 									... on Commit {
 										history(first: 10) {
@@ -536,7 +536,7 @@ function ReposTable({
 				const data = JSON.parse(gqlRes.stdout).data.repository;
 				if (!data) throw new Error("Repository not found");
 
-				const rawCommits = (data.defaultBranchRef?.target?.history?.nodes ||
+				const rawCommits = (data.ref?.target?.history?.nodes ||
 					[]) as Array<{
 					oid: string;
 					message: string;

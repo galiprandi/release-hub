@@ -190,8 +190,8 @@ fi
 
 # 6. Decide: restart or just open browser
 if is_port_in_use; then
-    if [ "$WAS_STALE" = true ]; then
-        # Build was updated → must restart server to serve new files
+    if [ "$WAS_STALE" = true ] || [ "$PULLED_CHANGES" = true ]; then
+        # Build was updated or code was pulled → must restart server to serve new files
         log_info "Restarting server to serve updated build..."
         kill_port
         echo "⚡ Starting preview server..."

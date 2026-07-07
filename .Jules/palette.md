@@ -13,3 +13,7 @@
 ## 2025-05-22 - [AI and High-Density Header Standard]
 **Learning:** AI-driven actions (like "Resumir con IA") must use semantic `ai` tokens (`text-ai`, `bg-ai/10`) and `rounded-lg` geometry to distinguish them from standard operations. High-density headers (e.g., `LogsViewer`) require consistent uppercase labels and `rounded-md` geometry for status indicators (e.g., "Live").
 **Action:** Standardize all AI buttons with `text-ai` and `bg-ai/10`. Ensure all header indicators and tooltips in high-density components use uppercase tracking-wider typography and appropriate Radix UI Tooltip Arrows.
+
+## 2026-07-07 - [Sensitive Input Visibility]
+**Learning:** Sensitive configuration fields (tokens, webhooks) in administrative dialogs should utilize show/hide visibility toggles. This balances security/privacy with the need for user verification during entry.
+**Action:** Always wrap sensitive inputs in a relative container with an absolute-positioned toggle button (Eye/EyeOff icons). Ensure the high-density standard (bg-muted/40) is applied to these inputs for visual consistency.

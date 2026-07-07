@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import 'vitest-canvas-mock'
 import React from 'react'
 import { expect, afterEach, vi } from 'vitest'
-import { cleanup, render } from '@testing-library/react'
+import { cleanup } from '@testing-library/react'
 import * as matchers from '@testing-library/jest-dom/matchers'
 import * as Tooltip from "@radix-ui/react-tooltip"
 

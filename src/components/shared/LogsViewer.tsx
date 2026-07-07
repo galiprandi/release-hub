@@ -341,8 +341,22 @@ export function LogsViewer({
 								}}
 								placeholder="BUSCAR (CMD+F)"
 								aria-label="Buscar logs"
-								className="pl-7 pr-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-muted/40 border border-border/60 rounded-lg w-48 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 placeholder:text-muted-foreground/40"
+								className="pl-7 pr-8 py-1 text-[10px] font-bold uppercase tracking-wider bg-muted/40 border border-border/60 rounded-lg w-48 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 placeholder:text-muted-foreground/40"
 							/>
+							{filter && (
+								<button
+									type="button"
+									onClick={() => {
+										setFilter("");
+										setCurrentMatchIndex(0);
+										searchInputRef.current?.focus();
+									}}
+									className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+									aria-label="Limpiar búsqueda"
+								>
+									<X className="w-3 h-3" />
+								</button>
+							)}
 						</div>
 					</Tooltip.Trigger>
 					<Tooltip.Portal>

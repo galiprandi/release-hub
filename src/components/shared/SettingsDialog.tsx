@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import * as Dialog from "@radix-ui/react-dialog"
-import { Settings, Trash2, Save, RefreshCw } from "lucide-react"
+import { Settings, Trash2, Save, RefreshCw, Eye, EyeOff } from "lucide-react"
 import { useSettings } from "@/hooks/useSettings"
 import { useToken } from "@/hooks/useToken"
 import { BaseDialog } from "@/components/ui/BaseDialog"
@@ -15,6 +15,8 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 	const setOpen = onOpenChange || setInternalOpen
 	const [sekiTokenInput, setSekiTokenInput] = useState("")
 	const [discordWebhookInput, setDiscordWebhookInput] = useState("")
+	const [showSekiToken, setShowSekiToken] = useState(false)
+	const [showDiscordWebhook, setShowDiscordWebhook] = useState(false)
 	const [isClearingCache, setIsClearingCache] = useState(false)
 
 	const handleSaveSekiToken = () => {
@@ -59,6 +61,8 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 			// Pre-fill inputs with current values
 			setSekiTokenInput("")
 			setDiscordWebhookInput("")
+			setShowSekiToken(false)
+			setShowDiscordWebhook(false)
 		}
 	}
 
@@ -139,13 +143,23 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<div className="space-y-1.5">
 									<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Token JWT</label>
 									<div className="flex gap-2">
-										<input
-											type="password"
-											value={sekiTokenInput}
-											onChange={(e) => setSekiTokenInput(e.target.value)}
-											placeholder="eyJhbGciOiJSUzUxMiIsInR5cCI6IkJlYXJlciJ9..."
-											className="flex-1 px-3 py-2 text-xs bg-background border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-										/>
+										<div className="relative flex-1">
+											<input
+												type={showSekiToken ? "text" : "password"}
+												value={sekiTokenInput}
+												onChange={(e) => setSekiTokenInput(e.target.value)}
+												placeholder="eyJhbGciOiJSUzUxMiIsInR5cCI6IkJlYXJlciJ9..."
+												className="w-full px-3 py-2 pr-10 text-xs bg-muted/40 border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+											/>
+											<button
+												type="button"
+												onClick={() => setShowSekiToken(!showSekiToken)}
+												className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground/60 hover:text-foreground transition-colors"
+												aria-label={showSekiToken ? "Ocultar token" : "Mostrar token"}
+											>
+												{showSekiToken ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+											</button>
+										</div>
 										<button
 											type="button"
 											onClick={handleSaveSekiToken}
@@ -198,13 +212,23 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 							<div className="space-y-1.5">
 								<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">URL del Webhook</label>
 								<div className="flex gap-2">
-									<input
-										type="text"
-										value={discordWebhookInput}
-										onChange={(e) => setDiscordWebhookInput(e.target.value)}
-										placeholder="https://discord.com/api/webhooks/..."
-										className="flex-1 px-3 py-2 text-xs bg-background border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-									/>
+									<div className="relative flex-1">
+										<input
+											type={showDiscordWebhook ? "text" : "password"}
+											value={discordWebhookInput}
+											onChange={(e) => setDiscordWebhookInput(e.target.value)}
+											placeholder="https://discord.com/api/webhooks/..."
+											className="w-full px-3 py-2 pr-10 text-xs bg-muted/40 border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+										/>
+										<button
+											type="button"
+											onClick={() => setShowDiscordWebhook(!showDiscordWebhook)}
+											className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground/60 hover:text-foreground transition-colors"
+											aria-label={showDiscordWebhook ? "Ocultar webhook" : "Mostrar webhook"}
+										>
+											{showDiscordWebhook ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+										</button>
+									</div>
 									<button
 										type="button"
 										onClick={handleSaveDiscordWebhook}

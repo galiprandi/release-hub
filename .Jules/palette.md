@@ -17,3 +17,7 @@
 ## 2026-07-07 - [Sensitive Input Visibility]
 **Learning:** Sensitive configuration fields (tokens, webhooks) in administrative dialogs should utilize show/hide visibility toggles. This balances security/privacy with the need for user verification during entry.
 **Action:** Always wrap sensitive inputs in a relative container with an absolute-positioned toggle button (Eye/EyeOff icons). Ensure the high-density standard (bg-muted/40) is applied to these inputs for visual consistency.
+
+## 2026-07-08 - [Form Label Accessibility Association]
+**Learning:** Inputs in administrative forms (like `SettingsDialog`) often lack explicit `id` and `htmlFor` association, hindering screen reader support and reducing click targets for users.
+**Action:** Always ensure every form label has a `htmlFor` attribute that matches the `id` of its corresponding input or textarea. This is a non-negotiable standard for accessibility in this repository.

@@ -141,10 +141,11 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 						) : (
 							<div className="space-y-3">
 								<div className="space-y-1.5">
-									<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Token JWT</label>
+									<label htmlFor="seki-token" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Token JWT</label>
 									<div className="flex gap-2">
 										<div className="relative flex-1">
 											<input
+												id="seki-token"
 												type={showSekiToken ? "text" : "password"}
 												value={sekiTokenInput}
 												onChange={(e) => setSekiTokenInput(e.target.value)}
@@ -210,10 +211,11 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 							</div>
 						) : (
 							<div className="space-y-1.5">
-								<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">URL del Webhook</label>
+								<label htmlFor="discord-webhook" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">URL del Webhook</label>
 								<div className="flex gap-2">
 									<div className="relative flex-1">
 										<input
+											id="discord-webhook"
 											type={showDiscordWebhook ? "text" : "password"}
 											value={discordWebhookInput}
 											onChange={(e) => setDiscordWebhookInput(e.target.value)}

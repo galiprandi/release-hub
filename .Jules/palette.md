@@ -21,3 +21,7 @@
 ## 2026-07-08 - [Form Label Accessibility Association]
 **Learning:** Inputs in administrative forms (like `SettingsDialog`) often lack explicit `id` and `htmlFor` association, hindering screen reader support and reducing click targets for users.
 **Action:** Always ensure every form label has a `htmlFor` attribute that matches the `id` of its corresponding input or textarea. This is a non-negotiable standard for accessibility in this repository.
+
+## 2026-07-09 - [Accessibility vs. Density Balance]
+**Learning:** Over-applying high-density typography (text-[10px]) to primary interactive elements like search inputs can lead to accessibility regressions. While metadata benefit from high density, inputs should remain at text-sm (14px) for legibility.
+**Action:** Use text-[10px] strictly for labels, badges, and secondary metadata. Keep primary inputs and main action labels at text-sm or use standardized ActionButton components to maintain accessible hit targets.

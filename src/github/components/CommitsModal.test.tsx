@@ -104,7 +104,7 @@ describe("CommitsModal", () => {
 				prodCommitHash="prod-hash"
 			/>
 		)
-		const input = screen.getByPlaceholderText(/filtrar commits/i)
+		const input = screen.getByPlaceholderText(/FILTRAR COMMITS/i)
 		fireEvent.change(input, { target: { value: "Commit 1" } })
 
 		expect(screen.getByText("Commit 1")).toBeInTheDocument()
@@ -139,7 +139,7 @@ describe("CommitsModal", () => {
 			/>
 		)
 
-		const summarizeButton = screen.getByRole("button", { name: /resumir con ia/i })
+		const summarizeButton = screen.getByRole("button", { name: /resumir/i })
 		fireEvent.click(summarizeButton)
 
 		// In the actual component, summarize is called within handleSummarizeWithAI

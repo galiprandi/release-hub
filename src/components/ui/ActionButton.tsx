@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react"
 import * as Tooltip from "@radix-ui/react-tooltip"
 export { ACTION_DEFINITIONS } from "./actionDefinitions"
 
-export type ActionColor = "default" | "success" | "destructive" | "primary" | "warning" | "info"
+export type ActionColor = "default" | "success" | "destructive" | "primary" | "warning" | "info" | "ai"
 
 export interface ActionDefinition {
 	icon: LucideIcon
@@ -30,6 +30,7 @@ const colorClasses: Record<ActionColor, string> = {
 	primary: "text-primary hover:bg-primary/20",
 	warning: "text-warning hover:bg-warning/20",
 	info: "text-info hover:bg-info/20",
+	ai: "text-ai bg-ai/10 border border-ai/20 hover:bg-ai/20",
 }
 
 const sizeClasses = {

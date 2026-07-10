@@ -5,6 +5,8 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import { useAISummarize } from "@galiprandi/react-tools";
 import { AISummaryCard } from "@/components/shared/AISummaryCard";
 import { BaseDialog } from "@/components/ui/BaseDialog";
+import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
+import { CopyButton } from "@/components/shared/CopyButton";
 
 interface CommitsModalProps {
 	isOpen: boolean;
@@ -175,28 +177,14 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 						</Tooltip.Portal>
 					</Tooltip.Root>
 
-					<Tooltip.Root>
-						<Tooltip.Trigger asChild>
-							<button
-								type="button"
-								onClick={handleSummarizeWithAI}
-								disabled={isGenerating || availability !== "available" || pendingCommits.length === 0}
-								className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-ai bg-ai/10 hover:bg-ai/20 rounded-lg border border-ai/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
-							>
-								{isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-								{isGenerating ? getStatusMessage : "Resumir"}
-							</button>
-						</Tooltip.Trigger>
-						<Tooltip.Portal>
-							<Tooltip.Content
-								className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md z-[10000]"
-								sideOffset={5}
-							>
-								RESUMIR CAMBIOS CON IA
-								<Tooltip.Arrow className="fill-popover" />
-							</Tooltip.Content>
-						</Tooltip.Portal>
-					</Tooltip.Root>
+					<ActionButton
+						action={ACTION_DEFINITIONS.aiSummarize}
+						onClick={handleSummarizeWithAI}
+						disabled={availability !== "available" || pendingCommits.length === 0}
+						loading={isGenerating}
+						showLabel
+						className="min-w-[100px]"
+					/>
 				</div>
 
 				{/* Contenido scrolleable */}
@@ -260,9 +248,15 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 													)}
 												</div>
 												<div className="flex items-center gap-3 mt-2 text-[10px] text-muted-foreground">
-													<span className="font-mono bg-muted px-1.5 py-0.5 rounded uppercase tracking-tighter">
-														{commit.shortHash}
-													</span>
+													<div className="flex items-center gap-1 group/hash">
+														<span className="font-mono bg-muted px-1.5 py-0.5 rounded uppercase tracking-tighter">
+															{commit.shortHash}
+														</span>
+														<CopyButton
+															text={commit.hash}
+															className="opacity-0 group-hover/hash:opacity-100 focus-visible:opacity-100 p-0.5"
+														/>
+													</div>
 													<span>•</span>
 													<span className="font-medium text-foreground/70">{commit.author}</span>
 													<span>•</span>

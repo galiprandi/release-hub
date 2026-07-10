@@ -79,8 +79,8 @@ export const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
 	info: { icon: Activity, label: "Información", color: "info" },
 
 	// AI actions
-	aiSummarize: { icon: Sparkles, label: "Resumir con IA", color: "primary" },
-	aiGenerate: { icon: Sparkles, label: "Generar con IA", color: "primary" },
+	aiSummarize: { icon: Sparkles, label: "Resumir con IA", color: "ai" },
+	aiGenerate: { icon: Sparkles, label: "Generar con IA", color: "ai" },
 
 	// Navigation actions
 	expand: { icon: ChevronDown, label: "Expandir", color: "default" },

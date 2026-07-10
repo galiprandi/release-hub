@@ -17,7 +17,7 @@
 - **SetupCard**: Unified component for onboarding and configuration states. Features a dual-state design for "Installed" (success tokens, high-density metadata) and "Missing" (destructive/warning tokens, collapsible command containers). Uses `text-[10px] font-bold uppercase tracking-wider` for labels.
 - **Unified Project Management Architecture**: Replaced module-specific dialogs with `ItemProjectSelectionDialog.tsx` in `src/components/shared/`. It supports both `repo` and `deployment` types, utilizes V2 typography and `rounded-xl` geometry, and includes a quick-create project action to minimize friction.
 - **StatusCard**: Loading/error/offline states.
-- **ActionButton**: Iconographic with tooltip.
+- **ActionButton**: Iconographic with tooltip. Supports an `ai` color variant with semantic tokens (`text-ai bg-ai/10 border border-ai/20 hover:bg-ai/20`).
 - **AI Chat Bubble**: High-density typography with `rounded-xl` geometry. User messages utilize `shadow-[0_0_15px_rgba(var(--primary),0.1)]`. Assistant messages use `bg-ai/5` and `border-ai/10` for subtle technical contrast.
 - **Feedback Stepper**: Technical step indicators with `shadow-[0_0_15px_rgba(var(--primary),0.2)]` for active states and `border-border/60` for inactive states.
 - **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering.

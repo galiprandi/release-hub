@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Search, GitCommit, Sparkles, Loader2, ChevronDown, ChevronRight, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { useAISummarize } from "@galiprandi/react-tools";
 import { AISummaryCard } from "@/components/shared/AISummaryCard";
 import { BaseDialog } from "@/components/ui/BaseDialog";
@@ -139,36 +140,63 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 			<div className="flex flex-col h-full overflow-hidden">
 				{/* Controles superiores */}
 				<div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
-					<div className="relative flex-1 max-w-sm">
-						<Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-						<input
-							type="text"
-							value={filter}
-							onChange={(e) => setFilter(e.target.value)}
-							placeholder="Filtrar commits..."
-							aria-label="Filtrar commits"
-							className="w-full pl-9 pr-10 py-2 text-sm bg-muted/40 border border-border/60 rounded-lg placeholder:text-muted-foreground/40 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
-						/>
-						{filter && (
+					<Tooltip.Root>
+						<Tooltip.Trigger asChild>
+							<div className="relative flex-1 max-w-sm">
+								<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+								<input
+									type="text"
+									value={filter}
+									onChange={(e) => setFilter(e.target.value)}
+									placeholder="FILTRAR COMMITS"
+									aria-label="Filtrar commits"
+									className="w-full pl-9 pr-10 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted/40 border border-border/60 rounded-lg placeholder:text-muted-foreground/40 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
+								/>
+								{filter && (
+									<button
+										type="button"
+										onClick={() => setFilter("")}
+										className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+										aria-label="Limpiar filtro"
+									>
+										<X className="w-3 h-3" />
+									</button>
+								)}
+							</div>
+						</Tooltip.Trigger>
+						<Tooltip.Portal>
+							<Tooltip.Content
+								className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md z-[10000]"
+								sideOffset={5}
+							>
+								FILTRAR COMMITS POR TEXTO
+								<Tooltip.Arrow className="fill-popover" />
+							</Tooltip.Content>
+						</Tooltip.Portal>
+					</Tooltip.Root>
+
+					<Tooltip.Root>
+						<Tooltip.Trigger asChild>
 							<button
 								type="button"
-								onClick={() => setFilter("")}
-								className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-								aria-label="Limpiar filtro"
+								onClick={handleSummarizeWithAI}
+								disabled={isGenerating || availability !== "available" || pendingCommits.length === 0}
+								className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-ai bg-ai/10 hover:bg-ai/20 rounded-lg border border-ai/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
 							>
-								<X className="w-3.5 h-3.5" />
+								{isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+								{isGenerating ? getStatusMessage : "Resumir"}
 							</button>
-						)}
-					</div>
-					<button
-						type="button"
-						onClick={handleSummarizeWithAI}
-						disabled={isGenerating || availability !== "available" || pendingCommits.length === 0}
-						className="inline-flex items-center gap-2 px-3 py-2 text-sm font-bold uppercase tracking-wider text-ai bg-ai/10 hover:bg-ai/20 rounded-lg border border-ai/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
-					>
-						{isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-						{isGenerating ? getStatusMessage : "Resumir con IA"}
-					</button>
+						</Tooltip.Trigger>
+						<Tooltip.Portal>
+							<Tooltip.Content
+								className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md z-[10000]"
+								sideOffset={5}
+							>
+								RESUMIR CAMBIOS CON IA
+								<Tooltip.Arrow className="fill-popover" />
+							</Tooltip.Content>
+						</Tooltip.Portal>
+					</Tooltip.Root>
 				</div>
 
 				{/* Contenido scrolleable */}

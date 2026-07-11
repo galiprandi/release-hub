@@ -106,11 +106,14 @@ function ImageChip({
 	const isFailed = image.state === 'FAILED'
 	const isClickable = isFailed || image.state === 'RUNNING'
 
+	const ariaLabel = `${image.app}: ${config.label}${isClickable ? ' - Ver detalles' : ''}`
+
 	return (
 		<button
 			type="button"
 			onClick={isClickable ? onClick : undefined}
 			disabled={!isClickable}
+			aria-label={ariaLabel}
 			className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all shrink-0 ${
 				isExpanded
 					? 'bg-foreground/10 text-foreground ring-1 ring-border'
@@ -125,7 +128,7 @@ function ImageChip({
 				className={`w-3 h-3 ${config.color} ${image.state === 'RUNNING' ? 'animate-spin' : ''}`}
 			/>
 			<span>{image.app}</span>
-			<span className="text-[9px] opacity-60 normal-case font-medium">{image.appType}</span>
+			<span className="text-[10px] opacity-60 normal-case font-medium">{image.appType}</span>
 			{isClickable && (
 				<ChevronRight
 					className={`w-2.5 h-2.5 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
@@ -149,7 +152,7 @@ function ImagePanel({ image }: { image: PulsarImageJob }) {
 					<config.icon className={`w-4 h-4 ${config.color}`} />
 					<span className="text-xs font-bold text-foreground">{image.app}</span>
 					<span className="text-[10px] text-muted-foreground/60">{image.appType}</span>
-					<span className={`px-1.5 py-0 text-[9px] rounded uppercase tracking-wider ${config.badge}`}>
+					<span className={`px-1.5 py-0 text-[10px] rounded-md font-bold uppercase tracking-wider ${config.badge}`}>
 						{config.label}
 					</span>
 				</div>
@@ -190,7 +193,7 @@ function ImagePanel({ image }: { image: PulsarImageJob }) {
 								/>
 								<span className="text-xs text-foreground truncate">{step.name}</span>
 							</div>
-							<span className={`text-[9px] font-bold uppercase tracking-wider shrink-0 ${stepConfig.color}`}>
+							<span className={`text-[10px] font-bold uppercase tracking-wider shrink-0 ${stepConfig.color}`}>
 								{stepConfig.label}
 							</span>
 						</div>
@@ -203,7 +206,7 @@ function ImagePanel({ image }: { image: PulsarImageJob }) {
 				<div className="px-3 py-3 border-t border-border/40 bg-destructive/5 space-y-2">
 					<div className="flex items-center gap-2">
 						<AlertCircle className="w-3.5 h-3.5 shrink-0 text-destructive/60" />
-						<span className="text-[9px] font-bold uppercase tracking-wider text-destructive/70 dark:text-destructive/60">
+						<span className="text-[10px] font-bold uppercase tracking-wider text-destructive/70 dark:text-destructive/60">
 							Step{failedSteps.length > 1 ? 's' : ''} fallido{failedSteps.length > 1 ? 's' : ''}
 						</span>
 					</div>
@@ -243,7 +246,7 @@ function FallbackPanel({ data }: { data: PulsarBuildData }) {
 				<div className="flex items-center gap-2">
 					<Icon className={`w-4 h-4 ${config.color}`} />
 					<span className="text-xs font-bold text-foreground">{fb.name}</span>
-					<span className={`px-1.5 py-0 text-[9px] rounded uppercase tracking-wider ${config.badge}`}>
+					<span className={`px-1.5 py-0 text-[10px] rounded-md font-bold uppercase tracking-wider ${config.badge}`}>
 						{config.label}
 					</span>
 				</div>
@@ -261,7 +264,7 @@ function FallbackPanel({ data }: { data: PulsarBuildData }) {
 			</div>
 			{fb.errorStep && (
 				<div className="px-3 py-2.5 space-y-1">
-					<span className="text-[9px] font-bold uppercase tracking-wider text-destructive/70 dark:text-destructive/60">
+					<span className="text-[10px] font-bold uppercase tracking-wider text-destructive/70 dark:text-destructive/60">
 						Step fallido
 					</span>
 					<p className="text-xs text-foreground/90 font-medium">{fb.errorStep.name}</p>
@@ -317,7 +320,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 						<RefTypeIcon className="w-3.5 h-3.5 text-muted-foreground" />
 						<span className="font-mono text-sm font-semibold text-foreground">{data.ref}</span>
 						<span
-							className={`px-1.5 py-0 text-[9px] rounded uppercase tracking-wider ${
+							className={`px-1.5 py-0 text-[10px] rounded-md font-bold uppercase tracking-wider ${
 								data.refType === 'TAG'
 									? 'bg-purple-50 text-purple-700 border border-purple-100 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800'
 									: 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800'

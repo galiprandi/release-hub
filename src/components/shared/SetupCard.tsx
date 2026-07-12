@@ -48,7 +48,7 @@ export function SetupCard({
 				<div className="flex-1">
 					<div className="flex items-center gap-2">
 						<p className="text-[10px] font-bold uppercase tracking-wider">{name}</p>
-						<span className="px-1.5 py-0.5 rounded-md bg-success/20 border border-success/20 text-[8px] font-bold uppercase">
+						<span className="px-1.5 py-0.5 rounded-md bg-success/20 border border-success/20 text-[10px] font-bold uppercase tracking-wider">
 							Instalado
 						</span>
 					</div>
@@ -93,7 +93,7 @@ export function SetupCard({
 							{icon}
 							{name}
 						</h2>
-						<span className={`px-1.5 py-0.5 rounded-md border text-[8px] font-bold uppercase ${badgeStyles}`}>
+						<span className={`px-1.5 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${badgeStyles}`}>
 							{isRequired ? "Requerido" : "Opcional"}
 						</span>
 					</div>

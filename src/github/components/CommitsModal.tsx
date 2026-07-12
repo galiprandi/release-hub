@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, GitCommit, Sparkles, Loader2, ChevronDown, ChevronRight, X } from "lucide-react";
+import { Search, GitCommit, ChevronDown, ChevronRight, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { useAISummarize } from "@galiprandi/react-tools";
@@ -40,13 +40,6 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 	
 	const isGenerating = isGeneratingLocal || status === "summarizing" || status === "initializing" || status === "downloading";
 	const summary = data || "";
-
-	const getStatusMessage = useMemo(() => {
-		if (status === "initializing") return "Inicializando modelo...";
-		if (status === "downloading") return "Descargando modelo...";
-		if (status === "summarizing") return "Generando resumen...";
-		return "Generando...";
-	}, [status]);
 
 	// Filtrar commits pendientes (después del commit de producción)
 	const prodCommitIndex = commits.findIndex(c => c.hash === prodCommitHash);

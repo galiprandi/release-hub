@@ -25,3 +25,7 @@
 ## 2026-07-09 - [Accessibility vs. Density Balance]
 **Learning:** Over-applying high-density typography (text-[10px]) to primary interactive elements like search inputs can lead to accessibility regressions. While metadata benefit from high density, inputs should remain at text-sm (14px) for legibility.
 **Action:** Use text-[10px] strictly for labels, badges, and secondary metadata. Keep primary inputs and main action labels at text-sm or use standardized ActionButton components to maintain accessible hit targets.
+
+## 2026-07-12 - [Unified Tooltip Standard]
+**Learning:** Native `title` tooltips are inconsistent across browsers and inaccessible to keyboard users. Standardizing on Radix UI tooltips in shared components like `DisplayInfo` ensures a consistent technical aesthetic (V2 High-Density) and full keyboard accessibility.
+**Action:** Replace native `title` attributes with standardized Radix UI tooltips. Ensure `Tooltip.Content` uses `text-[10px] font-bold uppercase tracking-wider` and includes a `Tooltip.Arrow`.

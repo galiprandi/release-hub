@@ -1,31 +1,3 @@
-## 2024-05-22 - [Typography Standard Enforcement]
-**Learning:** Legacy use of `text-[9px]` in several modules (GitHub, Kubernetes, Seki) violated the high-density technical standard of `text-[10px]`. Enforcing `text-[10px]` globally improves legibility while maintaining the desired technical density.
-**Action:** Always verify that metadata and small labels adhere strictly to the `text-[10px]` standard defined in `DESIGN.md`.
-
-## 2024-05-22 - [Semantic Token Alignment in Dialogs]
-**Learning:** Core components like `ConfirmDialog` often harbor hardcoded colors or generic Tailwind classes (e.g., `bg-yellow-600`) that break theme consistency. Migrating to semantic tokens (e.g., `bg-warning`) ensures the UI responds correctly to theme variables.
-**Action:** Audit core dialogs for hardcoded colors and replace them with semantic tokens from the OKLCH theme.
-
-## 2025-05-14 - [Modal Search & Geometry Alignment]
-**Learning:** Search inputs within modals (like `CommitsModal`) often lag behind global search standards, missing clear buttons and proper accessibility labels. Additionally, badge geometry must consistently use `rounded-md` to maintain the Industrial Resonance V2 aesthetic.
-**Action:** When implementing or refactoring modals, ensure search inputs include a clear button, `aria-label`, and align with `bg-muted/40` styling. Verify all badges use `rounded-md` geometry.
-
-## 2025-05-22 - [AI and High-Density Header Standard]
-**Learning:** AI-driven actions (like "Resumir con IA") must use semantic `ai` tokens (`text-ai`, `bg-ai/10`) and `rounded-lg` geometry to distinguish them from standard operations. High-density headers (e.g., `LogsViewer`) require consistent uppercase labels and `rounded-md` geometry for status indicators (e.g., "Live").
-**Action:** Standardize all AI buttons with `text-ai` and `bg-ai/10`. Ensure all header indicators and tooltips in high-density components use uppercase tracking-wider typography and appropriate Radix UI Tooltip Arrows.
-
-## 2026-07-07 - [Sensitive Input Visibility]
-**Learning:** Sensitive configuration fields (tokens, webhooks) in administrative dialogs should utilize show/hide visibility toggles. This balances security/privacy with the need for user verification during entry.
-**Action:** Always wrap sensitive inputs in a relative container with an absolute-positioned toggle button (Eye/EyeOff icons). Ensure the high-density standard (bg-muted/40) is applied to these inputs for visual consistency.
-
-## 2026-07-08 - [Form Label Accessibility Association]
-**Learning:** Inputs in administrative forms (like `SettingsDialog`) often lack explicit `id` and `htmlFor` association, hindering screen reader support and reducing click targets for users.
-**Action:** Always ensure every form label has a `htmlFor` attribute that matches the `id` of its corresponding input or textarea. This is a non-negotiable standard for accessibility in this repository.
-
-## 2026-07-09 - [Accessibility vs. Density Balance]
-**Learning:** Over-applying high-density typography (text-[10px]) to primary interactive elements like search inputs can lead to accessibility regressions. While metadata benefit from high density, inputs should remain at text-sm (14px) for legibility.
-**Action:** Use text-[10px] strictly for labels, badges, and secondary metadata. Keep primary inputs and main action labels at text-sm or use standardized ActionButton components to maintain accessible hit targets.
-
-## 2026-07-12 - [Unified Tooltip Standard]
-**Learning:** Native `title` tooltips are inconsistent across browsers and inaccessible to keyboard users. Standardizing on Radix UI tooltips in shared components like `DisplayInfo` ensures a consistent technical aesthetic (V2 High-Density) and full keyboard accessibility.
-**Action:** Replace native `title` attributes with standardized Radix UI tooltips. Ensure `Tooltip.Content` uses `text-[10px] font-bold uppercase tracking-wider` and includes a `Tooltip.Arrow`.
+## 2025-05-15 - [Unified Project Management UX Refinement]
+**Learning:** Icon-only action buttons in quick-create forms or selection dialogs (like Save/Cancel) often lack visual discoverability for sighted users even when `aria-label` is present. Additionally, manual empty states lead to visual inconsistency across modules.
+**Action:** Always wrap icon-only actions in Radix Tooltips to match the "Industrial Resonance V2" standard and prioritize the shared `EmptyState` component with a `min-h-0` override for compact dialog contexts.

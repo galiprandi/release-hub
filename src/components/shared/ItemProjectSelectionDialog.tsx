@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Check, Plus, FolderPlus, Save, X } from "lucide-react";
+import { Check, Plus, FolderPlus, Save, X, FolderSearch } from "lucide-react";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { useUserCollections } from "@/hooks/useUserCollections";
+import { EmptyState } from "./EmptyState";
 
 interface ItemProjectSelectionDialogProps {
 	isOpen: boolean;
@@ -70,11 +72,12 @@ export function ItemProjectSelectionDialog({
 			<div className="space-y-4">
 				<div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
 					{projects.length === 0 && !isCreating ? (
-						<div className="text-center py-8 bg-muted/10 rounded-xl border border-dashed border-border/40">
-							<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">
-								No tienes proyectos creados
-							</p>
-						</div>
+						<EmptyState
+							icon={<FolderSearch className="w-5 h-5 text-muted-foreground/40" />}
+							label="Sin proyectos"
+							caption="No tienes colecciones creadas para organizar tus recursos."
+							className="min-h-0 py-8"
+						/>
 					) : (
 						projects.map((project) => {
 							const active = isInProject(project.id);
@@ -82,6 +85,7 @@ export function ItemProjectSelectionDialog({
 								<button
 									key={project.id}
 									type="button"
+									aria-pressed={active}
 									onClick={() => toggleInProject(project.id)}
 									className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 ${
 										active
@@ -143,22 +147,49 @@ export function ItemProjectSelectionDialog({
 							placeholder="Nombre del proyecto..."
 							className="flex-1 bg-transparent border-none text-[10px] font-bold uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-md placeholder:text-muted-foreground/40 ml-2"
 						/>
-						<button
-							type="submit"
-							disabled={!newName.trim()}
-							aria-label="Guardar proyecto"
-							className="p-1.5 bg-primary text-primary-foreground rounded-lg disabled:opacity-50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
-						>
-							<Save className="w-3.5 h-3.5" />
-						</button>
-						<button
-							type="button"
-							onClick={() => setIsCreating(false)}
-							aria-label="Cancelar creación"
-							className="p-1.5 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
-						>
-							<X className="w-3.5 h-3.5" />
-						</button>
+						<Tooltip.Root>
+							<Tooltip.Trigger asChild>
+								<button
+									type="submit"
+									disabled={!newName.trim()}
+									aria-label="Guardar proyecto"
+									className="p-1.5 bg-primary text-primary-foreground rounded-lg disabled:opacity-50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
+								>
+									<Save className="w-3.5 h-3.5" />
+								</button>
+							</Tooltip.Trigger>
+							<Tooltip.Portal>
+								<Tooltip.Content
+									className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+									sideOffset={5}
+								>
+									Guardar proyecto
+									<Tooltip.Arrow className="fill-popover" />
+								</Tooltip.Content>
+							</Tooltip.Portal>
+						</Tooltip.Root>
+
+						<Tooltip.Root>
+							<Tooltip.Trigger asChild>
+								<button
+									type="button"
+									onClick={() => setIsCreating(false)}
+									aria-label="Cancelar creación"
+									className="p-1.5 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
+								>
+									<X className="w-3.5 h-3.5" />
+								</button>
+							</Tooltip.Trigger>
+							<Tooltip.Portal>
+								<Tooltip.Content
+									className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+									sideOffset={5}
+								>
+									Cancelar creación
+									<Tooltip.Arrow className="fill-popover" />
+								</Tooltip.Content>
+							</Tooltip.Portal>
+						</Tooltip.Root>
 					</form>
 				)}
 

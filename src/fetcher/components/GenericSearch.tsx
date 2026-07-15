@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Search, Loader2, X } from 'lucide-react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { EmptyState } from '@/components/shared/EmptyState'
 
 interface GenericSearchProps<T> {
   searchQuery?: string
@@ -153,14 +155,27 @@ export function GenericSearch<T>({
           readOnly={!isEditable}
         />
         {query && (
-          <button
-            type="button"
-            onClick={handleClear}
-            className={`absolute ${isLoading ? 'right-9' : 'right-3'} top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
-            aria-label="Limpiar búsqueda"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger asChild>
+              <button
+                type="button"
+                onClick={handleClear}
+                className={`absolute ${isLoading ? 'right-9' : 'right-3'} top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
+                aria-label="Limpiar búsqueda"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content
+                className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+                sideOffset={5}
+              >
+                Limpiar búsqueda
+                <Tooltip.Arrow className="fill-popover" />
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
         )}
         {isLoading && (
           <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
@@ -176,13 +191,12 @@ export function GenericSearch<T>({
               <p className="text-sm">Cargando resultados...</p>
             </div>
           ) : !hasResults ? (
-            <div className="p-4 text-center text-muted-foreground">
-              <p className="text-sm">
-                {query.length >= 2
-                  ? 'Sin resultados coincidentes'
-                  : 'Ingreso de texto para iniciar búsqueda'}
-              </p>
-            </div>
+            <EmptyState
+              className="min-h-0 py-8"
+              icon={<Search className="w-5 h-5 text-muted-foreground/40" />}
+              label={query.length >= 2 ? 'Sin resultados' : 'Búsqueda'}
+              caption={query.length >= 2 ? `No se encontraron coincidencias para "${query}"` : 'Ingresa texto para iniciar la búsqueda'}
+            />
           ) : (
             <div id="search-results" role="listbox" className="max-h-80 overflow-y-auto">
               {results.map((item, index) => {
@@ -208,17 +222,17 @@ export function GenericSearch<T>({
           {/* Footer hint */}
           <div className="px-3 py-2 bg-muted/30 border-t text-[10px] text-muted-foreground flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1 font-bold uppercase tracking-wider">
                 <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">↑↓</kbd> Navegar
               </span>
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1 font-bold uppercase tracking-wider">
                 <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">↵</kbd> Seleccionar
               </span>
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1 font-bold uppercase tracking-wider">
                 <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">Esc</kbd> Cerrar
               </span>
             </div>
-            <span>{results.length} resultados</span>
+            <span className="font-bold uppercase tracking-wider">{results.length} resultados</span>
           </div>
         </div>
       )}

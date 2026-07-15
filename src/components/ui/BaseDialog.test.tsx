@@ -51,8 +51,8 @@ describe("BaseDialog", () => {
 				<div>Content</div>
 			</BaseDialog>
 		)
-		const closeButton = screen.getByText("Cerrar")
-		closeButton.click()
+		const closeButtons = screen.getAllByText("Cerrar")
+		closeButtons[0].click()
 		expect(onOpenChange).toHaveBeenCalledWith(false)
 	})
 

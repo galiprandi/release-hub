@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import * as Dialog from "@radix-ui/react-dialog"
 import { Settings, Trash2, Save, RefreshCw, Eye, EyeOff } from "lucide-react"
+import { IconButton } from "@/components/shared/IconButton"
 import { useSettings } from "@/hooks/useSettings"
 import { useToken } from "@/hooks/useToken"
 import { BaseDialog } from "@/components/ui/BaseDialog"
@@ -69,11 +70,10 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 	return (
 		<>
 			{showTrigger && (
-				<button
-					type="button"
-					className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-lg"
-					title="Configuración"
-					aria-label="Configuración"
+				<IconButton
+					icon={<Settings className="w-5 h-5" />}
+					tooltip="Configuración"
+					className="cursor-pointer"
 					onClick={(e) => {
 						e.stopPropagation();
 						e.preventDefault();
@@ -91,9 +91,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 						e.stopPropagation();
 						e.preventDefault();
 					}}
-				>
-					<Settings className="w-5 h-5" />
-				</button>
+				/>
 			)}
 			<BaseDialog
 				open={open}

@@ -1,5 +1,6 @@
 import { Sparkles, Loader2, ClipboardCopy, Check, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
 import { Streamdown } from "streamdown";
+import { IconButton } from "@/components/shared/IconButton";
 
 interface AISummaryCardProps {
 	summary: string | null;
@@ -38,35 +39,27 @@ export function AISummaryCard({
 					<span className={`font-semibold tracking-tight ${isCompact ? 'text-xs' : 'text-sm'}`}>Resumen con IA</span>
 				</div>
 				<div className="flex items-center gap-1">
-					<button
-						type="button"
+					<IconButton
+						icon={isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
 						onClick={onToggleCollapse}
-						className="inline-flex items-center justify-center w-8 h-8 rounded-md transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1 focus-visible:outline-none"
-						title={isCollapsed ? "Expandir" : "Colapsar"}
+						tooltip={isCollapsed ? "Expandir" : "Colapsar"}
 						aria-label={isCollapsed ? "Expandir resumen" : "Colapsar resumen"}
 						aria-expanded={!isCollapsed}
-					>
-						{isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
-					</button>
-					<button
-						type="button"
+						className="w-8 h-8 hover:bg-white/10 text-white focus-visible:ring-white"
+					/>
+					<IconButton
+						icon={isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
 						onClick={onRegenerate}
 						disabled={isGenerating}
-						className="inline-flex items-center justify-center w-8 h-8 rounded-md transition-colors hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1 focus-visible:outline-none"
-						title="Regenerar resumen"
-						aria-label="Regenerar resumen"
-					>
-						{isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-					</button>
-					<button
-						type="button"
+						tooltip="Regenerar resumen"
+						className="w-8 h-8 hover:bg-white/10 text-white focus-visible:ring-white"
+					/>
+					<IconButton
+						icon={isCopied ? <Check className="w-4 h-4" /> : <ClipboardCopy className="w-4 h-4" />}
 						onClick={onCopy}
-						className="inline-flex items-center justify-center w-8 h-8 rounded-md transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1 focus-visible:outline-none"
-						title="Copiar resumen"
-						aria-label="Copiar resumen"
-					>
-						{isCopied ? <Check className="w-4 h-4" /> : <ClipboardCopy className="w-4 h-4" />}
-					</button>
+						tooltip="Copiar resumen"
+						className="w-8 h-8 hover:bg-white/10 text-white focus-visible:ring-white"
+					/>
 				</div>
 			</div>
 			{!isCollapsed && (

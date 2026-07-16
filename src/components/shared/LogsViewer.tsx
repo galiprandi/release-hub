@@ -344,18 +344,31 @@ export function LogsViewer({
 								className="pl-7 pr-8 py-1 text-[10px] font-bold uppercase tracking-wider bg-muted/40 border border-border/60 rounded-lg w-48 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 placeholder:text-muted-foreground/40"
 							/>
 							{filter && (
-								<button
-									type="button"
-									onClick={() => {
-										setFilter("");
-										setCurrentMatchIndex(0);
-										searchInputRef.current?.focus();
-									}}
-									className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
-									aria-label="Limpiar búsqueda"
-								>
-									<X className="w-3 h-3" />
-								</button>
+								<Tooltip.Root delayDuration={0}>
+									<Tooltip.Trigger asChild>
+										<button
+											type="button"
+											onClick={() => {
+												setFilter("");
+												setCurrentMatchIndex(0);
+												searchInputRef.current?.focus();
+											}}
+											className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+											aria-label="Limpiar búsqueda"
+										>
+											<X className="w-3 h-3" />
+										</button>
+									</Tooltip.Trigger>
+									<Tooltip.Portal>
+										<Tooltip.Content
+											className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+											sideOffset={5}
+										>
+											Limpiar búsqueda
+											<Tooltip.Arrow className="fill-popover" />
+										</Tooltip.Content>
+									</Tooltip.Portal>
+								</Tooltip.Root>
 							)}
 						</div>
 					</Tooltip.Trigger>

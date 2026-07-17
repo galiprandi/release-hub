@@ -9,6 +9,7 @@ import { QueryModal } from '@/fetcher/components/QueryModal';
 import { Table } from '@/components/ui/Table';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
+import { CopyButton } from '@/components/shared/CopyButton';
 import type { ColumnDef } from '@tanstack/react-table';
 import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
@@ -216,24 +217,6 @@ function FetcherPage() {
 		setEditingQuery(undefined);
 	};
 
-	const handleCopyResponse = useCallback(async (query: QueryRecord) => {
-		if (query.response?.body) {
-			try {
-				await navigator.clipboard.writeText(query.response.body);
-			} catch (error) {
-				console.error('Failed to copy to clipboard:', error);
-			}
-		}
-	}, []);
-
-	const handleCopyCurl = useCallback(async (query: QueryRecord) => {
-		try {
-			await navigator.clipboard.writeText(query.curl);
-		} catch (error) {
-			console.error('Failed to copy cURL to clipboard:', error);
-		}
-	}, []);
-
 	const headerActions = (
 		<form className="flex items-center gap-2" onSubmit={(e) => { e.preventDefault(); handleSendCurl(); }}>
 			<div className="relative">
@@ -342,8 +325,6 @@ function FetcherPage() {
 					<QueriesTable
 						queries={filteredAndSortedHistory}
 						onOpenModal={handleOpenModal}
-						onCopyResponse={handleCopyResponse}
-						onCopyCurl={handleCopyCurl}
 						onDelete={handleDelete}
 						isDeleting={isDeleting}
 					/>
@@ -377,15 +358,11 @@ function FetcherPage() {
 function QueriesTable({
 	queries,
 	onOpenModal,
-	onCopyResponse,
-	onCopyCurl,
 	onDelete,
 	isDeleting,
 }: {
 	queries: QueryRecord[]
 	onOpenModal: (query: QueryRecord) => void
-	onCopyResponse: (query: QueryRecord) => void
-	onCopyCurl: (query: QueryRecord) => void
 	onDelete: (query: QueryRecord) => void
 	isDeleting: boolean
 }) {
@@ -430,14 +407,12 @@ function QueriesTable({
 				<ActionsCell
 					query={row.original}
 					onOpenModal={onOpenModal}
-					onCopyResponse={onCopyResponse}
-					onCopyCurl={onCopyCurl}
 					onDelete={onDelete}
 					isDeleting={isDeleting}
 				/>
 			),
 		},
-	], [onOpenModal, onCopyResponse, onCopyCurl, onDelete, isDeleting])
+	], [onOpenModal, onDelete, isDeleting])
 
 	return (
 		<Table
@@ -530,15 +505,11 @@ function ResponseTimeCell({ query }: { query: QueryRecord }) {
 function ActionsCell({
 	query,
 	onOpenModal,
-	onCopyResponse,
-	onCopyCurl,
 	onDelete,
 	isDeleting,
 }: {
 	query: QueryRecord
 	onOpenModal: (query: QueryRecord) => void
-	onCopyResponse: (query: QueryRecord) => void
-	onCopyCurl: (query: QueryRecord) => void
 	onDelete: (query: QueryRecord) => void
 	isDeleting: boolean
 }) {
@@ -551,16 +522,16 @@ function ActionsCell({
 				className="text-success hover:bg-success/20"
 			/>
 			<div className="w-px h-4 bg-border/40 mx-0.5" />
-			<ActionButton
-				action={ACTION_DEFINITIONS.copyCurl}
-				onClick={() => onCopyCurl(query)}
-				size="sm"
+			<CopyButton
+				text={query.curl}
+				tooltip="Copiar cURL"
+				className="opacity-100 hover:bg-accent focus-visible:ring-offset-1"
 			/>
 			{query.response?.body && (
-				<ActionButton
-					action={ACTION_DEFINITIONS.copy}
-					onClick={() => onCopyResponse(query)}
-					size="sm"
+				<CopyButton
+					text={query.response.body}
+					tooltip="Copiar respuesta"
+					className="opacity-100 hover:bg-accent focus-visible:ring-offset-1"
 				/>
 			)}
 			<div className="w-px h-4 bg-border/40 mx-0.5" />

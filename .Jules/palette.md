@@ -9,3 +9,7 @@
 ## 2026-07-15 - [Search & Dialog Accessibility Standardization]
 **Learning:** Adding tooltips to existing accessible icon buttons (with sr-only text) can cause test failures due to ambiguous matches (multiple instances of the same text in the DOM). Testing should target the interactive role or handle multiple occurrences explicitly. Standardizing "No results" with a shared component ensures visual consistency and better user guidance.
 **Action:** Use `EmptyState` for search dropdowns and ensure tests use specific queries like `getByRole('button', { name: '...' })` when tooltips are present.
+
+## 2026-07-20 - [Enhanced CopyButton for Diverse Contexts]
+**Learning:** Raw clipboard-copy interactions are frequently implemented silently without visual or screen reader feedback, creating accessibility gaps. Standardizing copy interactions on a single `CopyButton` with customizable tooltips and localized aria-labels ensures unified, accessible, and delightful interactive copy feedback across different data modules.
+**Action:** Always leverage `CopyButton` instead of raw `navigator.clipboard` or generic `ActionButton` copy flows, specifying `tooltip` to provide contextual screen reader and tooltip descriptions.

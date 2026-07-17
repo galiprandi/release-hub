@@ -6,9 +6,11 @@ import { cn } from "@/lib/utils";
 interface CopyButtonProps {
 	text: string;
 	className?: string;
+	tooltip?: string;
+	copiedTooltip?: string;
 }
 
-export function CopyButton({ text, className }: CopyButtonProps) {
+export function CopyButton({ text, className, tooltip, copiedTooltip }: CopyButtonProps) {
 	const [copied, setCopied] = useState(false);
 
 	const handleCopy = useCallback(async () => {
@@ -26,9 +28,9 @@ export function CopyButton({ text, className }: CopyButtonProps) {
 			<Tooltip.Trigger asChild>
 				<button
 					onClick={handleCopy}
-					aria-label="Copiar al portapapeles"
+					aria-label={tooltip || "Copiar al portapapeles"}
 					className={cn(
-						"opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-accent focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none",
+						"opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-accent focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1",
 						className
 					)}
 					type="button"
@@ -45,7 +47,7 @@ export function CopyButton({ text, className }: CopyButtonProps) {
 					className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
 					sideOffset={5}
 				>
-					{copied ? "¡Copiado!" : "Copiar al portapapeles"}
+					{copied ? (copiedTooltip || "¡Copiado!") : (tooltip || "Copiar al portapapeles")}
 				</Tooltip.Content>
 			</Tooltip.Portal>
 		</Tooltip.Root>

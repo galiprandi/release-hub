@@ -11,6 +11,7 @@ import { PageLayout } from '../../layouts/PageLayout';
 import DayJS from '@/lib/dayjs';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 import { BaseDialog } from '@/components/ui/BaseDialog';
+import { CopyButton } from '@/components/shared/CopyButton';
 
 export const Route = createFileRoute('/health/')({
   component: HealthMonitorPage,
@@ -354,11 +355,10 @@ function ActionsCell({
         size="sm"
         tooltipSide="top"
       />
-      <ActionButton
-        action={ACTION_DEFINITIONS.copy}
-        onClick={() => navigator.clipboard.writeText(endpoint.url)}
-        size="sm"
-        tooltipSide="top"
+      <CopyButton
+        text={endpoint.url}
+        tooltip="Copiar URL"
+        className="opacity-100 hover:bg-accent focus-visible:ring-offset-1"
       />
       <ActionButton
         action={ACTION_DEFINITIONS.link}

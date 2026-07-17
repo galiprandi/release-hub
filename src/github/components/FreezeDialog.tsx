@@ -182,8 +182,9 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 						<div className="space-y-4">
 							<div className="space-y-3">
 								<div>
-									<label className="block text-sm font-medium mb-1.5">Branch</label>
+									<label htmlFor="freeze-branch-input" className="block text-sm font-medium mb-1.5">Branch</label>
 									<input
+										id="freeze-branch-input"
 										type="text"
 										value={branch}
 										onChange={(e) => setBranch(e.target.value)}

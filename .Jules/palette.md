@@ -13,3 +13,7 @@
 ## 2026-07-20 - [Enhanced CopyButton for Diverse Contexts]
 **Learning:** Raw clipboard-copy interactions are frequently implemented silently without visual or screen reader feedback, creating accessibility gaps. Standardizing copy interactions on a single `CopyButton` with customizable tooltips and localized aria-labels ensures unified, accessible, and delightful interactive copy feedback across different data modules.
 **Action:** Always leverage `CopyButton` instead of raw `navigator.clipboard` or generic `ActionButton` copy flows, specifying `tooltip` to provide contextual screen reader and tooltip descriptions.
+
+## 2026-07-22 - [In-place list edit accessibility and ID uniqueness]
+**Learning:** In-place edit views within mapped lists (like dynamic dialog lists or project dashboards) frequently duplicate label-input relationships. Hardcoded IDs lead to screen reader confusion and broken focus targets. Utilizing dynamic, composite IDs (e.g., `edit-name-${item.id}`) ensures correct and unique label association across multiple active list items.
+**Action:** Always construct dynamic IDs using parent/item IDs for list-mapped inputs/labels, maintaining correct WAI-ARIA and HTML5 association.

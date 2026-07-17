@@ -83,8 +83,9 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 								{editingProject === project.id ? (
 									<div className="flex-1 space-y-3 mr-4">
 										<div className="space-y-1">
-											<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Nombre</label>
+											<label htmlFor={`edit-name-${project.id}`} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Nombre</label>
 											<input
+												id={`edit-name-${project.id}`}
 												autoFocus
 												type="text"
 												value={editName}
@@ -94,8 +95,9 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 											/>
 										</div>
 										<div className="space-y-1">
-											<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Descripción</label>
+											<label htmlFor={`edit-desc-${project.id}`} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Descripción</label>
 											<textarea
+												id={`edit-desc-${project.id}`}
 												value={editDescription}
 												onChange={(e) => setEditDescription(e.target.value)}
 												className="w-full px-3 py-1.5 text-xs bg-background border border-border/60 rounded-lg focus:ring-2 focus:ring-primary/20 focus:outline-none h-20 resize-none transition-all"

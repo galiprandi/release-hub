@@ -31,6 +31,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { Terminal } from "@/components/shared/Terminal";
 import { useGitUser } from "@/hooks/useGitUser";
+import { IconButton } from "@/components/shared/IconButton";
 
 interface PageLayoutProps {
 	children: ReactNode;
@@ -249,58 +250,22 @@ export function PageLayout({
 									<React.Fragment key={index}>{action}</React.Fragment>
 								))}
 								{refreshFn && (
-									<Tooltip.Root>
-										<Tooltip.Trigger asChild>
-											<button
-												onClick={refreshFn}
-												className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-												aria-label="Refrescar"
-												type="button"
-											>
-												<RefreshCw className="w-4 h-4" aria-hidden="true" />
-											</button>
-										</Tooltip.Trigger>
-										<Tooltip.Portal>
-											<Tooltip.Content
-												side="bottom"
-												sideOffset={10}
-												className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
-											>
-												Refrescar
-												<Tooltip.Arrow className="fill-popover" />
-											</Tooltip.Content>
-										</Tooltip.Portal>
-									</Tooltip.Root>
+									<IconButton
+										icon={<RefreshCw className="w-4 h-4" />}
+										tooltip="Refrescar"
+										aria-label="Refrescar"
+										onClick={refreshFn}
+										className="p-2"
+									/>
 								)}
 								{themeSwitch && (
-									<Tooltip.Root>
-										<Tooltip.Trigger asChild>
-											<button
-												onClick={() => setIsDark(!isDark)}
-												className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-												aria-label={
-													isDark ? "Activar modo claro" : "Activar modo oscuro"
-												}
-												type="button"
-											>
-												{isDark ? (
-													<Sun className="w-4 h-4" aria-hidden="true" />
-												) : (
-													<Moon className="w-4 h-4" aria-hidden="true" />
-												)}
-											</button>
-										</Tooltip.Trigger>
-										<Tooltip.Portal>
-											<Tooltip.Content
-												side="bottom"
-												sideOffset={10}
-												className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
-											>
-												{isDark ? "Modo claro" : "Modo oscuro"}
-												<Tooltip.Arrow className="fill-popover" />
-											</Tooltip.Content>
-										</Tooltip.Portal>
-									</Tooltip.Root>
+									<IconButton
+										icon={isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+										tooltip={isDark ? "Modo claro" : "Modo oscuro"}
+										aria-label={isDark ? "Activar modo claro" : "Activar modo oscuro"}
+										onClick={() => setIsDark(!isDark)}
+										className="p-2"
+									/>
 								)}
 								<ScreenshotButton />
 							</div>
@@ -541,33 +506,14 @@ function ScreenshotButton() {
 	};
 
 	return (
-		<Tooltip.Root>
-				<Tooltip.Trigger asChild>
-					<button
-						onClick={handleCapture}
-						disabled={isCapturing}
-						className={`p-2 transition-colors ${
-							isCapturing
-								? "text-ai animate-pulse"
-								: "text-muted-foreground hover:text-ai"
-						}`}
-						aria-label="Tomar captura y preguntar a IA"
-						type="button"
-					>
-						<Camera className="w-4 h-4" />
-					</button>
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="bottom"
-						sideOffset={10}
-						className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
-					>
-						Tomar captura y preguntar
-						<Tooltip.Arrow className="fill-popover" />
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
+		<IconButton
+			icon={<Camera className="w-4 h-4" />}
+			tooltip="Tomar captura y preguntar"
+			aria-label="Tomar captura y preguntar a IA"
+			onClick={handleCapture}
+			disabled={isCapturing}
+			className={isCapturing ? "text-ai animate-pulse" : "hover:text-ai p-2"}
+		/>
 	);
 }
 

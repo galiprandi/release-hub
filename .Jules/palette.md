@@ -17,3 +17,7 @@
 ## 2026-07-22 - [In-place list edit accessibility and ID uniqueness]
 **Learning:** In-place edit views within mapped lists (like dynamic dialog lists or project dashboards) frequently duplicate label-input relationships. Hardcoded IDs lead to screen reader confusion and broken focus targets. Utilizing dynamic, composite IDs (e.g., `edit-name-${item.id}`) ensures correct and unique label association across multiple active list items.
 **Action:** Always construct dynamic IDs using parent/item IDs for list-mapped inputs/labels, maintaining correct WAI-ARIA and HTML5 association.
+
+## 2026-07-25 - [Standardizing Header Icon-Only Actions with IconButton]
+**Learning:** Hardcoded icon-only buttons with manual Tooltip configurations lead to highly redundant code, visual alignment drift, and accessibility inconsistencies across page headers. Leveraging the unified `<IconButton>` component automatically guarantees consistent hover timing, correct Spanish focus ring feedback, and clean, standardized layout geometry.
+**Action:** Always refactor custom-wrapped header/sidebar icon actions to use the standardized `<IconButton>` component to prevent styling drift and accessibility regression.

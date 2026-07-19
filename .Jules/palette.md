@@ -21,3 +21,7 @@
 ## 2026-07-25 - [Standardizing Header Icon-Only Actions with IconButton]
 **Learning:** Hardcoded icon-only buttons with manual Tooltip configurations lead to highly redundant code, visual alignment drift, and accessibility inconsistencies across page headers. Leveraging the unified `<IconButton>` component automatically guarantees consistent hover timing, correct Spanish focus ring feedback, and clean, standardized layout geometry.
 **Action:** Always refactor custom-wrapped header/sidebar icon actions to use the standardized `<IconButton>` component to prevent styling drift and accessibility regression.
+
+## 2026-07-26 - [Keyboard Accessibility for Hover-to-Reveal Actions]
+**Learning:** Hover-to-reveal layouts (e.g. `opacity-0 group-hover:opacity-100` lists) hide crucial buttons from keyboard and screen reader users navigating with Tab. Augmenting the container with `focus-within:opacity-100` reveals the control bar gracefully upon focus, maintaining visual clean-slate patterns while preserving strict accessibility compliance.
+**Action:** Always pair `opacity-0 group-hover:opacity-100` with `focus-within:opacity-100` on list-item operational cells.

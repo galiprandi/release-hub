@@ -232,6 +232,14 @@
 - should toggle commit expansion
 - should trigger AI summary
 
+## Module: ProjectManagementDialog
+- should call createProject when submitting the form
+- should not render when closed
+- should render empty state when open and no projects exist
+- should render project list when projects exist
+- should show create project form when click 'Nuevo Proyecto'
+- should trigger deletion when confirmation is confirmed
+
 ## Module: ProjectSelector
 - should call createProject when form is submitted
 - should open create project dialog

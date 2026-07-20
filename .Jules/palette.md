@@ -25,3 +25,7 @@
 ## 2026-07-26 - [Keyboard Accessibility for Hover-to-Reveal Actions]
 **Learning:** Hover-to-reveal layouts (e.g. `opacity-0 group-hover:opacity-100` lists) hide crucial buttons from keyboard and screen reader users navigating with Tab. Augmenting the container with `focus-within:opacity-100` reveals the control bar gracefully upon focus, maintaining visual clean-slate patterns while preserving strict accessibility compliance.
 **Action:** Always pair `opacity-0 group-hover:opacity-100` with `focus-within:opacity-100` on list-item operational cells.
+
+## 2026-07-27 - [Sensitive Input Masking & Switch Accessibility]
+**Learning:** Configured webhooks and other critical API integration string inputs in operational dialogs contain highly sensitive information and must follow the Industrial Resonance V2 Sensitive Input Standard with custom visibility toggles. Additionally, custom toggle button triggers must define explicit roles (`role="switch"`) and accessibility labels to satisfy screen readers.
+**Action:** Always wrap sensitive URL/token fields in masked password-type inputs with `Eye`/`EyeOff` toggle controls and decorate custom button switches with WAI-ARIA `role="switch"` and `aria-checked` attributes.

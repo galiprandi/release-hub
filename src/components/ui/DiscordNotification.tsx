@@ -1,4 +1,5 @@
-import { Bell, Link } from "lucide-react"
+import { useState } from "react"
+import { Bell, Link, Eye, EyeOff } from "lucide-react"
 import * as Tooltip from "@radix-ui/react-tooltip"
 
 interface DiscordNotificationProps {
@@ -16,8 +17,10 @@ export function DiscordNotification({
 	onEnabledChange,
 	readonly = false,
 }: DiscordNotificationProps) {
+	const [showWebhook, setShowWebhook] = useState(false)
+
 	return (
-		<div className="border rounded-md p-4">
+		<div className="border border-border/40 rounded-xl bg-muted/5 p-4">
 			{/* Header with toggle */}
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
@@ -26,49 +29,63 @@ export function DiscordNotification({
 				</div>
 				{/* Switch */}
 				<Tooltip.Root>
-						<Tooltip.Trigger asChild>
-							<button
-								type="button"
-								onClick={() => webhookUrl && onEnabledChange(!enabled)}
-								disabled={!webhookUrl}
-								className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-									enabled ? "bg-primary" : "bg-muted"
-								} disabled:opacity-50 disabled:cursor-not-allowed`}
-							>
-								<span
-									className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-										enabled ? "translate-x-5" : "translate-x-1"
-									}`}
-								/>
-							</button>
-						</Tooltip.Trigger>
-						<Tooltip.Portal>
-							<Tooltip.Content
-								className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 text-[10px] font-bold uppercase tracking-wider"
-								sideOffset={5}
-							>
-								{!webhookUrl ? "Configura el webhook primero" : enabled ? "Desactivar notificaciones" : "Activar notificaciones"}
-							</Tooltip.Content>
-						</Tooltip.Portal>
-					</Tooltip.Root>
+					<Tooltip.Trigger asChild>
+						<button
+							type="button"
+							role="switch"
+							aria-checked={enabled}
+							aria-label="Notificar en Discord"
+							onClick={() => webhookUrl && onEnabledChange(!enabled)}
+							disabled={!webhookUrl}
+							className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+								enabled ? "bg-primary" : "bg-muted"
+							} disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1`}
+						>
+							<span
+								className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+									enabled ? "translate-x-5" : "translate-x-1"
+								}`}
+							/>
+						</button>
+					</Tooltip.Trigger>
+					<Tooltip.Portal>
+						<Tooltip.Content
+							className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 text-[10px] font-bold uppercase tracking-wider"
+							sideOffset={5}
+						>
+							{!webhookUrl ? "Configura el webhook primero" : enabled ? "Desactivar notificaciones" : "Activar notificaciones"}
+							<Tooltip.Arrow className="fill-popover" />
+						</Tooltip.Content>
+					</Tooltip.Portal>
+				</Tooltip.Root>
 			</div>
 
 			{/* Webhook input (always shown when not readonly and onWebhookChange exists) */}
 			{!readonly && onWebhookChange && (
-				<div className="mt-4 space-y-2">
-					<label htmlFor="discord-webhook" className="block text-sm font-medium flex items-center gap-2">
-						<Link className="w-4 h-4 text-muted-foreground" />
+				<div className="mt-4 space-y-1.5">
+					<label htmlFor="discord-webhook" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 flex items-center gap-2 ml-1">
+						<Link className="w-3.5 h-3.5" />
 						Webhook de Discord
 					</label>
-					<input
-						id="discord-webhook"
-						type="text"
-						value={webhookUrl}
-						onChange={(e) => onWebhookChange(e.target.value)}
-						placeholder="https://discord.com/api/webhooks/..."
-						className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-					/>
-					<p className="text-xs text-muted-foreground">
+					<div className="relative">
+						<input
+							id="discord-webhook"
+							type={showWebhook ? "text" : "password"}
+							value={webhookUrl}
+							onChange={(e) => onWebhookChange(e.target.value)}
+							placeholder="https://discord.com/api/webhooks/..."
+							className="w-full px-3 py-2 pr-10 text-xs bg-muted/40 border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+						/>
+						<button
+							type="button"
+							onClick={() => setShowWebhook(!showWebhook)}
+							className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground/60 hover:text-foreground transition-colors"
+							aria-label={showWebhook ? "Ocultar webhook" : "Mostrar webhook"}
+						>
+							{showWebhook ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+						</button>
+					</div>
+					<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
 						URL del webhook de Discord para enviar notificaciones
 					</p>
 				</div>

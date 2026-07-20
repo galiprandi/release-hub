@@ -208,6 +208,15 @@
 - should have screen reader text 'Cerrar'
 - should render the button with X icon
 
+## Module: DiscordNotification
+- should be disabled and not toggle when webhook is empty
+- should call onEnabledChange when clicked and webhook is present
+- should call onWebhookChange when typing in the input
+- should have correct ARIA attributes on the switch
+- should not show the webhook input when readonly
+- should render the component with title and label
+- should toggle webhook visibility between password and text type
+
 ## Module: StatusCard
 - applies focus ring classes to buttons
 - applies hover and transition classes to retry button

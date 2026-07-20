@@ -4,6 +4,7 @@ import { BaseDialog } from "@/components/ui/BaseDialog";
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
 import { useUserCollections, type Project } from "@/hooks/useUserCollections";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 interface ProjectManagementDialogProps {
 	isOpen: boolean;
@@ -70,9 +71,12 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 					{/* List Projects */}
 					<div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-hide">
 						{projects.length === 0 && !isCreating && (
-							<div className="text-center py-12 bg-muted/10 rounded-xl border border-dashed border-border/60">
-								<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40">No tienes proyectos creados</p>
-							</div>
+							<EmptyState
+								className="min-h-0 py-12"
+								icon={<FolderKanban className="w-5 h-5 text-muted-foreground/40" />}
+								label="No tienes proyectos creados"
+								caption="Crea una colección para organizar tus repositorios y deployments de forma centralizada."
+							/>
 						)}
 
 						{projects.map((project) => (
@@ -107,14 +111,14 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 										<div className="flex items-center gap-2">
 											<button
 												onClick={() => handleSaveEdit(project.id)}
-												className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+												className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
 											>
 												<Save className="w-3.5 h-3.5" />
 												Guardar
 											</button>
 											<button
 												onClick={() => setEditingProject(null)}
-												className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+												className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
 											>
 												<X className="w-3.5 h-3.5" />
 												Cancelar
@@ -138,7 +142,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 												</p>
 											)}
 										</div>
-										<div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
+										<div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-all duration-200">
 											<ActionButton
 												action={{ icon: FolderEdit, label: "Editar", color: "default" }}
 												onClick={() => handleStartEdit(project)}
@@ -160,7 +164,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 					{!isCreating ? (
 						<button
 							onClick={() => setIsCreating(true)}
-							className="w-full py-4 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.1em] border border-dashed border-primary/40 text-primary rounded-xl hover:bg-primary/5 transition-all group"
+							className="w-full py-4 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.1em] border border-dashed border-primary/40 text-primary rounded-xl hover:bg-primary/5 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none group"
 						>
 							<FolderPlus className="w-4 h-4 group-hover:scale-110 transition-transform" />
 							Nuevo Proyecto
@@ -200,14 +204,14 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 							<div className="flex items-center gap-3">
 								<button
 									type="submit"
-									className="flex-1 py-2 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+									className="flex-1 py-2 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
 								>
 									Crear Proyecto
 								</button>
 								<button
 									type="button"
 									onClick={() => setIsCreating(false)}
-									className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+									className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
 								>
 									Cancelar
 								</button>
@@ -218,7 +222,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 					<div className="pt-4 border-t border-border/40 flex justify-end">
 						<button
 							onClick={() => onOpenChange(false)}
-							className="px-6 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+							className="px-6 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
 						>
 							Listo
 						</button>

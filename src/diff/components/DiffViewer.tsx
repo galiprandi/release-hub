@@ -8,6 +8,7 @@ import { GitCompare, Maximize2, Minimize2, Clock, Filter } from 'lucide-react';
 import { highlight } from 'sugar-high';
 import { escapeHtml } from '@/components/shared/logUtils';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { IconButton } from '@/components/shared/IconButton';
 
 interface DiffViewerProps {
   mode: DiffMode;
@@ -114,7 +115,10 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
 
   return (
     <div className="flex flex-col gap-4 h-[calc(100vh-180px)]">
-      <div className={clsx("grid grid-cols-2 gap-4 transition-all duration-300", isExpanded ? "hidden" : "h-1/2")}>
+      <div
+        data-testid="diff-panels"
+        className={clsx("grid grid-cols-2 gap-4 transition-all duration-300", isExpanded ? "hidden" : "h-1/2")}
+      >
         <DiffPanel
           title="Origen (Panel A)"
           value={textA}
@@ -174,13 +178,12 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
               <span className="hidden sm:inline">Solo diffs</span>
             </button>
             <div className="w-px h-4 bg-border/40 mx-1" />
-            <button
+            <IconButton
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-1.5 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 transition-all border border-transparent active:scale-95"
-              title={isExpanded ? "Restaurar" : "Expandir"}
-            >
-              {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-            </button>
+              icon={isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              tooltip={isExpanded ? "Restaurar" : "Expandir"}
+              className="p-1.5 text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 active:scale-95 border border-transparent"
+            />
           </div>
         </div>
         <div

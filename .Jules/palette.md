@@ -29,3 +29,7 @@
 ## 2026-07-27 - [Sensitive Input Masking & Switch Accessibility]
 **Learning:** Configured webhooks and other critical API integration string inputs in operational dialogs contain highly sensitive information and must follow the Industrial Resonance V2 Sensitive Input Standard with custom visibility toggles. Additionally, custom toggle button triggers must define explicit roles (`role="switch"`) and accessibility labels to satisfy screen readers.
 **Action:** Always wrap sensitive URL/token fields in masked password-type inputs with `Eye`/`EyeOff` toggle controls and decorate custom button switches with WAI-ARIA `role="switch"` and `aria-checked` attributes.
+
+## 2026-07-28 - [Tailwind Visibility and jsdom Testing Standard]
+**Learning:** Checking for visibility via `.not.toBeVisible()` can fail in jsdom when elements are hidden using Tailwind's `hidden` class, as jsdom does not fully compile Tailwind utility styles during component unit tests.
+**Action:** Always assert the presence of class-based visibility states (e.g., `toHaveClass("hidden")`) on the wrapper or container element rather than relying on layout-based visibility matchers.

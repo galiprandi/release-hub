@@ -230,6 +230,10 @@
 - renders offline state correctly
 - renders warn state with retry button
 
+## Module: DiffViewer
+- renders empty state initially
+- toggles expanded state when the expand/restore button is clicked
+
 ## Module: ContainerSearch
 - calls setQuery on change
 - renders correctly with placeholder

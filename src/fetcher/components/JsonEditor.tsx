@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Copy, Check, Code, Search, X } from 'lucide-react';
 import { formatJSON } from '@/utils/curlParser';
+import { IconButton } from '@/components/shared/IconButton';
 
 interface JsonEditorProps {
 	value: string;
@@ -90,59 +91,55 @@ export function JsonEditor({
 				<div className="flex items-center gap-2">
 					<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">JSON</label>
 				</div>
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-1.5">
 					{onSearchChange && (
-						<div className="flex items-center gap-1">
+						<div className="flex items-center gap-1.5">
 							{searchExpanded ? (
-								<div className="flex items-center gap-1">
+								<div className="flex items-center gap-1.5">
 									<input
 										type="text"
 										value={searchQuery}
 										onChange={(e) => onSearchChange(e.target.value)}
 										placeholder="Buscar..."
-										className="px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-32"
+										className="px-2 py-1 text-xs border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary w-32"
 										autoFocus
 									/>
-									<button
-										type="button"
+									<IconButton
+										icon={<X className="w-4 h-4" />}
+										tooltip="Cerrar búsqueda"
+										aria-label="Cerrar búsqueda de JSON"
 										onClick={() => {
 											setSearchExpanded(false);
 											onSearchChange('');
 										}}
-										className="text-primary hover:text-primary/80"
-										title="Cerrar búsqueda"
-									>
-										<X className="w-4 h-4" />
-									</button>
+										className="text-primary hover:text-primary/80 hover:bg-muted"
+									/>
 								</div>
 							) : (
-								<button
-									type="button"
+								<IconButton
+									icon={<Search className="w-4 h-4" />}
+									tooltip="Buscar"
+									aria-label="Buscar en JSON"
 									onClick={() => setSearchExpanded(true)}
-									className="text-primary hover:text-primary/80"
-									title="Buscar"
-								>
-									<Search className="w-4 h-4" />
-								</button>
+									className="text-primary hover:text-primary/80 hover:bg-muted"
+								/>
 							)}
 						</div>
 					)}
-					<button
-						type="button"
+					<IconButton
+						icon={formatFeedback ? <Check className="w-4 h-4 text-success animate-in zoom-in duration-200" /> : <Code className="w-4 h-4" />}
+						tooltip={formatFeedback ? 'Formateado' : 'Formatear JSON'}
+						aria-label={formatFeedback ? 'JSON formateado con éxito' : 'Formatear código JSON'}
 						onClick={handleFormatToggle}
-						className="text-primary hover:text-primary/80"
-						title={formatFeedback ? 'Formateado' : 'Formatear'}
-					>
-						{formatFeedback ? <Check className="w-4 h-4" /> : <Code className="w-4 h-4" />}
-					</button>
-					<button
-						type="button"
+						className="text-primary hover:text-primary/80 hover:bg-muted"
+					/>
+					<IconButton
+						icon={copied ? <Check className="w-4 h-4 text-success animate-in zoom-in duration-200" /> : <Copy className="w-4 h-4" />}
+						tooltip={copied ? '¡Copiado!' : 'Copiar JSON'}
+						aria-label={copied ? 'Código JSON copiado con éxito' : 'Copiar código JSON al portapapeles'}
 						onClick={handleCopy}
-						className="text-primary hover:text-primary/80"
-						title={copied ? 'Copiado' : 'Copiar'}
-					>
-						{copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-					</button>
+						className="text-primary hover:text-primary/80 hover:bg-muted"
+					/>
 				</div>
 			</div>
 			{readOnly ? (

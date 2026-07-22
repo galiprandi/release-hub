@@ -644,13 +644,14 @@ function InstallButton() {
 			onClick={handleCopy}
 			className="flex items-center gap-1.5 px-2 py-1 rounded bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
 			type="button"
+			aria-label={copied ? "Comando copiado con éxito" : "Copiar comando de instalación al portapapeles"}
 		>
 			{copied ? (
 				<Check className="w-3.5 h-3.5" />
 			) : (
 				<Copy className="w-3.5 h-3.5" />
 			)}
-			{copied ? "Copiado!" : "Install app"}
+			{copied ? "¡Copiado!" : "Instalar app"}
 		</button>
 	);
 }

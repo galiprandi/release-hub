@@ -33,3 +33,7 @@
 ## 2026-07-28 - [Tailwind Visibility and jsdom Testing Standard]
 **Learning:** Checking for visibility via `.not.toBeVisible()` can fail in jsdom when elements are hidden using Tailwind's `hidden` class, as jsdom does not fully compile Tailwind utility styles during component unit tests.
 **Action:** Always assert the presence of class-based visibility states (e.g., `toHaveClass("hidden")`) on the wrapper or container element rather than relying on layout-based visibility matchers.
+
+## 2026-07-29 - [JsonEditor & PageLayout Button Polish]
+**Learning:** Native `title` attributes on toolbar/icon-only buttons (such as format and search toggles in JSON/text editors) provide poor screen reader feedback and delay tooltip display. Migrating them to the `<IconButton />` standard with localized Spanish tooltips and explicit `aria-label` tags immediately polishes visual consistency, keyboard tab order, and screen reader discoverability. Additionally, mixed Spanish/English label text (like `copied ? "Copiado!" : "Install app"`) must be localized to strict Spanish, and dynamic screen reader accessibility descriptions should change with the state of the interactive copy trigger.
+**Action:** Always replace raw native `title` attributes with `<IconButton />` or Radix-wrapped tooltips and maintain consistent, fully localized Spanish labels and dynamic accessibility text across stateful copy elements.

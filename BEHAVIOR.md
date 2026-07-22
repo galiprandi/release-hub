@@ -239,6 +239,14 @@
 - renders correctly with placeholder
 - shows clear button when query is present and clears on click
 
+## Module: JsonEditor
+- calls onChange when text is updated
+- copies text to clipboard when copy button is clicked
+- formats JSON on format button click
+- renders JsonEditor in editable mode
+- renders JsonEditor in readOnly mode
+- toggles search input when search button is clicked
+
 ## Module: CommitsModal
 - should filter commits
 - should render commits when open

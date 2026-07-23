@@ -393,7 +393,7 @@ function ActionsCell({
 	const running = isRunning(container.status)
 
 	return (
-		<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+		<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200">
 			<div className="flex items-center gap-1">
 				<ActionButton
 					action={ACTION_DEFINITIONS.viewLogs}

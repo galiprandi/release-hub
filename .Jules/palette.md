@@ -37,3 +37,7 @@
 ## 2026-07-29 - [JsonEditor & PageLayout Button Polish]
 **Learning:** Native `title` attributes on toolbar/icon-only buttons (such as format and search toggles in JSON/text editors) provide poor screen reader feedback and delay tooltip display. Migrating them to the `<IconButton />` standard with localized Spanish tooltips and explicit `aria-label` tags immediately polishes visual consistency, keyboard tab order, and screen reader discoverability. Additionally, mixed Spanish/English label text (like `copied ? "Copiado!" : "Install app"`) must be localized to strict Spanish, and dynamic screen reader accessibility descriptions should change with the state of the interactive copy trigger.
 **Action:** Always replace raw native `title` attributes with `<IconButton />` or Radix-wrapped tooltips and maintain consistent, fully localized Spanish labels and dynamic accessibility text across stateful copy elements.
+
+## 2026-07-30 - [Keyboard Accessibility for Hover-to-Reveal Cells]
+**Learning:** Table action cells using hover-to-reveal wrappers (e.g. `opacity-0 group-hover:opacity-100`) completely hide vital operational actions from sighted keyboard users navigating via Tab, causing severe interaction blockages.
+**Action:** Always pair `opacity-0 group-hover:opacity-100` with `focus-within:opacity-100` on interactive action-cell containers to gracefully reveal controls upon keyboard navigation.

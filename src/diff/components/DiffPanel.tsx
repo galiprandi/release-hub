@@ -29,7 +29,7 @@ export function DiffPanel({
         </div>
         <CopyButton
           text={value}
-          className="opacity-0 group-hover:opacity-100 transition-opacity"
+          className="opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity"
         />
       </div>
       <div className="relative flex-1 bg-zinc-950/20">

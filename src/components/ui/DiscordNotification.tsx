@@ -20,7 +20,7 @@ export function DiscordNotification({
 	const [showWebhook, setShowWebhook] = useState(false)
 
 	return (
-		<div className="border border-border/40 rounded-xl bg-muted/5 p-4">
+		<div className="border border-border rounded-md bg-muted/5 p-4">
 			{/* Header with toggle */}
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
@@ -50,7 +50,7 @@ export function DiscordNotification({
 					</Tooltip.Trigger>
 					<Tooltip.Portal>
 						<Tooltip.Content
-							className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 text-[10px] font-bold uppercase tracking-wider"
+							className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 text-xs font-medium"
 							sideOffset={5}
 						>
 							{!webhookUrl ? "Configura el webhook primero" : enabled ? "Desactivar notificaciones" : "Activar notificaciones"}
@@ -63,7 +63,7 @@ export function DiscordNotification({
 			{/* Webhook input (always shown when not readonly and onWebhookChange exists) */}
 			{!readonly && onWebhookChange && (
 				<div className="mt-4 space-y-1.5">
-					<label htmlFor="discord-webhook" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 flex items-center gap-2 ml-1">
+					<label htmlFor="discord-webhook" className="text-xs font-medium text-muted-foreground/60 flex items-center gap-2 ml-1">
 						<Link className="w-3.5 h-3.5" />
 						Webhook de Discord
 					</label>
@@ -74,7 +74,7 @@ export function DiscordNotification({
 							value={webhookUrl}
 							onChange={(e) => onWebhookChange(e.target.value)}
 							placeholder="https://discord.com/api/webhooks/..."
-							className="w-full px-3 py-2 pr-10 text-xs bg-muted/40 border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+							className="w-full px-3 py-2 pr-10 text-xs bg-muted/30 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
 						/>
 						<button
 							type="button"
@@ -85,7 +85,7 @@ export function DiscordNotification({
 							{showWebhook ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
 						</button>
 					</div>
-					<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+					<p className="text-xs font-medium text-muted-foreground/60 ml-1">
 						URL del webhook de Discord para enviar notificaciones
 					</p>
 				</div>

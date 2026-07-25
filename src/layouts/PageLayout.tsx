@@ -83,7 +83,7 @@ export function PageLayout({
 	emptyState,
 	showEmptyState,
 }: PageLayoutProps) {
-	const [isDark, setIsDark] = useState(false);
+	const [isDark, setIsDark] = useState(true);
 	const routerState = useRouterState();
 	const pathname = routerState.location.pathname;
 	const { data: gitUser } = useGitUser();
@@ -102,17 +102,17 @@ export function PageLayout({
 	}, [isDark]);
 
 	return (
-		<div className="flex min-h-screen bg-background text-foreground transition-colors duration-200">
+		<div className="flex min-h-screen bg-background text-foreground">
 			{/* Aside Nav */}
 			<aside
-				className="w-[50px] h-screen sticky top-0 flex flex-col items-center py-4 bg-muted/30 border-r border-border/40 shrink-0"
+				className="w-[50px] h-screen sticky top-0 flex flex-col items-center py-4 bg-background border-r border-border shrink-0"
 				aria-label="Navegación principal"
 			>
-				<div className="p-1.5 rounded-lg bg-primary/10 mb-4" aria-hidden="true">
+				<div className="p-1.5 rounded-md bg-primary/10 mb-4" aria-hidden="true">
 					<Box className="w-6 h-6 text-primary" />
 				</div>
 
-				<div className="w-6 h-px bg-border/60 mb-4" aria-hidden="true" />
+				<div className="w-6 h-px bg-border mb-4" aria-hidden="true" />
 
 				<nav
 					className="flex flex-col gap-4 flex-1"
@@ -209,7 +209,7 @@ export function PageLayout({
 								"https://github.com/identicons/jasonlong.png"
 							}
 							alt="Avatar de usuario"
-							className="w-8 h-8 rounded-full border border-border/60 hover:border-primary/60 transition-colors"
+							className="w-8 h-8 rounded-full border border-border hover:border-primary/60 transition-colors"
 						/>
 					</a>
 				</div>
@@ -220,12 +220,12 @@ export function PageLayout({
 				{/* Header Bar */}
 				{header && (
 					<div className="sticky top-0 z-10">
-						<header className="h-14 bg-background/80 backdrop-blur-sm border-b border-border/40 flex items-center justify-between px-6 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+						<header className="h-14 bg-background/80 backdrop-blur-sm border-b border-border flex items-center justify-between px-6 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
 							<nav
 								className="flex items-center gap-4"
 								aria-label="Navegación de breadcrumb"
 							>
-								<h1 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground/80">
+								<h1 className="text-sm font-semibold text-muted-foreground/80">
 									{header.title}
 								</h1>
 							</nav>
@@ -294,7 +294,7 @@ export function PageLayout({
 				</div>
 				{/* Footer */}
 				{footer?.show && (
-					<footer className="mt-auto border-t border-border/40 py-4 px-8 bg-muted/30">
+					<footer className="mt-auto border-t border-border py-4 px-8 bg-muted/30">
 						<div className="flex items-center justify-between text-xs text-muted-foreground">
 							<span>{footer?.left}</span>
 							<div className="flex items-center gap-4">
@@ -351,7 +351,7 @@ function NavIcon({
 				<Tooltip.Content
 					side="right"
 					sideOffset={10}
-					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
 					role="tooltip"
 				>
 					{label}
@@ -393,7 +393,7 @@ function FeedbackIcon() {
 				<Tooltip.Content
 					side="right"
 					sideOffset={10}
-					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
 					role="tooltip"
 				>
 					Feedback
@@ -452,7 +452,7 @@ function AIChatIcon() {
 				<Tooltip.Content
 					side="right"
 					sideOffset={10}
-					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
 					role="tooltip"
 				>
 					Asistente AI
@@ -538,7 +538,7 @@ function SettingsIcon() {
 				<Tooltip.Content
 					side="right"
 					sideOffset={10}
-					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
 					role="tooltip"
 				>
 					Configuración
@@ -577,7 +577,7 @@ function TerminalIconModal() {
 				<Tooltip.Content
 					side="right"
 					sideOffset={10}
-					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+					className="bg-popover text-popover-foreground border px-2.5 py-1.5 rounded shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
 					role="tooltip"
 				>
 					Terminal
@@ -602,12 +602,12 @@ function TerminalIconModal() {
 						<div className="flex items-center gap-3">
 							<div className="flex items-center gap-1.5">
 								<div className="w-1 h-1 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-								<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+								<span className="text-xs font-medium text-muted-foreground/60">
 									Active Session
 								</span>
 							</div>
 							<div className="w-px h-3 bg-border/40" />
-							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 font-mono">
+							<span className="text-xs font-medium text-muted-foreground/40 font-mono">
 								Local
 							</span>
 						</div>
@@ -616,7 +616,7 @@ function TerminalIconModal() {
 				maxWidth="max-w-6xl"
 				className="w-[90vw] h-[80vh] !p-0"
 			>
-				<div className="flex-1 min-h-0 bg-zinc-950 rounded-b-xl overflow-hidden border-t border-border/40">
+				<div className="flex-1 min-h-0 bg-zinc-950 rounded-b-xl overflow-hidden border-t border-border">
 					<Terminal type="local" className="border-none rounded-none h-full" />
 				</div>
 			</BaseDialog>

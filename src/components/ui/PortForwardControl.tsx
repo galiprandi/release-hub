@@ -88,7 +88,7 @@ export function PortForwardControl({ value, placeholder = "8080", onChange, onCo
 				)}
 			</div>
 			{error && (
-				<span className="text-[10px] text-destructive font-medium truncate max-w-[120px]">
+				<span className="text-xs text-destructive font-medium truncate max-w-[120px]">
 					{error}
 				</span>
 			)}

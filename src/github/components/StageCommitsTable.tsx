@@ -93,7 +93,7 @@ export function StageCommitsTable({
 					)}
 
 					{/* Infinite scroll sensor */}
-					<div ref={loadMoreRef} className="flex items-center justify-center py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 border-t border-border/20">
+					<div ref={loadMoreRef} className="flex items-center justify-center py-4 text-xs font-medium text-muted-foreground/60 border-t border-border">
 						{isFetchingNextPage ? (
 							<div className="flex items-center gap-2">
 								<Loader2 className="w-3 h-3 animate-spin text-primary" />

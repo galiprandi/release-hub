@@ -112,6 +112,6 @@ describe("FeedbackDialog", () => {
 
 		const textarea = screen.getByLabelText(/descripción/i)
 		// Updated to match Industrial Resonance V2 focus standard with 20% opacity
-		expect(textarea).toHaveClass("focus:ring-2", "focus:ring-primary/20")
+		expect(textarea).toHaveClass("focus:ring-2", "focus:ring-primary/30")
 	})
 })

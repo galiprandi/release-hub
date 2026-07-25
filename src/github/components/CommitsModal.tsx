@@ -124,7 +124,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 			title={
 				<div className="flex items-center gap-2">
 					<span>Cambios desde {prodTag || "último deploy"}</span>
-					<span className="text-[10px] bg-muted px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
+					<span className="text-xs bg-muted px-2 py-0.5 rounded-md font-medium">
 						{pendingCommits.length}
 					</span>
 				</div>
@@ -145,7 +145,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 									onChange={(e) => setFilter(e.target.value)}
 									placeholder="FILTRAR COMMITS"
 									aria-label="Filtrar commits"
-									className="w-full pl-9 pr-10 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted/40 border border-border/60 rounded-lg placeholder:text-muted-foreground/40 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
+									className="w-full pl-9 pr-10 py-1.5 text-xs font-medium bg-muted/30 border border-border rounded-lg placeholder:text-muted-foreground/40 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
 								/>
 								{filter && (
 									<button
@@ -161,7 +161,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 						</Tooltip.Trigger>
 						<Tooltip.Portal>
 							<Tooltip.Content
-								className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md z-[10000]"
+								className="bg-popover text-popover-foreground border px-2 py-1 text-xs font-medium rounded-md shadow-md z-[10000]"
 								sideOffset={5}
 							>
 								FILTRAR COMMITS POR TEXTO
@@ -209,7 +209,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 								{filteredCommits.map((commit) => (
 									<div
 										key={commit.hash}
-										className="group p-4 bg-muted/30 rounded-xl border border-transparent hover:bg-accent hover:border-primary/30 transition-all duration-200 focus-visible:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+										className="group p-4 bg-muted/30 rounded-md border border-transparent hover:bg-accent hover:border-primary/30 transition-all duration-200 focus-visible:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
 										onClick={() => toggleCommitExpansion(commit.hash)}
 										role="button"
 										aria-expanded={expandedCommits.has(commit.hash)}
@@ -240,7 +240,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 														</div>
 													)}
 												</div>
-												<div className="flex items-center gap-3 mt-2 text-[10px] text-muted-foreground">
+												<div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
 													<div className="flex items-center gap-1 group/hash">
 														<span className="font-mono bg-muted px-1.5 py-0.5 rounded uppercase tracking-tighter">
 															{commit.shortHash}
@@ -256,7 +256,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 													<span>{commit.date}</span>
 												</div>
 												{expandedCommits.has(commit.hash) && commit.body && (
-													<div className="mt-4 p-3 rounded-lg bg-background/50 border border-border/50 text-[10px] text-muted-foreground whitespace-pre-wrap animate-in fade-in slide-in-from-top-2 duration-300">
+													<div className="mt-4 p-3 rounded-lg bg-background/50 border border-border text-xs text-muted-foreground whitespace-pre-wrap animate-in fade-in slide-in-from-top-2 duration-300">
 														{commit.body}
 													</div>
 												)}

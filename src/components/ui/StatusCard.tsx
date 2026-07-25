@@ -12,7 +12,7 @@ const FOCUS_RING = "focus-visible:ring-2 focus-visible:ring-primary focus-visibl
 export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps) {
 	const styles = {
 		loading: {
-			borderClass: 'border-border/50',
+			borderClass: 'border-border',
 			textClass: 'text-muted-foreground',
 			icon: Loader2,
 			iconClass: 'animate-spin',
@@ -41,7 +41,7 @@ export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps)
 	const Icon = style.icon;
 
 	return (
-		<div className={`bg-muted/10 border ${style.borderClass} rounded-xl p-4 h-[82px] flex items-center justify-between shadow-sm`}>
+		<div className={`bg-muted/30 border ${style.borderClass} rounded-md p-4 h-[82px] flex items-center justify-between shadow-sm`}>
 			<div className="flex items-center gap-3 text-sm overflow-hidden">
 				<div className={`p-2 rounded-lg bg-background/50 border ${style.borderClass}`}>
 					<Icon className={`w-4 h-4 shrink-0 ${style.iconClass} ${style.textClass}`} aria-hidden="true" />
@@ -53,10 +53,10 @@ export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps)
 					<button
 						type="button"
 						onClick={onRetry}
-						className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 shadow-sm ${
+						className={`text-xs font-medium px-3 py-1.5 rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 shadow-sm ${
 							type === 'error' ? 'bg-destructive/20 text-destructive hover:bg-destructive/30 border border-destructive/20' :
 							type === 'warn' ? 'bg-warning/20 text-warning hover:bg-warning/30 border border-warning/20' :
-							'bg-muted text-foreground hover:bg-accent border border-border/60'
+							'bg-muted text-foreground hover:bg-accent border border-border'
 						}`}
 					>
 						Reintentar

@@ -43,12 +43,12 @@ export function SetupCard({
 
 	if (isInstalled) {
 		return (
-			<div className="flex items-start gap-3 text-success text-sm border border-success/20 rounded-xl p-4 bg-success/10 shadow-sm transition-all hover:bg-success/20">
+			<div className="flex items-start gap-3 text-success text-sm border border-success/20 rounded-md p-4 bg-success/10 shadow-sm transition-all hover:bg-success/20">
 				<CheckCircle className="w-5 h-5 mt-0.5" />
 				<div className="flex-1">
 					<div className="flex items-center gap-2">
-						<p className="text-[10px] font-bold uppercase tracking-wider">{name}</p>
-						<span className="px-1.5 py-0.5 rounded-md bg-success/20 border border-success/20 text-[10px] font-bold uppercase tracking-wider">
+						<p className="text-xs font-medium">{name}</p>
+						<span className="px-1.5 py-0.5 rounded-md bg-success/20 border border-success/20 text-xs font-medium">
 							Instalado
 						</span>
 					</div>
@@ -56,12 +56,12 @@ export function SetupCard({
 						{description}
 					</p>
 					{version && (
-						<p className="text-[10px] font-mono text-muted-foreground/60 mt-2">
+						<p className="text-xs font-mono text-muted-foreground/60 mt-2">
 							Versión: {version}
 						</p>
 					)}
 					{!isRequired && (
-						<p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 mt-1">
+						<p className="text-xs font-medium uppercase tracking-widest text-muted-foreground/40 mt-1">
 							(Opcional)
 						</p>
 					)}
@@ -80,7 +80,7 @@ export function SetupCard({
 		: "bg-warning/20 border-warning/20";
 
 	return (
-		<div className={`border rounded-xl p-4 shadow-sm transition-all ${containerStyles}`}>
+		<div className={`border rounded-md p-4 shadow-sm transition-all ${containerStyles}`}>
 			<button
 				onClick={() => setIsOpen(!isOpen)}
 				className="w-full flex items-center gap-3 text-left focus-visible:outline-none"
@@ -89,11 +89,11 @@ export function SetupCard({
 				<XCircle className={`w-5 h-5 flex-shrink-0 ${iconStyles}`} />
 				<div className="flex-1">
 					<div className="flex items-center gap-2">
-						<h2 className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 ${iconStyles}`}>
+						<h2 className={`text-xs font-medium flex items-center gap-2 ${iconStyles}`}>
 							{icon}
 							{name}
 						</h2>
-						<span className={`px-1.5 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${badgeStyles}`}>
+						<span className={`px-1.5 py-0.5 rounded-md border text-xs font-medium ${badgeStyles}`}>
 							{isRequired ? "Requerido" : "Opcional"}
 						</span>
 					</div>
@@ -106,7 +106,7 @@ export function SetupCard({
 				)}
 			</button>
 			{isOpen && filteredCommands.length > 0 && (
-				<div className="mt-4 bg-muted/10 border border-border/40 p-4 rounded-lg text-sm font-mono space-y-3 text-foreground">
+				<div className="mt-4 bg-muted/30 border border-border p-4 rounded-lg text-sm font-mono space-y-3 text-foreground">
 					{filteredCommands.map((c) => (
 						<div key={c.cmd}>
 							{c.label && <p className="text-muted-foreground"># {c.label}</p>}

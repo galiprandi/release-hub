@@ -67,8 +67,8 @@ function statusConfig(state: PulsarBuildState) {
 			return {
 				icon: Circle,
 				color: 'text-muted-foreground/50',
-				bg: 'bg-muted/40',
-				badge: 'bg-muted/40 text-muted-foreground/60 border border-border/40',
+				bg: 'bg-muted/30',
+				badge: 'bg-muted/30 text-muted-foreground/60 border border-border',
 				label: 'SKIPPED',
 			}
 		case 'CANCELLED':
@@ -114,7 +114,7 @@ function ImageChip({
 			onClick={isClickable ? onClick : undefined}
 			disabled={!isClickable}
 			aria-label={ariaLabel}
-			className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all shrink-0 ${
+			className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all shrink-0 ${
 				isExpanded
 					? 'bg-foreground/10 text-foreground ring-1 ring-border'
 					: isFailed
@@ -128,7 +128,7 @@ function ImageChip({
 				className={`w-3 h-3 ${config.color} ${image.state === 'RUNNING' ? 'animate-spin' : ''}`}
 			/>
 			<span>{image.app}</span>
-			<span className="text-[10px] opacity-60 normal-case font-medium">{image.appType}</span>
+			<span className="text-xs opacity-60 normal-case font-medium">{image.appType}</span>
 			{isClickable && (
 				<ChevronRight
 					className={`w-2.5 h-2.5 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
@@ -146,13 +146,13 @@ function ImagePanel({ image }: { image: PulsarImageJob }) {
 	const failedSteps = image.steps.filter((s) => s.state === 'FAILED')
 
 	return (
-		<div className="border border-border/60 rounded-lg overflow-hidden bg-muted/10">
-			<div className="flex items-center justify-between px-3 py-2 bg-muted/20 border-b border-border/40">
+		<div className="border border-border rounded-lg overflow-hidden bg-muted/30">
+			<div className="flex items-center justify-between px-3 py-2 bg-muted/30 border-b border-border">
 				<div className="flex items-center gap-2">
 					<config.icon className={`w-4 h-4 ${config.color}`} />
 					<span className="text-xs font-bold text-foreground">{image.app}</span>
-					<span className="text-[10px] text-muted-foreground/60">{image.appType}</span>
-					<span className={`px-1.5 py-0 text-[10px] rounded-md font-bold uppercase tracking-wider ${config.badge}`}>
+					<span className="text-xs text-muted-foreground/60">{image.appType}</span>
+					<span className={`px-1.5 py-0 text-xs rounded-md font-medium ${config.badge}`}>
 						{config.label}
 					</span>
 				</div>
@@ -162,14 +162,14 @@ function ImagePanel({ image }: { image: PulsarImageJob }) {
 							href={image.url}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-[10px] font-bold underline hover:opacity-70 transition-opacity inline-flex items-center gap-1"
+							className="text-xs font-bold underline hover:opacity-70 transition-opacity inline-flex items-center gap-1"
 						>
 							Ver en GitHub
 							<ExternalLink className="w-2.5 h-2.5" />
 						</a>
 					)}
 					{duration && (
-						<span className="text-[10px] text-muted-foreground tabular-nums flex items-center gap-1">
+						<span className="text-xs text-muted-foreground tabular-nums flex items-center gap-1">
 							<Clock className="w-2.5 h-2.5" />
 							{duration}
 						</span>
@@ -193,7 +193,7 @@ function ImagePanel({ image }: { image: PulsarImageJob }) {
 								/>
 								<span className="text-xs text-foreground truncate">{step.name}</span>
 							</div>
-							<span className={`text-[10px] font-bold uppercase tracking-wider shrink-0 ${stepConfig.color}`}>
+							<span className={`text-xs font-medium shrink-0 ${stepConfig.color}`}>
 								{stepConfig.label}
 							</span>
 						</div>
@@ -203,10 +203,10 @@ function ImagePanel({ image }: { image: PulsarImageJob }) {
 
 			{/* Error detail */}
 			{failedSteps.length > 0 && (
-				<div className="px-3 py-3 border-t border-border/40 bg-destructive/5 space-y-2">
+				<div className="px-3 py-3 border-t border-border bg-destructive/5 space-y-2">
 					<div className="flex items-center gap-2">
 						<AlertCircle className="w-3.5 h-3.5 shrink-0 text-destructive/60" />
-						<span className="text-[10px] font-bold uppercase tracking-wider text-destructive/70 dark:text-destructive/60">
+						<span className="text-xs font-medium text-destructive/70 dark:text-destructive/60">
 							Step{failedSteps.length > 1 ? 's' : ''} fallido{failedSteps.length > 1 ? 's' : ''}
 						</span>
 					</div>
@@ -218,7 +218,7 @@ function ImagePanel({ image }: { image: PulsarImageJob }) {
 									href={`${image.url}#step-${step.number}:1`}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="text-[10px] text-primary hover:text-primary/80 inline-flex items-center gap-1 transition-colors"
+									className="text-xs text-primary hover:text-primary/80 inline-flex items-center gap-1 transition-colors"
 								>
 									Ver log del step
 									<ExternalLink className="w-2.5 h-2.5" />
@@ -241,12 +241,12 @@ function FallbackPanel({ data }: { data: PulsarBuildData }) {
 	const Icon = config.icon
 
 	return (
-		<div className="border border-border/60 rounded-lg overflow-hidden bg-destructive/5">
-			<div className="flex items-center justify-between px-3 py-2 bg-destructive/10 border-b border-border/40">
+		<div className="border border-border rounded-lg overflow-hidden bg-destructive/5">
+			<div className="flex items-center justify-between px-3 py-2 bg-destructive/10 border-b border-border">
 				<div className="flex items-center gap-2">
 					<Icon className={`w-4 h-4 ${config.color}`} />
 					<span className="text-xs font-bold text-foreground">{fb.name}</span>
-					<span className={`px-1.5 py-0 text-[10px] rounded-md font-bold uppercase tracking-wider ${config.badge}`}>
+					<span className={`px-1.5 py-0 text-xs rounded-md font-medium ${config.badge}`}>
 						{config.label}
 					</span>
 				</div>
@@ -255,7 +255,7 @@ function FallbackPanel({ data }: { data: PulsarBuildData }) {
 						href={fb.url}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="text-[10px] font-bold underline hover:opacity-70 transition-opacity inline-flex items-center gap-1"
+						className="text-xs font-bold underline hover:opacity-70 transition-opacity inline-flex items-center gap-1"
 					>
 						Ver en GitHub
 						<ExternalLink className="w-2.5 h-2.5" />
@@ -264,7 +264,7 @@ function FallbackPanel({ data }: { data: PulsarBuildData }) {
 			</div>
 			{fb.errorStep && (
 				<div className="px-3 py-2.5 space-y-1">
-					<span className="text-[10px] font-bold uppercase tracking-wider text-destructive/70 dark:text-destructive/60">
+					<span className="text-xs font-medium text-destructive/70 dark:text-destructive/60">
 						Step fallido
 					</span>
 					<p className="text-xs text-foreground/90 font-medium">{fb.errorStep.name}</p>
@@ -308,7 +308,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 
 	return (
 		<div
-			className={`bg-card border rounded-xl p-4 transition-all duration-500 ${
+			className={`bg-card border rounded-md p-4 transition-all duration-500 ${
 				data.state === 'FAILED' ? 'ring-1 ring-destructive/20' : ''
 			}`}
 		>
@@ -320,7 +320,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 						<RefTypeIcon className="w-3.5 h-3.5 text-muted-foreground" />
 						<span className="font-mono text-sm font-semibold text-foreground">{data.ref}</span>
 						<span
-							className={`px-1.5 py-0 text-[10px] rounded-md font-bold uppercase tracking-wider ${
+							className={`px-1.5 py-0 text-xs rounded-md font-medium ${
 								data.refType === 'TAG'
 									? 'bg-purple-50 text-purple-700 border border-purple-100 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800'
 									: 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800'
@@ -329,7 +329,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 							{data.refType}
 						</span>
 						<span
-							className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-md ${config.badge}`}
+							className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold rounded-md ${config.badge}`}
 						>
 							<StatusIcon
 								className={`w-3 h-3 ${config.color} ${data.state === 'RUNNING' ? 'animate-spin' : ''}`}
@@ -338,7 +338,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 						</span>
 						<div className="flex items-center gap-1 ml-auto">
 							<EnvIcon className="w-3.5 h-3.5 text-muted-foreground/60" />
-							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+							<span className="text-xs font-medium text-muted-foreground/60">
 								{envLabel}
 							</span>
 						</div>
@@ -390,7 +390,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 					{images.length > 0 && (
 						<div className="space-y-2 pt-1">
 							<div className="flex items-center gap-1.5">
-								<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 shrink-0 inline-flex items-center gap-1">
+								<span className="text-xs font-medium text-muted-foreground/60 shrink-0 inline-flex items-center gap-1">
 									<Package className="w-3 h-3" />
 									Imágenes ({images.length}):
 								</span>
@@ -422,7 +422,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 						<button
 							type="button"
 							onClick={() => setIsErrorModalOpen(true)}
-							className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-destructive bg-destructive/5 border border-destructive/20 rounded-md hover:bg-destructive/10 transition-colors"
+							className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-destructive bg-destructive/5 border border-destructive/20 rounded-md hover:bg-destructive/10 transition-colors"
 						>
 							<AlertCircle className="w-3 h-3" />
 							{failedImages.length} imagen{failedImages.length > 1 ? 'es' : ''} fallida{failedImages.length > 1 ? 's' : ''}

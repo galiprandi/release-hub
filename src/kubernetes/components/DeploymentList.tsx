@@ -331,7 +331,7 @@ export const DeploymentList = ({
 									<TerminalIcon className="w-4 h-4 text-primary" />
 								</div>
 								<div className="flex flex-col">
-									<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 leading-none mb-1">
+									<span className="text-xs font-medium text-muted-foreground/60 leading-none mb-1">
 										{selectedContext}
 									</span>
 									<span className="text-sm font-bold tracking-tight leading-none">
@@ -420,7 +420,7 @@ function DeploymentsTable({
 			header: () => (
 				<div className="flex items-center gap-2">
 					{icon && <span className="text-primary/40">{icon}</span>}
-					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{label}</span>
+					<span className="text-xs font-medium text-muted-foreground/60">{label}</span>
 				</div>
 			),
 			cell: ({ row }) => <DeploymentNameCell deployment={row.original} isLoading={isLoading} />,
@@ -428,28 +428,28 @@ function DeploymentsTable({
 		{
 			id: "namespace",
 			accessorKey: "namespace",
-			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Namespace</span>,
-			cell: ({ row }) => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{row.original.namespace}</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground/60">Namespace</span>,
+			cell: ({ row }) => <span className="text-xs font-medium text-muted-foreground/60">{row.original.namespace}</span>,
 			filterFn: 'equalsString',
 		},
 		{
 			accessorKey: "status",
-			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Estado</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground/60">Estado</span>,
 			cell: ({ row }) => <StatusCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			accessorKey: "age",
-			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Age</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground/60">Age</span>,
 			cell: ({ row }) => <AgeCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			accessorKey: "images",
-			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Imágenes</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground/60">Imágenes</span>,
 			cell: ({ row }) => <ImagesCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			id: "portForward",
-			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Port Forward</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground/60">Port Forward</span>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<PortForwardCell
@@ -461,7 +461,7 @@ function DeploymentsTable({
 		{
 			id: "actions",
 			accessorKey: "actions",
-			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 text-right block w-full">Acciones</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground/60 text-right block w-full">Acciones</span>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<ActionsCell
@@ -494,7 +494,7 @@ function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentW
 	if (isLoading) {
 		return (
 			<div className="flex items-center gap-2">
-				<div className="h-4 bg-muted/40 rounded w-32 animate-pulse" />
+				<div className="h-4 bg-muted/30 rounded w-32 animate-pulse" />
 			</div>
 		)
 	}
@@ -504,20 +504,20 @@ function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentW
 
 function StatusCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
 	if (isLoading) {
-		return <div className="h-6 bg-muted/40 rounded w-16 animate-pulse" />
+		return <div className="h-6 bg-muted/30 rounded w-16 animate-pulse" />
 	}
 
 	const variants: Record<string, { className: string; label: string }> = {
 		healthy: { className: 'bg-success/20 text-success border-success/20', label: 'Saludable' },
 		progressing: { className: 'bg-info/20 text-info border-info/20', label: 'Procesando' },
 		degraded: { className: 'bg-destructive/20 text-destructive border-destructive/20', label: 'Degradado' },
-		unknown: { className: 'bg-muted/20 text-muted-foreground border-border/10', label: 'Desconocido' },
+		unknown: { className: 'bg-muted/30 text-muted-foreground border-border', label: 'Desconocido' },
 	}
 
 	const variant = variants[deployment.status] || variants.unknown
 
 	return (
-		<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold tracking-wider uppercase ${variant.className}`}>
+		<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-xs font-medium uppercase ${variant.className}`}>
 			{variant.label}
 		</span>
 	)
@@ -527,7 +527,7 @@ function AgeCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoad
 	if (isLoading) {
 		return <div className="h-4 bg-muted rounded w-10" />
 	}
-	return <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{deployment.age}</span>
+	return <span className="text-xs font-medium text-muted-foreground/60">{deployment.age}</span>
 }
 
 function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
@@ -548,7 +548,7 @@ function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isL
 			{shortImages.map((img, i) => (
 				<div key={i} className="flex">
 					<span
-						className="inline-flex items-center px-1.5 py-0.5 rounded bg-muted/20 border border-border/10 text-[10px] font-medium text-muted-foreground tracking-tighter truncate max-w-[180px]"
+						className="inline-flex items-center px-1.5 py-0.5 rounded bg-muted/30 border border-border text-xs font-medium text-muted-foreground tracking-tighter truncate max-w-[180px]"
 						title={deployment.images[i]}
 					>
 						{img}

@@ -12,16 +12,16 @@ interface EmptyStateProps {
 export function EmptyState({ icon, label, caption, action, className }: EmptyStateProps) {
   return (
     <div className={clsx("flex items-center justify-center w-full min-h-[400px]", className)}>
-      <div className="w-full border rounded-xl p-12 text-center text-muted-foreground bg-muted/20 border-dashed border-border/40">
+      <div className="w-full border rounded-md p-12 text-center text-muted-foreground bg-muted/30 border-dashed border-border">
         {icon && (
           <div className="flex justify-center mb-6">
-            <div className="p-4 rounded-full bg-muted/20 border border-border/40">
+            <div className="p-4 rounded-full bg-muted/30 border border-border">
               {icon}
             </div>
           </div>
         )}
         {label && (
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground mb-2">
+          <h3 className="text-xs font-medium text-foreground mb-2">
             {label}
           </h3>
         )}

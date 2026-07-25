@@ -20,7 +20,7 @@ function NovedadesPage() {
 				),
 			}}
 		>
-			<div className="bg-muted/10 border border-border/40 rounded-xl p-8 mb-8">
+			<div className="bg-muted/30 border border-border rounded-md p-8 mb-8">
 				<Streamdown>{novedadesContent}</Streamdown>
 			</div>
 		</PageLayout>

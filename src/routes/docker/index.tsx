@@ -82,7 +82,7 @@ function DockerManagerPage() {
       action={ACTION_DEFINITIONS.refresh}
       onClick={handleRefresh}
       showLabel={true}
-      className="bg-background border border-border/60 shadow-sm px-4 py-2 rounded-lg"
+      className="bg-background border border-border shadow-sm px-4 py-2 rounded-lg"
     />
   );
 
@@ -98,7 +98,7 @@ function DockerManagerPage() {
         searchComponent: access?.hasAccess ? (
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Estado:</span>
+              <span className="text-xs font-medium text-muted-foreground/60">Estado:</span>
               <IndustrialTabs
                 options={[
                   { id: 'all', label: `Todos (${filterCounts.all})` },

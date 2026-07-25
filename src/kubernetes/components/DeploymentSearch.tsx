@@ -152,7 +152,7 @@ export function DeploymentSearch() {
           onBlur={() => setIsEditable(false)}
           placeholder={`Buscar por namespace... (ej: yumi-ticket-control)`}
           aria-label="Búsqueda de deployments"
-          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/40 border border-border/60 rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all hover:bg-muted/50`}
+          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all hover:bg-muted/50`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -174,7 +174,7 @@ export function DeploymentSearch() {
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content
-                className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+                className="bg-popover text-popover-foreground border px-2 py-1 text-xs font-medium rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
                 sideOffset={5}
               >
                 Limpiar búsqueda
@@ -190,7 +190,7 @@ export function DeploymentSearch() {
 
       {/* Dropdown Results */}
       {isOpen && (
-        <div className={`absolute top-full left-0 mt-2 ${searchWidth} bg-popover text-popover-foreground border rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100`}>
+        <div className={`absolute top-full left-0 mt-2 ${searchWidth} bg-popover text-popover-foreground border rounded-md shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100`}>
           {isLoading ? (
             <div className="p-4 text-center text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
@@ -218,7 +218,7 @@ export function DeploymentSearch() {
                     role="option"
                     aria-selected={isSelected}
                     id={`deployment-option-${index}`}
-                    className={`group p-3 border-b border-border/40 last:border-b-0 transition-colors ${
+                    className={`group p-3 border-b border-border last:border-b-0 transition-colors ${
                       isSelected ? 'bg-muted' : 'hover:bg-muted/50'
                     }`}
                   >
@@ -231,26 +231,26 @@ export function DeploymentSearch() {
                           </span>
                         </div>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{deployment.namespace}</span>
+                          <span className="text-xs font-medium text-muted-foreground/60">{deployment.namespace}</span>
                           <div className="w-px h-2.5 bg-border/60 mx-0.5" />
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 truncate">{deployment.context}</span>
+                          <span className="text-xs font-medium text-muted-foreground/40 truncate">{deployment.context}</span>
                         </div>
                         <div className="flex items-center gap-4 mt-2">
                           <div className="flex items-center gap-1.5">
-                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">Ready</span>
-                             <span className="px-1.5 py-0.5 rounded bg-muted/40 border border-border/10 text-[10px] font-mono font-bold text-foreground">
+                             <span className="text-xs font-medium text-muted-foreground/40">Ready</span>
+                             <span className="px-1.5 py-0.5 rounded bg-muted/30 border border-border text-xs font-mono font-bold text-foreground">
                                {deployment.ready}
                              </span>
                           </div>
                           <div className="flex items-center gap-1.5">
-                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">Up-to-date</span>
-                             <span className="px-1.5 py-0.5 rounded bg-muted/40 border border-border/10 text-[10px] font-mono font-bold text-foreground">
+                             <span className="text-xs font-medium text-muted-foreground/40">Up-to-date</span>
+                             <span className="px-1.5 py-0.5 rounded bg-muted/30 border border-border text-xs font-mono font-bold text-foreground">
                                {deployment.upToDate}
                              </span>
                           </div>
                           <div className="flex items-center gap-1.5">
-                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">Available</span>
-                             <span className="px-1.5 py-0.5 rounded bg-muted/40 border border-border/10 text-[10px] font-mono font-bold text-foreground">
+                             <span className="text-xs font-medium text-muted-foreground/40">Available</span>
+                             <span className="px-1.5 py-0.5 rounded bg-muted/30 border border-border text-xs font-mono font-bold text-foreground">
                                {deployment.available}
                              </span>
                           </div>
@@ -278,16 +278,16 @@ export function DeploymentSearch() {
           )}
 
           {/* Footer hint */}
-          <div className="px-3 py-2 bg-muted/60 border-t border-border/60 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80 flex items-center justify-between">
+          <div className="px-3 py-2 bg-muted/60 border-t border-border text-xs font-medium uppercase tracking-widest text-muted-foreground/80 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[10px]">↑↓</kbd> NAVEGAR
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border shadow-sm font-sans text-xs">↑↓</kbd> NAVEGAR
               </span>
               <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[10px]">↵</kbd> SELECCIONAR
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border shadow-sm font-sans text-xs">↵</kbd> SELECCIONAR
               </span>
               <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border/60 shadow-sm font-sans text-[10px]">ESC</kbd> CERRAR
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border shadow-sm font-sans text-xs">ESC</kbd> CERRAR
               </span>
             </div>
             <span className="opacity-60">{results.length} RESULTADOS</span>

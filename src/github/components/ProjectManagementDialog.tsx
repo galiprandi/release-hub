@@ -82,43 +82,43 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 						{projects.map((project) => (
 							<div
 								key={project.id}
-								className="group flex items-start justify-between p-4 bg-muted/10 rounded-xl border border-border/40 hover:bg-muted/20 transition-all"
+								className="group flex items-start justify-between p-4 bg-muted/30 rounded-md border border-border hover:bg-muted/30 transition-all"
 							>
 								{editingProject === project.id ? (
 									<div className="flex-1 space-y-3 mr-4">
 										<div className="space-y-1">
-											<label htmlFor={`edit-name-${project.id}`} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Nombre</label>
+											<label htmlFor={`edit-name-${project.id}`} className="text-xs font-medium text-muted-foreground/60 ml-1">Nombre</label>
 											<input
 												id={`edit-name-${project.id}`}
 												autoFocus
 												type="text"
 												value={editName}
 												onChange={(e) => setEditName(e.target.value)}
-												className="w-full px-3 py-1.5 text-xs bg-background border border-border/60 rounded-lg focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+												className="w-full px-3 py-1.5 text-xs bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/30 focus:outline-none transition-all"
 												placeholder="Nombre del proyecto"
 											/>
 										</div>
 										<div className="space-y-1">
-											<label htmlFor={`edit-desc-${project.id}`} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Descripción</label>
+											<label htmlFor={`edit-desc-${project.id}`} className="text-xs font-medium text-muted-foreground/60 ml-1">Descripción</label>
 											<textarea
 												id={`edit-desc-${project.id}`}
 												value={editDescription}
 												onChange={(e) => setEditDescription(e.target.value)}
-												className="w-full px-3 py-1.5 text-xs bg-background border border-border/60 rounded-lg focus:ring-2 focus:ring-primary/20 focus:outline-none h-20 resize-none transition-all"
+												className="w-full px-3 py-1.5 text-xs bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/30 focus:outline-none h-20 resize-none transition-all"
 												placeholder="Descripción (opcional)"
 											/>
 										</div>
 										<div className="flex items-center gap-2">
 											<button
 												onClick={() => handleSaveEdit(project.id)}
-												className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
+												className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
 											>
 												<Save className="w-3.5 h-3.5" />
 												Guardar
 											</button>
 											<button
 												onClick={() => setEditingProject(null)}
-												className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
+												className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
 											>
 												<X className="w-3.5 h-3.5" />
 												Cancelar
@@ -132,7 +132,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 												<h4 className="font-bold tracking-tight text-foreground uppercase text-[11px]">
 													{project.name}
 												</h4>
-												<span className="text-[10px] font-bold text-muted-foreground/40 bg-muted/20 px-1.5 rounded">
+												<span className="text-xs font-bold text-muted-foreground/40 bg-muted/30 px-1.5 rounded">
 													{project.repos.length} REPOS
 												</span>
 											</div>
@@ -164,17 +164,17 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 					{!isCreating ? (
 						<button
 							onClick={() => setIsCreating(true)}
-							className="w-full py-4 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.1em] border border-dashed border-primary/40 text-primary rounded-xl hover:bg-primary/5 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none group"
+							className="w-full py-4 flex items-center justify-center gap-2 text-xs font-medium uppercase tracking-[0.1em] border border-dashed border-primary/40 text-primary rounded-md hover:bg-primary/5 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none group"
 						>
 							<FolderPlus className="w-4 h-4 group-hover:scale-110 transition-transform" />
 							Nuevo Proyecto
 						</button>
 					) : (
-						<form onSubmit={handleCreate} className="p-5 bg-primary/5 rounded-xl border border-primary/20 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-							<h4 className="text-[10px] font-bold uppercase tracking-wider text-primary">Crear nuevo proyecto</h4>
+						<form onSubmit={handleCreate} className="p-5 bg-primary/5 rounded-md border border-primary/20 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+							<h4 className="text-xs font-medium text-primary">Crear nuevo proyecto</h4>
 							<div className="space-y-4">
 								<div className="space-y-1.5">
-									<label htmlFor="projectName" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+									<label htmlFor="projectName" className="text-xs font-medium text-muted-foreground/60 ml-1">
 										Nombre
 									</label>
 									<input
@@ -184,19 +184,19 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 										required
 										value={newName}
 										onChange={(e) => setNewName(e.target.value)}
-										className="w-full px-3 py-1.5 text-xs bg-background border border-border/60 rounded-lg focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+										className="w-full px-3 py-1.5 text-xs bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/30 focus:outline-none transition-all"
 										placeholder="Ej: Microservicios Core"
 									/>
 								</div>
 								<div className="space-y-1.5">
-									<label htmlFor="projectDesc" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+									<label htmlFor="projectDesc" className="text-xs font-medium text-muted-foreground/60 ml-1">
 										Descripción
 									</label>
 									<textarea
 										id="projectDesc"
 										value={newDescription}
 										onChange={(e) => setNewDescription(e.target.value)}
-										className="w-full px-3 py-1.5 text-xs bg-background border border-border/60 rounded-lg focus:ring-2 focus:ring-primary/20 focus:outline-none h-20 resize-none transition-all"
+										className="w-full px-3 py-1.5 text-xs bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/30 focus:outline-none h-20 resize-none transition-all"
 										placeholder="Breve descripción del propósito de esta colección..."
 									/>
 								</div>
@@ -204,14 +204,14 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 							<div className="flex items-center gap-3">
 								<button
 									type="submit"
-									className="flex-1 py-2 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
+									className="flex-1 py-2 flex items-center justify-center gap-2 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
 								>
 									Crear Proyecto
 								</button>
 								<button
 									type="button"
 									onClick={() => setIsCreating(false)}
-									className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
+									className="px-4 py-2 text-xs font-medium bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
 								>
 									Cancelar
 								</button>
@@ -219,10 +219,10 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 						</form>
 					)}
 
-					<div className="pt-4 border-t border-border/40 flex justify-end">
+					<div className="pt-4 border-t border-border flex justify-end">
 						<button
 							onClick={() => onOpenChange(false)}
-							className="px-6 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
+							className="px-6 py-2 text-xs font-medium bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
 						>
 							Listo
 						</button>

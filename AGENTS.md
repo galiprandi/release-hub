@@ -93,27 +93,32 @@
 ## Referencias rápidas
 
 - **Tokens**: Solo de `DESIGN.md`. Nunca hardcodeados (`text-zinc-500`, `bg-red-500`).
-- **Health Monitor**: Status dots (`w-1.5 h-1.5`), semantic badges (/20 opacity), double-line URLs. Header-based filtering and sorting (IndustrialTabs) with dynamic status counts, help ActionButton with technical dialog, and bg-muted/10 containers for ProductSections.
-- **Foco**: Administrative dialogs and interactive elements must use `focus:ring-primary/20` for focus-visible states.
-- **Navigation**: Prefer `IndustrialTabs` over legacy `FilterBar` or `select` for sorting/filtering. State must be synced with search params.
+- **Canon Visual**: Linear/Vercel — dark-first, neutral, keyboard-first, denso pero ordenado. Reemplaza Industrial Resonance V2. Ver `DESIGN.md`.
+- **Tipografía**: Jerarquía por size + weight + color. **Prohibido** `text-[10px] font-bold uppercase tracking-wider` y `tracking-[0.2em]`. Labels: `text-xs font-medium text-muted-foreground`.
+- **Geometría**: `rounded-md` (containers/cards/buttons), `rounded` (badges), `rounded-lg` (dialogs/panels grandes). **Prohibido** `rounded-xl` y `rounded-2xl`.
+- **Borders**: Hairline `border border-border`. **Prohibido** `border-border/40`, `border-border/60` — el border es el border.
+- **Containers**: `border border-border rounded-md bg-card`. **Prohibido** `bg-muted/40`, `bg-muted/10` para cards.
+- **Shadows**: `shadow-sm`, `shadow-md` con offset. **Prohibido** `shadow-[0_0_15px_rgba(...)]` (halo decoration V2).
+- **Foco**: `focus:ring-2 focus:ring-primary/30 focus:border-primary` para focus-visible states.
+- **Navigation**: Prefer `IndustrialTabs` (conceptualmente Tabs) over legacy `FilterBar` or `select` for sorting/filtering. State must be synced with search params.
 - **Type Hygiene**: Prohibido `any`. Interfaces explícitas o `unknown` + validación. Casts de tipo en handlers deben usar `id as typeof stateVariable`. Mocks de test deben sincronizarse con firmas reales mediante casts de interfaces (`as ExecResponse`).
 - **Dashboard Data**: Usar `useRepoDashboardDetails` para acceder a datos de repositorios en el dashboard de GitHub.
 - **Build Log**: Zero-warning build is mandatory. Outdated hook signatures in mocks/tests must be synchronized immediately.
 - **Dead Code Elimination**: Components and hooks identified as orphans must be removed immediately. Legacy hooks `usePipeline.ts`, `usePipelineDetector.ts`, `useKubectlNamespaceAccess.ts`, and `useGitHubActions.ts` have been eradicated. Excepción: la ruta `/dev/seki-preview` y sus archivos en `src/plugins/pipeline/seki/dev/` son un sandbox permanente de iteración visual y NO deben ser borrados.
-- **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Setup page aligned with V2 standard using high-density badges, semantic tokens with 20% opacity, and technical command containers.
-- **Setup Unification Standard**: Setup pages must use the centralized `SetupCard` component (`src/components/shared/SetupCard.tsx`) and `detectOS` utility (`src/utils/os.ts`). Navigation buttons in setup flows must use `rounded-lg` geometry and `text-[10px]` typography.
+- **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Setup page uses `SetupCard` with `rounded-md` and `text-xs font-medium` labels.
+- **Setup Unification Standard**: Setup pages must use the centralized `SetupCard` component (`src/components/shared/SetupCard.tsx`) and `detectOS` utility (`src/utils/os.ts`). Navigation buttons use `rounded-md` geometry and `text-sm font-medium` typography.
 - **Mutaciones**: Optimistic update + revalidación selectiva. Nunca `window.location.reload()`.
 - **Resiliencia**: Si CLI falla (`kubectl`, `docker`), redirigir a `<module>/setup`.
-- **Novedades**: Technical header with Newspaper icon. Content encapsulated in bg-muted/10 containers with rounded-xl and p-8 padding.
-- **Docker UI**: Status filtering and `ContainerSearch` are promoted to the `PageLayout` header using `IndustrialTabs` and a dedicated search input. High-density cells use semantic dots (`StatusCell`) and hover-to-reveal patterns (`ActionsCell`).
-- **Fetcher UI**: Filtering, sorting, and text search (`q` param) are implemented via `IndustrialTabs` and a header search input. `UrlCell` uses a double-line pattern: Muted Domain and Foreground Path.
-- **Omnisearch (RepoSearch)**: Standardized to `bg-muted/40` with `border-border/60` and `focus:ring-primary/20`. Results must include high-density technical badges (`REPO`, `FILE`).
-- **AI Chat Standard**: Message bubbles use `rounded-xl` geometry. User messages: `bg-primary shadow-[0_0_15px_rgba(var(--primary),0.1)]`. Assistant messages: `bg-ai/5 border border-ai/10`. Input area uses `bg-muted/40` with `focus-within:ring-primary/20`.
-- **Feedback Dialog Standard**: Stepper buttons use `shadow-[0_0_15px_rgba(var(--primary),0.2)]` when active/completed. Form inputs use `bg-muted/40` with `border-border/60`. Success/Error states use semantic tokens with 20% opacity and technical shadows.
-- **Diff Viewer**: Mode selection uses `IndustrialTabs`, synchronized with the `mode` search parameter. Technical metadata headers and comparison results use `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`. Containers use `bg-muted/10` and `border-border/60`. Empty states use `tracking-widest` placeholders.
-- **GitHub UI**: Collection navigation and management actions are in the `PageLayout` header. Dashboard-level filtering uses `IndustrialTabs` synced with `filter` search parameter. Technical metadata cels use high-density typography (`text-[10px] font-bold uppercase tracking-wider`). Organization groups are collapsible and support bulk "Expand/Collapse All" actions.
-- **Health Monitor V2**: Primary environment filtering (Production, Staging, Unhealthy) is moved to the PageLayout header using IndustrialTabs. Product sections use `bg-muted/10` containers with `rounded-xl` geometry and technical Box icons.
-- **Novedades Page**: Implements a high-density technical header with the 'Newspaper' icon. Content is encapsulated in a 'bg-muted/10' container with 'border-border/40' and 'rounded-xl' geometry.
+- **Novedades**: Header with `Newspaper` icon + `text-lg font-semibold`. Content in `border border-border rounded-md bg-card p-6`.
+- **Docker UI**: Status filtering and `ContainerSearch` in the `PageLayout` header using `IndustrialTabs` and a dedicated search input. Cells use semantic dots (`StatusCell`) and hover-to-reveal patterns (`ActionsCell`).
+- **Fetcher UI**: Filtering, sorting, and text search (`q` param) via `IndustrialTabs` and a header search input. `UrlCell` uses a double-line pattern: domain (`text-xs text-muted-foreground`), path (`text-sm font-medium`).
+- **Omnisearch (RepoSearch)**: `bg-background border border-border rounded-md`. Focus: `focus:ring-2 focus:ring-primary/30`. Results include `text-xs font-medium` badges.
+- **AI Chat Standard**: Message bubbles use `rounded-lg` geometry. User messages: `bg-primary text-primary-foreground`. Assistant messages: `bg-muted/30 border border-border`. Input area: `bg-background border border-border rounded-md`.
+- **Feedback Dialog Standard**: Stepper buttons use `shadow-sm` when active/completed. Form inputs use `bg-background border border-border`. Success/Error states use semantic tokens with `/15` opacity.
+- **Diff Viewer**: Mode selection uses `IndustrialTabs`, synchronized with the `mode` search parameter. Panel headers use `text-xs text-muted-foreground`. Containers use `border border-border rounded-md bg-card`. Code viewport: `bg-zinc-950/30`.
+- **GitHub UI**: Collection navigation and management actions in the `PageLayout` header. Dashboard-level filtering uses `IndustrialTabs` synced with `filter` search parameter. Metadata cells use `text-xs font-medium text-muted-foreground`. Organization groups are collapsible.
+- **Health Monitor**: Primary environment filtering (Production, Staging, Unhealthy) in the PageLayout header using IndustrialTabs. Product sections use `border border-border rounded-md bg-card` containers with `Box` icons.
+- **Novedades Page**: Header with `Newspaper` icon + `text-lg font-semibold`. Content in `border border-border rounded-md bg-card p-6`.
 - **Estructura**: Los componentes de módulo viven siempre en `src/<modulo>/components/`. Globales en `src/components/shared/` o `src/components/ui/`. El directorio raíz `src/components/` debe permanecer libre de archivos `.tsx` directos.
 - **Hardening**: Middleware `spawn` con `shell: false` y timeout obligatorio de 30s (`spawnAsync`). Centralización de seguridad en `src/utils/security.ts`. Allow-list estricto en `/local/exec` (shells y node prohibidos) y `/local/script`. Validación estricta de recursos Kubernetes (RFC 1123) en todos los middlewares locales. SSRF protection con DNS Rebinding protection (pre-resolución obligatoria) bloqueando 127.0.0.0/8, 169.254.0.0/16, CGNAT y IPv6 local. Proxy de salud requiere `servername` (SNI) al usar IPs resueltas.
 - **Seki Pipeline Standards**: Obligatorio usar `useSekiPipelinesByEnv` (`src/plugins/pipeline/seki/`). Las interfaces de eventos (`SekiPipelineEvent`) deben incluir `markdown` para extracción de rutas y detalles de error. El monitor de salud (`useHealthMonitor`) consume nativamente `SekiPipelineEvent[]`, eliminando la necesidad de puentes de mapeo legacy. La nomenclatura de metadatos es estrictamente camelCase (`updatedAt`).
@@ -122,6 +127,18 @@
 - **SSRF Hardening Standard**: `isInternalAddress` in `src/utils/security.ts` must account for decimal and hexadecimal IP representations to prevent bypasses. All proxy and health check middlewares must utilize this centralized utility.
 - **Search State Synchronization**: Redundant local state for search inputs (e.g., `localSearch`) must be avoided. Search inputs should bind directly to URL search parameters to ensure consistency and eliminate "setState in effect" linter warnings.
 - **Unified Project Management Architecture**: Replaced legacy duplicated dialogs (`ProjectSelectionDialog`, `DeploymentProjectSelectionDialog`) with a single `ItemProjectSelectionDialog.tsx` in `src/components/shared/`. It handles both `repo` and `deployment` types, reducing entropy and ensuring visual consistency across GitHub and Kubernetes flows.
+
+### Mejora #17: Visual Redesign — Linear/Vercel Canon
+- **Redesign Completo**: Reemplazo total de Industrial Resonance V2 por el canon Linear/Vercel — dark-first, neutral, keyboard-first, denso pero ordenado.
+- **Paleta**: Neutral dark-first (near-black bg, near-white fg, hairline borders). Accent cambiado de cyan-teal (oklch hue 190) a indigo (oklch hue 265). Dark mode como default.
+- **Tipografía**: Jerarquía por size + weight + color. Erradicación total de `text-[10px] font-bold uppercase tracking-wider` (312+272 ocurrencias). Labels ahora `text-xs font-medium text-muted-foreground`.
+- **Geometría**: `rounded-md` reemplaza `rounded-xl` (32 ocurrencias). Hairline borders sin opacidad. Shadows sutiles con offset reemplazan halos decorativos.
+- **Containers**: `border border-border rounded-md bg-card` reemplaza `bg-muted/40` y `bg-muted/10` (116 ocurrencias).
+- **Focus**: `focus:ring-primary/30` reemplaza `focus:ring-primary/20` (28 ocurrencias).
+- **Diff Viewer**: Inset shadows reemplazados por `border-l-2` semántico. `bg-zinc-950/30` reemplaza `bg-zinc-950/20`.
+- **PRODUCT.md**: Brand commitment actualizado — canon Linear/Vercel vinculante.
+- **DESIGN.md**: Reescrito completamente con direction contract y reglas del nuevo canon.
+- **Verificación**: Build zero-warning, 0 patrones V2 residuales en código.
 
 ### Mejora #16: Unified Project Management & Table V2 Refinement
 - **Unified Dialog**: Implementation of `ItemProjectSelectionDialog.tsx` in `src/components/shared/` to centralize project assignment logic.

@@ -239,9 +239,9 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 		>
 			<>
 				{/* URL and method controls */}
-				<div className="flex items-center gap-3 p-4 border-b bg-muted/10 flex-shrink-0">
-					<div className="flex-1 flex items-center gap-0.5 bg-background border border-border/60 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1 transition-all">
-						<div className="relative border-r border-border/60">
+				<div className="flex items-center gap-3 p-4 border-b bg-muted/30 flex-shrink-0">
+					<div className="flex-1 flex items-center gap-0.5 bg-background border border-border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1 transition-all">
+						<div className="relative border-r border-border">
 							<select
 								value={form.method}
 								aria-label="Método HTTP"
@@ -255,7 +255,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 										setRequestTab('body');
 									}
 								}}
-								className="appearance-none bg-muted/40 px-3 py-2 pr-8 text-[10px] font-bold uppercase tracking-wider focus:outline-none cursor-pointer hover:bg-muted/60 transition-colors"
+								className="appearance-none bg-muted/30 px-3 py-2 pr-8 text-xs font-medium focus:outline-none cursor-pointer hover:bg-muted/60 transition-colors"
 							>
 								{['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
 									<option key={m} value={m}>{m}</option>
@@ -302,7 +302,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 					{/* Main content grid */}
 					<div className="flex-1 grid grid-cols-2 overflow-hidden">
 						{/* Left side: Editable form */}
-						<div className="p-4 border-r border-border/40 flex flex-col">
+						<div className="p-4 border-r border-border flex flex-col">
 							<div className="space-y-4 flex-1 flex flex-col">
 								{/* Request tabs */}
 								<IndustrialTabs
@@ -321,7 +321,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 									{requestTab === 'params' && (
 										<div>
 											<div className="flex items-center justify-between mb-1.5">
-												<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Query Params</label>
+												<label className="text-xs font-medium text-muted-foreground/60">Query Params</label>
 												<ActionButton
 													action={{ icon: Plus, label: "Agregar", color: "primary" }}
 													onClick={() => setForm(prev => ({
@@ -330,7 +330,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 													}))}
 													size="sm"
 													showLabel
-													className="text-[10px] font-bold uppercase tracking-wider hover:underline p-0 h-auto"
+													className="text-xs font-medium hover:underline p-0 h-auto"
 												/>
 											</div>
 											<div className="space-y-2">
@@ -381,7 +381,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 									{requestTab === 'headers' && (
 										<div>
 											<div className="flex items-center justify-between mb-1.5">
-												<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Headers</label>
+												<label className="text-xs font-medium text-muted-foreground/60">Headers</label>
 												<ActionButton
 													action={{ icon: Plus, label: "Agregar", color: "primary" }}
 													onClick={() => setForm(prev => ({
@@ -390,7 +390,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 													}))}
 													size="sm"
 													showLabel
-													className="text-[10px] font-bold uppercase tracking-wider hover:underline p-0 h-auto"
+													className="text-xs font-medium hover:underline p-0 h-auto"
 												/>
 											</div>
 											<div className="space-y-2">
@@ -507,9 +507,9 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 												onSearchChange={setBodySearchQuery}
 											/>
 										) : (
-											<div className="text-[11px] font-mono space-y-1.5 bg-muted/20 border border-border/40 rounded-lg p-4 h-full overflow-auto">
+											<div className="text-[11px] font-mono space-y-1.5 bg-muted/30 border border-border rounded-lg p-4 h-full overflow-auto">
 												{Object.entries(response.headers).map(([key, value]) => (
-													<div key={key} className="flex gap-2 pb-1 border-b border-border/20 last:border-0">
+													<div key={key} className="flex gap-2 pb-1 border-b border-border last:border-0">
 														<span className="font-bold text-muted-foreground min-w-[120px] shrink-0 uppercase tracking-tighter">{key}:</span>
 														<span className="text-foreground break-all">{value}</span>
 													</div>
@@ -528,9 +528,9 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 
 					{/* Footer with timing info - spans full width */}
 					{response && (
-						<div className="px-4 py-2 border-t border-border/40 bg-muted/20 flex items-center justify-between flex-shrink-0">
+						<div className="px-4 py-2 border-t border-border bg-muted/30 flex items-center justify-between flex-shrink-0">
 							<div className="flex items-center gap-3">
-								<span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${
+								<span className={`px-2 py-0.5 rounded-md border text-xs font-medium ${
 										response.status >= 200 && response.status < 300
 											? 'bg-success/20 text-success border-success/20'
 											: response.status >= 400
@@ -539,11 +539,11 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 									}`} title={query?.updatedAt ? DayJS(query.updatedAt).format('LLL') : DayJS().format('LLL')}>
 									{response.status} {response.statusText}
 								</span>
-								<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 bg-muted/40 border border-border/40 px-2 py-0.5 rounded-md">
+								<span className="text-xs font-medium text-muted-foreground/60 bg-muted/30 border border-border px-2 py-0.5 rounded-md">
 									{response.responseTime}ms
 								</span>
 							</div>
-							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">
+							<span className="text-xs font-medium text-muted-foreground/40">
 								{DayJS(query?.updatedAt || new Date()).fromNow()}
 							</span>
 						</div>

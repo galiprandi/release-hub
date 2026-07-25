@@ -87,9 +87,9 @@ export function JsonEditor({
 
 	return (
 		<div>
-			<div className="flex items-center justify-between bg-muted/40 border border-border/60 rounded-t-lg pb-1 px-4">
+			<div className="flex items-center justify-between bg-muted/30 border border-border rounded-t-lg pb-1 px-4">
 				<div className="flex items-center gap-2">
-					<label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">JSON</label>
+					<label className="text-xs font-medium text-muted-foreground">JSON</label>
 				</div>
 				<div className="flex items-center gap-1.5">
 					{onSearchChange && (
@@ -144,7 +144,7 @@ export function JsonEditor({
 			</div>
 			{readOnly ? (
 				<div className="relative">
-					<pre className={`w-full ${height} px-2.5 py-1.5 text-xs font-mono whitespace-pre-wrap break-all border border-t-0 rounded-b-lg bg-muted/20 overflow-auto`}>
+					<pre className={`w-full ${height} px-2.5 py-1.5 text-xs font-mono whitespace-pre-wrap break-all border border-t-0 rounded-b-lg bg-muted/30 overflow-auto`}>
 						{getDisplayValue() || '(Sin respuesta)'}
 					</pre>
 					{value && (

@@ -77,7 +77,7 @@ export function ProjectSelector({ repo }: { repo: string }) {
 			>
 				<form onSubmit={handleCreate} className="space-y-4">
 					<div>
-						<label htmlFor="project-name" className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">
+						<label htmlFor="project-name" className="block text-xs font-medium text-muted-foreground/60 mb-2">
 							Nombre del proyecto
 						</label>
 						<input
@@ -86,12 +86,12 @@ export function ProjectSelector({ repo }: { repo: string }) {
 							value={newName}
 							onChange={e => setNewName(e.target.value)}
 							placeholder="Ej: Frontend, Backend, Infraestructura"
-							className="w-full px-3 py-2 text-sm border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background transition-all"
+							className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background transition-all"
 							autoFocus
 						/>
 					</div>
 					<div>
-						<label htmlFor="project-desc" className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">
+						<label htmlFor="project-desc" className="block text-xs font-medium text-muted-foreground/60 mb-2">
 							Descripción (opcional)
 						</label>
 						<input
@@ -100,21 +100,21 @@ export function ProjectSelector({ repo }: { repo: string }) {
 							value={newDesc}
 							onChange={e => setNewDesc(e.target.value)}
 							placeholder="Descripción breve del proyecto"
-							className="w-full px-3 py-2 text-sm border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background transition-all"
+							className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background transition-all"
 						/>
 					</div>
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
 						<button
 							type="button"
 							onClick={() => setIsCreating(false)}
-							className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider border border-border/60 rounded-lg hover:bg-muted/40 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+							className="px-4 py-2 text-xs font-medium border border-border rounded-lg hover:bg-muted/30 transition-all focus:outline-none focus:ring-2 focus:ring-primary/30"
 						>
 							Cancelar
 						</button>
 						<button
 							type="submit"
 							disabled={!newName.trim()}
-							className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary/20"
+							className="px-4 py-2 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary/30"
 						>
 							Crear proyecto
 						</button>

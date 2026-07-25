@@ -84,7 +84,7 @@ function KubernetesPage() {
 				searchComponent: isInstalled ? (
 					<div className="flex items-center gap-6">
 						<div className="flex items-center gap-2">
-							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Vistas:</span>
+							<span className="text-xs font-medium text-muted-foreground/60">Vistas:</span>
 							<IndustrialTabs
 								options={[
 									{ id: 'favorites', label: 'Favoritos' },
@@ -98,7 +98,7 @@ function KubernetesPage() {
 
 						{availableNamespaces.length > 0 && (
 							<div className="flex items-center gap-2">
-								<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Namespace:</span>
+								<span className="text-xs font-medium text-muted-foreground/60">Namespace:</span>
 								<IndustrialTabs
 									options={[
 										{ id: 'all', label: 'Todos' },
@@ -132,7 +132,7 @@ function KubernetesPage() {
 								input.focus();
 							}
 						}}
-						className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-bold uppercase tracking-wider shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-medium shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 					>
 						<Search className="w-4 h-4" />
 						Buscar Deployments

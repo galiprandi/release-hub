@@ -1,135 +1,206 @@
 # Design System - ReleaseHub
 
-## Industrial Resonance V2
-- **Font**: Inter (Google Fonts, variable opsz 14-32, weights 300-700). Configured in `index.html` with `preconnect` + `display=swap`. Applied globally in `index.css` with `font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11'` (alternate glyphs for a/i/l/1) and antialiased rendering. Fallback: `system-ui, -apple-system, sans-serif`.
-- **Typography**: `tracking-tight` (names), `text-[10px] font-bold uppercase tracking-wider` (labels).
-- **Hierarchy**: Semantic tokens + 20% opacity (`bg-success/20 border-success/20`).
-- **Geometry**: `rounded-xl` (containers), `rounded-lg` (actions), `rounded-md` (badges).
-- **Hardening**: Middleware `spawn` con `shell: false` y timeout obligatorio de 30s (`spawnAsync`). Centralización de seguridad en `src/utils/security.ts`. Allow-list estricto en `/local/exec` (shells y node prohibidos). Validación estricta de recursos Kubernetes (RFC 1123) en todos los middlewares locales. Allow-list de scripts autorizados en `/local/script`. SSRF protection bloqueando 127.0.0.0/8, 169.254.0.0/16, CGNAT y IPv6 local, incluyendo representaciones decimales y hexadecimales de IPs para prevenir bypasses por normalización. DNS Rebinding protection mediante pre-resolución de hostnames en el proxy. Sanitización de inputs para CLI. Escapado HTML obligatorio en componentes que utilicen `dangerouslySetInnerHTML` (XSS Hardening).
-- **Standard Cells**: Health (semantic dots), PRs (primary badge), Workflows (status badge + pulse), Operations (high-density actions).
-- **Focus**: Administrative dialogs and interactive elements use `focus:ring-primary/20` for a refined technical aesthetic.
-- **ARIA**: Explicit `aria-label` for icon buttons.
+> Canon: Linear/Vercel — dark-first, neutral, keyboard-first, denso pero ordenado.
+> Reemplaza Industrial Resonance V2. Ejecutado a fidelity completa, sin quirk.
+
+## Direction Contract
+
+**THESIS:** ReleaseHub deja de ser un dashboard SaaS cyan-teal con tipografía técnica uppercase y se convierte en un tool dev dark-first, neutral, con jerarquía por tamaño/peso/color — el estándar de categoría ejecutado straight.
+
+**OWN-WORLD:** Paleta neutral dark-first (near-black bg, near-white fg, hairline borders). Inter como face primaria con jerarquía por size+weight+color. Geometría small-radius (6-8px). Un accent indigo sutil. Shadows sutiles con offset. Keyboard-first.
+
+**STORY:** El developer abre ReleaseHub y ve un tool que se sienta junto a Linear — limpio, denso, ordenado, sin chrome decorativo. La información técnica se lee al instante. El AI assistant está presente pero no grita.
+
+**FIRST VIEWPORT:** Sidebar estrecho con iconos, header minimal con título + filtros integrados, tabla densa con hairline borders, status dots sutiles, sin badges uppercase. Dark mode default.
+
+**FORM:** Canon (Linear/Vercel standard), ejecutado straight, sin quirk smuggleado.
+
+## Typography
+
+- **Font**: Inter (Google Fonts, variable opsz 14-32, weights 300-700). Configured in `index.html` with `preconnect` + `display=swap`. Applied globally in `index.css` with antialiased rendering. Fallback: `system-ui, -apple-system, sans-serif`.
+- **Hierarchy**: por size + weight + color, **nunca** por `uppercase tracking-wider`.
+  - Page titles: `text-lg font-semibold tracking-tight`
+  - Section headers: `text-sm font-medium`
+  - Body / cell content: `text-sm` (14px)
+  - Labels / metadata: `text-xs text-muted-foreground` (12px, medium weight, sin uppercase)
+  - Code / data / measurements: `font-mono text-xs`
+- **Tracking**: `tracking-tight` en títulos, `tracking-normal` en body, `-0.02em` max en display.
+- **Prohibido**: `text-[10px] font-bold uppercase tracking-wider` y `tracking-[0.2em]` — eran el alma de Industrial Resonance V2 y quedan erradicados.
+
+## Color Strategy
+
+**Restrained**: neutrals + un accent (indigo). El accent aparece en foco, primary actions, revalidation dots y highlights — no como fondo de contenedores.
+
+### Dark mode (default)
+- `--background`: near-black neutral (`oklch(0.16 0.003 286)`)
+- `--foreground`: near-white (`oklch(0.97 0 0)`)
+- `--card`: ligeramente más claro que bg (`oklch(0.185 0.003 286)`)
+- `--muted`: surface para hover/secondary (`oklch(0.22 0.003 286)`)
+- `--muted-foreground`: texto secondary (`oklch(0.63 0.01 286)`)
+- `--border`: hairline sutil (`oklch(0.26 0.003 286)`)
+- `--primary`: indigo (`oklch(0.62 0.19 265)`)
+- `--destructive`: red (`oklch(0.55 0.22 25)`)
+- `--success`: green (`oklch(0.55 0.16 142)`)
+- `--warning`: amber (`oklch(0.70 0.15 70)`)
+- `--ai`: violet (`oklch(0.60 0.18 300)`)
+
+### Light mode
+- `--background`: white (`oklch(1 0 0)`)
+- `--foreground`: near-black (`oklch(0.16 0.003 286)`)
+- `--border`: hairline (`oklch(0.91 0.003 286)`)
+- `--primary`: indigo (`oklch(0.55 0.19 265)`)
+- Mismas relaciones semánticas, invertidas.
+
+## Geometry
+
+- **Radii**: `rounded-md` (6px) para containers y cards, `rounded` (4px) para badges y small controls, `rounded-lg` (8px) para dialogs y panels grandes. **Prohibido** `rounded-xl` y `rounded-2xl` — eran V2.
+- **Borders**: hairline 1px (`border border-border`). Sin `border-border/40` ni `border-border/60` — el border es el border.
+- **Shadows**: sutiles con offset (`shadow-sm`, `shadow-md`). Prohibido `shadow-[0_0_15px_rgba(...)]` — era V2 halo decoration.
+- **Elevation**: declarar una vez — border **o** shadow, no ambas. Un 1px border bajo una shadow wide es el ghost card.
 
 ## Component Patterns
-- **Table**: `bg-muted/40` headers, technical metadata, and explicit vertical dividers between columns (`bg-border/20` in headers, `bg-border/5` in rows). Row hover utilizes `bg-muted/10` for subtle visual feedback. Internal filter bar uses `bg-muted/40` with a nested segmented-control layout for a professional aesthetic.
-- **Search Inputs**: Standardized to `bg-muted/40` with `border-border/60`. Focus state uses `focus:ring-primary/20`. Technical search results in dropdowns include high-density badges (`REPO`, `FILE`, `CONT`) with 10% opacity backgrounds.
-- **EmptyState**: Centered layout featuring an icon in a `p-4 rounded-full bg-muted/20 border border-border/40` container. Typography for labels is strictly `text-[10px] font-bold uppercase tracking-[0.2em]`.
-- **SetupCard**: Unified component for onboarding and configuration states. Features a dual-state design for "Installed" (success tokens, high-density metadata) and "Missing" (destructive/warning tokens, collapsible command containers). Uses `text-[10px] font-bold uppercase tracking-wider` for labels.
-- **Unified Project Management Architecture**: Replaced module-specific dialogs with `ItemProjectSelectionDialog.tsx` in `src/components/shared/`. It supports both `repo` and `deployment` types, utilizes V2 typography and `rounded-xl` geometry, and includes a quick-create project action to minimize friction.
-- **StatusCard**: Loading/error/offline states.
-- **ActionButton**: Iconographic with tooltip. Supports an `ai` color variant with semantic tokens (`text-ai bg-ai/10 border border-ai/20 hover:bg-ai/20`).
-- **AI Chat Bubble**: High-density typography with `rounded-xl` geometry. User messages utilize `shadow-[0_0_15px_rgba(var(--primary),0.1)]`. Assistant messages use `bg-ai/5` and `border-ai/10` for subtle technical contrast.
-- **Feedback Stepper**: Technical step indicators with `shadow-[0_0_15px_rgba(var(--primary),0.2)]` for active states and `border-border/60` for inactive states.
-- **IndustrialTabs**: Unified selector for modals, panels, and persistent sorting/filtering.
-- **Terminal**: High-density technical header with session metadata (e.g., 'Sesión Local Activa', '/bin/bash'). Aligned with V2 typography (`text-[10px] font-bold uppercase tracking-wider`). Includes dynamic OS detection badges and connection status with semantic dots. Viewport uses `bg-zinc-950` background.
-- **BaseDialog**: Modal consistency.
+
+### Table
+- Headers: `text-xs font-medium text-muted-foreground`, sin `bg-muted/40`. Fondo transparente o `bg-background`.
+- Dividers: hairline `border-b border-border` entre rows. Sin vertical dividers decorativos.
+- Row hover: `hover:bg-muted/30` — sutil, un solo tono.
+- Cells: `text-sm`, metadata en `text-xs text-muted-foreground font-mono` cuando es data técnica.
+- Sin `bg-muted/40` en headers. Sin `bg-border/20` dividers.
+
+### Badges & Status
+- **Badges**: `rounded` (4px), `text-xs font-medium`, `px-1.5 py-0.5`. Backgrounds con `/15` opacity (más sutil que `/20`). Sin uppercase.
+- **Status dots**: `w-1.5 h-1.5 rounded-full` con color semántico. OK incluye `animate-pulse` sutil. Sin shadows decorativas en dots.
+- **Labels**: texto natural (OK, Error, Detenido) en `text-xs font-medium` con color semántico — sin `text-[10px] uppercase`.
+
+### Inputs & Search
+- `bg-background border border-border rounded-md text-sm`. Focus: `focus:ring-2 focus:ring-primary/30 focus:border-primary`. Sin `bg-muted/40`.
+- Placeholders: `text-muted-foreground/60`.
+
+### Buttons
+- Primary: `bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90`.
+- Secondary: `border border-border bg-background hover:bg-muted/30 rounded-md`.
+- Ghost: `hover:bg-muted/30 rounded-md`.
+- Icon buttons: `rounded-md p-2 hover:bg-muted/30`, con `aria-label`.
+- **Prohibido** `rounded-lg` en buttons — era V2. Usar `rounded-md`.
+
+### Cards & Containers
+- `border border-border rounded-md bg-card`. Sin `bg-muted/40`, sin `bg-muted/10`, sin `rounded-xl`.
+- Padding: `p-4` o `p-6` según densidad.
+
+### EmptyState
+- Centrado, icono en `p-3 rounded-md bg-muted/30 border border-border`. Label: `text-sm font-medium text-muted-foreground`. Sin `text-[10px] uppercase tracking-[0.2em]`.
+
+### Dialogs (BaseDialog)
+- `rounded-lg bg-background border border-border shadow-lg`. Header con `text-sm font-semibold`. Sin `rounded-xl`.
+
+### Tabs (IndustrialTabs → Tabs)
+- Renombrar conceptualmente a **Tabs** (el nombre IndustrialTabs era V2 branding).
+- Estilo: `inline-flex items-center gap-1 p-1 bg-muted/30 rounded-md`. Tab activo: `bg-background text-foreground shadow-sm`. Tab inactivo: `text-muted-foreground hover:text-foreground`.
+- Sin `bg-muted/40` containers alrededor.
+
+### AI Chat
+- User bubble: `bg-primary text-primary-foreground rounded-lg`. Sin `shadow-[0_0_15px_rgba(...)]`.
+- Assistant bubble: `bg-muted/30 border border-border rounded-lg`.
+- Input: `bg-background border border-border rounded-md`.
+
+### Terminal
+- Viewport: `bg-zinc-950` (se mantiene). Header: `text-xs text-muted-foreground` con metadata de sesión. Sin `text-[10px] uppercase tracking-wider`.
+
+### SetupCard
+- `border border-border rounded-md bg-card`. Estados Installed/Missing con accent semántico en un dot o icon, no en backgrounds completos. Labels: `text-xs font-medium text-muted-foreground`.
+
+## Layout
+
+- **Sidebar**: fijo, 50px (colapsado) / 240px (expandido). `border-r border-border bg-background`. Icons con `rounded-md` hover.
+- **Header**: sticky con `backdrop-blur-sm bg-background/80 border-b border-border`.
+- **Content**: `px-6 py-6 gap-6`. Más compacto que V2 (`px-8`).
+- **PageLayout**: título `text-lg font-semibold tracking-tight`, acciones alineadas a la derecha.
 
 ## State Management & Search
-- **URL-First**: All filtering and search state must reside in URL search parameters to ensure persistence and shareability.
-- **Single Source of Truth**: Avoid duplicating search parameter state in local component state (`useState`). Inputs should be controlled directly by the search parameters provided by the router to prevent synchronization issues and unnecessary renders.
 
-## Cache-First Tokens (ADR-001)
-| Estado | Token |
-|---|---|
-| Revalidando | `bg-primary/10 text-primary/70`, icono `animate-spin` (2s) |
-| Stale | `bg-warning/10 text-warning`, timestamp `text-muted-foreground/60` |
-| Desactualizado (>24h) | `bg-warning/10 text-warning` + icono `Clock` |
+- **URL-First**: todo estado visual vive en search params (TanStack Router). Sin cambios.
+- **Single Source of Truth**: sin duplicar search param state en `useState`. Sin cambios.
 
-## Cache-First UI Patterns
+## Cache-First UI Patterns (ADR-001)
 
 > La red es una corrección en background. La UI nunca bloquea por datos.
 
 ### Loading
-- Skeleton **solo** si `!data` (no hay data previa en caché).
-- Nunca spinner overlay sobre contenido existente.
+- Skeleton **solo** si `!data`. Nunca spinner overlay sobre contenido existente.
 
 ### Revalidation Indicator
 - `w-1.5 h-1.5 rounded-full bg-primary animate-pulse` en header cuando `isFetching && !!data`.
-- Nunca bloquear interacción.
 
 ### Stale Indicator
-- Timestamp relativo (`text-[10px] text-muted-foreground/60`) cuando `dataUpdatedAt > staleTime`.
-- Badge `bg-warning/10 text-warning` con tooltip si >24h.
+- Timestamp relativo (`text-xs text-muted-foreground`) cuando `dataUpdatedAt > staleTime`.
+- Badge `bg-warning/15 text-warning rounded` con tooltip si >24h.
 
 ### Animated Diffs
-- Nuevos items: `transition-all duration-300`, `opacity-0 → opacity-100`, insertados arriba.
+- Nuevos items: `transition-all duration-300`, `opacity-0 → opacity-100`.
 - Highlight temporal: `bg-primary/5` por 2s, luego fade out.
-- Técnica: CSS `transition` sobre `max-height` y `opacity`. No Framer Motion.
-
-### Componentes Cache-First
-- **RevalidationIndicator**: Dot de revalidación en headers de tabla/card.
-- **StaleBadge**: Badge con `Clock` cuando data supera `staleTime`.
+- CSS `transition` sobre `max-height` y `opacity`. No Framer Motion.
 
 ### Error Notification
-- Mutaciones: **solo** toast en error. Éxito = silencio.
-- Rollback automático del caché local en fallo.
+- Mutaciones: solo toast en error. Éxito = silencio. Rollback automático.
 
-## Layout V2
-- Sidebar fijo (50px). Sticky header with backdrop-blur.
-- Contenido `px-8`, `gap-6`.
-- **Build Hygiene**: El log de build debe permanecer con cero advertencias. Cualquier `any` o dependencia de hook faltante debe ser resuelta inmediatamente. La eliminación de código muerto (`useKubectlNamespaceAccess.ts`, `useGitHubActions.ts`) es mandatoria para mantener la higiene.
+## Module Standards
 
-## Specific Module Standards
+### Docker
+- Status filtering en PageLayout header via Tabs (sync `status` param). Icon `Boxes` en título.
+- `StatusCell`: dot semántico + label `text-xs font-medium` (OK/Error/Detenido). Sin uppercase.
+- `ActionsCell`: hover-to-reveal (`opacity-0 group-hover:opacity-100`).
+- Empty state: icon en `rounded-md bg-muted/30`, label `text-sm`.
 
-### Docker UI Resonance
-- **Header Promotion**: Status filtering (Todos, Ejecutando, Detenido, Finalizado) is promoted to the `PageLayout` header using `IndustrialTabs`, synchronized with the `status` search parameter. Header title includes the technical `Boxes` icon. Integrated `ContainerSearch` in the header for real-time name and image filtering.
-- **Table Cells**:
-  - `StatusCell`: High-density technical status labels (OK, ERROR, Detenido) accompanied by semantic dots with shadows and animations (OK = pulse). Backgrounds use 20% opacity semantic tokens.
-  - `StartedCell`: High-density technical metadata using `text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`.
-  - `PortsCell`: Standardized selection of external ports with high-density technical badges for opening ports.
-  - `ActionsCell`: Operations are hidden until row hover using the `opacity-0 group-hover:opacity-100` pattern to reduce visual noise.
-- **Empty State**: V2 technical style featuring a centered layout with a `Boxes` icon in a circular `bg-muted/20` container and bold uppercase tracking-wider typography.
-- **Placeholder Standard**: Access verification (`checkingAccess`) renders `null` to avoid layout shifts and maintain a clean visual state.
+### Health Monitor
+- Environment filtering (Production/Staging/Unhealthy) en header via Tabs.
+- Product sections: `border border-border rounded-md bg-card`. Header con icon `Box` + `text-sm font-medium`.
+- Status dots: `w-1.5 h-1.5 rounded-full` con color semántico. OK pulse.
+- Double-line URLs: domain (`text-xs text-muted-foreground`), path (`font-mono text-xs`).
 
-### Health Monitor Resonance
-- **Route Filtering**: Primary environment filtering (Production, Staging, Unhealthy) is moved to the PageLayout header using IndustrialTabs (synchronized with `environment` search parameter).
-- **Product Grouping**: Product sections use `bg-muted/10` containers with `rounded-xl` geometry and technical `Box` icons in `bg-muted/20` headers.
-- **Navigation & Controls**: Environment filtering (All, Prod, Stag, Error) and Sorting (Nombre, Errores, Recientes) are globalized in the `PageLayout` header using `IndustrialTabs`. Environment tabs include dynamic status counts (e.g., 'Production (5)').
-- **Technical Help**: Help instructions are moved to a `HelpCircle` ActionButton in the header that triggers a `BaseDialog`.
-- **Status Dots**: `w-1.5 h-1.5 rounded-full` with semantic shadows for health states (OK/Error). OK includes `animate-pulse`.
-- **Product Section**: Encapsulated in `bg-muted/10` with `rounded-xl`. Header includes the standard `Box` icon and high-density technical metadata.
-- **Double-line URLs**: Table displays domain (muted, `text-[10px]`) and path (foreground, `font-mono text-xs`).
-- **Revalidation**: `bg-primary animate-pulse` dot in header during background checks.
+### Kubernetes
+- Setup: `SetupCard` con `rounded-md`, labels `text-xs font-medium`.
+- Dashboard: Tabs para Favoritos/Proyectos (sync `tab` param).
+- Namespace filtering en header via Tabs (sync `namespace` param).
+- Deployment status: badges `rounded text-xs font-medium` con `/15` opacity. Labels localizados.
 
-### Novedades Resonance
-- **Layout**: High-density header with `Newspaper` icon.
-- **Content**: Encapsulated in `bg-muted/10` container with `rounded-xl` and `p-8` for optimal readability.
+### GitHub
+- Dashboard: Tabs + project actions en PageLayout header.
+- Org grouping: `border border-border rounded-md bg-card`. Collapsible. Header con `text-sm font-medium` + count.
+- `HealthCell`: dot semántico + `text-xs font-medium` (OK/Error).
+- `OperationsCell`: hover-to-reveal.
+- Detail view: nav + links en header. Links: `text-sm hover:bg-muted/30 rounded-md`.
 
-### Kubernetes UI Resonance
-- **Setup Page**: Aligned with Industrial Resonance V2 aesthetic using `SetupCard`. Features high-density technical badges for OS detection and status, and command containers utilizing `bg-muted/10` backgrounds. Cards utilize `rounded-xl` geometry and semantic tokens with 20% opacity.
-- **Dashboard Navigation**: Uses `IndustrialTabs` for switching between 'Favoritos' and 'Proyectos'. State is persisted via `tab` search parameter.
-- **Namespace Filtering**: Promoted to the `PageLayout` header using `IndustrialTabs`, synchronized with the `namespace` search parameter. Per-table filter bars are removed for high-density consistency.
-- **Grouping**: Favorites are grouped by `context` (Boxes icon). Projects are grouped by `project.id` (Folder icon).
-- **Deployment Status**: Badges use semantic tokens (success/info/destructive/muted) with 20% opacity and `rounded-md`. Labels are localized (Saludable, Procesando, Degradado, Desconocido).
-- **Search UI**: On-demand namespace search with 400ms debounce. Queries `searchDeploymentsByNamespace` across all contexts in parallel. High-density dropdown with technical metadata (Namespace, Context, Ready/Up-to-date/Available counts) and keyboard-centric navigation hints. No hardcoded namespace list.
+### Fetcher
+- Dual Tabs para method filtering y sorting (sync `method`, `sortBy` params).
+- Header search (`q` param).
+- `UrlCell`: domain (`text-xs text-muted-foreground`), path (`text-sm font-medium`).
+- Headers: `text-xs font-medium text-muted-foreground`.
 
-### GitHub UI Resonance
-- **Dashboard Layout**: Primary collection navigation (`IndustrialTabs`) and project management actions reside in the `PageLayout` header.
-- **Organization Grouping**: Repositories are grouped by organization in collapsible containers (`bg-muted/10`, `rounded-xl`). Headers include high-density typography, organization icons, and repository counts. Supports bulk "Expand/Collapse All" functionality.
-- **Global Filtering**: Dashboard-level filtering (e.g., 'Pendientes') uses `IndustrialTabs` enclosed in `bg-muted/40` containers with `border-border/40` to match technical standards.
-- **Table Cells**:
-  - `HealthCell`: Includes semantic dots (OK pulse) and high-density technical labels ('OK'/'ERROR') with semantic colors.
-  - `PRsCell` & `ActionsStatusCell`: Use semantic backgrounds with 20% opacity and technical borders.
-  - `OperationsCell`: Implements hover-to-reveal (`opacity-0 group-hover:opacity-100`) to maintain layout focus.
-- **Detail View**: Navigation (Commits/Tags), external links (PRs, Actions), and `ProjectSelector` are promoted to the `PageLayout` header and actions array. Links use `bg-muted/40` and high-density technical typography.
-- **Setup Page**: Aligned with Industrial Resonance V2 aesthetic using `SetupCard`. Features high-density technical badges (`REQUERIDO`, `INSTALADO`), semantic tokens with 20% opacity, and centralized OS detection.
+### Diff Viewer
+- Tabs para mode selection (sync `mode` param). Responsive `w-full sm:w-[620px]`.
+- Panel headers: `text-xs text-muted-foreground`.
+- Containers: `border border-border rounded-md bg-card`. Code viewport: `bg-zinc-950/30`.
+- Line highlighting: semantic backgrounds `/15` opacity.
+- Controls: `rounded-md`, `hover:bg-muted/30`.
 
-### Novedades Page Resonance
-- **Header**: High-density technical header with the 'Newspaper' icon.
-- **Content**: Encapsulated in a `bg-muted/10` container with `border-border/40`, `rounded-xl` geometry, and `p-8` padding.
+### Novedades
+- Header con icon `Newspaper` + `text-lg font-semibold`.
+- Content: `border border-border rounded-md bg-card p-6`.
 
-### Fetcher UI Resonance
-- **Navigation & Sorting**: Dual `IndustrialTabs` implementation for method filtering (ALL, GET, POST, etc.) and persistent sorting (Recent, Method, Status, Duration), synchronized with `method` and `sortBy` search parameters.
-- **Header Search**: Integrated persistent text search in the header (`q` search parameter) for filtering history by URL, domain, or method.
-- **Table Structure**:
-  - `UrlCell`: Domain as technical metadata (`text-[10px] font-bold uppercase text-muted-foreground/60`) and Path as primary content (`text-sm font-medium`).
-  - Headers: Standard high-density `span` pattern (`text-[10px] font-bold uppercase tracking-wider`).
-  - Actions: 20% opacity backgrounds on hover for `ActionButton` components.
+## Hardening (sin cambios)
 
-### Diff Viewer Resonance V2
-- **Navigation**: Uses `IndustrialTabs` in `DiffControls` for mode selection (JSON, JWT, cURL, JS, TS, etc.), synchronized with the `mode` search parameter in `src/routes/diff.tsx`. Supports responsive widths (`w-full sm:w-[620px]`).
-- **Typography**: High-density technical metadata (`text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60`) for panel headers and comparison results.
-- **Visual Containers**: Main view and panels use `bg-muted/5` background and `border-border/40` for refined hierarchy. Panel headers include pulsating semantic dots with shadows for visual anchoring and `bg-zinc-950/20` for code viewports.
-- **Empty State**: Uses `bg-muted/10` and `border-border/40` geometry with high-density V2 labels and primary-colored icons.
-- **Line Highlighting**: Implements semantic backgrounds (added/removed/changed) at 20% opacity with inset visual markers and high-density line numbering.
-- **Controls**: Action buttons (Solo diffs, Expand, Copy) use semantic shadows, 20% opacity backgrounds, and `rounded-lg` geometry.
+- Middleware `spawn` con `shell: false`, timeout 30s (`spawnAsync`).
+- Centralización en `src/utils/security.ts`. Allow-list estricto.
+- SSRF protection con DNS Rebinding protection.
+- XSS: escapado HTML obligatorio en `dangerouslySetInnerHTML`.
+
+## Focus & Accessibility
+
+- Focus visible: `focus:ring-2 focus:ring-primary/30 focus:border-primary`.
+- `aria-label` explícito en icon buttons.
+- Navegación por teclado. Contraste ≥4.5:1 body, ≥3:1 large text.
+
+## Build Hygiene
+
+- Zero-warning build obligatorio. `any` o dependencias faltantes se resuelven inmediatamente.
+- Dead code elimination mandatoria.

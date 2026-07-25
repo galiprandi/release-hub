@@ -137,25 +137,25 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
         />
       </div>
 
-      <div className="flex-1 flex flex-col border rounded-xl bg-muted/5 shadow-sm overflow-hidden border-border/40 min-h-0 transition-all duration-300 hover:border-border/60">
-        <div className="px-4 py-2 border-b bg-muted/20 border-border/40 flex items-center justify-between">
+      <div className="flex-1 flex flex-col border rounded-md bg-muted/5 shadow-sm overflow-hidden border-border min-h-0 transition-all duration-300 hover:border-border">
+        <div className="px-4 py-2 border-b bg-muted/30 border-border flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.3)]" />
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+              <h3 className="text-xs font-medium text-muted-foreground/60">
                 Resultado de Comparación
               </h3>
             </div>
             {mode === 'jwt' && (expirationA || expirationB) && (
               <div className="flex items-center gap-3">
                 {expirationA && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-warning/10 text-warning border border-warning/20 text-[10px] font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(var(--warning),0.05)]">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-warning/10 text-warning border border-warning/20 text-xs font-medium shadow-[0_0_10px_rgba(var(--warning),0.05)]">
                     <Clock className="w-3 h-3" />
                     <span>A: {expirationA}</span>
                   </span>
                 )}
                 {expirationB && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-warning/10 text-warning border border-warning/20 text-[10px] font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(var(--warning),0.05)]">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-warning/10 text-warning border border-warning/20 text-xs font-medium shadow-[0_0_10px_rgba(var(--warning),0.05)]">
                     <Clock className="w-3 h-3" />
                     <span>B: {expirationB}</span>
                   </span>
@@ -167,10 +167,10 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
             <button
               onClick={() => setShowOnlyDiffs(!showOnlyDiffs)}
               className={clsx(
-                "px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider border",
+                "px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 text-xs font-medium border",
                 showOnlyDiffs
-                  ? "bg-primary/20 text-primary border-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.1)] ring-1 ring-primary/10"
-                  : "text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 border-transparent"
+                  ? "bg-primary/20 text-primary border-primary/20 shadow-sm ring-1 ring-primary/10"
+                  : "text-muted-foreground/60 hover:text-foreground hover:bg-muted/30 border-transparent"
               )}
               title={showOnlyDiffs ? "Mostrar todas las líneas" : "Mostrar solo diferencias"}
             >
@@ -182,14 +182,14 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
               onClick={() => setIsExpanded(!isExpanded)}
               icon={isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
               tooltip={isExpanded ? "Restaurar" : "Expandir"}
-              className="p-1.5 text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 active:scale-95 border border-transparent"
+              className="p-1.5 text-muted-foreground/60 hover:text-foreground hover:bg-muted/30 active:scale-95 border border-transparent"
             />
           </div>
         </div>
         <div
           ref={diffScrollRef}
           onScroll={handleDiffScroll}
-          className="flex-1 overflow-auto p-4 font-mono text-[13px] scrollbar-hide flex flex-col bg-zinc-950/20"
+          className="flex-1 overflow-auto p-4 font-mono text-[13px] scrollbar-hide flex flex-col bg-zinc-950/30"
         >
           {!textA && !textB ? (
             <EmptyState
@@ -249,12 +249,12 @@ function DiffLineRow({ line, mode }: { line: DiffLine; mode: DiffMode }) {
     <div className="flex w-full group transition-colors duration-100 hover:bg-muted/5">
       {/* Left side */}
       <div className={clsx(
-        "flex-1 flex border-r border-border/10 transition-colors",
-        line.left?.type === 'removed' && "bg-destructive/20 text-destructive/90 shadow-[inset_4px_0_0_0_theme(colors.destructive.DEFAULT/0.4)]",
-        line.left?.type === 'changed' && "bg-warning/20 text-warning/90 shadow-[inset_4px_0_0_0_theme(colors.warning.DEFAULT/0.4)]",
+        "flex-1 flex border-r border-border transition-colors",
+        line.left?.type === 'removed' && "bg-destructive/20 text-destructive/90 border-l-2 border-destructive/40",
+        line.left?.type === 'changed' && "bg-warning/20 text-warning/90 border-l-2 border-warning/40",
         !line.left && "bg-muted/5 opacity-40"
       )}>
-        <span className="w-10 shrink-0 text-right pr-3 text-muted-foreground/30 select-none text-[10px] pt-0.5">
+        <span className="w-10 shrink-0 text-right pr-3 text-muted-foreground/30 select-none text-xs pt-0.5">
           {line.left?.lineNumber || ''}
         </span>
         <span className="w-4 shrink-0 flex justify-center select-none font-bold text-[11px] pt-0.5">
@@ -275,11 +275,11 @@ function DiffLineRow({ line, mode }: { line: DiffLine; mode: DiffMode }) {
       {/* Right side */}
       <div className={clsx(
         "flex-1 flex transition-colors",
-        line.right?.type === 'added' && "bg-success/20 text-success/90 shadow-[inset_4px_0_0_0_theme(colors.success.DEFAULT/0.4)]",
-        line.right?.type === 'changed' && "bg-warning/20 text-warning/90 shadow-[inset_4px_0_0_0_theme(colors.warning.DEFAULT/0.4)]",
+        line.right?.type === 'added' && "bg-success/20 text-success/90 border-l-2 border-success/40",
+        line.right?.type === 'changed' && "bg-warning/20 text-warning/90 border-l-2 border-warning/40",
         !line.right && "bg-muted/5 opacity-40"
       )}>
-        <span className="w-10 shrink-0 text-right pr-3 text-muted-foreground/30 select-none text-[10px] pt-0.5">
+        <span className="w-10 shrink-0 text-right pr-3 text-muted-foreground/30 select-none text-xs pt-0.5">
           {line.right?.lineNumber || ''}
         </span>
         <span className="w-4 shrink-0 flex justify-center select-none font-bold text-[11px] pt-0.5">

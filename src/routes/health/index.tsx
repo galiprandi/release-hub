@@ -45,7 +45,7 @@ function HealthHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
         </p>
 
         <div className="space-y-3">
-          <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Funcionamiento Técnico</h4>
+          <h4 className="text-xs font-medium text-muted-foreground/60">Funcionamiento Técnico</h4>
           <ul className="space-y-2">
             {[
               "Detección automática de endpoints desde pipelines de despliegue",
@@ -61,8 +61,8 @@ function HealthHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
           </ul>
         </div>
 
-        <div className="p-3 rounded-lg bg-muted/30 border border-border/40">
-          <p className="text-[10px] text-muted-foreground leading-relaxed italic">
+        <div className="p-3 rounded-lg bg-muted/30 border border-border">
+          <p className="text-xs text-muted-foreground leading-relaxed italic">
             Tip: Puedes filtrar por ambiente o estado de error directamente desde la barra superior para focalizar tu atención.
           </p>
         </div>
@@ -114,9 +114,9 @@ function ProductSection({
   });
 
   return (
-    <div className="bg-muted/10 rounded-xl border border-border/40 overflow-hidden shadow-sm">
+    <div className="bg-muted/30 rounded-md border border-border overflow-hidden shadow-sm">
       {/* Header del producto */}
-      <div className="flex items-center justify-between bg-muted/20 border-b border-border/40 px-4 py-2">
+      <div className="flex items-center justify-between bg-muted/30 border-b border-border px-4 py-2">
         <div className="flex items-center gap-2">
           <Box className="w-4 h-4 text-primary/60" />
           <Link
@@ -126,7 +126,7 @@ function ProductSection({
           >
             {productName}
           </Link>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">({services.length} servicios)</span>
+          <span className="text-xs font-medium text-muted-foreground/60">({services.length} servicios)</span>
         </div>
         <div className="flex items-center gap-2">
           {(() => {
@@ -136,19 +136,19 @@ function ProductSection({
             return (
               <>
                 {healthy > 0 && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-success/20 border border-success/20 text-[10px] font-bold uppercase tracking-wider text-success">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-success/20 border border-success/20 text-xs font-medium text-success">
                     <div className="w-1.5 h-1.5 rounded-full bg-success" />
                     {healthy} OK
                   </span>
                 )}
                 {pending > 0 && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-muted/20 border border-border/20 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-muted/30 border border-border text-xs font-medium text-muted-foreground">
                     <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
                     {pending} Pendiente
                   </span>
                 )}
                 {unhealthy > 0 && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-destructive/20 border border-destructive/20 text-[10px] font-bold uppercase tracking-wider text-destructive">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-destructive/20 border border-destructive/20 text-xs font-medium text-destructive">
                     <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
                     {unhealthy} Error
                   </span>
@@ -185,44 +185,44 @@ function EndpointsTable({
     {
       id: "status",
       accessorFn: (row) => row.isHealthy,
-      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Status</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground/60">Status</span>,
       cell: ({ row }) => <StatusCell endpoint={row.original} />,
     },
     {
       accessorKey: "service",
-      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Ruta</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground/60">Ruta</span>,
       cell: ({ row }) => <span className="font-medium tracking-tight text-foreground">{row.original.service || '/'}</span>,
     },
     {
       id: "environment",
       accessorFn: (row) => row.environment,
-      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Ambiente</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground/60">Ambiente</span>,
       cell: ({ row }) => <EnvironmentCell endpoint={row.original} />,
     },
     {
       accessorKey: "lastChecked",
-      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Verificado</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground/60">Verificado</span>,
       cell: ({ row }) => <LastCheckedCell endpoint={row.original} />,
     },
     {
       accessorKey: "responseTime",
-      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Tiempo</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground/60">Tiempo</span>,
       cell: ({ row }) => <ResponseTimeCell endpoint={row.original} />,
     },
     {
       accessorKey: "url",
-      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">URL</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground/60">URL</span>,
       cell: ({ row }) => <UrlCell endpoint={row.original} />,
     },
     {
       accessorKey: "error",
-      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Error</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground/60">Error</span>,
       cell: ({ row }) => <ErrorCell endpoint={row.original} />,
     },
     {
       id: "actions",
       accessorKey: "actions",
-      header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Acciones</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground/60">Acciones</span>,
       enableSorting: false,
       cell: ({ row }) => (
         <ActionsCell
@@ -255,7 +255,7 @@ function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMo
   const isProd = endpoint.environment === 'production';
   return (
     <span
-      className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${
+      className={`px-2 py-0.5 rounded-md border text-xs font-medium ${
         isProd
           ? 'bg-primary/20 text-primary border-primary/20'
           : 'bg-info/20 text-info border-info/20'
@@ -269,16 +269,16 @@ function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMo
 function ResponseTimeCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
   if (endpoint.responseTime !== undefined) {
     return (
-      <span className={`text-[10px] font-bold uppercase tracking-wider ${endpoint.isHealthy ? 'text-success' : 'text-destructive'}`}>
+      <span className={`text-xs font-medium ${endpoint.isHealthy ? 'text-success' : 'text-destructive'}`}>
         {endpoint.responseTime}ms
       </span>
     )
   }
-  return <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">-</span>
+  return <span className="text-xs font-medium text-muted-foreground/40">-</span>
 }
 
 function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
-  if (!endpoint.error) return <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">-</span>
+  if (!endpoint.error) return <span className="text-xs font-medium text-muted-foreground/40">-</span>
 
   const errorMessage = (() => {
     if (endpoint.details) {
@@ -295,7 +295,7 @@ function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>
   const truncatedMessage = errorMessage.length > 50 ? `${errorMessage.slice(0, 50)}...` : errorMessage
 
   return (
-    <span className="text-[10px] font-bold uppercase tracking-wider text-destructive" title={errorMessage}>
+    <span className="text-xs font-medium text-destructive" title={errorMessage}>
       {truncatedMessage}
     </span>
   )
@@ -303,7 +303,7 @@ function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>
 
 function LastCheckedCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
   return (
-    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+    <span className="text-xs font-medium text-muted-foreground/60">
       {DayJS(endpoint.lastChecked).fromNow()}
     </span>
   )
@@ -324,7 +324,7 @@ function UrlCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['
   return (
     <div className="flex flex-col gap-0.5" title={endpoint.url}>
       {domain && (
-        <span className="text-[10px] font-medium text-muted-foreground/60 leading-none truncate max-w-[250px]">
+        <span className="text-xs font-medium text-muted-foreground/60 leading-none truncate max-w-[250px]">
           {domain}
         </span>
       )}
@@ -499,7 +499,7 @@ function HealthMonitorPage() {
         }}
         onClick={() => setIsHelpOpen(true)}
         size="md"
-        className="bg-muted/20 hover:bg-muted/30"
+        className="bg-muted/30 hover:bg-muted/30"
       />
       <div className="w-px h-6 bg-border/40 mx-1" />
       {stats.unhealthy > 0 && (
@@ -585,7 +585,7 @@ function HealthMonitorPage() {
           action={!activeFilter && (
             <Link
               to="/github"
-              className={`inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm hover:opacity-90 transition-all ${FOCUS_RING}`}
+              className={`inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground text-xs font-medium rounded-lg shadow-sm hover:opacity-90 transition-all ${FOCUS_RING}`}
             >
               <ExternalLink className="w-4 h-4" />
               Explorar Repositorios

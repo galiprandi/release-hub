@@ -119,7 +119,7 @@ export function Terminal({ type, name, podName, namespace, context, container, c
   return (
     <div
       ref={terminalRef}
-      className={`w-full h-full min-h-[400px] bg-[#09090b] rounded-lg overflow-hidden border border-border/40 ${className}`}
+      className={`w-full h-full min-h-[400px] bg-[#09090b] rounded-lg overflow-hidden border border-border ${className}`}
     />
   );
 }

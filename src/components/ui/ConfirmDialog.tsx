@@ -188,14 +188,14 @@ export function ConfirmDialog({
 						type="button"
 						onClick={() => onOpenChange(false)}
 						disabled={disabled}
-						className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider border rounded-lg hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
+						className="px-4 py-2 text-xs font-medium border rounded-lg hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
 					>
 						{cancelText}
 					</button>
 					<button
 						onClick={handleConfirm}
 						disabled={disabled}
-						className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none ${config.buttonClass}`}
+						className={`px-4 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none ${config.buttonClass}`}
 					>
 						{isLoading ? (
 							<>

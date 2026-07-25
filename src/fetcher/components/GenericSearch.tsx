@@ -146,7 +146,7 @@ export function GenericSearch<T>({
           onBlur={() => setIsEditable(false)}
           placeholder={placeholder}
           aria-label="Búsqueda"
-          className={`${width} pl-9 pr-14 py-2 bg-muted/40 border border-border/60 rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/40`}
+          className={`${width} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/40`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -168,7 +168,7 @@ export function GenericSearch<T>({
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content
-                className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+                className="bg-popover text-popover-foreground border px-2 py-1 text-xs font-medium rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
                 sideOffset={5}
               >
                 Limpiar búsqueda
@@ -220,19 +220,19 @@ export function GenericSearch<T>({
           )}
 
           {/* Footer hint */}
-          <div className="px-3 py-2 bg-muted/30 border-t text-[10px] text-muted-foreground flex items-center justify-between">
+          <div className="px-3 py-2 bg-muted/30 border-t text-xs text-muted-foreground flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1 font-bold uppercase tracking-wider">
+              <span className="flex items-center gap-1 font-medium">
                 <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">↑↓</kbd> Navegar
               </span>
-              <span className="flex items-center gap-1 font-bold uppercase tracking-wider">
+              <span className="flex items-center gap-1 font-medium">
                 <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">↵</kbd> Seleccionar
               </span>
-              <span className="flex items-center gap-1 font-bold uppercase tracking-wider">
+              <span className="flex items-center gap-1 font-medium">
                 <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">Esc</kbd> Cerrar
               </span>
             </div>
-            <span className="font-bold uppercase tracking-wider">{results.length} resultados</span>
+            <span className="font-medium">{results.length} resultados</span>
           </div>
         </div>
       )}

@@ -201,7 +201,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 					</div>
 					<div className="flex flex-col">
 						<span className="text-sm font-bold tracking-tight">Asistente AI</span>
-						<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+						<span className="text-xs font-medium text-muted-foreground/60">
 							{activeProfile.label}
 						</span>
 					</div>
@@ -216,7 +216,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 						options={AI_PROFILES.map(p => ({ id: p.id, label: p.label }))}
 						activeId={activeProfileId}
 						onChange={setActiveProfileId}
-						className="bg-muted/40 p-1"
+						className="bg-muted/30 p-1"
 					/>
 					<div className="w-px h-4 bg-border/40 mx-1" />
 					<ActionButton
@@ -246,9 +246,9 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							}`}>
 								{msg.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
 							</div>
-							<div className={`max-w-[85%] p-3 rounded-xl text-sm ${
+							<div className={`max-w-[85%] p-3 rounded-md text-sm ${
 								msg.role === "user"
-									? "bg-primary text-primary-foreground rounded-tr-none shadow-[0_0_15px_rgba(var(--primary),0.1)]"
+									? "bg-primary text-primary-foreground rounded-tr-none shadow-sm"
 									: "bg-ai/5 border border-ai/10 rounded-tl-none text-foreground/90"
 							}`}>
 								<div className="prose prose-sm dark:prose-invert max-w-none break-words leading-relaxed">
@@ -291,19 +291,19 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 				</div>
 
 				{/* Input Area */}
-				<div className="p-4 bg-background border-t border-border/40">
+				<div className="p-4 bg-background border-t border-border">
 					{attachedFile && (
-						<div className="mb-3 flex items-center gap-2 p-2 bg-muted/20 border border-border/40 rounded-lg animate-in fade-in slide-in-from-bottom-2">
+						<div className="mb-3 flex items-center gap-2 p-2 bg-muted/30 border border-border rounded-lg animate-in fade-in slide-in-from-bottom-2">
 							{previewUrl ? (
-								<img src={previewUrl} alt="Preview" className="w-10 h-10 rounded object-cover border border-border/40" />
+								<img src={previewUrl} alt="Preview" className="w-10 h-10 rounded object-cover border border-border" />
 							) : (
-								<div className="w-10 h-10 rounded bg-muted/40 flex items-center justify-center border border-border/40">
+								<div className="w-10 h-10 rounded bg-muted/30 flex items-center justify-center border border-border">
 									<Paperclip className="w-4 h-4 text-muted-foreground" />
 								</div>
 							)}
 							<div className="flex-1 min-w-0">
-								<p className="text-[10px] font-bold truncate text-foreground/80 uppercase tracking-wider">{attachedFile.name}</p>
-								<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{(attachedFile.size / 1024).toFixed(1)} KB</p>
+								<p className="text-xs font-bold truncate text-foreground/80">{attachedFile.name}</p>
+								<p className="text-xs font-medium text-muted-foreground/60">{(attachedFile.size / 1024).toFixed(1)} KB</p>
 							</div>
 							<button
 								onClick={removeFile}
@@ -315,7 +315,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 						</div>
 					)}
 
-					<div className="relative flex items-end gap-2 bg-muted/40 border border-border/60 rounded-xl p-2 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-ai/40 transition-all">
+					<div className="relative flex items-end gap-2 bg-muted/30 border border-border rounded-md p-2 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-ai/40 transition-all">
 						<input
 							type="file"
 							ref={fileInputRef}
@@ -341,7 +341,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 						/>
 						<div className="flex items-center gap-2">
 							{contextUsage !== undefined && contextUsage > 0 && (
-								<span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">
+								<span className="text-xs font-bold text-muted-foreground/40">
 									CTX: {contextUsage}
 								</span>
 							)}
@@ -358,7 +358,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 									onClick={handleSend}
 									aria-label="Enviar mensaje"
 									disabled={!input.trim() || status === "initializing" || status === "downloading"}
-									className={`p-2 rounded-lg transition-all focus:ring-2 focus:ring-primary/20 ${
+									className={`p-2 rounded-lg transition-all focus:ring-2 focus:ring-primary/30 ${
 										input.trim()
 											? "bg-ai text-ai-foreground shadow-sm hover:opacity-90"
 											: "bg-muted text-muted-foreground/40 cursor-not-allowed"
@@ -369,7 +369,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							)}
 						</div>
 					</div>
-					<p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-center text-muted-foreground/40">
+					<p className="mt-2 text-xs font-medium text-center text-muted-foreground/40">
 						La IA puede cometer errores. El procesamiento ocurre localmente en tu navegador.
 					</p>
 				</div>

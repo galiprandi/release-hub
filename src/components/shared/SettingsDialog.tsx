@@ -104,24 +104,24 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 				<div className="flex-1 overflow-y-auto space-y-8 py-2 scrollbar-hide">
 					{/* Seki Token Section */}
 					<section className="space-y-4">
-						<div className="pb-3 border-b border-border/40">
-							<h3 className="text-[10px] font-bold uppercase tracking-wider text-foreground">Token de Seki</h3>
-							<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 mt-1">
+						<div className="pb-3 border-b border-border">
+							<h3 className="text-xs font-medium text-foreground">Token de Seki</h3>
+							<p className="text-xs font-medium text-muted-foreground/40 mt-1">
 								Autenticación técnica para el núcleo de pipelines
 							</p>
 						</div>
 
 						{settings.sekiToken ? (
 							<div className="space-y-3">
-								<div className="bg-muted/10 border border-border/40 rounded-xl p-4 space-y-2">
+								<div className="bg-muted/30 border border-border rounded-md p-4 space-y-2">
 									<div className="flex items-center gap-2">
 										<div className={`w-1.5 h-1.5 rounded-full ${isExpired ? 'bg-destructive animate-pulse' : 'bg-success shadow-[0_0_8px_rgba(34,197,94,0.4)]'}`} />
-										<span className={`text-[10px] font-bold uppercase tracking-wider ${isExpired ? 'text-destructive' : 'text-success'}`}>
+										<span className={`text-xs font-medium ${isExpired ? 'text-destructive' : 'text-success'}`}>
 											{isExpired ? 'Token expirado' : 'Token activo'}
 										</span>
 									</div>
 									{expirationDate && (
-										<p className={`text-[10px] font-bold uppercase tracking-wider ${isExpired ? 'text-destructive/60' : 'text-muted-foreground/60'}`}>
+										<p className={`text-xs font-medium ${isExpired ? 'text-destructive/60' : 'text-muted-foreground/60'}`}>
 											Expira: {expirationDate}
 										</p>
 									)}
@@ -130,7 +130,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									type="button"
 									onClick={handleClearSekiToken}
-									className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-wider text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/20 transition-all w-full"
+									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/20 transition-all w-full"
 								>
 									<Trash2 className="w-3.5 h-3.5" />
 									Revocar Acceso
@@ -139,7 +139,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 						) : (
 							<div className="space-y-3">
 								<div className="space-y-1.5">
-									<label htmlFor="seki-token" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Token JWT</label>
+									<label htmlFor="seki-token" className="text-xs font-medium text-muted-foreground/60 ml-1">Token JWT</label>
 									<div className="flex gap-2">
 										<div className="relative flex-1">
 											<input
@@ -148,7 +148,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 												value={sekiTokenInput}
 												onChange={(e) => setSekiTokenInput(e.target.value)}
 												placeholder="eyJhbGciOiJSUzUxMiIsInR5cCI6IkJlYXJlciJ9..."
-												className="w-full px-3 py-2 pr-10 text-xs bg-muted/40 border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+												className="w-full px-3 py-2 pr-10 text-xs bg-muted/30 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
 											/>
 											<button
 												type="button"
@@ -163,14 +163,14 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 											type="button"
 											onClick={handleSaveSekiToken}
 											disabled={!sekiTokenInput.trim() || isUpdating}
-											className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+											className="flex items-center gap-2 px-4 py-2 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
 										>
 											<Save className="w-3.5 h-3.5" />
 											Guardar
 										</button>
 									</div>
 								</div>
-								<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 text-center">
+								<p className="text-xs font-medium text-muted-foreground/40 text-center">
 									Persistencia local en el entorno del navegador
 								</p>
 							</div>
@@ -179,21 +179,21 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 
 					{/* Discord Webhook Section */}
 					<section className="space-y-4">
-						<div className="pb-3 border-b border-border/40">
-							<h3 className="text-[10px] font-bold uppercase tracking-wider text-foreground">Notificaciones Discord</h3>
-							<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 mt-1">
+						<div className="pb-3 border-b border-border">
+							<h3 className="text-xs font-medium text-foreground">Notificaciones Discord</h3>
+							<p className="text-xs font-medium text-muted-foreground/40 mt-1">
 								Canal global de eventos y alertas técnicas
 							</p>
 						</div>
 
 						{settings.discordWebhook ? (
 							<div className="space-y-3">
-								<div className="bg-muted/10 border border-border/40 rounded-xl p-4 space-y-2">
+								<div className="bg-muted/30 border border-border rounded-md p-4 space-y-2">
 									<div className="flex items-center gap-2">
 										<div className="w-1.5 h-1.5 rounded-full bg-success shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-										<span className="text-[10px] font-bold uppercase tracking-wider text-success">Webhook configurado</span>
+										<span className="text-xs font-medium text-success">Webhook configurado</span>
 									</div>
-									<p className="text-[10px] font-mono text-muted-foreground/60 break-all leading-relaxed">
+									<p className="text-xs font-mono text-muted-foreground/60 break-all leading-relaxed">
 										{settings.discordWebhook.slice(0, 50)}...
 									</p>
 								</div>
@@ -201,7 +201,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									type="button"
 									onClick={handleClearDiscordWebhook}
-									className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-wider text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/20 transition-all w-full"
+									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/20 transition-all w-full"
 								>
 									<Trash2 className="w-3.5 h-3.5" />
 									Eliminar Webhook
@@ -209,7 +209,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 							</div>
 						) : (
 							<div className="space-y-1.5">
-								<label htmlFor="discord-webhook" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">URL del Webhook</label>
+								<label htmlFor="discord-webhook" className="text-xs font-medium text-muted-foreground/60 ml-1">URL del Webhook</label>
 								<div className="flex gap-2">
 									<div className="relative flex-1">
 										<input
@@ -218,7 +218,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 											value={discordWebhookInput}
 											onChange={(e) => setDiscordWebhookInput(e.target.value)}
 											placeholder="https://discord.com/api/webhooks/..."
-											className="w-full px-3 py-2 pr-10 text-xs bg-muted/40 border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+											className="w-full px-3 py-2 pr-10 text-xs bg-muted/30 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
 										/>
 										<button
 											type="button"
@@ -233,7 +233,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 										type="button"
 										onClick={handleSaveDiscordWebhook}
 										disabled={!discordWebhookInput.trim() || isUpdating}
-										className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+										className="flex items-center gap-2 px-4 py-2 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
 									>
 										<Save className="w-3.5 h-3.5" />
 										Guardar
@@ -245,9 +245,9 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 
 					{/* Clear Cache Section */}
 					<section className="space-y-4">
-						<div className="pb-3 border-b border-border/40">
-							<h3 className="text-[10px] font-bold uppercase tracking-wider text-foreground">Gestión de Datos</h3>
-							<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 mt-1">
+						<div className="pb-3 border-b border-border">
+							<h3 className="text-xs font-medium text-foreground">Gestión de Datos</h3>
+							<p className="text-xs font-medium text-muted-foreground/40 mt-1">
 								Invalidación de caché y resincronización global
 							</p>
 						</div>
@@ -256,7 +256,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 							type="button"
 							onClick={handleClearCache}
 							disabled={isClearingCache}
-							className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-wider bg-muted hover:bg-muted/80 px-4 py-3 rounded-xl border border-border/40 transition-all w-full disabled:opacity-50 group focus:outline-none focus:ring-2 focus:ring-primary/20"
+							className="flex items-center justify-center gap-2 text-xs font-medium bg-muted hover:bg-muted/80 px-4 py-3 rounded-md border border-border transition-all w-full disabled:opacity-50 group focus:outline-none focus:ring-2 focus:ring-primary/30"
 						>
 							{isClearingCache ? (
 								<>
@@ -274,9 +274,9 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 				</div>
 
 				{/* Footer */}
-				<div className="mt-8 pt-4 border-t border-border/40 flex-shrink-0">
+				<div className="mt-8 pt-4 border-t border-border flex-shrink-0">
 					<Dialog.Close asChild>
-						<button className="w-full px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all border border-border/40 focus:outline-none focus:ring-2 focus:ring-primary/20">
+						<button className="w-full px-4 py-2.5 text-xs font-medium bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all border border-border focus:outline-none focus:ring-2 focus:ring-primary/30">
 							Finalizar
 						</button>
 					</Dialog.Close>

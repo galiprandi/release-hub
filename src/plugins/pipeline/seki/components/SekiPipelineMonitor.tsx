@@ -291,14 +291,14 @@ function SubeventRow({ sub }: { sub: SekiPipelineEvent }) {
 						href={sub.deployUrl}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="text-[10px] text-primary hover:text-primary/80 inline-flex items-center gap-0.5 transition-colors"
+						className="text-xs text-primary hover:text-primary/80 inline-flex items-center gap-0.5 transition-colors"
 						onClick={(e) => e.stopPropagation()}
 					>
 						<ExternalLink className="w-2.5 h-2.5" />
 						url
 					</a>
 				)}
-				{duration && <span className="text-[10px] text-muted-foreground tabular-nums">{duration}</span>}
+				{duration && <span className="text-xs text-muted-foreground tabular-nums">{duration}</span>}
 			</div>
 		</div>
 	)
@@ -308,7 +308,7 @@ function SubeventRow({ sub }: { sub: SekiPipelineEvent }) {
 
 function DeployUrlChip({ label, url }: { label: string; url: string }) {
 	return (
-		<span className="group inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium text-primary bg-primary/5 border border-primary/20 rounded-md hover:bg-primary/10 transition-colors">
+		<span className="group inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-primary bg-primary/5 border border-primary/20 rounded-md hover:bg-primary/10 transition-colors">
 			<a
 				href={url}
 				target="_blank"
@@ -354,12 +354,12 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 	}, [hasError, aiAvailable, hasResult, isGenerating, trigger])
 
 	return (
-		<div className="border border-border/60 rounded-lg overflow-hidden bg-muted/10">
-			<div className="flex items-center justify-between px-3 py-2 bg-muted/20 border-b border-border/40">
+		<div className="border border-border rounded-lg overflow-hidden bg-muted/30">
+			<div className="flex items-center justify-between px-3 py-2 bg-muted/30 border-b border-border">
 				<div className="flex items-center gap-2">
 					<config.icon className={`w-4 h-4 ${config.color}`} />
 					<span className="text-xs font-bold text-foreground">{stage.label}</span>
-					<span className={`px-1.5 py-0 text-[10px] rounded uppercase tracking-wider ${config.badge}`}>
+					<span className={`px-1.5 py-0 text-xs rounded ${config.badge}`}>
 						{config.label}
 					</span>
 				</div>
@@ -368,7 +368,7 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 						<button
 							type="button"
 							onClick={ai.regenerate}
-							className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+							className="text-xs text-muted-foreground hover:text-foreground transition-colors"
 							title="Regenerar análisis"
 						>
 							↻
@@ -378,13 +378,13 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 						<button
 							type="button"
 							onClick={onOpenLog}
-							className="text-[10px] font-bold underline hover:opacity-70 transition-opacity"
+							className="text-xs font-bold underline hover:opacity-70 transition-opacity"
 						>
 							Ver log
 						</button>
 					)}
 					{duration && (
-						<span className="text-[10px] text-muted-foreground tabular-nums flex items-center gap-1">
+						<span className="text-xs text-muted-foreground tabular-nums flex items-center gap-1">
 							<Clock className="w-2.5 h-2.5" />
 							{duration}
 						</span>
@@ -399,7 +399,7 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 			</div>
 
 			{hasError && (
-				<div className="px-3 py-3 border-t border-border/40 bg-destructive/5 space-y-2.5">
+				<div className="px-3 py-3 border-t border-border bg-destructive/5 space-y-2.5">
 					<div className="flex items-center gap-2">
 						{ai.isGenerating ? (
 							<Loader2 className="w-3.5 h-3.5 shrink-0 animate-spin text-purple-500 dark:text-purple-400" />
@@ -417,7 +417,7 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 							<span className="text-[11px] text-muted-foreground italic">IA no disponible</span>
 						)}
 						{ai.error && !ai.isGenerating && !ai.isFallback && (
-							<span className="text-[10px] text-muted-foreground">{ai.error}</span>
+							<span className="text-xs text-muted-foreground">{ai.error}</span>
 						)}
 					</div>
 
@@ -425,7 +425,7 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 						<div className="space-y-2">
 							{ai.diagnosis && (
 								<div className="space-y-0.5">
-									<span className="text-[10px] font-bold uppercase tracking-wider text-destructive/70 dark:text-destructive/60">
+									<span className="text-xs font-medium text-destructive/70 dark:text-destructive/60">
 										Diagnóstico
 									</span>
 									<p className="text-xs text-foreground/90 font-medium leading-relaxed">{ai.diagnosis}</p>
@@ -433,7 +433,7 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 							)}
 							{ai.command && (
 								<div className="space-y-0.5">
-									<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+									<span className="text-xs font-medium text-muted-foreground/60">
 										Comando
 									</span>
 									<code className="block text-[11px] font-mono text-primary bg-primary/5 px-2 py-1.5 rounded break-all">
@@ -443,7 +443,7 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 							)}
 							{ai.correction && (
 								<div className="space-y-0.5">
-									<span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+									<span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
 										Corrección
 									</span>
 									<p className="text-xs text-foreground/80 leading-relaxed">{ai.correction}</p>
@@ -493,7 +493,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 	}
 
 	return (
-		<div className={`bg-card border rounded-xl p-4 transition-all duration-500 ${
+		<div className={`bg-card border rounded-md p-4 transition-all duration-500 ${
 			filteredData.state === 'FAILED' ? 'ring-1 ring-destructive/20' : ''
 		} ${
 			filteredData.state === 'WARN' ? 'ring-1 ring-amber-400/20' : ''
@@ -506,20 +506,20 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 					<div className="flex items-center gap-2 flex-wrap">
 						<RefTypeIcon className="w-3.5 h-3.5 text-muted-foreground" />
 						<span className="font-mono text-sm font-semibold text-foreground">{filteredData.ref}</span>
-						<span className={`px-1.5 py-0 text-[10px] rounded uppercase tracking-wider ${
+						<span className={`px-1.5 py-0 text-xs rounded ${
 							filteredData.refType === 'TAG'
 								? 'bg-purple-50 text-purple-700 border border-purple-100 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800'
 								: 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800'
 						}`}>
 							{filteredData.refType}
 						</span>
-						<span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-md ${config.badge}`}>
+						<span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold rounded-md ${config.badge}`}>
 							<StatusIcon className={`w-3 h-3 ${config.color} ${filteredData.state === 'RUNNING' || filteredData.state === 'STARTED' ? 'animate-spin' : ''}`} />
 							{config.label}
 						</span>
 						<div className="flex items-center gap-1 ml-auto">
 							<EnvIcon className="w-3.5 h-3.5 text-muted-foreground/60" />
-							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+							<span className="text-xs font-medium text-muted-foreground/60">
 								{envLabel}
 							</span>
 						</div>
@@ -552,7 +552,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 					{/* Deploy URLs (with copy-to-clipboard) */}
 					{deploySubs.length > 0 && (
 						<div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
-							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 shrink-0">
+							<span className="text-xs font-medium text-muted-foreground/60 shrink-0">
 								Deploy:
 							</span>
 							{deploySubs.map((sub) => (
@@ -575,12 +575,12 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 											key={stage.id}
 											type="button"
 											onClick={() => handleStageClick(stage.id)}
-											className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all shrink-0 ${
+											className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all shrink-0 ${
 												isExpanded
 													? 'bg-foreground/10 text-foreground ring-1 ring-border'
 													: isFailed
 														? `${stageConfig.badge} hover:scale-105`
-														: 'bg-muted/40 text-muted-foreground border border-border/40 hover:bg-muted/60'
+														: 'bg-muted/30 text-muted-foreground border border-border hover:bg-muted/60'
 											}`}
 										>
 											<StageIcon className={`w-3 h-3 ${stageConfig.color} ${stage.state === 'RUNNING' || stage.state === 'STARTED' ? 'animate-spin' : ''}`} />
@@ -623,12 +623,12 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 					<div className="p-6 overflow-y-auto">
 						{failedStages.length > 0 && (
 							<div className="mb-4 space-y-2">
-								<span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+								<span className="text-xs font-medium text-muted-foreground">
 									Stages con problemas ({failedStages.length})
 								</span>
 								{failedStages.map((stage) => (
-									<div key={stage.id} className="border border-border/60 rounded-lg overflow-hidden bg-muted/10">
-										<div className="flex items-center justify-between px-3 py-2 bg-muted/20 border-b border-border/40">
+									<div key={stage.id} className="border border-border rounded-lg overflow-hidden bg-muted/30">
+										<div className="flex items-center justify-between px-3 py-2 bg-muted/30 border-b border-border">
 											<span className="text-xs font-bold text-foreground">{stage.label}</span>
 										</div>
 										<div className="p-2 space-y-0.5">
@@ -641,7 +641,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 							</div>
 						)}
 						<div className="mt-4">
-							<span className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2 block">
+							<span className="text-xs font-medium text-muted-foreground mb-2 block">
 								Log completo
 							</span>
 							<pre className="text-xs whitespace-pre-wrap font-mono text-foreground/90 bg-muted/50 p-4 rounded-lg border overflow-x-auto">

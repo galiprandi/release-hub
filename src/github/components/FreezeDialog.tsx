@@ -137,7 +137,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 								<button
 									type="button"
 									disabled={!canManage}
-									className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold uppercase tracking-wider rounded-lg transition-colors shadow-sm ${
+									className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors shadow-sm ${
 										isLocked
 											? "bg-warning text-warning-foreground hover:bg-warning/90"
 											: "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -150,7 +150,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 						</Tooltip.Trigger>
 						<Tooltip.Portal>
 							<Tooltip.Content
-								className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 text-[10px] font-bold uppercase tracking-wider"
+								className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 text-xs font-medium"
 								sideOffset={5}
 							>
 								<div className="text-xs space-y-1">
@@ -211,11 +211,11 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 							{error && <p className="text-sm text-destructive">{error}</p>}
 						</div>
 
-						<div className="mt-4 pt-4 border-t border-border/60 flex justify-end flex-shrink-0">
+						<div className="mt-4 pt-4 border-t border-border flex justify-end flex-shrink-0">
 							<button
 								onClick={handleToggleFreeze}
 								disabled={isToggling}
-								className={`px-4 py-2 text-sm font-bold uppercase tracking-wider text-white rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none ${
+								className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none ${
 									isLocked ? "bg-info hover:bg-info/90" : "bg-muted-foreground hover:bg-muted-foreground/90"
 								}`}
 							>
@@ -241,7 +241,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 							)}
 						</div>
 						<Dialog.Close asChild>
-							<button className="mt-4 px-4 py-2 text-sm font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all shadow-sm">
+							<button className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all shadow-sm">
 								Cerrar
 							</button>
 						</Dialog.Close>

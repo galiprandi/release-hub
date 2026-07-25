@@ -246,7 +246,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 					type="button"
 					onClick={() => handleOpenChange(true)}
 					aria-haspopup="dialog"
-					className="inline-flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-muted/20 border border-transparent hover:border-border/40 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
+					className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-transparent hover:border-border rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
 				>
 					<MessageSquare className="w-3.5 h-3.5" />
 					Feedback
@@ -279,17 +279,17 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 											aria-current={s.id === step ? "step" : undefined}
 											aria-label={`Paso ${idx + 1}: ${s.label}${isCompleted(s.id) ? " - Completado" : s.id === step ? " - Actual" : ""}`}
 											aria-disabled={idx > currentStepIndex}
-											className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${
+											className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
 												isCompleted(s.id) 
-												? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(var(--primary),0.2)] cursor-pointer"
+												? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm cursor-pointer"
 													: s.id === step 
-													? "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--primary),0.2)] cursor-pointer"
-													: "bg-muted/40 text-muted-foreground/40 border border-border/60 cursor-default"
-											} focus:outline-none focus:ring-2 focus:ring-primary/20`}
+													? "bg-primary text-primary-foreground shadow-sm cursor-pointer"
+													: "bg-muted/30 text-muted-foreground/40 border border-border cursor-default"
+											} focus:outline-none focus:ring-2 focus:ring-primary/30`}
 										>
 											{isCompleted(s.id) ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
 										</button>
-										<span className={`text-[10px] font-bold uppercase tracking-widest ${
+										<span className={`text-xs font-medium uppercase tracking-widest ${
 											s.id === step ? "text-foreground" : "text-muted-foreground/40"
 										}`} aria-hidden="true">
 											{s.label}
@@ -310,7 +310,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 						<div className="flex flex-col flex-1 overflow-y-auto scrollbar-hide">
 							<div className="space-y-4">
 								<div className="space-y-2">
-									<label htmlFor="feedback-description" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+									<label htmlFor="feedback-description" className="text-xs font-medium text-muted-foreground/60 ml-1">
 										Descripción Técnica
 									</label>
 									<textarea
@@ -320,29 +320,29 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 										onChange={(e) => setDescription(e.target.value)}
 										placeholder="Explica en detalle tu idea, problema o sugerencia. El sistema utilizará IA para normalizar el reporte..."
 										rows={8}
-										className="w-full px-4 py-3 text-xs bg-muted/40 border border-border/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-all duration-200 leading-relaxed font-mono placeholder:text-muted-foreground/40"
+										className="w-full px-4 py-3 text-xs bg-muted/30 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none transition-all duration-200 leading-relaxed font-mono placeholder:text-muted-foreground/40"
 									/>
 								</div>
 
 								{aiError && (
 									<div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center gap-2">
 										<AlertCircle className="w-4 h-4 text-destructive" />
-										<p className="text-[10px] font-bold uppercase tracking-wider text-destructive">{aiError.message}</p>
+										<p className="text-xs font-medium text-destructive">{aiError.message}</p>
 									</div>
 								)}
 								{error && (
 									<div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center gap-2">
 										<AlertCircle className="w-4 h-4 text-destructive" />
-										<p className="text-[10px] font-bold uppercase tracking-wider text-destructive">{error}</p>
+										<p className="text-xs font-medium text-destructive">{error}</p>
 									</div>
 								)}
 							</div>
 
-							<div className="mt-8 pt-4 border-t border-border/40 flex justify-end flex-shrink-0">
+							<div className="mt-8 pt-4 border-t border-border flex justify-end flex-shrink-0">
 								<button
 									onClick={handleNext}
 									disabled={isGenerating || isEnhancing || !description.trim()}
-									className="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+									className="px-6 py-2.5 text-xs font-medium uppercase tracking-widest bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
 								>
 									{(isGenerating || isEnhancing) ? (
 										<>
@@ -365,7 +365,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 						<div className="flex flex-col flex-1 overflow-y-auto scrollbar-hide">
 							<div className="space-y-6">
 								<div className="space-y-2">
-									<label htmlFor="feedback-title" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+									<label htmlFor="feedback-title" className="text-xs font-medium text-muted-foreground/60 ml-1">
 										Título Sugerido por IA
 									</label>
 									<input
@@ -373,12 +373,12 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 										type="text"
 										value={aiTitle}
 										onChange={(e) => setAiTitle(e.target.value)}
-										className="w-full px-4 py-3 text-xs bg-muted/40 border border-border/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold uppercase tracking-tight"
+										className="w-full px-4 py-3 text-xs bg-muted/30 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-bold uppercase tracking-tight"
 									/>
 								</div>
 
 								<div className="space-y-2">
-									<label htmlFor="feedback-body" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+									<label htmlFor="feedback-body" className="text-xs font-medium text-muted-foreground/60 ml-1">
 										Propuesta Estructurada
 									</label>
 									<textarea
@@ -386,31 +386,31 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 										value={aiBody}
 										onChange={(e) => setAiBody(e.target.value)}
 										rows={8}
-										className="w-full px-4 py-3 text-xs bg-muted/40 border border-border/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition-all duration-200 leading-relaxed"
+										className="w-full px-4 py-3 text-xs bg-muted/30 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none transition-all duration-200 leading-relaxed"
 									/>
 								</div>
 
 								<div className="flex items-center gap-2">
-									<span className="text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 px-2.5 py-1 rounded-md">
+									<span className="text-xs font-medium bg-primary/10 text-primary border border-primary/20 px-2.5 py-1 rounded-md">
 										#feedback
 									</span>
-									<span className="text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground/60 border border-border/40 px-2.5 py-1 rounded-md">
+									<span className="text-xs font-medium bg-muted text-muted-foreground/60 border border-border px-2.5 py-1 rounded-md">
 										#ai-generated
 									</span>
 								</div>
 							</div>
 
-							<div className="mt-8 pt-4 border-t border-border/40 flex justify-between items-center flex-shrink-0">
+							<div className="mt-8 pt-4 border-t border-border flex justify-between items-center flex-shrink-0">
 								<button
 									onClick={() => setStep("describe")}
-									className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+									className="px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
 								>
 									Volver a editar
 								</button>
 								<button
 									onClick={handleSend}
 									disabled={!aiTitle.trim() || !aiBody.trim()}
-									className="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+									className="px-6 py-2.5 text-xs font-medium uppercase tracking-widest bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
 								>
 									<Send className="w-3.5 h-3.5" />
 									Enviar Feedback
@@ -427,8 +427,8 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<Loader2 className="w-16 h-16 animate-spin text-primary relative z-10" />
 							</div>
 							<div className="space-y-2">
-								<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground">Sincronizando con GitHub</p>
-								<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">
+								<p className="text-xs font-medium text-foreground">Sincronizando con GitHub</p>
+								<p className="text-xs font-medium text-muted-foreground/40">
 									Creando registro técnico en <span className="text-foreground/60">galiprandi/release-hub</span>
 								</p>
 							</div>
@@ -443,8 +443,8 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 							</div>
 							<div className="space-y-4">
 								<div className="space-y-1">
-									<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-success">¡Feedback Enviado!</p>
-									<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+									<p className="text-xs font-medium text-success">¡Feedback Enviado!</p>
+									<p className="text-xs font-medium text-muted-foreground/60">
 										Tu propuesta ya es un issue oficial
 									</p>
 								</div>
@@ -453,7 +453,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 										href={issueUrl}
 										target="_blank"
 										rel="noopener noreferrer"
-										className="inline-flex items-center gap-2 px-4 py-2 bg-muted/20 border border-border/40 rounded-lg text-[10px] font-bold uppercase tracking-wider text-primary hover:bg-muted/40 transition-all"
+										className="inline-flex items-center gap-2 px-4 py-2 bg-muted/30 border border-border rounded-lg text-xs font-medium text-primary hover:bg-muted/30 transition-all"
 									>
 										<span>Ver en GitHub</span>
 										<Terminal className="w-3.5 h-3.5" />
@@ -463,7 +463,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 							<button
 								type="button"
 								onClick={() => handleOpenChange(false)}
-								className="w-full mt-4 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+								className="w-full mt-4 px-4 py-2.5 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
 							>
 								Finalizar
 							</button>
@@ -480,7 +480,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 											<div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
 											<Loader2 className="w-16 h-16 animate-spin text-primary relative z-10" />
 										</div>
-										<div className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40">
+										<div className="flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground/40">
 											<Sparkles className="w-4 h-4" />
 											<span>Análisis IA en curso</span>
 										</div>
@@ -493,10 +493,10 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 										<div className="flex items-center justify-center gap-2">
 											<button
 												onClick={() => setShowOriginalError(!showOriginalError)}
-												className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all flex items-center gap-1.5 border ${
+												className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 border ${
 													showOriginalError 
 														? 'bg-destructive/10 text-destructive border-destructive/20 shadow-[0_0_8px_rgba(239,68,68,0.2)]'
-														: 'bg-muted/40 text-muted-foreground/60 border-border/40'
+														: 'bg-muted/30 text-muted-foreground/60 border-border'
 												}`}
 											>
 												{showOriginalError ? (
@@ -512,7 +512,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 												)}
 											</button>
 										</div>
-										<div className="bg-muted/10 border border-border/40 rounded-xl p-4 text-xs font-medium leading-relaxed text-left">
+										<div className="bg-muted/30 border border-border rounded-md p-4 text-xs font-medium leading-relaxed text-left">
 											<div className={showOriginalError ? "text-destructive font-mono" : "text-foreground/90"}>
 												{showOriginalError ? originalError : error}
 											</div>
@@ -524,14 +524,14 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									type="button"
 									onClick={() => handleOpenChange(false)}
-									className="flex-1 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider border border-border/60 rounded-lg hover:bg-muted/20 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+									className="flex-1 px-4 py-2.5 text-xs font-medium border border-border rounded-lg hover:bg-muted/30 transition-all focus:outline-none focus:ring-2 focus:ring-primary/30"
 								>
 									Cerrar
 								</button>
 								<button
 									type="button"
 									onClick={() => setStep("review")}
-									className="flex-1 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+									className="flex-1 px-4 py-2.5 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
 								>
 									Reintentar
 								</button>

@@ -87,20 +87,20 @@ export function ItemProjectSelectionDialog({
 									type="button"
 									aria-pressed={active}
 									onClick={() => toggleInProject(project.id)}
-									className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 ${
+									className={`w-full flex items-center justify-between p-3 rounded-md border transition-all text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 ${
 										active
 											? "bg-primary/5 border-primary/20 hover:bg-primary/10 shadow-[0_0_10px_rgba(var(--primary),0.05)]"
-											: "bg-muted/10 border-border/20 hover:bg-muted/20"
+											: "bg-muted/30 border-border hover:bg-muted/30"
 									}`}
 								>
 									<div className="flex-1 min-w-0">
 										<h4
-											className={`text-[10px] font-bold uppercase tracking-wider ${active ? "text-primary" : "text-foreground"}`}
+											className={`text-xs font-medium ${active ? "text-primary" : "text-foreground"}`}
 										>
 											{project.name}
 										</h4>
 										{project.description && (
-											<p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1 opacity-70">
+											<p className="text-xs text-muted-foreground mt-0.5 line-clamp-1 opacity-70">
 												{project.description}
 											</p>
 										)}
@@ -129,7 +129,7 @@ export function ItemProjectSelectionDialog({
 					<button
 						type="button"
 						onClick={() => setIsCreating(true)}
-						className="w-full flex items-center justify-center gap-2 p-3 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/5 border border-dashed border-primary/30 rounded-xl hover:bg-primary/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
+						className="w-full flex items-center justify-center gap-2 p-3 text-xs font-medium text-primary bg-primary/5 border border-dashed border-primary/30 rounded-md hover:bg-primary/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
 					>
 						<FolderPlus className="w-4 h-4" />
 						Nuevo Proyecto
@@ -137,7 +137,7 @@ export function ItemProjectSelectionDialog({
 				) : (
 					<form
 						onSubmit={handleQuickCreate}
-						className="flex items-center gap-2 p-2 bg-muted/10 rounded-xl border border-border/40 animate-in fade-in slide-in-from-top-1 duration-200"
+						className="flex items-center gap-2 p-2 bg-muted/30 rounded-md border border-border animate-in fade-in slide-in-from-top-1 duration-200"
 					>
 						<input
 							autoFocus
@@ -145,7 +145,7 @@ export function ItemProjectSelectionDialog({
 							value={newName}
 							onChange={(e) => setNewName(e.target.value)}
 							placeholder="Nombre del proyecto..."
-							className="flex-1 bg-transparent border-none text-[10px] font-bold uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-md placeholder:text-muted-foreground/40 ml-2"
+							className="flex-1 bg-transparent border-none text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 rounded-md placeholder:text-muted-foreground/40 ml-2"
 						/>
 						<Tooltip.Root>
 							<Tooltip.Trigger asChild>
@@ -160,7 +160,7 @@ export function ItemProjectSelectionDialog({
 							</Tooltip.Trigger>
 							<Tooltip.Portal>
 								<Tooltip.Content
-									className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+									className="bg-popover text-popover-foreground border px-2 py-1 text-xs font-medium rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
 									sideOffset={5}
 								>
 									Guardar proyecto
@@ -182,7 +182,7 @@ export function ItemProjectSelectionDialog({
 							</Tooltip.Trigger>
 							<Tooltip.Portal>
 								<Tooltip.Content
-									className="bg-popover text-popover-foreground border px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+									className="bg-popover text-popover-foreground border px-2 py-1 text-xs font-medium rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
 									sideOffset={5}
 								>
 									Cancelar creación
@@ -193,11 +193,11 @@ export function ItemProjectSelectionDialog({
 					</form>
 				)}
 
-				<div className="pt-2 border-t border-border/20 flex justify-end">
+				<div className="pt-2 border-t border-border flex justify-end">
 					<button
 						type="button"
 						onClick={() => onOpenChange(false)}
-						className="px-6 py-2 text-[10px] font-bold uppercase tracking-wider bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
+						className="px-6 py-2 text-xs font-medium bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
 					>
 						Listo
 					</button>

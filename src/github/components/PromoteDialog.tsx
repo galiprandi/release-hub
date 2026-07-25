@@ -189,7 +189,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 								type="button"
 								onClick={() => handleOpenChange(true)}
 								aria-haspopup="dialog"
-								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold uppercase tracking-wider bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none shadow-sm"
+								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none shadow-sm"
 							>
 								<Rocket className="w-4 h-4" />
 								<span>Promocionar</span>
@@ -197,7 +197,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 						</Tooltip.Trigger>
 						<Tooltip.Portal>
 							<Tooltip.Content
-								className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 text-[10px] font-bold uppercase tracking-wider"
+								className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 text-xs font-medium"
 								sideOffset={5}
 							>
 								<div className="text-xs space-y-1">
@@ -258,7 +258,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 												type="button"
 												onClick={() => generateCommitSummary(pendingCommits)}
 												disabled={isGeneratingSummary || !summaryAvailable || !hasPendingCommits}
-												className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-ai hover:bg-ai/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+												className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-ai hover:bg-ai/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
 												title="Regenerar descripción con IA"
 											>
 												{isGeneratingSummary ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
@@ -306,17 +306,17 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 									{error && <p className="text-sm text-destructive">{error}</p>}
 
 									{!canCreateTags && !isLoadingPerms && (
-										<p className="text-[10px] text-warning bg-warning/10 p-2 rounded-lg border border-warning/20">
+										<p className="text-xs text-warning bg-warning/10 p-2 rounded-lg border border-warning/20">
 											No tienes permisos de escritura en este repositorio para crear tags.
 										</p>
 									)}
 								</div>
 
-								<div className="mt-4 pt-4 border-t border-border/60 flex justify-end flex-shrink-0">
+								<div className="mt-4 pt-4 border-t border-border flex justify-end flex-shrink-0">
 									<button
 										onClick={handleCreateTag}
 										disabled={isCreating || !tagName.trim() || (!canCreateTags && !isLoadingPerms)}
-										className="px-4 py-2 text-sm font-bold uppercase tracking-wider bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none shadow-sm"
+										className="px-4 py-2 text-sm font-medium bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none shadow-sm"
 									>
 										{isCreating ? <><Loader2 className="w-4 h-4 animate-spin" /> Publicando...</> : <><Rocket className="w-4 h-4" /> Publicar Tag</>}
 									</button>
@@ -330,9 +330,9 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 										<div className="flex items-center gap-2">
 											<GitCommit className="w-4 h-4 text-muted-foreground" />
 											<span className="font-medium text-sm">Cambios desde {latestTag}</span>
-											<span className="text-[10px] bg-muted px-2 py-0.5 rounded-full">{pendingCommits.length}</span>
+											<span className="text-xs bg-muted px-2 py-0.5 rounded-full">{pendingCommits.length}</span>
 										</div>
-										<p className="text-[10px] text-muted-foreground mt-1 pl-6">
+										<p className="text-xs text-muted-foreground mt-1 pl-6">
 											Commits que se incluirán en este release
 										</p>
 									</div>
@@ -340,7 +340,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 										{pendingCommits.map((commit) => (
 											<div
 												key={commit.hash}
-												className="py-1 border-b border-border/50 last:border-0"
+												className="py-1 border-b border-border last:border-0"
 											>
 												<div className="flex items-center gap-2">
 													<CommitLink hash={commit.hash} org={org} repo={name} showStatus={false} />
@@ -348,7 +348,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 														{commit.message.split('\n')[0]}
 													</span>
 												</div>
-												<div className="text-[10px] text-muted-foreground mt-0.5 pl-6">
+												<div className="text-xs text-muted-foreground mt-0.5 pl-6">
 													{new Date(commit.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
 													<span className="mx-1">•</span>
 													{commit.author}
@@ -369,7 +369,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 								<p className="text-lg font-semibold">Tag <span className="font-mono">{tagName}</span> creado</p>
 								<p className="text-sm text-muted-foreground mt-1">El lanzamiento fue publicado correctamente en <strong>{repo}</strong>.</p>
 								{webhookUrl && (
-									<p className="text-[10px] text-muted-foreground mt-2">
+									<p className="text-xs text-muted-foreground mt-2">
 										Notificación enviada al canal de Discord
 									</p>
 								)}
@@ -377,7 +377,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 							<button
 								type="button"
 								onClick={() => handleOpenChange(false)}
-								className="mt-4 px-4 py-2 text-sm font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none shadow-sm"
+								className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none shadow-sm"
 							>
 								Cerrar
 							</button>

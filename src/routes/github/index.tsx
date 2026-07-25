@@ -192,7 +192,7 @@ function Dashboard() {
 				searchComponent: (
 					<div className="flex items-center gap-4">
 						<div className="flex items-center gap-2">
-							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+							<span className="text-xs font-medium text-muted-foreground/60">
 								Colecciones:
 							</span>
 							<IndustrialTabs
@@ -203,7 +203,7 @@ function Dashboard() {
 											{t.icon && <t.icon className="w-3 h-3" />}
 											<span>{t.label}</span>
 											{t.count !== undefined && t.count > 0 && (
-												<span className="ml-1 px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-[10px]">
+												<span className="ml-1 px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-xs">
 													{t.count}
 												</span>
 											)}
@@ -237,7 +237,7 @@ function Dashboard() {
 					showLabel={true}
 					onClick={handleRefresh}
 					size="md"
-					className="bg-muted/20 hover:bg-muted/30"
+					className="bg-muted/30 hover:bg-muted/30"
 					disabled={isRefreshing}
 				/>,
 				<ActionButton
@@ -250,7 +250,7 @@ function Dashboard() {
 					showLabel={true}
 					onClick={handleManageProjects}
 					size="md"
-					className="bg-muted/20 hover:bg-muted/30"
+					className="bg-muted/30 hover:bg-muted/30"
 				/>,
 			]}
 			isLoading={isLoadingRepos}
@@ -279,10 +279,10 @@ function Dashboard() {
 				{!isEmpty && (
 					<div className="flex items-center justify-between px-1">
 						<div className="flex items-center gap-2">
-							<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+							<span className="text-xs font-medium text-muted-foreground/60">
 								Filtrar:
 							</span>
-							<div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border/40">
+							<div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border border-border">
 								<IndustrialTabs
 									options={[
 										{ id: "all", label: "Todos" },
@@ -305,7 +305,7 @@ function Dashboard() {
 							<button
 								type="button"
 								onClick={toggleAllCollapse}
-								className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all border border-transparent hover:border-border/40"
+								className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all border border-transparent hover:border-border"
 							>
 								{isAllCollapsed ? (
 									<>
@@ -354,7 +354,7 @@ function Dashboard() {
 												input.focus();
 											}
 										}}
-										className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-bold uppercase tracking-wider shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+										className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-medium shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 									>
 										<Search className="w-4 h-4" />
 										Descubrir Repositorios
@@ -371,7 +371,7 @@ function Dashboard() {
 													input.focus();
 												}
 											}}
-											className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-bold uppercase tracking-wider shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+											className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-medium shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 										>
 											<Search className="w-4 h-4" />
 											Añadir Repositorios
@@ -379,7 +379,7 @@ function Dashboard() {
 										<button
 											type="button"
 											onClick={handleManageProjects}
-											className="inline-flex items-center gap-2 px-6 py-2.5 bg-muted/20 text-foreground rounded-lg hover:bg-muted/30 transition-all text-xs font-bold uppercase tracking-wider border border-border/20 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+											className="inline-flex items-center gap-2 px-6 py-2.5 bg-muted/30 text-foreground rounded-lg hover:bg-muted/30 transition-all text-xs font-medium border border-border focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 										>
 											<Settings2 className="w-4 h-4" />
 											Gestionar Proyecto
@@ -399,8 +399,8 @@ function Dashboard() {
 								<section
 									key={org}
 									className={clsx(
-										"rounded-xl border border-border/40 overflow-hidden transition-all duration-300",
-										isCollapsed ? "bg-muted/5" : "bg-muted/10 space-y-3 pb-4",
+										"rounded-md border border-border overflow-hidden transition-all duration-300",
+										isCollapsed ? "bg-muted/5" : "bg-muted/30 space-y-3 pb-4",
 									)}
 								>
 									<header
@@ -412,8 +412,8 @@ function Dashboard() {
 										}}
 										tabIndex={0}
 										className={clsx(
-											"flex items-center justify-between px-4 py-2 bg-muted/20 cursor-pointer hover:bg-muted/30 transition-colors group",
-											!isCollapsed && "border-b border-border/40 mb-3",
+											"flex items-center justify-between px-4 py-2 bg-muted/30 cursor-pointer hover:bg-muted/30 transition-colors group",
+											!isCollapsed && "border-b border-border mb-3",
 										)}
 									>
 										<div className="flex items-center gap-3">
@@ -424,10 +424,10 @@ function Dashboard() {
 											)}
 											<div className="flex items-center gap-2">
 												<Building2 className="w-4 h-4 text-primary/60" />
-												<h2 className="text-[10px] font-bold uppercase tracking-widest text-foreground">
+												<h2 className="text-xs font-medium uppercase tracking-widest text-foreground">
 													{org}
 												</h2>
-												<span className="px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-[10px] font-bold text-muted-foreground/60">
+												<span className="px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-xs font-bold text-muted-foreground/60">
 													{repoCount}
 												</span>
 											</div>
@@ -435,7 +435,7 @@ function Dashboard() {
 
 										{isCollapsed && (
 											<div className="flex items-center gap-4">
-												<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40 italic">
+												<span className="text-xs font-medium text-muted-foreground/40 italic">
 													Click para expandir
 												</span>
 											</div>
@@ -638,7 +638,7 @@ function ReposTable({
 			{
 				accessorKey: "name",
 				header: () => (
-					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground/60">
 						Repositorio
 					</span>
 				),
@@ -658,7 +658,7 @@ function ReposTable({
 			{
 				accessorKey: "tag",
 				header: () => (
-					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground/60">
 						Producción
 					</span>
 				),
@@ -667,7 +667,7 @@ function ReposTable({
 			{
 				accessorKey: "commit",
 				header: () => (
-					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground/60">
 						Staging
 					</span>
 				),
@@ -676,7 +676,7 @@ function ReposTable({
 			{
 				id: "health",
 				header: () => (
-					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground/60">
 						Salud
 					</span>
 				),
@@ -685,7 +685,7 @@ function ReposTable({
 			{
 				id: "prs",
 				header: () => (
-					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground/60">
 						PRs
 					</span>
 				),
@@ -699,7 +699,7 @@ function ReposTable({
 			{
 				id: "actions_status",
 				header: () => (
-					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground/60">
 						Workflows
 					</span>
 				),
@@ -713,7 +713,7 @@ function ReposTable({
 			{
 				accessorKey: "updatedAt",
 				header: () => (
-					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground/60">
 						Actividad
 					</span>
 				),
@@ -722,7 +722,7 @@ function ReposTable({
 			{
 				accessorKey: "author",
 				header: () => (
-					<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground/60">
 						Autor
 					</span>
 				),
@@ -732,7 +732,7 @@ function ReposTable({
 				id: "operations",
 				accessorKey: "actions",
 				header: () => (
-					<div className="text-right text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+					<div className="text-right text-xs font-medium text-muted-foreground/60">
 						Operations
 					</div>
 				),
@@ -773,10 +773,10 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 	if (isLoading) {
 		return (
 			<div className="flex items-center gap-2">
-				<div className="w-4 h-4 bg-muted/40 rounded-full flex-shrink-0 flex items-center justify-center">
+				<div className="w-4 h-4 bg-muted/30 rounded-full flex-shrink-0 flex items-center justify-center">
 					<Loader2 className="w-3 h-3 animate-spin text-muted-foreground/40" />
 				</div>
-				<div className="h-4 bg-muted/20 rounded w-32 animate-pulse" />
+				<div className="h-4 bg-muted/30 rounded w-32 animate-pulse" />
 			</div>
 		);
 	}
@@ -798,7 +798,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 								<button
 									type="button"
 									onClick={() => setIsCommitsModalOpen(true)}
-									className="inline-flex items-center gap-1 text-[10px] bg-warning/20 text-warning px-2 py-0.5 rounded-full border border-warning/20 font-bold cursor-pointer hover:bg-warning/30 hover:border-warning/40 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+									className="inline-flex items-center gap-1 text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full border border-warning/20 font-bold cursor-pointer hover:bg-warning/30 hover:border-warning/40 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
 								>
 									<GitPullRequestCreateArrow className="w-2.5 h-2.5" />
 									<span>{pendingCount}</span>
@@ -806,7 +806,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 							</Tooltip.Trigger>
 							<Tooltip.Portal>
 								<Tooltip.Content
-									className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+									className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
 									sideOffset={5}
 								>
 									{pendingCount} commit{pendingCount !== 1 ? "s" : ""}{" "}
@@ -863,7 +863,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 	}, [latestTag, commits]);
 
 	if (isLoading) {
-		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
+		return <div className="h-4 bg-muted/30 rounded w-16 animate-pulse" />;
 	}
 
 	return latestTag?.name ? (
@@ -913,7 +913,7 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 	}, [latestCommit]);
 
 	if (isLoading) {
-		return <div className="h-4 bg-muted/20 rounded w-16 animate-pulse" />;
+		return <div className="h-4 bg-muted/30 rounded w-16 animate-pulse" />;
 	}
 
 	return latestCommit?.shortHash ? (
@@ -938,11 +938,11 @@ function DateCell({ repo }: { repo: RepoInfo }) {
 	const commitDate = queryData?.commits?.[0]?.date;
 
 	if (isLoading) {
-		return <div className="h-4 bg-muted/20 rounded w-24 animate-pulse" />;
+		return <div className="h-4 bg-muted/30 rounded w-24 animate-pulse" />;
 	}
 
 	return commitDate ? (
-		<div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+		<div className="text-xs font-medium text-muted-foreground/60">
 			{DayJS(commitDate).fromNow()}
 		</div>
 	) : null;
@@ -968,7 +968,7 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 						search={{
 							environment: unhealthyCount > 0 ? "unhealthy" : undefined,
 						}}
-						className="flex items-center gap-1.5 hover:bg-muted/40 p-1 rounded-md transition-colors"
+						className="flex items-center gap-1.5 hover:bg-muted/30 p-1 rounded-md transition-colors"
 					>
 						<div className="flex items-center -space-x-1">
 							{unhealthyCount > 0 && (
@@ -984,13 +984,13 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 						<div className="flex items-center gap-1.5">
 							<span
 								className={clsx(
-									"text-[10px] font-bold uppercase tracking-wider",
+									"text-xs font-medium",
 									unhealthyCount > 0 ? "text-destructive" : "text-success",
 								)}
 							>
 								{statusLabel}
 							</span>
-							<span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">
+							<span className="text-xs font-bold text-muted-foreground/40">
 								({endpoints.length})
 							</span>
 						</div>
@@ -998,11 +998,11 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 				</Tooltip.Trigger>
 				<Tooltip.Portal>
 					<Tooltip.Content
-						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
 						sideOffset={5}
 					>
 						<div className="space-y-1">
-							<p className="border-b border-border/40 pb-1 mb-1">
+							<p className="border-b border-border pb-1 mb-1">
 								Estado de Salud
 							</p>
 							{healthyCount > 0 && (
@@ -1036,7 +1036,7 @@ function AuthorCell({ repo }: { repo: RepoInfo }) {
 	const commitAuthor = queryData?.commits?.[0]?.author;
 
 	if (isLoading) {
-		return <div className="h-4 bg-muted/20 rounded w-32 animate-pulse" />;
+		return <div className="h-4 bg-muted/30 rounded w-32 animate-pulse" />;
 	}
 
 	const truncatedAuthor =
@@ -1046,7 +1046,7 @@ function AuthorCell({ repo }: { repo: RepoInfo }) {
 
 	return truncatedAuthor ? (
 		<span
-			className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60"
+			className="text-xs font-medium text-muted-foreground/60"
 			title={commitAuthor}
 		>
 			{truncatedAuthor}
@@ -1058,7 +1058,7 @@ function PRsCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
 	const prCount = details?.prCount || 0;
 
 	if (!details) {
-		return <div className="h-4 bg-muted/20 rounded w-8 animate-pulse" />;
+		return <div className="h-4 bg-muted/30 rounded w-8 animate-pulse" />;
 	}
 
 	if (prCount === 0) return null;
@@ -1076,14 +1076,14 @@ function PRsCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
 						aria-label={`${prCount} pull requests abiertos`}
 					>
 						<GitPullRequest className="w-3 h-3" />
-						<span className="text-[10px] font-bold uppercase tracking-wider">
+						<span className="text-xs font-medium">
 							{prCount}
 						</span>
 					</a>
 				</Tooltip.Trigger>
 				<Tooltip.Portal>
 					<Tooltip.Content
-						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
 						sideOffset={5}
 					>
 						{prCount} pull request{prCount !== 1 ? "s" : ""} abierto
@@ -1104,7 +1104,7 @@ function ActionsStatusCell({
 	const actions = details?.actions;
 
 	if (!details) {
-		return <div className="h-4 bg-muted/20 rounded w-12 animate-pulse" />;
+		return <div className="h-4 bg-muted/30 rounded w-12 animate-pulse" />;
 	}
 
 	if (!actions || actions.total === 0) return null;
@@ -1131,18 +1131,18 @@ function ActionsStatusCell({
 						aria-label={`Estado de GitHub Actions: ${hasFailure ? "Fallido" : isRunning ? "En progreso" : "Exitoso"}`}
 					>
 						<Play className={clsx("w-3 h-3", isRunning && "animate-pulse")} />
-						<span className="text-[10px] font-bold uppercase tracking-wider">
+						<span className="text-xs font-medium">
 							{hasFailure ? "Error" : isRunning ? "Running" : "Success"}
 						</span>
 					</a>
 				</Tooltip.Trigger>
 				<Tooltip.Portal>
 					<Tooltip.Content
-						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-[10px] font-bold uppercase tracking-wider z-50 animate-in fade-in zoom-in-95"
+						className="bg-popover text-popover-foreground border px-2 py-1 rounded-md shadow-md text-xs font-medium z-50 animate-in fade-in zoom-in-95"
 						sideOffset={5}
 					>
 						<div className="space-y-1">
-							<p className="border-b border-border/40 pb-1 mb-1">
+							<p className="border-b border-border pb-1 mb-1">
 								Últimos 5 runs
 							</p>
 							{actions.failed > 0 && (

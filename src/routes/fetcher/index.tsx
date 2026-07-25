@@ -225,7 +225,7 @@ function FetcherPage() {
 					value={curlInput}
 					onChange={(e) => setCurlInput(e.target.value)}
 					placeholder="Importar cURL... (curl -X GET...)"
-					className="w-80 px-3 py-1.5 text-sm border border-border/60 bg-muted/40 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono transition-shadow placeholder:text-muted-foreground/40"
+					className="w-80 px-3 py-1.5 text-sm border border-border bg-muted/30 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono transition-shadow placeholder:text-muted-foreground/40"
 				/>
 			</div>
 			<ActionButton
@@ -241,7 +241,7 @@ function FetcherPage() {
 	const searchComponent = (
 		<div className="flex items-center gap-4">
 			<div className="flex items-center gap-2">
-				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Búsqueda</span>
+				<span className="text-xs font-medium text-muted-foreground/60">Búsqueda</span>
 				<div className="relative">
 					<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground/60" />
 					<input
@@ -251,7 +251,7 @@ function FetcherPage() {
 							handleQuerySearch(e.target.value);
 						}}
 						placeholder="Buscar en historial..."
-						className="w-48 pl-8 pr-3 py-1.5 bg-muted/40 border border-border/60 rounded-lg text-[11px] focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/40 font-medium uppercase tracking-tight"
+						className="w-48 pl-8 pr-3 py-1.5 bg-muted/30 border border-border rounded-lg text-[11px] focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/40 font-medium uppercase tracking-tight"
 					/>
 					{search.q && (
 						<button
@@ -268,7 +268,7 @@ function FetcherPage() {
 			</div>
 			<div className="w-px h-6 bg-border/40 mx-1" />
 			<div className="flex items-center gap-2">
-				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Método</span>
+				<span className="text-xs font-medium text-muted-foreground/60">Método</span>
 				<IndustrialTabs
 					options={[
 						{ id: 'ALL', label: 'Todos' },
@@ -284,7 +284,7 @@ function FetcherPage() {
 				/>
 			</div>
 			<div className="flex items-center gap-2">
-				<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Orden</span>
+				<span className="text-xs font-medium text-muted-foreground/60">Orden</span>
 				<IndustrialTabs
 					options={[
 						{ id: 'recent', label: 'Recientes' },
@@ -369,7 +369,7 @@ function QueriesTable({
 	const columns: ColumnDef<QueryRecord>[] = useMemo(() => [
 		{
 			accessorKey: "url",
-			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">URL</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground/60">URL</span>,
 			cell: ({ row }) => <UrlCell query={row.original} />,
 		},
 		{
@@ -378,30 +378,30 @@ function QueriesTable({
 				const parsed = parseCurlForDisplay(row.curl);
 				return parsed?.method || '';
 			},
-			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Método</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground/60">Método</span>,
 			cell: ({ row }) => <MethodCell query={row.original} />,
 			filterFn: 'equalsString',
 		},
 		{
 			accessorKey: "updatedAt",
-			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Enviado</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground/60">Enviado</span>,
 			cell: ({ row }) => <SentCell query={row.original} />,
 		},
 		{
 			accessorKey: "responseTime",
-			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Tiempo</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground/60">Tiempo</span>,
 			cell: ({ row }) => <ResponseTimeCell query={row.original} />,
 		},
 		{
 			id: "status",
 			accessorFn: (row) => row.response?.status || null,
-			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Status</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground/60">Status</span>,
 			cell: ({ row }) => <StatusCell query={row.original} />,
 		},
 		{
 			id: "actions",
 			accessorKey: "actions",
-			header: () => <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 text-right block">Acciones</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground/60 text-right block">Acciones</span>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<ActionsCell
@@ -435,10 +435,10 @@ function MethodCell({ query }: { query: QueryRecord }) {
 		DELETE: "bg-destructive/20 text-destructive border-destructive/20",
 	}
 
-	const style = methodStyles[parsed.method.toUpperCase()] || "bg-muted/40 text-muted-foreground border-border/40"
+	const style = methodStyles[parsed.method.toUpperCase()] || "bg-muted/30 text-muted-foreground border-border"
 
 	return (
-		<span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${style}`}>
+		<span className={`px-2 py-0.5 rounded-md border text-xs font-medium ${style}`}>
 			{parsed.method}
 		</span>
 	)
@@ -451,7 +451,7 @@ function UrlCell({ query }: { query: QueryRecord }) {
 	const fullPath = parsed.path.length > 80 ? `${parsed.path.slice(0, 80)}...` : parsed.path
 	return (
 		<div className="flex flex-col">
-			<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 truncate max-w-md">
+			<span className="text-xs font-medium text-muted-foreground/60 truncate max-w-md">
 				{parsed.domain}
 			</span>
 			<span className="text-sm font-medium tracking-tight text-foreground truncate max-w-md">
@@ -463,7 +463,7 @@ function UrlCell({ query }: { query: QueryRecord }) {
 
 function SentCell({ query }: { query: QueryRecord }) {
 	return (
-		<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60" title={query.updatedAt ? DayJS(query.updatedAt).format('LLL') : 'Nunca'}>
+		<span className="text-xs font-medium text-muted-foreground/60" title={query.updatedAt ? DayJS(query.updatedAt).format('LLL') : 'Nunca'}>
 			{query.updatedAt ? DayJS(query.updatedAt).fromNow() : 'Nunca'}
 		</span>
 	)
@@ -472,34 +472,34 @@ function SentCell({ query }: { query: QueryRecord }) {
 function StatusCell({ query }: { query: QueryRecord }) {
 	if (query.response?.status) {
 		const { status } = query.response
-		let style = "bg-muted/40 text-muted-foreground border-border/40"
+		let style = "bg-muted/30 text-muted-foreground border-border"
 		if (status >= 200 && status < 300) style = "bg-success/20 text-success border-success/20"
 		else if (status >= 400 && status < 500) style = "bg-warning/20 text-warning border-warning/20"
 		else if (status >= 500) style = "bg-destructive/20 text-destructive border-destructive/20"
 
 		return (
-			<span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${style}`}>
+			<span className={`px-2 py-0.5 rounded-md border text-xs font-medium ${style}`}>
 				{status}
 			</span>
 		)
 	}
-	return <span className="text-muted-foreground/40 text-[10px] font-bold uppercase tracking-wider">-</span>
+	return <span className="text-muted-foreground/40 text-xs font-medium">-</span>
 }
 
 function ResponseTimeCell({ query }: { query: QueryRecord }) {
 	if (query.response?.responseTime) {
 		const { responseTime } = query.response
-		let style = "bg-muted/40 text-muted-foreground border-border/40"
+		let style = "bg-muted/30 text-muted-foreground border-border"
 		if (responseTime < 200) style = "bg-success/20 text-success border-success/20"
 		else if (responseTime > 1000) style = "bg-destructive/20 text-destructive border-destructive/20"
 
 		return (
-			<span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${style}`}>
+			<span className={`px-2 py-0.5 rounded-md border text-xs font-medium ${style}`}>
 				{responseTime}ms
 			</span>
 		)
 	}
-	return <span className="text-muted-foreground/40 text-[10px] font-bold uppercase tracking-wider">-</span>
+	return <span className="text-muted-foreground/40 text-xs font-medium">-</span>
 }
 
 function ActionsCell({

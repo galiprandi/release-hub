@@ -601,7 +601,7 @@ function TerminalIconModal() {
 						</div>
 						<div className="flex items-center gap-3">
 							<div className="flex items-center gap-1.5">
-								<div className="w-1 h-1 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+								<div className="w-1 h-1 rounded-full bg-success animate-pulse " />
 								<span className="text-xs font-medium text-muted-foreground">
 									Active Session
 								</span>

@@ -508,9 +508,9 @@ function StatusCell({ deployment, isLoading }: { deployment: DeploymentInfo; isL
 	}
 
 	const variants: Record<string, { className: string; label: string }> = {
-		healthy: { className: 'bg-success/20 text-success border-success/20', label: 'Saludable' },
-		progressing: { className: 'bg-info/20 text-info border-info/20', label: 'Procesando' },
-		degraded: { className: 'bg-destructive/20 text-destructive border-destructive/20', label: 'Degradado' },
+		healthy: { className: 'bg-success/20 text-success border-success/30', label: 'Saludable' },
+		progressing: { className: 'bg-info/20 text-info border-info/30', label: 'Procesando' },
+		degraded: { className: 'bg-destructive/20 text-destructive border-destructive/30', label: 'Degradado' },
 		unknown: { className: 'bg-muted/30 text-muted-foreground border-border', label: 'Desconocido' },
 	}
 

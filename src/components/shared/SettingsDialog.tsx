@@ -115,7 +115,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 							<div className="space-y-3">
 								<div className="bg-muted/30 border border-border rounded-md p-4 space-y-2">
 									<div className="flex items-center gap-2">
-										<div className={`w-1.5 h-1.5 rounded-full ${isExpired ? 'bg-destructive animate-pulse' : 'bg-success shadow-[0_0_8px_rgba(34,197,94,0.4)]'}`} />
+										<div className={`w-1.5 h-1.5 rounded-full ${isExpired ? 'bg-destructive animate-pulse' : 'bg-success '}`} />
 										<span className={`text-xs font-medium ${isExpired ? 'text-destructive' : 'text-success'}`}>
 											{isExpired ? 'Token expirado' : 'Token activo'}
 										</span>
@@ -130,7 +130,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									type="button"
 									onClick={handleClearSekiToken}
-									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/20 transition-all w-full"
+									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/30 transition-all w-full"
 								>
 									<Trash2 className="w-3.5 h-3.5" />
 									Revocar Acceso
@@ -190,7 +190,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 							<div className="space-y-3">
 								<div className="bg-muted/30 border border-border rounded-md p-4 space-y-2">
 									<div className="flex items-center gap-2">
-										<div className="w-1.5 h-1.5 rounded-full bg-success shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+										<div className="w-1.5 h-1.5 rounded-full bg-success " />
 										<span className="text-xs font-medium text-success">Webhook configurado</span>
 									</div>
 									<p className="text-xs font-mono text-muted-foreground break-all leading-relaxed">
@@ -201,7 +201,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									type="button"
 									onClick={handleClearDiscordWebhook}
-									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/20 transition-all w-full"
+									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/30 transition-all w-full"
 								>
 									<Trash2 className="w-3.5 h-3.5" />
 									Eliminar Webhook

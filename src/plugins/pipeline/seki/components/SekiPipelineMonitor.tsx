@@ -308,7 +308,7 @@ function SubeventRow({ sub }: { sub: SekiPipelineEvent }) {
 
 function DeployUrlChip({ label, url }: { label: string; url: string }) {
 	return (
-		<span className="group inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-primary bg-primary/5 border border-primary/20 rounded-md hover:bg-primary/10 transition-colors">
+		<span className="group inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-primary bg-primary/5 border border-primary/30 rounded-md hover:bg-primary/10 transition-colors">
 			<a
 				href={url}
 				target="_blank"
@@ -411,10 +411,10 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 							<AlertCircle className="w-3.5 h-3.5 shrink-0 text-destructive/60" />
 						)}
 						{ai.isGenerating && (
-							<span className="text-[11px] text-muted-foreground italic">Analizando con IA...</span>
+							<span className="text-xs text-muted-foreground italic">Analizando con IA...</span>
 						)}
 						{ai.isFallback && !ai.hasResult && (
-							<span className="text-[11px] text-muted-foreground italic">IA no disponible</span>
+							<span className="text-xs text-muted-foreground italic">IA no disponible</span>
 						)}
 						{ai.error && !ai.isGenerating && !ai.isFallback && (
 							<span className="text-xs text-muted-foreground">{ai.error}</span>
@@ -436,7 +436,7 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 									<span className="text-xs font-medium text-muted-foreground">
 										Comando
 									</span>
-									<code className="block text-[11px] font-mono text-primary bg-primary/5 px-2 py-1.5 rounded break-all">
+									<code className="block text-xs font-mono text-primary bg-primary/5 px-2 py-1.5 rounded break-all">
 										{ai.command}
 									</code>
 								</div>

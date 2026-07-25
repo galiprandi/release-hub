@@ -190,11 +190,7 @@ function Dashboard() {
 			header={{
 				title: "Repositorios",
 				searchComponent: (
-					<div className="flex items-center gap-4">
-						<div className="flex items-center gap-2">
-							<span className="text-xs font-medium text-muted-foreground">
-								Colecciones:
-							</span>
+					<div className="flex items-center gap-3">
 							<IndustrialTabs
 								options={tabs.map((t) => ({
 									id: t.value,
@@ -220,8 +216,6 @@ function Dashboard() {
 									})
 								}
 							/>
-						</div>
-						<div className="w-px h-6 bg-border mx-1" />
 						<RepoSearch />
 					</div>
 				),
@@ -234,10 +228,9 @@ function Dashboard() {
 						label: "Actualizar",
 						color: "default",
 					}}
-					showLabel={true}
+					showLabel={false}
 					onClick={handleRefresh}
 					size="md"
-					className="bg-muted/30 hover:bg-muted/30"
 					disabled={isRefreshing}
 				/>,
 				<ActionButton
@@ -247,10 +240,9 @@ function Dashboard() {
 						label: "Gestionar Proyectos",
 						color: "default",
 					}}
-					showLabel={true}
+					showLabel={false}
 					onClick={handleManageProjects}
 					size="md"
-					className="bg-muted/30 hover:bg-muted/30"
 				/>,
 			]}
 			isLoading={isLoadingRepos}
@@ -286,7 +278,7 @@ function Dashboard() {
 								<IndustrialTabs
 									options={[
 										{ id: "all", label: "Todos" },
-										{ id: "true", label: "Pendientes" },
+										{ id: "true", label: "Sin deploy" },
 									]}
 									activeId={activeFilter || "all"}
 									onChange={(id) =>
@@ -354,7 +346,7 @@ function Dashboard() {
 												input.focus();
 											}
 										}}
-										className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-medium shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+										className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-all text-xs font-medium shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 									>
 										<Search className="w-4 h-4" />
 										Descubrir Repositorios
@@ -371,7 +363,7 @@ function Dashboard() {
 													input.focus();
 												}
 											}}
-											className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-medium shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+											className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-all text-xs font-medium shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 										>
 											<Search className="w-4 h-4" />
 											Añadir Repositorios
@@ -379,7 +371,7 @@ function Dashboard() {
 										<button
 											type="button"
 											onClick={handleManageProjects}
-											className="inline-flex items-center gap-2 px-6 py-2.5 bg-muted/30 text-foreground rounded-lg hover:bg-muted/30 transition-all text-xs font-medium border border-border focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+											className="inline-flex items-center gap-2 px-6 py-2.5 bg-muted/30 text-foreground rounded-md hover:bg-muted/30 transition-all text-xs font-medium border border-border focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 										>
 											<Settings2 className="w-4 h-4" />
 											Gestionar Proyecto
@@ -647,7 +639,7 @@ function ReposTable({
 			{
 				id: "pending_filter",
 				accessorKey: "fullName",
-				header: "Pendientes",
+				header: "Sin deploy",
 				enableHiding: true,
 				cell: () => null,
 				filterFn: (row, _columnId, filterValue) => {
@@ -798,7 +790,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 								<button
 									type="button"
 									onClick={() => setIsCommitsModalOpen(true)}
-									className="inline-flex items-center gap-1 text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full border border-warning/20 font-bold cursor-pointer hover:bg-warning/30 hover:border-warning/40 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+									className="inline-flex items-center gap-1 text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full border border-warning/30 font-bold cursor-pointer hover:bg-warning/30 hover:border-warning/40 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 								>
 									<GitPullRequestCreateArrow className="w-2.5 h-2.5" />
 									<span>{pendingCount}</span>
@@ -972,10 +964,10 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 					>
 						<div className="flex items-center -space-x-1">
 							{unhealthyCount > 0 && (
-								<div className="w-1.5 h-1.5 rounded-full bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.4)]" />
+								<div className="w-1.5 h-1.5 rounded-full bg-destructive " />
 							)}
 							{healthyCount > 0 && (
-								<div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+								<div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse " />
 							)}
 							{pendingCount > 0 && (
 								<div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 shadow-sm" />
@@ -1072,7 +1064,7 @@ function PRsCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
 						href={`https://github.com/${org}/${name}/pulls`}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="inline-flex items-center gap-1.5 px-2 py-1 bg-primary/20 text-primary border border-primary/20 rounded-md hover:bg-primary/30 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+						className="inline-flex items-center gap-1.5 px-2 py-1 bg-primary/20 text-primary border border-primary/30 rounded-md hover:bg-primary/30 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 						aria-label={`${prCount} pull requests abiertos`}
 					>
 						<GitPullRequest className="w-3 h-3" />
@@ -1123,9 +1115,9 @@ function ActionsStatusCell({
 						className={clsx(
 							"inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 border",
 							hasFailure
-								? "bg-destructive/20 text-destructive border-destructive/20 hover:bg-destructive/30"
+								? "bg-destructive/20 text-destructive border-destructive/30 hover:bg-destructive/30"
 								: isRunning
-									? "bg-warning/20 text-warning border-warning/20 hover:bg-warning/30"
+									? "bg-warning/20 text-warning border-warning/30 hover:bg-warning/30"
 									: "bg-success/20 text-success border-success/20 hover:bg-success/30",
 						)}
 						aria-label={`Estado de GitHub Actions: ${hasFailure ? "Fallido" : isRunning ? "En progreso" : "Exitoso"}`}

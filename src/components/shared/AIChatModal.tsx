@@ -241,7 +241,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 						>
 							<div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border ${
 								msg.role === "user"
-									? "bg-primary/10 border-primary/20 text-primary"
+									? "bg-primary/10 border-primary/30 text-primary"
 									: "bg-ai/10 border-ai/20 text-ai"
 							}`}>
 								{msg.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
@@ -283,7 +283,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 					)}
 
 					{error && (
-						<div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-xs text-destructive flex items-center gap-2 ml-11">
+						<div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-xs text-destructive flex items-center gap-2 ml-11">
 							<X className="w-3 h-3" />
 							<span>Error: {error.message}</span>
 						</div>
@@ -315,7 +315,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 						</div>
 					)}
 
-					<div className="relative flex items-end gap-2 bg-muted/30 border border-border rounded-md p-2 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-ai/40 transition-all">
+					<div className="relative flex items-end gap-2 bg-muted/30 border border-border rounded-md p-2 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-ai/40 transition-all">
 						<input
 							type="file"
 							ref={fileInputRef}

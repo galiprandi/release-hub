@@ -507,7 +507,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 												onSearchChange={setBodySearchQuery}
 											/>
 										) : (
-											<div className="text-[11px] font-mono space-y-1.5 bg-muted/30 border border-border rounded-lg p-4 h-full overflow-auto">
+											<div className="text-xs font-mono space-y-1.5 bg-muted/30 border border-border rounded-lg p-4 h-full overflow-auto">
 												{Object.entries(response.headers).map(([key, value]) => (
 													<div key={key} className="flex gap-2 pb-1 border-b border-border last:border-0">
 														<span className="font-bold text-muted-foreground min-w-[120px] shrink-0 uppercase tracking-tighter">{key}:</span>
@@ -532,10 +532,10 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 							<div className="flex items-center gap-3">
 								<span className={`px-2 py-0.5 rounded-md border text-xs font-medium ${
 										response.status >= 200 && response.status < 300
-											? 'bg-success/20 text-success border-success/20'
+											? 'bg-success/20 text-success border-success/30'
 											: response.status >= 400
-												? 'bg-destructive/20 text-destructive border-destructive/20'
-												: 'bg-warning/20 text-warning border-warning/20'
+												? 'bg-destructive/20 text-destructive border-destructive/30'
+												: 'bg-warning/20 text-warning border-warning/30'
 									}`} title={query?.updatedAt ? DayJS(query.updatedAt).format('LLL') : DayJS().format('LLL')}>
 									{response.status} {response.statusText}
 								</span>

@@ -42,6 +42,6 @@ describe("DialogCloseButton", () => {
 			</Dialog.Root>
 		)
 		const button = screen.getByRole("button")
-		expect(button).toHaveClass("focus-visible:ring-2", "focus-visible:ring-primary/20", "focus-visible:ring-offset-1")
+		expect(button).toHaveClass("focus-visible:ring-2", "focus-visible:ring-primary/30", "focus-visible:ring-offset-1")
 	})
 })

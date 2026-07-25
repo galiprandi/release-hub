@@ -69,7 +69,7 @@ export const DisplayInfo = ({
 						<span
 							className={cn(
 								"text-sm text-foreground",
-								"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 rounded-md",
+								"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 rounded-md",
 							)}
 							style={{ cursor: "help" }}
 							tabIndex={0}

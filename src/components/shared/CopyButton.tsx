@@ -30,7 +30,7 @@ export function CopyButton({ text, className, tooltip, copiedTooltip }: CopyButt
 					onClick={handleCopy}
 					aria-label={tooltip || "Copiar al portapapeles"}
 					className={cn(
-						"opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-accent focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1",
+						"opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-accent focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1",
 						className
 					)}
 					type="button"

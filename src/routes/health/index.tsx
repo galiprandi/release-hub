@@ -136,7 +136,7 @@ function ProductSection({
             return (
               <>
                 {healthy > 0 && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-success/20 border border-success/20 text-xs font-medium text-success">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-success/20 border border-success/30 text-xs font-medium text-success">
                     <div className="w-1.5 h-1.5 rounded-full bg-success" />
                     {healthy} OK
                   </span>
@@ -148,7 +148,7 @@ function ProductSection({
                   </span>
                 )}
                 {unhealthy > 0 && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-destructive/20 border border-destructive/20 text-xs font-medium text-destructive">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-destructive/20 border border-destructive/30 text-xs font-medium text-destructive">
                     <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
                     {unhealthy} Error
                   </span>
@@ -247,8 +247,8 @@ function EndpointsTable({
 
 function StatusCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
   if (endpoint.isHealthy === null) return <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
-  if (endpoint.isHealthy === true) return <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-  return <div className="w-1.5 h-1.5 rounded-full bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.4)]" />
+  if (endpoint.isHealthy === true) return <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse " />
+  return <div className="w-1.5 h-1.5 rounded-full bg-destructive " />
 }
 
 function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
@@ -257,8 +257,8 @@ function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMo
     <span
       className={`px-2 py-0.5 rounded-md border text-xs font-medium ${
         isProd
-          ? 'bg-primary/20 text-primary border-primary/20'
-          : 'bg-info/20 text-info border-info/20'
+          ? 'bg-primary/20 text-primary border-primary/30'
+          : 'bg-info/20 text-info border-info/30'
       }`}
     >
       {endpoint.environment}
@@ -515,7 +515,7 @@ function HealthMonitorPage() {
           }}
           loading={isChecking}
           showLabel
-          className="bg-destructive/10 border border-destructive/20"
+          className="bg-destructive/10 border border-destructive/30"
         />
       )}
     </div>

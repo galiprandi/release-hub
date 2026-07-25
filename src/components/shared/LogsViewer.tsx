@@ -284,7 +284,7 @@ export function LogsViewer({
 						type="button"
 						onClick={handleSummarizeWithAI}
 						disabled={isGenerating || availability !== "available" || !currentLogs}
-						className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-ai bg-ai/10 border border-ai/20 hover:bg-ai/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
+						className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-ai bg-ai/10 border border-ai/20 hover:bg-ai/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 					>
 						{isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
 						{isGenerating ? getStatusMessage : "Resumir"}
@@ -307,7 +307,7 @@ export function LogsViewer({
 						<select
 							value={logLevelFilter}
 							onChange={(e) => setLogLevelFilter(e.target.value as "all" | "ERROR" | "WARN" | "INFO" | "DEBUG")}
-							className="bg-muted/30 border border-border rounded-lg px-2 py-1 text-xs font-medium focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
+							className="bg-muted/30 border border-border rounded-lg px-2 py-1 text-xs font-medium focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 							aria-label="Filtrar por nivel de log"
 						>
 							<option value="all">Todos</option>
@@ -341,7 +341,7 @@ export function LogsViewer({
 								}}
 								placeholder="BUSCAR (CMD+F)"
 								aria-label="Buscar logs"
-								className="pl-7 pr-8 py-1 text-xs font-medium bg-muted/30 border border-border rounded-lg w-48 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 placeholder:text-muted-foreground/70"
+								className="pl-7 pr-8 py-1 text-xs font-medium bg-muted/30 border border-border rounded-lg w-48 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 placeholder:text-muted-foreground/70"
 							/>
 							{filter && (
 								<Tooltip.Root delayDuration={0}>
@@ -505,7 +505,7 @@ export function LogsViewer({
 							<select
 								value={selectedResourceId || resources[0].id}
 								onChange={(e) => onResourceChange?.(e.target.value)}
-									className="bg-muted/30 border border-border rounded-lg px-2 py-1 text-xs font-medium focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
+									className="bg-muted/30 border border-border rounded-lg px-2 py-1 text-xs font-medium focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 								aria-label="Seleccionar recurso"
 							>
 								{resources.map((resource) => (
@@ -543,7 +543,7 @@ export function LogsViewer({
 						<select
 							value={selectedResourceId || resources[0].id}
 							onChange={(e) => onResourceChange?.(e.target.value)}
-							className="bg-muted/30 border border-border rounded-lg px-2 py-1 text-xs font-medium focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
+							className="bg-muted/30 border border-border rounded-lg px-2 py-1 text-xs font-medium focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 							aria-label="Seleccionar recurso"
 						>
 							{resources.map((resource) => (

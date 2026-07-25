@@ -141,7 +141,7 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
         <div className="px-4 py-2 border-b bg-muted/30 border-border flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.3)]" />
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse " />
               <h3 className="text-xs font-medium text-muted-foreground">
                 Resultado de Comparación
               </h3>
@@ -149,13 +149,13 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
             {mode === 'jwt' && (expirationA || expirationB) && (
               <div className="flex items-center gap-3">
                 {expirationA && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-warning/10 text-warning border border-warning/20 text-xs font-medium shadow-[0_0_10px_rgba(var(--warning),0.05)]">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-warning/10 text-warning border border-warning/30 text-xs font-medium shadow-[0_0_10px_rgba(var(--warning),0.05)]">
                     <Clock className="w-3 h-3" />
                     <span>A: {expirationA}</span>
                   </span>
                 )}
                 {expirationB && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-warning/10 text-warning border border-warning/20 text-xs font-medium shadow-[0_0_10px_rgba(var(--warning),0.05)]">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-warning/10 text-warning border border-warning/30 text-xs font-medium shadow-[0_0_10px_rgba(var(--warning),0.05)]">
                     <Clock className="w-3 h-3" />
                     <span>B: {expirationB}</span>
                   </span>
@@ -169,7 +169,7 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
               className={clsx(
                 "px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 text-xs font-medium border",
                 showOnlyDiffs
-                  ? "bg-primary/20 text-primary border-primary/20 shadow-sm ring-1 ring-primary/10"
+                  ? "bg-primary/20 text-primary border-primary/30 shadow-sm ring-1 ring-primary/10"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/30 border-transparent"
               )}
               title={showOnlyDiffs ? "Mostrar todas las líneas" : "Mostrar solo diferencias"}
@@ -257,7 +257,7 @@ function DiffLineRow({ line, mode }: { line: DiffLine; mode: DiffMode }) {
         <span className="w-10 shrink-0 text-right pr-3 text-muted-foreground/30 select-none text-xs pt-0.5">
           {line.left?.lineNumber || ''}
         </span>
-        <span className="w-4 shrink-0 flex justify-center select-none font-bold text-[11px] pt-0.5">
+        <span className="w-4 shrink-0 flex justify-center select-none font-bold text-xs pt-0.5">
           {line.left?.type === 'removed' ? '-' : line.left?.type === 'changed' ? '!' : ''}
         </span>
         {mode !== 'text' && line.left?.value ? (
@@ -282,7 +282,7 @@ function DiffLineRow({ line, mode }: { line: DiffLine; mode: DiffMode }) {
         <span className="w-10 shrink-0 text-right pr-3 text-muted-foreground/30 select-none text-xs pt-0.5">
           {line.right?.lineNumber || ''}
         </span>
-        <span className="w-4 shrink-0 flex justify-center select-none font-bold text-[11px] pt-0.5">
+        <span className="w-4 shrink-0 flex justify-center select-none font-bold text-xs pt-0.5">
           {line.right?.type === 'added' ? '+' : line.right?.type === 'changed' ? '!' : ''}
         </span>
         {mode !== 'text' && line.right?.value ? (

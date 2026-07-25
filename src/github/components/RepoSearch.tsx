@@ -189,7 +189,7 @@ export function RepoSearch() {
             ? 'Buscar archivo: file:AGENTS.md'
             : `Búsqueda en ${summaryData?.total || 0} repositorios... (Cmd+K)`}
           aria-label="Búsqueda de repositorios"
-          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/70`}
+          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/70`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -277,7 +277,7 @@ export function RepoSearch() {
                               <span className="font-medium text-sm truncate">
                                 {item.name}
                               </span>
-                              <span className="px-1.5 py-0.5 rounded bg-warning/10 text-warning border border-warning/20 text-xs font-medium">
+                              <span className="px-1.5 py-0.5 rounded bg-warning/10 text-warning border border-warning/30 text-xs font-medium">
                                 FILE
                               </span>
                             </div>
@@ -328,7 +328,7 @@ export function RepoSearch() {
                             <span className="font-medium text-sm truncate">
                               {item.fullName}
                             </span>
-                            <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 text-xs font-medium">
+                            <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/30 text-xs font-medium">
                               REPO
                             </span>
                           </div>

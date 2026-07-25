@@ -87,9 +87,9 @@ export function ItemProjectSelectionDialog({
 									type="button"
 									aria-pressed={active}
 									onClick={() => toggleInProject(project.id)}
-									className={`w-full flex items-center justify-between p-3 rounded-md border transition-all text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 ${
+									className={`w-full flex items-center justify-between p-3 rounded-md border transition-all text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1 ${
 										active
-											? "bg-primary/5 border-primary/20 hover:bg-primary/10 shadow-[0_0_10px_rgba(var(--primary),0.05)]"
+											? "bg-primary/5 border-primary/30 hover:bg-primary/10 shadow-[0_0_10px_rgba(var(--primary),0.05)]"
 											: "bg-muted/30 border-border hover:bg-muted/30"
 									}`}
 								>
@@ -129,7 +129,7 @@ export function ItemProjectSelectionDialog({
 					<button
 						type="button"
 						onClick={() => setIsCreating(true)}
-						className="w-full flex items-center justify-center gap-2 p-3 text-xs font-medium text-primary bg-primary/5 border border-dashed border-primary/30 rounded-md hover:bg-primary/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
+						className="w-full flex items-center justify-center gap-2 p-3 text-xs font-medium text-primary bg-primary/5 border border-dashed border-primary/30 rounded-md hover:bg-primary/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1"
 					>
 						<FolderPlus className="w-4 h-4" />
 						Nuevo Proyecto
@@ -153,7 +153,7 @@ export function ItemProjectSelectionDialog({
 									type="submit"
 									disabled={!newName.trim()}
 									aria-label="Guardar proyecto"
-									className="p-1.5 bg-primary text-primary-foreground rounded-lg disabled:opacity-50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
+									className="p-1.5 bg-primary text-primary-foreground rounded-lg disabled:opacity-50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1"
 								>
 									<Save className="w-3.5 h-3.5" />
 								</button>
@@ -175,7 +175,7 @@ export function ItemProjectSelectionDialog({
 									type="button"
 									onClick={() => setIsCreating(false)}
 									aria-label="Cancelar creación"
-									className="p-1.5 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
+									className="p-1.5 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1"
 								>
 									<X className="w-3.5 h-3.5" />
 								</button>
@@ -197,7 +197,7 @@ export function ItemProjectSelectionDialog({
 					<button
 						type="button"
 						onClick={() => onOpenChange(false)}
-						className="px-6 py-2 text-xs font-medium bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1"
+						className="px-6 py-2 text-xs font-medium bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1"
 					>
 						Listo
 					</button>

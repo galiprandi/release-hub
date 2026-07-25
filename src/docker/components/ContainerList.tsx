@@ -271,12 +271,12 @@ function StatusCell({ container }: { container: ContainerInfo }) {
 	let label = 'Detenido'
 
 	if (running) {
-		colorClass = 'bg-success/20 text-success border-success/20'
-		dotClass = 'bg-success shadow-[0_0_8px_rgba(34,197,94,0.4)] animate-pulse'
+		colorClass = 'bg-success/20 text-success border-success/30'
+		dotClass = 'bg-success  animate-pulse'
 		label = 'OK'
 	} else if (exited) {
-		colorClass = 'bg-destructive/20 text-destructive border-destructive/20'
-		dotClass = 'bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.4)]'
+		colorClass = 'bg-destructive/20 text-destructive border-destructive/30'
+		dotClass = 'bg-destructive '
 		label = 'ERROR'
 	}
 

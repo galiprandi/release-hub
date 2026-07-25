@@ -43,12 +43,12 @@ export function SetupCard({
 
 	if (isInstalled) {
 		return (
-			<div className="flex items-start gap-3 text-success text-sm border border-success/20 rounded-md p-4 bg-success/10 shadow-sm transition-all hover:bg-success/20">
+			<div className="flex items-start gap-3 text-success text-sm border border-success/30 rounded-md p-4 bg-success/10 shadow-sm transition-all hover:bg-success/20">
 				<CheckCircle className="w-5 h-5 mt-0.5" />
 				<div className="flex-1">
 					<div className="flex items-center gap-2">
 						<p className="text-xs font-medium">{name}</p>
-						<span className="px-1.5 py-0.5 rounded-md bg-success/20 border border-success/20 text-xs font-medium">
+						<span className="px-1.5 py-0.5 rounded-md bg-success/20 border border-success/30 text-xs font-medium">
 							Instalado
 						</span>
 					</div>
@@ -71,13 +71,13 @@ export function SetupCard({
 	}
 
 	const containerStyles = isRequired
-		? "border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/15"
-		: "border-warning/20 bg-warning/10 text-warning hover:bg-warning/15";
+		? "border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/15"
+		: "border-warning/30 bg-warning/10 text-warning hover:bg-warning/15";
 
 	const iconStyles = isRequired ? "text-destructive" : "text-warning";
 	const badgeStyles = isRequired
-		? "bg-destructive/20 border-destructive/20"
-		: "bg-warning/20 border-warning/20";
+		? "bg-destructive/20 border-destructive/30"
+		: "bg-warning/20 border-warning/30";
 
 	return (
 		<div className={`border rounded-md p-4 shadow-sm transition-all ${containerStyles}`}>

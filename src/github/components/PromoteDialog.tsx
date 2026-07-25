@@ -189,7 +189,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 								type="button"
 								onClick={() => handleOpenChange(true)}
 								aria-haspopup="dialog"
-								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none shadow-sm"
+								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none shadow-sm"
 							>
 								<Rocket className="w-4 h-4" />
 								<span>Promocionar</span>
@@ -306,7 +306,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 									{error && <p className="text-sm text-destructive">{error}</p>}
 
 									{!canCreateTags && !isLoadingPerms && (
-										<p className="text-xs text-warning bg-warning/10 p-2 rounded-lg border border-warning/20">
+										<p className="text-xs text-warning bg-warning/10 p-2 rounded-lg border border-warning/30">
 											No tienes permisos de escritura en este repositorio para crear tags.
 										</p>
 									)}
@@ -316,7 +316,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 									<button
 										onClick={handleCreateTag}
 										disabled={isCreating || !tagName.trim() || (!canCreateTags && !isLoadingPerms)}
-										className="px-4 py-2 text-sm font-medium bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none shadow-sm"
+										className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none shadow-sm"
 									>
 										{isCreating ? <><Loader2 className="w-4 h-4 animate-spin" /> Publicando...</> : <><Rocket className="w-4 h-4" /> Publicar Tag</>}
 									</button>

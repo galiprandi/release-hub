@@ -99,7 +99,7 @@ function ProductIndex() {
 								<GitPullRequest className="w-3.5 h-3.5 text-primary/60" />
 								<span>PRs</span>
 								{openPRs && openPRs.count > 0 && (
-									<span className="inline-flex items-center justify-center px-1.5 py-0 text-xs font-bold bg-primary/20 text-primary border border-primary/20 rounded-full min-w-[1.25rem] h-4">
+									<span className="inline-flex items-center justify-center px-1.5 py-0 text-xs font-bold bg-primary/20 text-primary border border-primary/30 rounded-full min-w-[1.25rem] h-4">
 										{openPRs.count}
 									</span>
 								)}
@@ -115,13 +115,13 @@ function ProductIndex() {
 								{actionsSummary && actionsSummary.total > 0 && (
 									<div className="flex items-center gap-1 ml-0.5">
 										{actionsSummary.running > 0 && (
-											<span className="inline-flex items-center gap-0.5 px-1.5 py-0 text-xs font-bold bg-warning/20 text-warning border border-warning/20 rounded-full h-4">
+											<span className="inline-flex items-center gap-0.5 px-1.5 py-0 text-xs font-bold bg-warning/20 text-warning border border-warning/30 rounded-full h-4">
 												<span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
 												{actionsSummary.running}
 											</span>
 										)}
 										{actionsSummary.failed > 0 && (
-											<span className="inline-flex items-center justify-center px-1.5 py-0 text-xs font-bold bg-destructive/20 text-destructive border border-destructive/20 rounded-full min-w-[1rem] h-4">
+											<span className="inline-flex items-center justify-center px-1.5 py-0 text-xs font-bold bg-destructive/20 text-destructive border border-destructive/30 rounded-full min-w-[1rem] h-4">
 												{actionsSummary.failed}
 											</span>
 										)}

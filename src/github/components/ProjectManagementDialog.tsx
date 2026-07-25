@@ -111,14 +111,14 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 										<div className="flex items-center gap-2">
 											<button
 												onClick={() => handleSaveEdit(project.id)}
-												className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
+												className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1 focus-visible:outline-none"
 											>
 												<Save className="w-3.5 h-3.5" />
 												Guardar
 											</button>
 											<button
 												onClick={() => setEditingProject(null)}
-												className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
+												className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1 focus-visible:outline-none"
 											>
 												<X className="w-3.5 h-3.5" />
 												Cancelar
@@ -129,7 +129,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 									<>
 										<div className="flex-1 min-w-0">
 											<div className="flex items-center gap-2">
-												<h4 className="font-bold tracking-tight text-foreground uppercase text-[11px]">
+												<h4 className="font-bold tracking-tight text-foreground text-xs">
 													{project.name}
 												</h4>
 												<span className="text-xs font-bold text-muted-foreground/70 bg-muted/30 px-1.5 rounded">
@@ -137,7 +137,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 												</span>
 											</div>
 											{project.description && (
-												<p className="text-[11px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+												<p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
 													{project.description}
 												</p>
 											)}
@@ -164,13 +164,13 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 					{!isCreating ? (
 						<button
 							onClick={() => setIsCreating(true)}
-							className="w-full py-4 flex items-center justify-center gap-2 text-xs font-medium uppercase tracking-[0.1em] border border-dashed border-primary/40 text-primary rounded-md hover:bg-primary/5 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none group"
+							className="w-full py-4 flex items-center justify-center gap-2 text-xs font-medium uppercase  border border-dashed border-primary/40 text-primary rounded-md hover:bg-primary/5 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1 focus-visible:outline-none group"
 						>
 							<FolderPlus className="w-4 h-4 group-hover:scale-110 transition-transform" />
 							Nuevo Proyecto
 						</button>
 					) : (
-						<form onSubmit={handleCreate} className="p-5 bg-primary/5 rounded-md border border-primary/20 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+						<form onSubmit={handleCreate} className="p-5 bg-primary/5 rounded-md border border-primary/30 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
 							<h4 className="text-xs font-medium text-primary">Crear nuevo proyecto</h4>
 							<div className="space-y-4">
 								<div className="space-y-1.5">
@@ -204,14 +204,14 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 							<div className="flex items-center gap-3">
 								<button
 									type="submit"
-									className="flex-1 py-2 flex items-center justify-center gap-2 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
+									className="flex-1 py-2 flex items-center justify-center gap-2 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1 focus-visible:outline-none"
 								>
 									Crear Proyecto
 								</button>
 								<button
 									type="button"
 									onClick={() => setIsCreating(false)}
-									className="px-4 py-2 text-xs font-medium bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
+									className="px-4 py-2 text-xs font-medium bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1 focus-visible:outline-none"
 								>
 									Cancelar
 								</button>
@@ -222,7 +222,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 					<div className="pt-4 border-t border-border flex justify-end">
 						<button
 							onClick={() => onOpenChange(false)}
-							className="px-6 py-2 text-xs font-medium bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 focus-visible:outline-none"
+							className="px-6 py-2 text-xs font-medium bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1 focus-visible:outline-none"
 						>
 							Listo
 						</button>

@@ -251,7 +251,7 @@ function FetcherPage() {
 							handleQuerySearch(e.target.value);
 						}}
 						placeholder="Buscar en historial..."
-						className="w-48 pl-8 pr-3 py-1.5 bg-muted/30 border border-border rounded-lg text-[11px] focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/70 font-medium uppercase tracking-tight"
+						className="w-48 pl-8 pr-3 py-1.5 bg-muted/30 border border-border rounded-lg text-xs focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/70 font-medium uppercase tracking-tight"
 					/>
 					{search.q && (
 						<button
@@ -428,11 +428,11 @@ function MethodCell({ query }: { query: QueryRecord }) {
 	if (!parsed) return null
 
 	const methodStyles: Record<string, string> = {
-		GET: "bg-success/20 text-success border-success/20",
-		POST: "bg-info/20 text-info border-info/20",
-		PUT: "bg-warning/20 text-warning border-warning/20",
-		PATCH: "bg-warning/20 text-warning border-warning/20",
-		DELETE: "bg-destructive/20 text-destructive border-destructive/20",
+		GET: "bg-success/20 text-success border-success/30",
+		POST: "bg-info/20 text-info border-info/30",
+		PUT: "bg-warning/20 text-warning border-warning/30",
+		PATCH: "bg-warning/20 text-warning border-warning/30",
+		DELETE: "bg-destructive/20 text-destructive border-destructive/30",
 	}
 
 	const style = methodStyles[parsed.method.toUpperCase()] || "bg-muted/30 text-muted-foreground border-border"
@@ -473,9 +473,9 @@ function StatusCell({ query }: { query: QueryRecord }) {
 	if (query.response?.status) {
 		const { status } = query.response
 		let style = "bg-muted/30 text-muted-foreground border-border"
-		if (status >= 200 && status < 300) style = "bg-success/20 text-success border-success/20"
-		else if (status >= 400 && status < 500) style = "bg-warning/20 text-warning border-warning/20"
-		else if (status >= 500) style = "bg-destructive/20 text-destructive border-destructive/20"
+		if (status >= 200 && status < 300) style = "bg-success/20 text-success border-success/30"
+		else if (status >= 400 && status < 500) style = "bg-warning/20 text-warning border-warning/30"
+		else if (status >= 500) style = "bg-destructive/20 text-destructive border-destructive/30"
 
 		return (
 			<span className={`px-2 py-0.5 rounded-md border text-xs font-medium ${style}`}>
@@ -490,8 +490,8 @@ function ResponseTimeCell({ query }: { query: QueryRecord }) {
 	if (query.response?.responseTime) {
 		const { responseTime } = query.response
 		let style = "bg-muted/30 text-muted-foreground border-border"
-		if (responseTime < 200) style = "bg-success/20 text-success border-success/20"
-		else if (responseTime > 1000) style = "bg-destructive/20 text-destructive border-destructive/20"
+		if (responseTime < 200) style = "bg-success/20 text-success border-success/30"
+		else if (responseTime > 1000) style = "bg-destructive/20 text-destructive border-destructive/30"
 
 		return (
 			<span className={`px-2 py-0.5 rounded-md border text-xs font-medium ${style}`}>

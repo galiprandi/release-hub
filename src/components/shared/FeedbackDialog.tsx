@@ -246,7 +246,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 					type="button"
 					onClick={() => handleOpenChange(true)}
 					aria-haspopup="dialog"
-					className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-transparent hover:border-border rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1"
+					className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-transparent hover:border-border rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 				>
 					<MessageSquare className="w-3.5 h-3.5" />
 					Feedback
@@ -297,7 +297,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 									</div>
 									{idx < steps.length - 1 && (
 										<div className={`w-12 h-px ${
-															isCompleted(s.id) ? "bg-primary shadow-[0_0_8px_rgba(var(--primary),0.5)]" : "bg-border"
+															isCompleted(s.id) ? "bg-primary " : "bg-border"
 														}`} aria-hidden="true" />
 									)}
 								</React.Fragment>
@@ -325,13 +325,13 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 								</div>
 
 								{aiError && (
-									<div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center gap-2">
+									<div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 flex items-center gap-2">
 										<AlertCircle className="w-4 h-4 text-destructive" />
 										<p className="text-xs font-medium text-destructive">{aiError.message}</p>
 									</div>
 								)}
 								{error && (
-									<div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center gap-2">
+									<div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 flex items-center gap-2">
 										<AlertCircle className="w-4 h-4 text-destructive" />
 										<p className="text-xs font-medium text-destructive">{error}</p>
 									</div>
@@ -391,7 +391,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 								</div>
 
 								<div className="flex items-center gap-2">
-									<span className="text-xs font-medium bg-primary/10 text-primary border border-primary/20 px-2.5 py-1 rounded-md">
+									<span className="text-xs font-medium bg-primary/10 text-primary border border-primary/30 px-2.5 py-1 rounded-md">
 										#feedback
 									</span>
 									<span className="text-xs font-medium bg-muted text-muted-foreground border border-border px-2.5 py-1 rounded-md">
@@ -438,7 +438,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 					{/* Step: Success */}
 					{step === "success" && (
 						<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-6">
-							<div className="w-16 h-16 rounded-full bg-success/20 border border-success/20 flex items-center justify-center shadow-[0_0_20px_rgba(var(--success),0.1)]">
+							<div className="w-16 h-16 rounded-full bg-success/20 border border-success/30 flex items-center justify-center shadow-[0_0_20px_rgba(var(--success),0.1)]">
 								<CheckCircle2 className="w-8 h-8 text-success" />
 							</div>
 							<div className="space-y-4">
@@ -487,7 +487,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 									</div>
 								) : (
 									<div className="space-y-4">
-										<div className="w-16 h-16 rounded-full bg-destructive/20 border border-destructive/20 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(var(--destructive),0.1)]">
+										<div className="w-16 h-16 rounded-full bg-destructive/20 border border-destructive/30 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(var(--destructive),0.1)]">
 											<AlertCircle className="w-8 h-8 text-destructive" />
 										</div>
 										<div className="flex items-center justify-center gap-2">
@@ -495,7 +495,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 												onClick={() => setShowOriginalError(!showOriginalError)}
 												className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 border ${
 													showOriginalError 
-														? 'bg-destructive/10 text-destructive border-destructive/20 shadow-[0_0_8px_rgba(239,68,68,0.2)]'
+														? 'bg-destructive/10 text-destructive border-destructive/30 '
 														: 'bg-muted/30 text-muted-foreground border-border'
 												}`}
 											>

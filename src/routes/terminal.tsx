@@ -27,7 +27,7 @@ function TerminalPage() {
         <div className="flex items-center justify-between px-4 py-2.5 bg-muted/30 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+              <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse " />
               <span className="text-xs font-medium text-muted-foreground">Sesión Local Activa</span>
             </div>
             <div className="w-px h-3 bg-border" />
@@ -36,12 +36,12 @@ function TerminalPage() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
                <span className="text-xs font-medium text-muted-foreground/70">Status</span>
-               <span className="px-1.5 py-0.5 rounded bg-success/20 border border-success/20 text-xs font-bold text-success">Connected</span>
+               <span className="px-1.5 py-0.5 rounded bg-success/20 border border-success/30 text-xs font-bold text-success">Connected</span>
             </div>
             <div className="w-px h-3 bg-border" />
             <div className="flex items-center gap-1.5">
                <span className="text-xs font-medium text-muted-foreground/70">OS</span>
-               <span className="px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 text-xs font-bold text-primary">{os}</span>
+               <span className="px-1.5 py-0.5 rounded bg-primary/10 border border-primary/30 text-xs font-bold text-primary">{os}</span>
             </div>
           </div>
         </div>

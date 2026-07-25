@@ -53,13 +53,13 @@ export function PortForwardControl({ value, placeholder = "8080", onChange, onCo
 							: isLoading
 								? "border-info/50 text-info/70 cursor-not-allowed animate-pulse"
 								: "border-input text-foreground placeholder:text-muted-foreground"
-					} focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1`}
+					} focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1`}
 				/>
 				<button
 					type="button"
 					onClick={handleToggle}
 					disabled={isLoading || (!isActive && !effectiveValue)}
-					className={`p-1 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 ${
+					className={`p-1 rounded transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 ${
 						isActive
 							? "text-destructive hover:bg-destructive/10"
 							: isLoading
@@ -79,7 +79,7 @@ export function PortForwardControl({ value, placeholder = "8080", onChange, onCo
 						href={`http://localhost:${effectiveValue}/health`}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="p-1 rounded text-info hover:bg-info/10 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						className="p-1 rounded text-info hover:bg-info/10 transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 						aria-label="Abrir servicio en nueva pestaña"
 						title="Servicio con /health disponible"
 					>

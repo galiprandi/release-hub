@@ -341,7 +341,7 @@ export function LogsViewer({
 								}}
 								placeholder="BUSCAR (CMD+F)"
 								aria-label="Buscar logs"
-								className="pl-7 pr-8 py-1 text-xs font-medium bg-muted/30 border border-border rounded-lg w-48 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 placeholder:text-muted-foreground/40"
+								className="pl-7 pr-8 py-1 text-xs font-medium bg-muted/30 border border-border rounded-lg w-48 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 placeholder:text-muted-foreground/70"
 							/>
 							{filter && (
 								<Tooltip.Root delayDuration={0}>
@@ -353,7 +353,7 @@ export function LogsViewer({
 												setCurrentMatchIndex(0);
 												searchInputRef.current?.focus();
 											}}
-											className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+											className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted/30 rounded-full text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 											aria-label="Limpiar búsqueda"
 										>
 											<X className="w-3 h-3" />

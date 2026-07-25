@@ -106,7 +106,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 					<section className="space-y-4">
 						<div className="pb-3 border-b border-border">
 							<h3 className="text-xs font-medium text-foreground">Token de Seki</h3>
-							<p className="text-xs font-medium text-muted-foreground/40 mt-1">
+							<p className="text-xs font-medium text-muted-foreground/70 mt-1">
 								Autenticación técnica para el núcleo de pipelines
 							</p>
 						</div>
@@ -121,7 +121,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 										</span>
 									</div>
 									{expirationDate && (
-										<p className={`text-xs font-medium ${isExpired ? 'text-destructive/60' : 'text-muted-foreground/60'}`}>
+										<p className={`text-xs font-medium ${isExpired ? 'text-destructive/60' : 'text-muted-foreground'}`}>
 											Expira: {expirationDate}
 										</p>
 									)}
@@ -139,7 +139,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 						) : (
 							<div className="space-y-3">
 								<div className="space-y-1.5">
-									<label htmlFor="seki-token" className="text-xs font-medium text-muted-foreground/60 ml-1">Token JWT</label>
+									<label htmlFor="seki-token" className="text-xs font-medium text-muted-foreground ml-1">Token JWT</label>
 									<div className="flex gap-2">
 										<div className="relative flex-1">
 											<input
@@ -153,7 +153,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 											<button
 												type="button"
 												onClick={() => setShowSekiToken(!showSekiToken)}
-												className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground/60 hover:text-foreground transition-colors"
+												className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
 												aria-label={showSekiToken ? "Ocultar token" : "Mostrar token"}
 											>
 												{showSekiToken ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -170,7 +170,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 										</button>
 									</div>
 								</div>
-								<p className="text-xs font-medium text-muted-foreground/40 text-center">
+								<p className="text-xs font-medium text-muted-foreground/70 text-center">
 									Persistencia local en el entorno del navegador
 								</p>
 							</div>
@@ -181,7 +181,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 					<section className="space-y-4">
 						<div className="pb-3 border-b border-border">
 							<h3 className="text-xs font-medium text-foreground">Notificaciones Discord</h3>
-							<p className="text-xs font-medium text-muted-foreground/40 mt-1">
+							<p className="text-xs font-medium text-muted-foreground/70 mt-1">
 								Canal global de eventos y alertas técnicas
 							</p>
 						</div>
@@ -193,7 +193,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 										<div className="w-1.5 h-1.5 rounded-full bg-success shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
 										<span className="text-xs font-medium text-success">Webhook configurado</span>
 									</div>
-									<p className="text-xs font-mono text-muted-foreground/60 break-all leading-relaxed">
+									<p className="text-xs font-mono text-muted-foreground break-all leading-relaxed">
 										{settings.discordWebhook.slice(0, 50)}...
 									</p>
 								</div>
@@ -209,7 +209,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 							</div>
 						) : (
 							<div className="space-y-1.5">
-								<label htmlFor="discord-webhook" className="text-xs font-medium text-muted-foreground/60 ml-1">URL del Webhook</label>
+								<label htmlFor="discord-webhook" className="text-xs font-medium text-muted-foreground ml-1">URL del Webhook</label>
 								<div className="flex gap-2">
 									<div className="relative flex-1">
 										<input
@@ -223,7 +223,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 										<button
 											type="button"
 											onClick={() => setShowDiscordWebhook(!showDiscordWebhook)}
-											className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground/60 hover:text-foreground transition-colors"
+											className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
 											aria-label={showDiscordWebhook ? "Ocultar webhook" : "Mostrar webhook"}
 										>
 											{showDiscordWebhook ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -247,7 +247,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 					<section className="space-y-4">
 						<div className="pb-3 border-b border-border">
 							<h3 className="text-xs font-medium text-foreground">Gestión de Datos</h3>
-							<p className="text-xs font-medium text-muted-foreground/40 mt-1">
+							<p className="text-xs font-medium text-muted-foreground/70 mt-1">
 								Invalidación de caché y resincronización global
 							</p>
 						</div>
@@ -265,7 +265,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 								</>
 							) : (
 								<>
-									<RefreshCw className="w-4 h-4 text-muted-foreground/60 group-hover:text-primary transition-colors" />
+									<RefreshCw className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
 									<span>Limpiar Caché Global</span>
 								</>
 							)}

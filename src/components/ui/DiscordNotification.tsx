@@ -63,7 +63,7 @@ export function DiscordNotification({
 			{/* Webhook input (always shown when not readonly and onWebhookChange exists) */}
 			{!readonly && onWebhookChange && (
 				<div className="mt-4 space-y-1.5">
-					<label htmlFor="discord-webhook" className="text-xs font-medium text-muted-foreground/60 flex items-center gap-2 ml-1">
+					<label htmlFor="discord-webhook" className="text-xs font-medium text-muted-foreground flex items-center gap-2 ml-1">
 						<Link className="w-3.5 h-3.5" />
 						Webhook de Discord
 					</label>
@@ -79,13 +79,13 @@ export function DiscordNotification({
 						<button
 							type="button"
 							onClick={() => setShowWebhook(!showWebhook)}
-							className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground/60 hover:text-foreground transition-colors"
+							className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
 							aria-label={showWebhook ? "Ocultar webhook" : "Mostrar webhook"}
 						>
 							{showWebhook ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
 						</button>
 					</div>
-					<p className="text-xs font-medium text-muted-foreground/60 ml-1">
+					<p className="text-xs font-medium text-muted-foreground ml-1">
 						URL del webhook de Discord para enviar notificaciones
 					</p>
 				</div>

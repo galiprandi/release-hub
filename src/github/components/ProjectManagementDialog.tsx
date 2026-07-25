@@ -73,7 +73,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 						{projects.length === 0 && !isCreating && (
 							<EmptyState
 								className="min-h-0 py-12"
-								icon={<FolderKanban className="w-5 h-5 text-muted-foreground/40" />}
+								icon={<FolderKanban className="w-5 h-5 text-muted-foreground/70" />}
 								label="No tienes proyectos creados"
 								caption="Crea una colección para organizar tus repositorios y deployments de forma centralizada."
 							/>
@@ -87,7 +87,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 								{editingProject === project.id ? (
 									<div className="flex-1 space-y-3 mr-4">
 										<div className="space-y-1">
-											<label htmlFor={`edit-name-${project.id}`} className="text-xs font-medium text-muted-foreground/60 ml-1">Nombre</label>
+											<label htmlFor={`edit-name-${project.id}`} className="text-xs font-medium text-muted-foreground ml-1">Nombre</label>
 											<input
 												id={`edit-name-${project.id}`}
 												autoFocus
@@ -99,7 +99,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 											/>
 										</div>
 										<div className="space-y-1">
-											<label htmlFor={`edit-desc-${project.id}`} className="text-xs font-medium text-muted-foreground/60 ml-1">Descripción</label>
+											<label htmlFor={`edit-desc-${project.id}`} className="text-xs font-medium text-muted-foreground ml-1">Descripción</label>
 											<textarea
 												id={`edit-desc-${project.id}`}
 												value={editDescription}
@@ -132,7 +132,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 												<h4 className="font-bold tracking-tight text-foreground uppercase text-[11px]">
 													{project.name}
 												</h4>
-												<span className="text-xs font-bold text-muted-foreground/40 bg-muted/30 px-1.5 rounded">
+												<span className="text-xs font-bold text-muted-foreground/70 bg-muted/30 px-1.5 rounded">
 													{project.repos.length} REPOS
 												</span>
 											</div>
@@ -174,7 +174,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 							<h4 className="text-xs font-medium text-primary">Crear nuevo proyecto</h4>
 							<div className="space-y-4">
 								<div className="space-y-1.5">
-									<label htmlFor="projectName" className="text-xs font-medium text-muted-foreground/60 ml-1">
+									<label htmlFor="projectName" className="text-xs font-medium text-muted-foreground ml-1">
 										Nombre
 									</label>
 									<input
@@ -189,7 +189,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 									/>
 								</div>
 								<div className="space-y-1.5">
-									<label htmlFor="projectDesc" className="text-xs font-medium text-muted-foreground/60 ml-1">
+									<label htmlFor="projectDesc" className="text-xs font-medium text-muted-foreground ml-1">
 										Descripción
 									</label>
 									<textarea

@@ -284,20 +284,20 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 												? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm cursor-pointer"
 													: s.id === step 
 													? "bg-primary text-primary-foreground shadow-sm cursor-pointer"
-													: "bg-muted/30 text-muted-foreground/40 border border-border cursor-default"
+													: "bg-muted/30 text-muted-foreground/70 border border-border cursor-default"
 											} focus:outline-none focus:ring-2 focus:ring-primary/30`}
 										>
 											{isCompleted(s.id) ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
 										</button>
-										<span className={`text-xs font-medium uppercase tracking-widest ${
-											s.id === step ? "text-foreground" : "text-muted-foreground/40"
+										<span className={`text-xs font-medium  ${
+											s.id === step ? "text-foreground" : "text-muted-foreground/70"
 										}`} aria-hidden="true">
 											{s.label}
 										</span>
 									</div>
 									{idx < steps.length - 1 && (
 										<div className={`w-12 h-px ${
-															isCompleted(s.id) ? "bg-primary shadow-[0_0_8px_rgba(var(--primary),0.5)]" : "bg-border/20"
+															isCompleted(s.id) ? "bg-primary shadow-[0_0_8px_rgba(var(--primary),0.5)]" : "bg-border"
 														}`} aria-hidden="true" />
 									)}
 								</React.Fragment>
@@ -310,7 +310,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 						<div className="flex flex-col flex-1 overflow-y-auto scrollbar-hide">
 							<div className="space-y-4">
 								<div className="space-y-2">
-									<label htmlFor="feedback-description" className="text-xs font-medium text-muted-foreground/60 ml-1">
+									<label htmlFor="feedback-description" className="text-xs font-medium text-muted-foreground ml-1">
 										Descripción Técnica
 									</label>
 									<textarea
@@ -320,7 +320,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 										onChange={(e) => setDescription(e.target.value)}
 										placeholder="Explica en detalle tu idea, problema o sugerencia. El sistema utilizará IA para normalizar el reporte..."
 										rows={8}
-										className="w-full px-4 py-3 text-xs bg-muted/30 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none transition-all duration-200 leading-relaxed font-mono placeholder:text-muted-foreground/40"
+										className="w-full px-4 py-3 text-xs bg-muted/30 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none transition-all duration-200 leading-relaxed font-mono placeholder:text-muted-foreground/70"
 									/>
 								</div>
 
@@ -342,7 +342,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									onClick={handleNext}
 									disabled={isGenerating || isEnhancing || !description.trim()}
-									className="px-6 py-2.5 text-xs font-medium uppercase tracking-widest bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+									className="px-6 py-2.5 text-xs font-medium  bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
 								>
 									{(isGenerating || isEnhancing) ? (
 										<>
@@ -365,7 +365,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 						<div className="flex flex-col flex-1 overflow-y-auto scrollbar-hide">
 							<div className="space-y-6">
 								<div className="space-y-2">
-									<label htmlFor="feedback-title" className="text-xs font-medium text-muted-foreground/60 ml-1">
+									<label htmlFor="feedback-title" className="text-xs font-medium text-muted-foreground ml-1">
 										Título Sugerido por IA
 									</label>
 									<input
@@ -378,7 +378,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 								</div>
 
 								<div className="space-y-2">
-									<label htmlFor="feedback-body" className="text-xs font-medium text-muted-foreground/60 ml-1">
+									<label htmlFor="feedback-body" className="text-xs font-medium text-muted-foreground ml-1">
 										Propuesta Estructurada
 									</label>
 									<textarea
@@ -394,7 +394,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 									<span className="text-xs font-medium bg-primary/10 text-primary border border-primary/20 px-2.5 py-1 rounded-md">
 										#feedback
 									</span>
-									<span className="text-xs font-medium bg-muted text-muted-foreground/60 border border-border px-2.5 py-1 rounded-md">
+									<span className="text-xs font-medium bg-muted text-muted-foreground border border-border px-2.5 py-1 rounded-md">
 										#ai-generated
 									</span>
 								</div>
@@ -410,7 +410,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									onClick={handleSend}
 									disabled={!aiTitle.trim() || !aiBody.trim()}
-									className="px-6 py-2.5 text-xs font-medium uppercase tracking-widest bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+									className="px-6 py-2.5 text-xs font-medium  bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
 								>
 									<Send className="w-3.5 h-3.5" />
 									Enviar Feedback
@@ -428,7 +428,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 							</div>
 							<div className="space-y-2">
 								<p className="text-xs font-medium text-foreground">Sincronizando con GitHub</p>
-								<p className="text-xs font-medium text-muted-foreground/40">
+								<p className="text-xs font-medium text-muted-foreground/70">
 									Creando registro técnico en <span className="text-foreground/60">galiprandi/release-hub</span>
 								</p>
 							</div>
@@ -444,7 +444,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 							<div className="space-y-4">
 								<div className="space-y-1">
 									<p className="text-xs font-medium text-success">¡Feedback Enviado!</p>
-									<p className="text-xs font-medium text-muted-foreground/60">
+									<p className="text-xs font-medium text-muted-foreground">
 										Tu propuesta ya es un issue oficial
 									</p>
 								</div>
@@ -480,7 +480,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 											<div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
 											<Loader2 className="w-16 h-16 animate-spin text-primary relative z-10" />
 										</div>
-										<div className="flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground/40">
+										<div className="flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground/70">
 											<Sparkles className="w-4 h-4" />
 											<span>Análisis IA en curso</span>
 										</div>
@@ -496,7 +496,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 												className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 border ${
 													showOriginalError 
 														? 'bg-destructive/10 text-destructive border-destructive/20 shadow-[0_0_8px_rgba(239,68,68,0.2)]'
-														: 'bg-muted/30 text-muted-foreground/60 border-border'
+														: 'bg-muted/30 text-muted-foreground border-border'
 												}`}
 											>
 												{showOriginalError ? (

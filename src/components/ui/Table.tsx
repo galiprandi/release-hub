@@ -117,19 +117,19 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 		<div className={twMerge(clsx("w-full rounded-md border border-border shadow-sm overflow-hidden bg-background", className))}>
 			{/* Filter Bar */}
 			{filters && filters.length > 0 && (
-				<div className="px-4 py-1.5 border-b border-border bg-muted/30">
+				<div className="px-4 py-2 border-b border-border bg-muted/20">
 					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
 						<div className="flex items-center gap-2">
-							<span className="text-xs font-medium text-muted-foreground/60">{filterLabel}</span>
-							<div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border border-border">
+							<span className="text-xs font-medium text-muted-foreground">{filterLabel}</span>
+							<div className="flex items-center gap-0.5 bg-muted/30 p-0.5 rounded-md border border-border">
 								<button
 									type="button"
 									onClick={handleResetFilters}
 									aria-pressed={currentActiveFilter === null}
 									className={clsx(
-										"px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1",
+										"px-2.5 py-1 text-xs font-medium rounded transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none",
 										currentActiveFilter === null
-											? "bg-background shadow-sm text-foreground ring-1 ring-border/20"
+											? "bg-background shadow-sm text-foreground"
 											: "text-muted-foreground hover:bg-accent hover:text-foreground"
 									)}
 								>
@@ -144,9 +144,9 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 											onClick={() => handleFilterClick(filter)}
 											aria-pressed={isActive}
 											className={clsx(
-												"px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1",
+												"px-2.5 py-1 text-xs font-medium rounded transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none",
 												isActive
-													? "bg-background shadow-sm text-foreground ring-1 ring-border/20"
+													? "bg-background shadow-sm text-foreground"
 													: "text-muted-foreground hover:bg-accent hover:text-foreground"
 											)}
 										>
@@ -162,7 +162,7 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 
 			{/* Empty state when filters yield no results */}
 			{table.getRowModel().rows.length === 0 ? (
-				<div className="text-center py-12 bg-muted/30">
+				<div className="text-center py-12">
 					<p className="text-sm font-medium text-muted-foreground">No hay resultados que coincidan con los filtros aplicados.</p>
 				</div>
 			) : (
@@ -171,7 +171,7 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 						<table className="w-full table-auto">
 							<thead>
 								{table.getHeaderGroups().map((headerGroup) => (
-									<tr key={headerGroup.id} className="bg-muted/30">
+									<tr key={headerGroup.id} className="bg-muted/20">
 										{headerGroup.headers.map((header, index) => {
 											const canSort = header.column.getCanSort()
 											const sortDirection = header.column.getIsSorted()
@@ -183,11 +183,11 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 													key={header.id}
 													scope="col"
 													className={clsx(
-														"text-left px-4 py-3 text-xs font-medium text-muted-foreground/60 border-b border-border relative",
+														"text-left px-4 py-2.5 text-xs font-medium text-muted-foreground border-b border-border",
 														isFirstColumn && "w-full",
 														!isFirstColumn && !columnWidth && "whitespace-nowrap",
 														columnWidth && "overflow-hidden text-ellipsis whitespace-nowrap",
-														canSort && "cursor-pointer hover:bg-muted/60 transition-colors select-none"
+														canSort && "cursor-pointer hover:bg-muted/40 transition-colors select-none"
 													)}
 													style={columnWidth ? { width: columnWidth, minWidth: columnWidth, maxWidth: columnWidth } : undefined}
 													onClick={header.column.getToggleSortingHandler()}
@@ -215,18 +215,15 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 															</span>
 														)}
 													</div>
-													{index < headerGroup.headers.length - 1 && (
-														<div className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-px bg-border/20" aria-hidden="true" />
-													)}
 												</th>
 											)
 										})}
 									</tr>
 								))}
 							</thead>
-							<tbody className="divide-y divide-border/40">
+							<tbody className="divide-y divide-border">
 								{table.getRowModel().rows.map((row) => (
-									<tr key={row.id} className="hover:bg-muted/30 transition-colors group">
+									<tr key={row.id} className="hover:bg-muted/20 transition-colors group">
 										{row.getVisibleCells().map((cell, index) => {
 											const isFirstColumn = index === 0
 											const columnWidth = cell.column.columnDef.meta?.width
@@ -234,7 +231,7 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 												<td
 													key={cell.id}
 													className={clsx(
-														"px-4 py-3 text-sm relative",
+														"px-4 py-3 text-sm",
 														isFirstColumn && "w-full font-medium",
 														!isFirstColumn && !columnWidth && "whitespace-nowrap",
 														columnWidth && "overflow-hidden text-ellipsis whitespace-nowrap"
@@ -242,9 +239,6 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 													style={columnWidth ? { width: columnWidth, minWidth: columnWidth, maxWidth: columnWidth } : undefined}
 												>
 													{flexRender(cell.column.columnDef.cell, cell.getContext())}
-													{index < row.getVisibleCells().length - 1 && (
-														<div className="absolute right-0 top-1/2 -translate-y-1/2 h-6 w-px bg-border/5" aria-hidden="true" />
-													)}
 												</td>
 											)
 										})}
@@ -256,7 +250,7 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 
 					{/* Pagination */}
 					{showPagination && (
-						<div className="flex items-center justify-between px-6 py-4 border-t border-border bg-muted/30">
+						<div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/20">
 							<div className="text-xs font-medium text-muted-foreground">
 								Mostrando <span className="text-foreground">{(pagination.pageIndex * pagination.pageSize) + 1} - {Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredRowCount)}</span> de <span className="text-foreground">{filteredRowCount}</span>
 							</div>
@@ -265,18 +259,18 @@ export function Table<TData, TValue>({ columns, data, className, filters, filter
 									type="button"
 									onClick={() => table.previousPage()}
 									disabled={!table.getCanPreviousPage()}
-									className="px-4 py-1.5 text-xs font-medium uppercase tracking-tight border border-border rounded-md bg-background hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+									className="px-3 py-1.5 text-xs font-medium border border-border rounded-md bg-background hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 								>
 									Anterior
 								</button>
-								<span className="text-xs font-medium text-muted-foreground/60">
+								<span className="text-xs font-medium text-muted-foreground">
 									Página <span className="text-foreground">{pagination.pageIndex + 1}</span> de <span className="text-foreground">{pageCount}</span>
 								</span>
 								<button
 									type="button"
 									onClick={() => table.nextPage()}
 									disabled={!table.getCanNextPage()}
-									className="px-4 py-1.5 text-xs font-medium border border-border rounded-md bg-background hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+									className="px-3 py-1.5 text-xs font-medium border border-border rounded-md bg-background hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 								>
 									Siguiente
 								</button>

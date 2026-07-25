@@ -331,7 +331,7 @@ export const DeploymentList = ({
 									<TerminalIcon className="w-4 h-4 text-primary" />
 								</div>
 								<div className="flex flex-col">
-									<span className="text-xs font-medium text-muted-foreground/60 leading-none mb-1">
+									<span className="text-xs font-medium text-muted-foreground leading-none mb-1">
 										{selectedContext}
 									</span>
 									<span className="text-sm font-bold tracking-tight leading-none">
@@ -345,7 +345,7 @@ export const DeploymentList = ({
 								<select
 									value={activePodName || ''}
 									onChange={(e) => setSelectedPodName(e.target.value || null)}
-									className="text-xs bg-muted border rounded px-2 py-1 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+									className="text-xs bg-muted border rounded px-2 py-1 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 									aria-label="Seleccionar pod"
 								>
 									{deploymentPods.map((pod) => (
@@ -420,7 +420,7 @@ function DeploymentsTable({
 			header: () => (
 				<div className="flex items-center gap-2">
 					{icon && <span className="text-primary/40">{icon}</span>}
-					<span className="text-xs font-medium text-muted-foreground/60">{label}</span>
+					<span className="text-xs font-medium text-muted-foreground">{label}</span>
 				</div>
 			),
 			cell: ({ row }) => <DeploymentNameCell deployment={row.original} isLoading={isLoading} />,
@@ -428,28 +428,28 @@ function DeploymentsTable({
 		{
 			id: "namespace",
 			accessorKey: "namespace",
-			header: () => <span className="text-xs font-medium text-muted-foreground/60">Namespace</span>,
-			cell: ({ row }) => <span className="text-xs font-medium text-muted-foreground/60">{row.original.namespace}</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground">Namespace</span>,
+			cell: ({ row }) => <span className="text-xs font-medium text-muted-foreground">{row.original.namespace}</span>,
 			filterFn: 'equalsString',
 		},
 		{
 			accessorKey: "status",
-			header: () => <span className="text-xs font-medium text-muted-foreground/60">Estado</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground">Estado</span>,
 			cell: ({ row }) => <StatusCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			accessorKey: "age",
-			header: () => <span className="text-xs font-medium text-muted-foreground/60">Age</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground">Age</span>,
 			cell: ({ row }) => <AgeCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			accessorKey: "images",
-			header: () => <span className="text-xs font-medium text-muted-foreground/60">Imágenes</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground">Imágenes</span>,
 			cell: ({ row }) => <ImagesCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			id: "portForward",
-			header: () => <span className="text-xs font-medium text-muted-foreground/60">Port Forward</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground">Port Forward</span>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<PortForwardCell
@@ -461,7 +461,7 @@ function DeploymentsTable({
 		{
 			id: "actions",
 			accessorKey: "actions",
-			header: () => <span className="text-xs font-medium text-muted-foreground/60 text-right block w-full">Acciones</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground text-right block w-full">Acciones</span>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<ActionsCell
@@ -527,7 +527,7 @@ function AgeCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoad
 	if (isLoading) {
 		return <div className="h-4 bg-muted rounded w-10" />
 	}
-	return <span className="text-xs font-medium text-muted-foreground/60">{deployment.age}</span>
+	return <span className="text-xs font-medium text-muted-foreground">{deployment.age}</span>
 }
 
 function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
@@ -585,7 +585,7 @@ function ActionsCell({
 				action={ACTION_DEFINITIONS.openTerminal}
 				onClick={() => onOpenTerminal(deployment, context)}
 			/>
-			<div className="w-px h-4 bg-border/40 mx-0.5" />
+			<div className="w-px h-4 bg-border mx-0.5" />
 			<ActionButton
 				action={ACTION_DEFINITIONS.manageProjects}
 				onClick={() => onManageProjects(deployment, context)}

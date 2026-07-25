@@ -25,7 +25,7 @@ export const Route = createFileRoute('/health/')({
   },
 });
 
-const FOCUS_RING = "focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1";
+const FOCUS_RING = "focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1";
 
 function HealthHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   return (
@@ -45,7 +45,7 @@ function HealthHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
         </p>
 
         <div className="space-y-3">
-          <h4 className="text-xs font-medium text-muted-foreground/60">Funcionamiento Técnico</h4>
+          <h4 className="text-xs font-medium text-muted-foreground">Funcionamiento Técnico</h4>
           <ul className="space-y-2">
             {[
               "Detección automática de endpoints desde pipelines de despliegue",
@@ -126,7 +126,7 @@ function ProductSection({
           >
             {productName}
           </Link>
-          <span className="text-xs font-medium text-muted-foreground/60">({services.length} servicios)</span>
+          <span className="text-xs font-medium text-muted-foreground">({services.length} servicios)</span>
         </div>
         <div className="flex items-center gap-2">
           {(() => {
@@ -185,44 +185,44 @@ function EndpointsTable({
     {
       id: "status",
       accessorFn: (row) => row.isHealthy,
-      header: () => <span className="text-xs font-medium text-muted-foreground/60">Status</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground">Status</span>,
       cell: ({ row }) => <StatusCell endpoint={row.original} />,
     },
     {
       accessorKey: "service",
-      header: () => <span className="text-xs font-medium text-muted-foreground/60">Ruta</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground">Ruta</span>,
       cell: ({ row }) => <span className="font-medium tracking-tight text-foreground">{row.original.service || '/'}</span>,
     },
     {
       id: "environment",
       accessorFn: (row) => row.environment,
-      header: () => <span className="text-xs font-medium text-muted-foreground/60">Ambiente</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground">Ambiente</span>,
       cell: ({ row }) => <EnvironmentCell endpoint={row.original} />,
     },
     {
       accessorKey: "lastChecked",
-      header: () => <span className="text-xs font-medium text-muted-foreground/60">Verificado</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground">Verificado</span>,
       cell: ({ row }) => <LastCheckedCell endpoint={row.original} />,
     },
     {
       accessorKey: "responseTime",
-      header: () => <span className="text-xs font-medium text-muted-foreground/60">Tiempo</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground">Tiempo</span>,
       cell: ({ row }) => <ResponseTimeCell endpoint={row.original} />,
     },
     {
       accessorKey: "url",
-      header: () => <span className="text-xs font-medium text-muted-foreground/60">URL</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground">URL</span>,
       cell: ({ row }) => <UrlCell endpoint={row.original} />,
     },
     {
       accessorKey: "error",
-      header: () => <span className="text-xs font-medium text-muted-foreground/60">Error</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground">Error</span>,
       cell: ({ row }) => <ErrorCell endpoint={row.original} />,
     },
     {
       id: "actions",
       accessorKey: "actions",
-      header: () => <span className="text-xs font-medium text-muted-foreground/60">Acciones</span>,
+      header: () => <span className="text-xs font-medium text-muted-foreground">Acciones</span>,
       enableSorting: false,
       cell: ({ row }) => (
         <ActionsCell
@@ -274,11 +274,11 @@ function ResponseTimeCell({ endpoint }: { endpoint: ReturnType<typeof useHealthM
       </span>
     )
   }
-  return <span className="text-xs font-medium text-muted-foreground/40">-</span>
+  return <span className="text-xs font-medium text-muted-foreground/70">-</span>
 }
 
 function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
-  if (!endpoint.error) return <span className="text-xs font-medium text-muted-foreground/40">-</span>
+  if (!endpoint.error) return <span className="text-xs font-medium text-muted-foreground/70">-</span>
 
   const errorMessage = (() => {
     if (endpoint.details) {
@@ -303,7 +303,7 @@ function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>
 
 function LastCheckedCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
   return (
-    <span className="text-xs font-medium text-muted-foreground/60">
+    <span className="text-xs font-medium text-muted-foreground">
       {DayJS(endpoint.lastChecked).fromNow()}
     </span>
   )
@@ -324,7 +324,7 @@ function UrlCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['
   return (
     <div className="flex flex-col gap-0.5" title={endpoint.url}>
       {domain && (
-        <span className="text-xs font-medium text-muted-foreground/60 leading-none truncate max-w-[250px]">
+        <span className="text-xs font-medium text-muted-foreground leading-none truncate max-w-[250px]">
           {domain}
         </span>
       )}
@@ -501,7 +501,7 @@ function HealthMonitorPage() {
         size="md"
         className="bg-muted/30 hover:bg-muted/30"
       />
-      <div className="w-px h-6 bg-border/40 mx-1" />
+      <div className="w-px h-6 bg-border mx-1" />
       {stats.unhealthy > 0 && (
         <ActionButton
           action={{
@@ -554,7 +554,7 @@ function HealthMonitorPage() {
               onChange={handleEnvironmentChange}
               className="w-96"
             />
-            <div className="w-px h-6 bg-border/40 mx-1" />
+            <div className="w-px h-6 bg-border mx-1" />
             <IndustrialTabs
               options={[
                 { id: 'default', label: 'Nombre' },

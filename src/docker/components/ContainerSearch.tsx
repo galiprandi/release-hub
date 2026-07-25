@@ -19,7 +19,7 @@ export function ContainerSearch({ query, setQuery, placeholder = "Buscar contene
 
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
       <input
         ref={inputRef}
         type="text"
@@ -28,7 +28,7 @@ export function ContainerSearch({ query, setQuery, placeholder = "Buscar contene
         onFocus={() => setIsEditable(true)}
         onBlur={() => setIsEditable(false)}
         placeholder={placeholder}
-        className="w-64 pl-9 pr-9 py-1.5 bg-muted/30 border border-border rounded-lg text-[13px] focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/40"
+        className="w-64 pl-9 pr-9 py-1.5 bg-muted/30 border border-border rounded-lg text-[13px] focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/70"
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"
@@ -41,7 +41,7 @@ export function ContainerSearch({ query, setQuery, placeholder = "Buscar contene
             <button
               type="button"
               onClick={handleClear}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted/30 rounded-full text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
               aria-label="Limpiar búsqueda"
             >
               <X className="w-3.5 h-3.5" />

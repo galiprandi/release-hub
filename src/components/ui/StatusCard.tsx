@@ -7,7 +7,7 @@ export interface StatusCardProps {
 	onRetry?: () => void;
 }
 
-const FOCUS_RING = "focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1";
+const FOCUS_RING = "focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1";
 
 export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps) {
 	const styles = {
@@ -53,7 +53,7 @@ export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps)
 					<button
 						type="button"
 						onClick={onRetry}
-						className={`text-xs font-medium px-3 py-1.5 rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 shadow-sm ${
+						className={`text-xs font-medium px-3 py-1.5 rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 shadow-sm ${
 							type === 'error' ? 'bg-destructive/20 text-destructive hover:bg-destructive/30 border border-destructive/20' :
 							type === 'warn' ? 'bg-warning/20 text-warning hover:bg-warning/30 border border-warning/20' :
 							'bg-muted text-foreground hover:bg-accent border border-border'

@@ -56,12 +56,12 @@ export function SetupCard({
 						{description}
 					</p>
 					{version && (
-						<p className="text-xs font-mono text-muted-foreground/60 mt-2">
+						<p className="text-xs font-mono text-muted-foreground mt-2">
 							Versión: {version}
 						</p>
 					)}
 					{!isRequired && (
-						<p className="text-xs font-medium uppercase tracking-widest text-muted-foreground/40 mt-1">
+						<p className="text-xs font-medium  text-muted-foreground/70 mt-1">
 							(Opcional)
 						</p>
 					)}
@@ -97,12 +97,12 @@ export function SetupCard({
 							{isRequired ? "Requerido" : "Opcional"}
 						</span>
 					</div>
-					<p className="text-xs text-muted-foreground/60 mt-1 leading-relaxed">{description}</p>
+					<p className="text-xs text-muted-foreground mt-1 leading-relaxed">{description}</p>
 				</div>
 				{isOpen ? (
-					<ChevronDown className="w-4 h-4 text-muted-foreground/60" />
+					<ChevronDown className="w-4 h-4 text-muted-foreground" />
 				) : (
-					<ChevronRight className="w-4 h-4 text-muted-foreground/60" />
+					<ChevronRight className="w-4 h-4 text-muted-foreground" />
 				)}
 			</button>
 			{isOpen && filteredCommands.length > 0 && (

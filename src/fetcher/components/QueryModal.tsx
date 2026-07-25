@@ -321,7 +321,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 									{requestTab === 'params' && (
 										<div>
 											<div className="flex items-center justify-between mb-1.5">
-												<label className="text-xs font-medium text-muted-foreground/60">Query Params</label>
+												<label className="text-xs font-medium text-muted-foreground">Query Params</label>
 												<ActionButton
 													action={{ icon: Plus, label: "Agregar", color: "primary" }}
 													onClick={() => setForm(prev => ({
@@ -346,7 +346,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 																	setForm(prev => ({ ...prev, queryParams: newQueryParams }));
 																}}
 																placeholder="Key"
-																className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
+																className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 transition-shadow"
 														/>
 															<input
 																	type="text"
@@ -356,7 +356,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 																		queryParams: { ...prev.queryParams, [key]: e.target.value }
 																	}))}
 																	placeholder="Value"
-																	className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
+																	className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 transition-shadow"
 															/>
 															<ActionButton
 																	action={ACTION_DEFINITIONS.delete}
@@ -381,7 +381,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 									{requestTab === 'headers' && (
 										<div>
 											<div className="flex items-center justify-between mb-1.5">
-												<label className="text-xs font-medium text-muted-foreground/60">Headers</label>
+												<label className="text-xs font-medium text-muted-foreground">Headers</label>
 												<ActionButton
 													action={{ icon: Plus, label: "Agregar", color: "primary" }}
 													onClick={() => setForm(prev => ({
@@ -408,7 +408,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 																			setForm(prev => ({ ...prev, headers: newHeaders }));
 																		}}
 																	placeholder="Header name"
-																	className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
+																	className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 transition-shadow"
 															/>
 															{key.toLowerCase() === 'authorization' ? (
 																	<div className="relative">
@@ -439,7 +439,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 																					headers: { ...prev.headers, [key]: e.target.value }
 																				}))}
 																			placeholder="Value"
-																			className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-shadow"
+																			className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 transition-shadow"
 																		/>
 															)}
 															<ActionButton
@@ -539,11 +539,11 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 									}`} title={query?.updatedAt ? DayJS(query.updatedAt).format('LLL') : DayJS().format('LLL')}>
 									{response.status} {response.statusText}
 								</span>
-								<span className="text-xs font-medium text-muted-foreground/60 bg-muted/30 border border-border px-2 py-0.5 rounded-md">
+								<span className="text-xs font-medium text-muted-foreground bg-muted/30 border border-border px-2 py-0.5 rounded-md">
 									{response.responseTime}ms
 								</span>
 							</div>
-							<span className="text-xs font-medium text-muted-foreground/40">
+							<span className="text-xs font-medium text-muted-foreground/70">
 								{DayJS(query?.updatedAt || new Date()).fromNow()}
 							</span>
 						</div>

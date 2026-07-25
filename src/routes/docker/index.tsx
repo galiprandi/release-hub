@@ -98,7 +98,7 @@ function DockerManagerPage() {
         searchComponent: access?.hasAccess ? (
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-muted-foreground/60">Estado:</span>
+              <span className="text-xs font-medium text-muted-foreground">Estado:</span>
               <IndustrialTabs
                 options={[
                   { id: 'all', label: `Todos (${filterCounts.all})` },
@@ -111,7 +111,7 @@ function DockerManagerPage() {
                 className="w-full sm:w-[520px]"
               />
             </div>
-            <div className="w-px h-6 bg-border/40 mx-1" />
+            <div className="w-px h-6 bg-border mx-1" />
             <ContainerSearch query={searchQuery} setQuery={setSearchQuery} />
           </div>
         ) : undefined

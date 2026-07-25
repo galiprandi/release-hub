@@ -130,7 +130,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 							<Dialog.Trigger asChild>
 								<button
 									type="button"
-									className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+									className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 								>
 									<RefreshCw className="w-4 h-4" />
 									<span>Re Deploy</span>
@@ -204,7 +204,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 							<button
 								onClick={handleForceRedeploy}
 								disabled={isExecuting}
-								className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+								className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 							>
 								{isExecuting ? (
 									<>

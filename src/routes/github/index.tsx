@@ -192,7 +192,7 @@ function Dashboard() {
 				searchComponent: (
 					<div className="flex items-center gap-4">
 						<div className="flex items-center gap-2">
-							<span className="text-xs font-medium text-muted-foreground/60">
+							<span className="text-xs font-medium text-muted-foreground">
 								Colecciones:
 							</span>
 							<IndustrialTabs
@@ -203,7 +203,7 @@ function Dashboard() {
 											{t.icon && <t.icon className="w-3 h-3" />}
 											<span>{t.label}</span>
 											{t.count !== undefined && t.count > 0 && (
-												<span className="ml-1 px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-xs">
+												<span className="ml-1 px-1.5 py-0.5 rounded-full bg-muted/30 text-xs">
 													{t.count}
 												</span>
 											)}
@@ -221,7 +221,7 @@ function Dashboard() {
 								}
 							/>
 						</div>
-						<div className="w-px h-6 bg-border/40 mx-1" />
+						<div className="w-px h-6 bg-border mx-1" />
 						<RepoSearch />
 					</div>
 				),
@@ -279,7 +279,7 @@ function Dashboard() {
 				{!isEmpty && (
 					<div className="flex items-center justify-between px-1">
 						<div className="flex items-center gap-2">
-							<span className="text-xs font-medium text-muted-foreground/60">
+							<span className="text-xs font-medium text-muted-foreground">
 								Filtrar:
 							</span>
 							<div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border border-border">
@@ -354,7 +354,7 @@ function Dashboard() {
 												input.focus();
 											}
 										}}
-										className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-medium shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+										className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-medium shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 									>
 										<Search className="w-4 h-4" />
 										Descubrir Repositorios
@@ -371,7 +371,7 @@ function Dashboard() {
 													input.focus();
 												}
 											}}
-											className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-medium shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+											className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all text-xs font-medium shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 										>
 											<Search className="w-4 h-4" />
 											Añadir Repositorios
@@ -379,7 +379,7 @@ function Dashboard() {
 										<button
 											type="button"
 											onClick={handleManageProjects}
-											className="inline-flex items-center gap-2 px-6 py-2.5 bg-muted/30 text-foreground rounded-lg hover:bg-muted/30 transition-all text-xs font-medium border border-border focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+											className="inline-flex items-center gap-2 px-6 py-2.5 bg-muted/30 text-foreground rounded-lg hover:bg-muted/30 transition-all text-xs font-medium border border-border focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 										>
 											<Settings2 className="w-4 h-4" />
 											Gestionar Proyecto
@@ -418,16 +418,16 @@ function Dashboard() {
 									>
 										<div className="flex items-center gap-3">
 											{isCollapsed ? (
-												<ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:text-primary transition-colors" />
+												<ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
 											) : (
-												<ChevronDown className="w-4 h-4 text-muted-foreground/60 group-hover:text-primary transition-colors" />
+												<ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
 											)}
 											<div className="flex items-center gap-2">
 												<Building2 className="w-4 h-4 text-primary/60" />
-												<h2 className="text-xs font-medium uppercase tracking-widest text-foreground">
+												<h2 className="text-xs font-medium  text-foreground">
 													{org}
 												</h2>
-												<span className="px-1.5 py-0.5 rounded-full bg-muted-foreground/10 text-xs font-bold text-muted-foreground/60">
+												<span className="px-1.5 py-0.5 rounded-full bg-muted/30 text-xs font-bold text-muted-foreground">
 													{repoCount}
 												</span>
 											</div>
@@ -435,7 +435,7 @@ function Dashboard() {
 
 										{isCollapsed && (
 											<div className="flex items-center gap-4">
-												<span className="text-xs font-medium text-muted-foreground/40 italic">
+												<span className="text-xs font-medium text-muted-foreground/70 italic">
 													Click para expandir
 												</span>
 											</div>
@@ -638,7 +638,7 @@ function ReposTable({
 			{
 				accessorKey: "name",
 				header: () => (
-					<span className="text-xs font-medium text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground">
 						Repositorio
 					</span>
 				),
@@ -658,7 +658,7 @@ function ReposTable({
 			{
 				accessorKey: "tag",
 				header: () => (
-					<span className="text-xs font-medium text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground">
 						Producción
 					</span>
 				),
@@ -667,7 +667,7 @@ function ReposTable({
 			{
 				accessorKey: "commit",
 				header: () => (
-					<span className="text-xs font-medium text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground">
 						Staging
 					</span>
 				),
@@ -676,7 +676,7 @@ function ReposTable({
 			{
 				id: "health",
 				header: () => (
-					<span className="text-xs font-medium text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground">
 						Salud
 					</span>
 				),
@@ -685,7 +685,7 @@ function ReposTable({
 			{
 				id: "prs",
 				header: () => (
-					<span className="text-xs font-medium text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground">
 						PRs
 					</span>
 				),
@@ -699,7 +699,7 @@ function ReposTable({
 			{
 				id: "actions_status",
 				header: () => (
-					<span className="text-xs font-medium text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground">
 						Workflows
 					</span>
 				),
@@ -713,7 +713,7 @@ function ReposTable({
 			{
 				accessorKey: "updatedAt",
 				header: () => (
-					<span className="text-xs font-medium text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground">
 						Actividad
 					</span>
 				),
@@ -722,7 +722,7 @@ function ReposTable({
 			{
 				accessorKey: "author",
 				header: () => (
-					<span className="text-xs font-medium text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground">
 						Autor
 					</span>
 				),
@@ -732,7 +732,7 @@ function ReposTable({
 				id: "operations",
 				accessorKey: "actions",
 				header: () => (
-					<div className="text-right text-xs font-medium text-muted-foreground/60">
+					<div className="text-right text-xs font-medium text-muted-foreground">
 						Operations
 					</div>
 				),
@@ -774,7 +774,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 		return (
 			<div className="flex items-center gap-2">
 				<div className="w-4 h-4 bg-muted/30 rounded-full flex-shrink-0 flex items-center justify-center">
-					<Loader2 className="w-3 h-3 animate-spin text-muted-foreground/40" />
+					<Loader2 className="w-3 h-3 animate-spin text-muted-foreground/70" />
 				</div>
 				<div className="h-4 bg-muted/30 rounded w-32 animate-pulse" />
 			</div>
@@ -788,7 +788,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 					to="/github/$org/$repo"
 					params={{ org, repo: name }}
 					search={{ view: "commits" }}
-					className="font-medium tracking-tight hover:text-primary transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 rounded-md"
+					className="font-medium tracking-tight hover:text-primary transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 rounded-md"
 				>
 					{name}
 				</Link>
@@ -798,7 +798,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 								<button
 									type="button"
 									onClick={() => setIsCommitsModalOpen(true)}
-									className="inline-flex items-center gap-1 text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full border border-warning/20 font-bold cursor-pointer hover:bg-warning/30 hover:border-warning/40 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+									className="inline-flex items-center gap-1 text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full border border-warning/20 font-bold cursor-pointer hover:bg-warning/30 hover:border-warning/40 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 								>
 									<GitPullRequestCreateArrow className="w-2.5 h-2.5" />
 									<span>{pendingCount}</span>
@@ -877,7 +877,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 			navigateToRepo={true}
 		/>
 	) : (
-		<span className="text-muted-foreground/40 text-xs font-medium italic">
+		<span className="text-muted-foreground/70 text-xs font-medium italic">
 			Sin tags
 		</span>
 	);
@@ -927,7 +927,7 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 			navigateToRepo={true}
 		/>
 	) : (
-		<span className="text-muted-foreground/40 text-xs font-medium italic">
+		<span className="text-muted-foreground/70 text-xs font-medium italic">
 			Sin commits
 		</span>
 	);
@@ -942,7 +942,7 @@ function DateCell({ repo }: { repo: RepoInfo }) {
 	}
 
 	return commitDate ? (
-		<div className="text-xs font-medium text-muted-foreground/60">
+		<div className="text-xs font-medium text-muted-foreground">
 			{DayJS(commitDate).fromNow()}
 		</div>
 	) : null;
@@ -990,7 +990,7 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 							>
 								{statusLabel}
 							</span>
-							<span className="text-xs font-bold text-muted-foreground/40">
+							<span className="text-xs font-bold text-muted-foreground/70">
 								({endpoints.length})
 							</span>
 						</div>
@@ -1046,7 +1046,7 @@ function AuthorCell({ repo }: { repo: RepoInfo }) {
 
 	return truncatedAuthor ? (
 		<span
-			className="text-xs font-medium text-muted-foreground/60"
+			className="text-xs font-medium text-muted-foreground"
 			title={commitAuthor}
 		>
 			{truncatedAuthor}
@@ -1072,7 +1072,7 @@ function PRsCell({ repo, details }: { repo: RepoInfo; details?: RepoDetails }) {
 						href={`https://github.com/${org}/${name}/pulls`}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="inline-flex items-center gap-1.5 px-2 py-1 bg-primary/20 text-primary border border-primary/20 rounded-md hover:bg-primary/30 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+						className="inline-flex items-center gap-1.5 px-2 py-1 bg-primary/20 text-primary border border-primary/20 rounded-md hover:bg-primary/30 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 						aria-label={`${prCount} pull requests abiertos`}
 					>
 						<GitPullRequest className="w-3 h-3" />
@@ -1121,7 +1121,7 @@ function ActionsStatusCell({
 						target="_blank"
 						rel="noopener noreferrer"
 						className={clsx(
-							"inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 border",
+							"inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 border",
 							hasFailure
 								? "bg-destructive/20 text-destructive border-destructive/20 hover:bg-destructive/30"
 								: isRunning
@@ -1194,7 +1194,7 @@ function OperationsCell({
 				latestTag={latestTag?.name}
 				iconOnly={true}
 			/>
-			<div className="w-px h-4 bg-border/20 mx-0.5" />
+			<div className="w-px h-4 bg-border mx-0.5" />
 			<ActionButton
 				action={ACTION_DEFINITIONS.manageProjects}
 				onClick={() => setIsProjectSelectionOpen(true)}

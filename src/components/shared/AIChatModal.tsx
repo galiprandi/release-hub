@@ -201,7 +201,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 					</div>
 					<div className="flex flex-col">
 						<span className="text-sm font-bold tracking-tight">Asistente AI</span>
-						<span className="text-xs font-medium text-muted-foreground/60">
+						<span className="text-xs font-medium text-muted-foreground">
 							{activeProfile.label}
 						</span>
 					</div>
@@ -218,7 +218,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 						onChange={setActiveProfileId}
 						className="bg-muted/30 p-1"
 					/>
-					<div className="w-px h-4 bg-border/40 mx-1" />
+					<div className="w-px h-4 bg-border mx-1" />
 					<ActionButton
 						action={{ icon: Trash2, label: "Limpiar", color: "default" }}
 						onClick={handleClearChat}
@@ -303,7 +303,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							)}
 							<div className="flex-1 min-w-0">
 								<p className="text-xs font-bold truncate text-foreground/80">{attachedFile.name}</p>
-								<p className="text-xs font-medium text-muted-foreground/60">{(attachedFile.size / 1024).toFixed(1)} KB</p>
+								<p className="text-xs font-medium text-muted-foreground">{(attachedFile.size / 1024).toFixed(1)} KB</p>
 							</div>
 							<button
 								onClick={removeFile}
@@ -326,7 +326,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 						<button
 							onClick={() => fileInputRef.current?.click()}
 							aria-label="Adjuntar archivo"
-							className="p-2 text-muted-foreground/60 hover:text-ai transition-colors"
+							className="p-2 text-muted-foreground hover:text-ai transition-colors"
 						>
 							<Paperclip className="w-4 h-4" />
 						</button>
@@ -336,12 +336,12 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							onChange={(e) => setInput(e.target.value)}
 							onKeyDown={handleKeyDown}
 							placeholder="Pregunta algo sobre ReleaseHub..."
-							className="w-full bg-transparent border-none focus:ring-0 text-sm resize-none py-2 px-1 max-h-32 min-h-[40px] placeholder:text-muted-foreground/60 font-medium"
+							className="w-full bg-transparent border-none focus:ring-0 text-sm resize-none py-2 px-1 max-h-32 min-h-[40px] placeholder:text-muted-foreground font-medium"
 							rows={1}
 						/>
 						<div className="flex items-center gap-2">
 							{contextUsage !== undefined && contextUsage > 0 && (
-								<span className="text-xs font-bold text-muted-foreground/40">
+								<span className="text-xs font-bold text-muted-foreground/70">
 									CTX: {contextUsage}
 								</span>
 							)}
@@ -361,7 +361,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 									className={`p-2 rounded-lg transition-all focus:ring-2 focus:ring-primary/30 ${
 										input.trim()
 											? "bg-ai text-ai-foreground shadow-sm hover:opacity-90"
-											: "bg-muted text-muted-foreground/40 cursor-not-allowed"
+											: "bg-muted text-muted-foreground/70 cursor-not-allowed"
 									}`}
 								>
 									<Send className="w-4 h-4" />
@@ -369,7 +369,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							)}
 						</div>
 					</div>
-					<p className="mt-2 text-xs font-medium text-center text-muted-foreground/40">
+					<p className="mt-2 text-xs font-medium text-center text-muted-foreground/70">
 						La IA puede cometer errores. El procesamiento ocurre localmente en tu navegador.
 					</p>
 				</div>

@@ -13,8 +13,8 @@ interface IndustrialTabsProps<T extends string> {
 }
 
 /**
- * IndustrialTabs - A unified tab component following the Industrial Resonance V2 standard.
- * Uses bg-muted/30, rounded-lg container, rounded-md active items, and text-xs font-medium uppercase.
+ * IndustrialTabs - Unified tab component following the Linear/Vercel canon.
+ * bg-muted/30 container, rounded-md, text-xs font-medium. No uppercase.
  */
 export function IndustrialTabs<T extends string>({
 	options,
@@ -23,16 +23,16 @@ export function IndustrialTabs<T extends string>({
 	className = "",
 }: IndustrialTabsProps<T>) {
 	return (
-		<div className={`flex p-1 bg-muted/30 border border-border rounded-lg gap-1 items-center ${className}`}>
+		<div className={`flex p-1 bg-muted/30 border border-border rounded-md gap-1 items-center ${className}`}>
 			{options.map((option) => (
 				<button
 					key={option.id}
 					type="button"
 					onClick={() => onChange(option.id)}
 					aria-pressed={activeId === option.id}
-					className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+					className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-all ${
 						activeId === option.id
-							? 'bg-background shadow-sm text-foreground ring-1 ring-border/20'
+							? 'bg-background shadow-sm text-foreground'
 							: 'text-muted-foreground hover:bg-accent hover:text-foreground'
 					}`}
 				>

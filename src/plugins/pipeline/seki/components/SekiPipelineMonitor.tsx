@@ -433,7 +433,7 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 							)}
 							{ai.command && (
 								<div className="space-y-0.5">
-									<span className="text-xs font-medium text-muted-foreground/60">
+									<span className="text-xs font-medium text-muted-foreground">
 										Comando
 									</span>
 									<code className="block text-[11px] font-mono text-primary bg-primary/5 px-2 py-1.5 rounded break-all">
@@ -518,8 +518,8 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 							{config.label}
 						</span>
 						<div className="flex items-center gap-1 ml-auto">
-							<EnvIcon className="w-3.5 h-3.5 text-muted-foreground/60" />
-							<span className="text-xs font-medium text-muted-foreground/60">
+							<EnvIcon className="w-3.5 h-3.5 text-muted-foreground" />
+							<span className="text-xs font-medium text-muted-foreground">
 								{envLabel}
 							</span>
 						</div>
@@ -530,11 +530,11 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 						{filteredData.commit?.author && (
 							<span className="font-medium text-foreground/80 truncate max-w-[200px]">{filteredData.commit.author}</span>
 						)}
-						<span className="text-muted-foreground/40">·</span>
+						<span className="text-muted-foreground/70">·</span>
 						<span>{lastUpdated}</span>
 						{totalDuration && (
 							<>
-								<span className="text-muted-foreground/40">·</span>
+								<span className="text-muted-foreground/70">·</span>
 								<span className="inline-flex items-center gap-1 tabular-nums">
 									<Clock className="w-2.5 h-2.5" />
 									{totalDuration}
@@ -543,7 +543,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 						)}
 					</div>
 					{filteredData.commit?.message && (
-						<div className="flex items-center gap-1.5 text-xs text-muted-foreground/80">
+						<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
 							<GitCommit className="w-3 h-3 shrink-0" />
 							<span className="truncate">{filteredData.commit.message}</span>
 						</div>
@@ -552,7 +552,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 					{/* Deploy URLs (with copy-to-clipboard) */}
 					{deploySubs.length > 0 && (
 						<div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
-							<span className="text-xs font-medium text-muted-foreground/60 shrink-0">
+							<span className="text-xs font-medium text-muted-foreground shrink-0">
 								Deploy:
 							</span>
 							{deploySubs.map((sub) => (

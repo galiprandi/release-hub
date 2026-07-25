@@ -41,7 +41,7 @@ function PulsarPreviewPage() {
 				</p>
 
 				<div className="space-y-2">
-					<span className="text-xs font-medium text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground">
 						Staging OK + Production FAILED (1 imagen fallida)
 					</span>
 					<PulsarBuildMonitorData
@@ -53,7 +53,7 @@ function PulsarPreviewPage() {
 				</div>
 
 				<div className="space-y-2">
-					<span className="text-xs font-medium text-muted-foreground/60">
+					<span className="text-xs font-medium text-muted-foreground">
 						Production en progreso (building)
 					</span>
 					<PulsarBuildMonitorData

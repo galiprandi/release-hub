@@ -57,7 +57,7 @@ function ProductIndex() {
 				searchComponent: (
 					<div className="flex items-center gap-4">
 						<div className="flex items-center gap-2">
-							<span className="text-xs font-medium text-muted-foreground/60">
+							<span className="text-xs font-medium text-muted-foreground">
 								Vista:
 							</span>
 							<IndustrialTabs
@@ -88,13 +88,13 @@ function ProductIndex() {
 								className="w-48"
 							/>
 						</div>
-						<div className="w-px h-6 bg-border/40 mx-1" />
+						<div className="w-px h-6 bg-border mx-1" />
 						<div className="flex items-center gap-2">
 							<a
 								href={openPRs?.repoUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted border border-border rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted border border-border rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 							>
 								<GitPullRequest className="w-3.5 h-3.5 text-primary/60" />
 								<span>PRs</span>
@@ -108,7 +108,7 @@ function ProductIndex() {
 								href={actionsSummary?.repoUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted border border-border rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted border border-border rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 							>
 								<Play className="w-3.5 h-3.5 text-primary/60" />
 								<span>Actions</span>
@@ -139,7 +139,7 @@ function ProductIndex() {
 				) : (
 					<PromoteDialog key="promote" repo={fullProduct} latestTag={latestTag?.name} iconOnly={true} showLabel={true} />
 				),
-				<div key="divider" className="w-px h-6 bg-border/40 mx-1" />,
+				<div key="divider" className="w-px h-6 bg-border mx-1" />,
 				<ProjectSelector key="project" repo={fullProduct} />,
 			]}
 			refreshFn={handleRefetchPipeline}

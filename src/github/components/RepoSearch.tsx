@@ -189,7 +189,7 @@ export function RepoSearch() {
             ? 'Buscar archivo: file:AGENTS.md'
             : `Búsqueda en ${summaryData?.total || 0} repositorios... (Cmd+K)`}
           aria-label="Búsqueda de repositorios"
-          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/40`}
+          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/70`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -203,7 +203,7 @@ export function RepoSearch() {
               <button
                 type="button"
                 onClick={handleClear}
-                className={`absolute ${isLoading ? 'right-9' : 'right-3'} top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
+                className={`absolute ${isLoading ? 'right-9' : 'right-3'} top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted/30 rounded-full text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all`}
                 aria-label="Limpiar búsqueda"
               >
                 <X className="w-3.5 h-3.5" />
@@ -239,9 +239,9 @@ export function RepoSearch() {
             <EmptyState
               className="min-h-0 py-8"
               icon={isFileMode ? (
-                <FileCode className="w-5 h-5 text-muted-foreground/40" />
+                <FileCode className="w-5 h-5 text-muted-foreground/70" />
               ) : (
-                <GitBranch className="w-5 h-5 text-muted-foreground/40" />
+                <GitBranch className="w-5 h-5 text-muted-foreground/70" />
               )}
               label={query.length >= 2 ? 'Sin resultados' : 'Búsqueda de repositorios'}
               caption={query.length >= 2 ? `No se encontraron coincidencias para "${query}"` : 'Ingresa texto para iniciar la búsqueda'}
@@ -284,7 +284,7 @@ export function RepoSearch() {
                             <p className="text-xs text-muted-foreground mt-1 truncate">
                               {item.path}
                             </p>
-                            <p className="text-xs text-muted-foreground/60 mt-1">
+                            <p className="text-xs text-muted-foreground mt-1">
                               {item.fullName}
                             </p>
                           </button>

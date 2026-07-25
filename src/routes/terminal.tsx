@@ -28,19 +28,19 @@ function TerminalPage() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-              <span className="text-xs font-medium text-muted-foreground/80">Sesión Local Activa</span>
+              <span className="text-xs font-medium text-muted-foreground">Sesión Local Activa</span>
             </div>
-            <div className="w-px h-3 bg-border/40" />
-            <span className="text-xs font-medium text-muted-foreground/40 font-mono">/bin/{shell}</span>
+            <div className="w-px h-3 bg-border" />
+            <span className="text-xs font-medium text-muted-foreground/70 font-mono">/bin/{shell}</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
-               <span className="text-xs font-medium text-muted-foreground/40">Status</span>
+               <span className="text-xs font-medium text-muted-foreground/70">Status</span>
                <span className="px-1.5 py-0.5 rounded bg-success/20 border border-success/20 text-xs font-bold text-success">Connected</span>
             </div>
-            <div className="w-px h-3 bg-border/40" />
+            <div className="w-px h-3 bg-border" />
             <div className="flex items-center gap-1.5">
-               <span className="text-xs font-medium text-muted-foreground/40">OS</span>
+               <span className="text-xs font-medium text-muted-foreground/70">OS</span>
                <span className="px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 text-xs font-bold text-primary">{os}</span>
             </div>
           </div>

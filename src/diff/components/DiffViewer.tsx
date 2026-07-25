@@ -142,7 +142,7 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.3)]" />
-              <h3 className="text-xs font-medium text-muted-foreground/60">
+              <h3 className="text-xs font-medium text-muted-foreground">
                 Resultado de Comparación
               </h3>
             </div>
@@ -170,19 +170,19 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
                 "px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 text-xs font-medium border",
                 showOnlyDiffs
                   ? "bg-primary/20 text-primary border-primary/20 shadow-sm ring-1 ring-primary/10"
-                  : "text-muted-foreground/60 hover:text-foreground hover:bg-muted/30 border-transparent"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/30 border-transparent"
               )}
               title={showOnlyDiffs ? "Mostrar todas las líneas" : "Mostrar solo diferencias"}
             >
               <Filter className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Solo diffs</span>
             </button>
-            <div className="w-px h-4 bg-border/40 mx-1" />
+            <div className="w-px h-4 bg-border mx-1" />
             <IconButton
               onClick={() => setIsExpanded(!isExpanded)}
               icon={isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
               tooltip={isExpanded ? "Restaurar" : "Expandir"}
-              className="p-1.5 text-muted-foreground/60 hover:text-foreground hover:bg-muted/30 active:scale-95 border border-transparent"
+              className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/30 active:scale-95 border border-transparent"
             />
           </div>
         </div>

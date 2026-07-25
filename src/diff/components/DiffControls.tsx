@@ -24,7 +24,7 @@ export function DiffControls({ mode, onModeChange }: DiffControlsProps) {
     id: m.id,
     label: (
       <div className="flex items-center justify-center gap-1.5 py-0.5">
-        <m.icon className={`w-3.5 h-3.5 transition-colors ${mode === m.id ? 'text-primary' : 'text-muted-foreground/40'}`} />
+        <m.icon className={`w-3.5 h-3.5 transition-colors ${mode === m.id ? 'text-primary' : 'text-muted-foreground/70'}`} />
         <span>{m.label}</span>
       </div>
     )

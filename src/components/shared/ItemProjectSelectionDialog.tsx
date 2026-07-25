@@ -73,7 +73,7 @@ export function ItemProjectSelectionDialog({
 				<div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
 					{projects.length === 0 && !isCreating ? (
 						<EmptyState
-							icon={<FolderSearch className="w-5 h-5 text-muted-foreground/40" />}
+							icon={<FolderSearch className="w-5 h-5 text-muted-foreground/70" />}
 							label="Sin proyectos"
 							caption="No tienes colecciones creadas para organizar tus recursos."
 							className="min-h-0 py-8"
@@ -109,7 +109,7 @@ export function ItemProjectSelectionDialog({
 										className={`p-1.5 rounded-lg transition-colors ${
 											active
 												? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
-												: "bg-muted text-muted-foreground group-hover:bg-muted-foreground/10"
+												: "bg-muted text-muted-foreground group-hover:bg-muted/30"
 										}`}
 									>
 										{active ? (
@@ -145,7 +145,7 @@ export function ItemProjectSelectionDialog({
 							value={newName}
 							onChange={(e) => setNewName(e.target.value)}
 							placeholder="Nombre del proyecto..."
-							className="flex-1 bg-transparent border-none text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 rounded-md placeholder:text-muted-foreground/40 ml-2"
+							className="flex-1 bg-transparent border-none text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 rounded-md placeholder:text-muted-foreground/70 ml-2"
 						/>
 						<Tooltip.Root>
 							<Tooltip.Trigger asChild>

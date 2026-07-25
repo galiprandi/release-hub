@@ -189,7 +189,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 								type="button"
 								onClick={() => handleOpenChange(true)}
 								aria-haspopup="dialog"
-								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none shadow-sm"
+								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none shadow-sm"
 							>
 								<Rocket className="w-4 h-4" />
 								<span>Promocionar</span>
@@ -245,7 +245,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 											value={tagName}
 											onChange={(e) => setTagName(e.target.value)}
 											placeholder={suggestedTag}
-											className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-all"
+											className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 transition-all"
 										/>
 									</div>
 
@@ -258,7 +258,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 												type="button"
 												onClick={() => generateCommitSummary(pendingCommits)}
 												disabled={isGeneratingSummary || !summaryAvailable || !hasPendingCommits}
-												className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-ai hover:bg-ai/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+												className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-ai hover:bg-ai/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 												title="Regenerar descripción con IA"
 											>
 												{isGeneratingSummary ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
@@ -272,7 +272,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 											placeholder="Descripción del release..."
 											rows={8}
 											disabled={isGeneratingSummary}
-											className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-all resize-y disabled:opacity-50"
+											className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 transition-all resize-y disabled:opacity-50"
 										/>
 									</div>
 
@@ -289,7 +289,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 											onClick={() => setShowCommits(!showCommits)}
 											aria-expanded={showCommits}
 											aria-controls="pending-commits-list"
-											className="w-full flex items-center justify-between px-3 py-2 bg-muted/50 hover:bg-muted border rounded-md transition-all text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+											className="w-full flex items-center justify-between px-3 py-2 bg-muted/50 hover:bg-muted border rounded-md transition-all text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 										>
 											<span className="flex items-center gap-2">
 												<GitCommit className="w-4 h-4 text-muted-foreground" />
@@ -316,7 +316,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 									<button
 										onClick={handleCreateTag}
 										disabled={isCreating || !tagName.trim() || (!canCreateTags && !isLoadingPerms)}
-										className="px-4 py-2 text-sm font-medium bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none shadow-sm"
+										className="px-4 py-2 text-sm font-medium bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none shadow-sm"
 									>
 										{isCreating ? <><Loader2 className="w-4 h-4 animate-spin" /> Publicando...</> : <><Rocket className="w-4 h-4" /> Publicar Tag</>}
 									</button>

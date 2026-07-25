@@ -108,12 +108,12 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 		return (
 			<div className="flex flex-col items-center justify-center py-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
 				<div className="p-4 rounded-full bg-muted/30 border border-border mb-4">
-					<Boxes className="w-8 h-8 text-muted-foreground/40" />
+					<Boxes className="w-8 h-8 text-muted-foreground/70" />
 				</div>
 				<h3 className="text-xs font-medium text-muted-foreground">
 					{searchQuery ? "No se encontraron resultados" : "No hay contenedores"}
 				</h3>
-				<p className="text-xs text-muted-foreground/60 mt-1 max-w-[300px] text-center">
+				<p className="text-xs text-muted-foreground mt-1 max-w-[300px] text-center">
 					{searchQuery ? `No hay contenedores que coincidan con "${searchQuery}"` : "No se detectaron contenedores en este entorno."}
 				</p>
 			</div>
@@ -159,7 +159,7 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 									<TerminalIcon className="w-4 h-4 text-primary" />
 								</div>
 								<div className="flex flex-col">
-									<span className="text-xs font-medium text-muted-foreground/60 leading-none mb-1">Terminal</span>
+									<span className="text-xs font-medium text-muted-foreground leading-none mb-1">Terminal</span>
 									<span className="text-sm font-semibold tracking-tight leading-none">{selectedContainer.name}</span>
 								</div>
 							</div>
@@ -297,7 +297,7 @@ function StartedCell({ container }: { container: ContainerInfo }) {
 	}
 
 	return (
-		<span className="text-xs font-medium text-muted-foreground/60">
+		<span className="text-xs font-medium text-muted-foreground">
 			{parseRunningTime(container.runningFor)}
 		</span>
 	)
@@ -356,7 +356,7 @@ function PortsCell({ container }: { container: ContainerInfo }) {
 			<select
 				value={selectedPort}
 				onChange={(e) => setSelectedPort(e.target.value)}
-				className="text-xs font-medium border border-border rounded-lg px-2 py-1 bg-muted/30 hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1 cursor-pointer"
+				className="text-xs font-medium border border-border rounded-lg px-2 py-1 bg-muted/30 hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 cursor-pointer"
 				aria-label="Seleccionar puerto"
 			>
 				{externalPorts.map((port, index) => (
@@ -406,7 +406,7 @@ function ActionsCell({
 				/>
 			</div>
 
-			<div className="w-px h-4 bg-border/40 mx-1" aria-hidden="true" />
+			<div className="w-px h-4 bg-border mx-1" aria-hidden="true" />
 
 			<div className="flex items-center gap-1">
 				<ActionButton

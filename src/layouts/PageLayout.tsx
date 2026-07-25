@@ -225,7 +225,7 @@ export function PageLayout({
 								className="flex items-center gap-4"
 								aria-label="Navegación de breadcrumb"
 							>
-								<h1 className="text-sm font-semibold text-muted-foreground/80">
+								<h1 className="text-sm font-semibold text-muted-foreground">
 									{header.title}
 								</h1>
 							</nav>
@@ -331,7 +331,7 @@ function NavIcon({
 
 	const buttonContent = (
 		<button
-			className={`p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none ${
+			className={`p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none ${
 				isActive
 					? "bg-primary text-primary-foreground shadow-sm"
 					: "text-muted-foreground hover:text-foreground hover:bg-muted/60"
@@ -378,7 +378,7 @@ function FeedbackIcon() {
 	const buttonContent = (
 		<button
 			onClick={() => setOpen(true)}
-			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none text-muted-foreground hover:text-foreground hover:bg-muted/60"
+			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none text-muted-foreground hover:text-foreground hover:bg-muted/60"
 			aria-label="Feedback"
 			type="button"
 		>
@@ -437,7 +437,7 @@ function AIChatIcon() {
 	const buttonContent = (
 		<button
 			onClick={() => setOpen(true)}
-			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none text-muted-foreground hover:text-ai hover:bg-ai/10"
+			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none text-muted-foreground hover:text-ai hover:bg-ai/10"
 			aria-label="Asistente AI"
 			type="button"
 		>
@@ -523,7 +523,7 @@ function SettingsIcon() {
 	const buttonContent = (
 		<button
 			onClick={() => setOpen(true)}
-			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none text-muted-foreground hover:text-foreground hover:bg-muted/60"
+			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none text-muted-foreground hover:text-foreground hover:bg-muted/60"
 			aria-label="Configuración"
 			type="button"
 		>
@@ -562,7 +562,7 @@ function TerminalIconModal() {
 	const buttonContent = (
 		<button
 			onClick={() => setOpen(true)}
-			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none text-muted-foreground hover:text-foreground hover:bg-muted/60"
+			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none text-muted-foreground hover:text-foreground hover:bg-muted/60"
 			aria-label="Terminal"
 			type="button"
 		>
@@ -602,12 +602,12 @@ function TerminalIconModal() {
 						<div className="flex items-center gap-3">
 							<div className="flex items-center gap-1.5">
 								<div className="w-1 h-1 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-								<span className="text-xs font-medium text-muted-foreground/60">
+								<span className="text-xs font-medium text-muted-foreground">
 									Active Session
 								</span>
 							</div>
-							<div className="w-px h-3 bg-border/40" />
-							<span className="text-xs font-medium text-muted-foreground/40 font-mono">
+							<div className="w-px h-3 bg-border" />
+							<span className="text-xs font-medium text-muted-foreground/70 font-mono">
 								Local
 							</span>
 						</div>
@@ -642,7 +642,7 @@ function InstallButton() {
 	return (
 		<button
 			onClick={handleCopy}
-			className="flex items-center gap-1.5 px-2 py-1 rounded bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+			className="flex items-center gap-1.5 px-2 py-1 rounded bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 			type="button"
 			aria-label={copied ? "Comando copiado con éxito" : "Copiar comando de instalación al portapapeles"}
 		>

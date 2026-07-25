@@ -160,7 +160,7 @@ export function JsonEditor({
 						onChange={(e) => onChange(e.target.value)}
 						placeholder={placeholder}
 						readOnly={readOnly}
-						className={`w-full ${height} px-2.5 py-1.5 text-sm border border-t-0 rounded-b-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono bg-background`}
+						className={`w-full ${height} px-2.5 py-1.5 text-sm border border-t-0 rounded-b-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 font-mono bg-background`}
 					/>
 					{value && (
 						<div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-background/80 px-1.5 py-0.5 rounded">

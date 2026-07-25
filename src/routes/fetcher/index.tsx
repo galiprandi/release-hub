@@ -225,7 +225,7 @@ function FetcherPage() {
 					value={curlInput}
 					onChange={(e) => setCurlInput(e.target.value)}
 					placeholder="Importar cURL... (curl -X GET...)"
-					className="w-80 px-3 py-1.5 text-sm border border-border bg-muted/30 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 font-mono transition-shadow placeholder:text-muted-foreground/40"
+					className="w-80 px-3 py-1.5 text-sm border border-border bg-muted/30 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 font-mono transition-shadow placeholder:text-muted-foreground/70"
 				/>
 			</div>
 			<ActionButton
@@ -241,9 +241,9 @@ function FetcherPage() {
 	const searchComponent = (
 		<div className="flex items-center gap-4">
 			<div className="flex items-center gap-2">
-				<span className="text-xs font-medium text-muted-foreground/60">Búsqueda</span>
+				<span className="text-xs font-medium text-muted-foreground">Búsqueda</span>
 				<div className="relative">
-					<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground/60" />
+					<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
 					<input
 						type="text"
 						value={search.q || ''}
@@ -251,7 +251,7 @@ function FetcherPage() {
 							handleQuerySearch(e.target.value);
 						}}
 						placeholder="Buscar en historial..."
-						className="w-48 pl-8 pr-3 py-1.5 bg-muted/30 border border-border rounded-lg text-[11px] focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/40 font-medium uppercase tracking-tight"
+						className="w-48 pl-8 pr-3 py-1.5 bg-muted/30 border border-border rounded-lg text-[11px] focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/70 font-medium uppercase tracking-tight"
 					/>
 					{search.q && (
 						<button
@@ -259,16 +259,16 @@ function FetcherPage() {
 							onClick={() => {
 								handleQuerySearch('');
 							}}
-							className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground transition-all"
+							className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted/30 rounded-full text-muted-foreground transition-all"
 						>
 							<X className="w-2.5 h-2.5" />
 						</button>
 					)}
 				</div>
 			</div>
-			<div className="w-px h-6 bg-border/40 mx-1" />
+			<div className="w-px h-6 bg-border mx-1" />
 			<div className="flex items-center gap-2">
-				<span className="text-xs font-medium text-muted-foreground/60">Método</span>
+				<span className="text-xs font-medium text-muted-foreground">Método</span>
 				<IndustrialTabs
 					options={[
 						{ id: 'ALL', label: 'Todos' },
@@ -284,7 +284,7 @@ function FetcherPage() {
 				/>
 			</div>
 			<div className="flex items-center gap-2">
-				<span className="text-xs font-medium text-muted-foreground/60">Orden</span>
+				<span className="text-xs font-medium text-muted-foreground">Orden</span>
 				<IndustrialTabs
 					options={[
 						{ id: 'recent', label: 'Recientes' },
@@ -317,7 +317,7 @@ function FetcherPage() {
 					<StatusCard type="loading" message="Cargando historial..." />
 				) : history.length === 0 ? (
 					<EmptyState
-						icon={<Send className="w-8 h-8 text-muted-foreground/40" />}
+						icon={<Send className="w-8 h-8 text-muted-foreground/70" />}
 						label="Historial Vacío"
 						caption="Pega un comando cURL en la barra superior o copia uno al portapapeles para comenzar."
 					/>
@@ -369,7 +369,7 @@ function QueriesTable({
 	const columns: ColumnDef<QueryRecord>[] = useMemo(() => [
 		{
 			accessorKey: "url",
-			header: () => <span className="text-xs font-medium text-muted-foreground/60">URL</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground">URL</span>,
 			cell: ({ row }) => <UrlCell query={row.original} />,
 		},
 		{
@@ -378,30 +378,30 @@ function QueriesTable({
 				const parsed = parseCurlForDisplay(row.curl);
 				return parsed?.method || '';
 			},
-			header: () => <span className="text-xs font-medium text-muted-foreground/60">Método</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground">Método</span>,
 			cell: ({ row }) => <MethodCell query={row.original} />,
 			filterFn: 'equalsString',
 		},
 		{
 			accessorKey: "updatedAt",
-			header: () => <span className="text-xs font-medium text-muted-foreground/60">Enviado</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground">Enviado</span>,
 			cell: ({ row }) => <SentCell query={row.original} />,
 		},
 		{
 			accessorKey: "responseTime",
-			header: () => <span className="text-xs font-medium text-muted-foreground/60">Tiempo</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground">Tiempo</span>,
 			cell: ({ row }) => <ResponseTimeCell query={row.original} />,
 		},
 		{
 			id: "status",
 			accessorFn: (row) => row.response?.status || null,
-			header: () => <span className="text-xs font-medium text-muted-foreground/60">Status</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground">Status</span>,
 			cell: ({ row }) => <StatusCell query={row.original} />,
 		},
 		{
 			id: "actions",
 			accessorKey: "actions",
-			header: () => <span className="text-xs font-medium text-muted-foreground/60 text-right block">Acciones</span>,
+			header: () => <span className="text-xs font-medium text-muted-foreground text-right block">Acciones</span>,
 			enableSorting: false,
 			cell: ({ row }) => (
 				<ActionsCell
@@ -451,7 +451,7 @@ function UrlCell({ query }: { query: QueryRecord }) {
 	const fullPath = parsed.path.length > 80 ? `${parsed.path.slice(0, 80)}...` : parsed.path
 	return (
 		<div className="flex flex-col">
-			<span className="text-xs font-medium text-muted-foreground/60 truncate max-w-md">
+			<span className="text-xs font-medium text-muted-foreground truncate max-w-md">
 				{parsed.domain}
 			</span>
 			<span className="text-sm font-medium tracking-tight text-foreground truncate max-w-md">
@@ -463,7 +463,7 @@ function UrlCell({ query }: { query: QueryRecord }) {
 
 function SentCell({ query }: { query: QueryRecord }) {
 	return (
-		<span className="text-xs font-medium text-muted-foreground/60" title={query.updatedAt ? DayJS(query.updatedAt).format('LLL') : 'Nunca'}>
+		<span className="text-xs font-medium text-muted-foreground" title={query.updatedAt ? DayJS(query.updatedAt).format('LLL') : 'Nunca'}>
 			{query.updatedAt ? DayJS(query.updatedAt).fromNow() : 'Nunca'}
 		</span>
 	)
@@ -483,7 +483,7 @@ function StatusCell({ query }: { query: QueryRecord }) {
 			</span>
 		)
 	}
-	return <span className="text-muted-foreground/40 text-xs font-medium">-</span>
+	return <span className="text-muted-foreground/70 text-xs font-medium">-</span>
 }
 
 function ResponseTimeCell({ query }: { query: QueryRecord }) {
@@ -499,7 +499,7 @@ function ResponseTimeCell({ query }: { query: QueryRecord }) {
 			</span>
 		)
 	}
-	return <span className="text-muted-foreground/40 text-xs font-medium">-</span>
+	return <span className="text-muted-foreground/70 text-xs font-medium">-</span>
 }
 
 function ActionsCell({
@@ -521,7 +521,7 @@ function ActionsCell({
 				size="sm"
 				className="text-success hover:bg-success/20"
 			/>
-			<div className="w-px h-4 bg-border/40 mx-0.5" />
+			<div className="w-px h-4 bg-border mx-0.5" />
 			<CopyButton
 				text={query.curl}
 				tooltip="Copiar cURL"
@@ -534,7 +534,7 @@ function ActionsCell({
 					className="opacity-100 hover:bg-accent focus-visible:ring-offset-1"
 				/>
 			)}
-			<div className="w-px h-4 bg-border/40 mx-0.5" />
+			<div className="w-px h-4 bg-border mx-0.5" />
 			<ActionButton
 				action={ACTION_DEFINITIONS.delete}
 				onClick={() => onDelete(query)}

@@ -68,7 +68,7 @@ function statusConfig(state: PulsarBuildState) {
 				icon: Circle,
 				color: 'text-muted-foreground/50',
 				bg: 'bg-muted/30',
-				badge: 'bg-muted/30 text-muted-foreground/60 border border-border',
+				badge: 'bg-muted/30 text-muted-foreground border border-border',
 				label: 'SKIPPED',
 			}
 		case 'CANCELLED':
@@ -151,7 +151,7 @@ function ImagePanel({ image }: { image: PulsarImageJob }) {
 				<div className="flex items-center gap-2">
 					<config.icon className={`w-4 h-4 ${config.color}`} />
 					<span className="text-xs font-bold text-foreground">{image.app}</span>
-					<span className="text-xs text-muted-foreground/60">{image.appType}</span>
+					<span className="text-xs text-muted-foreground">{image.appType}</span>
 					<span className={`px-1.5 py-0 text-xs rounded-md font-medium ${config.badge}`}>
 						{config.label}
 					</span>
@@ -337,8 +337,8 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 							{config.label}
 						</span>
 						<div className="flex items-center gap-1 ml-auto">
-							<EnvIcon className="w-3.5 h-3.5 text-muted-foreground/60" />
-							<span className="text-xs font-medium text-muted-foreground/60">
+							<EnvIcon className="w-3.5 h-3.5 text-muted-foreground" />
+							<span className="text-xs font-medium text-muted-foreground">
 								{envLabel}
 							</span>
 						</div>
@@ -351,11 +351,11 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 								{data.commit.author}
 							</span>
 						)}
-						<span className="text-muted-foreground/40">·</span>
+						<span className="text-muted-foreground/70">·</span>
 						<span>{lastUpdated}</span>
 						{totalDuration && (
 							<>
-								<span className="text-muted-foreground/40">·</span>
+								<span className="text-muted-foreground/70">·</span>
 								<span className="inline-flex items-center gap-1 tabular-nums">
 									<Clock className="w-2.5 h-2.5" />
 									{totalDuration}
@@ -364,7 +364,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 						)}
 						{data.externalUrl && (
 							<>
-								<span className="text-muted-foreground/40">·</span>
+								<span className="text-muted-foreground/70">·</span>
 								<a
 									href={data.externalUrl}
 									target="_blank"
@@ -380,7 +380,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 
 					{/* Commit message */}
 					{data.commit?.message && (
-						<div className="flex items-center gap-1.5 text-xs text-muted-foreground/80">
+						<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
 							<GitCommit className="w-3 h-3 shrink-0" />
 							<span className="truncate">{data.commit.message.split('\n')[0]}</span>
 						</div>
@@ -390,7 +390,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 					{images.length > 0 && (
 						<div className="space-y-2 pt-1">
 							<div className="flex items-center gap-1.5">
-								<span className="text-xs font-medium text-muted-foreground/60 shrink-0 inline-flex items-center gap-1">
+								<span className="text-xs font-medium text-muted-foreground shrink-0 inline-flex items-center gap-1">
 									<Package className="w-3 h-3" />
 									Imágenes ({images.length}):
 								</span>

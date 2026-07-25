@@ -145,13 +145,13 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 									onChange={(e) => setFilter(e.target.value)}
 									placeholder="FILTRAR COMMITS"
 									aria-label="Filtrar commits"
-									className="w-full pl-9 pr-10 py-1.5 text-xs font-medium bg-muted/30 border border-border rounded-lg placeholder:text-muted-foreground/40 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
+									className="w-full pl-9 pr-10 py-1.5 text-xs font-medium bg-muted/30 border border-border rounded-lg placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
 								/>
 								{filter && (
 									<button
 										type="button"
 										onClick={() => setFilter("")}
-										className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted-foreground/10 rounded-full text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-1"
+										className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted/30 rounded-full text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 										aria-label="Limpiar filtro"
 									>
 										<X className="w-3 h-3" />

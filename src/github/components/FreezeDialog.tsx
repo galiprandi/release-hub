@@ -141,7 +141,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 										isLocked
 											? "bg-warning text-warning-foreground hover:bg-warning/90"
 											: "bg-muted text-muted-foreground hover:bg-muted/80"
-									} disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none`}
+									} disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none`}
 								>
 									{isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
 									<span>{isLocked ? "Desbloquear" : "Bloquear"}</span>
@@ -188,7 +188,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 										type="text"
 										value={branch}
 										onChange={(e) => setBranch(e.target.value)}
-										className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none"
+										className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 										placeholder="main"
 									/>
 								</div>
@@ -215,7 +215,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 							<button
 								onClick={handleToggleFreeze}
 								disabled={isToggling}
-								className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:outline-none ${
+								className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none ${
 									isLocked ? "bg-info hover:bg-info/90" : "bg-muted-foreground hover:bg-muted-foreground/90"
 								}`}
 							>

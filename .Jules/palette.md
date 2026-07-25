@@ -41,3 +41,7 @@
 ## 2026-07-30 - [Keyboard Accessibility for Hover-to-Reveal Cells]
 **Learning:** Table action cells using hover-to-reveal wrappers (e.g. `opacity-0 group-hover:opacity-100`) completely hide vital operational actions from sighted keyboard users navigating via Tab, causing severe interaction blockages.
 **Action:** Always pair `opacity-0 group-hover:opacity-100` with `focus-within:opacity-100` on interactive action-cell containers to gracefully reveal controls upon keyboard navigation.
+
+## 2026-07-31 - [Copy Button Standardization & Keyboard Accessibility]
+**Learning:** Raw HTML copy buttons inside hover-to-reveal components bypass global design systems, lack keyboard accessibility, and miss out on beautiful visual feedback (like Radix tooltips and success states). Replacing them with the reusable `<CopyButton>` standardizes localized messages in Spanish and visual cues. Moreover, ensuring the `<CopyButton>` supports `focus-within:opacity-100` allows the action to reveal beautifully upon keyboard focus.
+**Action:** Use the `<CopyButton>` component and always pair hover-to-reveal animations with `focus-within:opacity-100` or `focus-visible:opacity-100` for seamless keyboard tab navigation.

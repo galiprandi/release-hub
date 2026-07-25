@@ -31,8 +31,6 @@ import {
 	AlertCircle,
 	Sparkles,
 	ChevronRight,
-	Copy,
-	Check,
 } from 'lucide-react'
 import { useAIPrompt } from '@galiprandi/react-tools'
 import DayJS from '@/lib/dayjs'
@@ -40,6 +38,7 @@ import { useSekiPipelinesByEnv } from '../hooks/useSekiPipelinesByEnv'
 import { sekiAdapter } from '../adapter'
 import type { SekiPipelineData, SekiPipelineState, SekiStage, SekiPipelineEvent } from '../types'
 import { BaseDialog } from '@/components/ui/BaseDialog'
+import { CopyButton } from '@/components/shared/CopyButton'
 
 // === AI Failure Summary ===
 
@@ -308,20 +307,6 @@ function SubeventRow({ sub }: { sub: SekiPipelineEvent }) {
 // === Deploy URL chip with copy-to-clipboard ===
 
 function DeployUrlChip({ label, url }: { label: string; url: string }) {
-	const [copied, setCopied] = useState(false)
-
-	const handleCopy = useCallback(async (e: React.MouseEvent) => {
-		e.stopPropagation()
-		e.preventDefault()
-		try {
-			await navigator.clipboard.writeText(url)
-			setCopied(true)
-			setTimeout(() => setCopied(false), 2000)
-		} catch {
-			// silently ignore
-		}
-	}, [url])
-
 	return (
 		<span className="group inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium text-primary bg-primary/5 border border-primary/20 rounded-md hover:bg-primary/10 transition-colors">
 			<a
@@ -334,14 +319,12 @@ function DeployUrlChip({ label, url }: { label: string; url: string }) {
 				{label}
 				<ExternalLink className="w-2.5 h-2.5" />
 			</a>
-			<button
-				type="button"
-				onClick={handleCopy}
-				title="Copiar URL"
-				className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-primary/20"
-			>
-				{copied ? <Check className="w-2.5 h-2.5 text-emerald-500" /> : <Copy className="w-2.5 h-2.5" />}
-			</button>
+			<CopyButton
+				text={url}
+				className="opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity p-0.5 w-auto h-auto"
+				tooltip="Copiar URL"
+				copiedTooltip="¡Copiado!"
+			/>
 		</span>
 	)
 }

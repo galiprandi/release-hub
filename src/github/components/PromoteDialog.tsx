@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import * as Tooltip from "@radix-ui/react-tooltip"
-import { Rocket, Loader2, CheckCircle2, ChevronRight, ChevronLeft, GitCommit, Sparkles, ExternalLink } from "lucide-react"
+import { Rocket, Loader2, CheckCircle2, ChevronRight, ChevronLeft, GitCommit, Sparkles, ExternalLink, AlertCircle } from "lucide-react"
 import axios from "axios"
 import { runCommand } from "@/api/exec"
 import { useRepoPermission } from "@/hooks/useRepoPermission"
@@ -250,8 +250,24 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 											value={tagName}
 											onChange={(e) => setTagName(e.target.value)}
 											placeholder={suggestedTag}
-											className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 transition-all"
+											className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus-visible:ring-2 transition-all ${
+												tagName && !validateTagName(tagName).valid
+													? 'border-warning focus-visible:ring-warning/30'
+													: 'focus-visible:ring-primary/30'
+											}`}
 										/>
+										{tagName && !validateTagName(tagName).valid && (
+											<p className="text-xs text-warning mt-1.5 flex items-center gap-1.5">
+												<AlertCircle className="w-3 h-3" />
+												{validateTagName(tagName).message}
+											</p>
+										)}
+										{tagName && validateTagName(tagName).valid && (
+											<p className="text-xs text-success mt-1.5 flex items-center gap-1.5">
+												<CheckCircle2 className="w-3 h-3" />
+												Formato valido
+											</p>
+										)}
 									</div>
 
 									<div>
@@ -474,4 +490,11 @@ function incrementVersion(tag: string): string {
 	const minor = parts[1]
 	const patch = parts[2] ? parseInt(parts[2], 10) + 1 : 0
 	return `v${major}.${minor}.${patch}`
+}
+
+function validateTagName(tag: string): { valid: boolean; message?: string } {
+	if (!tag.trim()) return { valid: false, message: "Tag name is required" }
+	if (!/^v\d+\.\d+\.\d+/.test(tag)) return { valid: false, message: "Format should be vX.Y.Z (e.g., v1.2.3)" }
+	if (tag.includes(" ")) return { valid: false, message: "Tag name cannot contain spaces" }
+	return { valid: true }
 }

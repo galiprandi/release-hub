@@ -494,6 +494,20 @@ function HealthMonitorPage() {
     });
   }, [favorites, endpoints, removeProductEndpoints]);
 
+  // Keyboard shortcut: R to refresh all endpoints
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'r' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        const target = e.target as HTMLElement
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return
+        e.preventDefault()
+        checkAllEndpoints()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [checkAllEndpoints]);
+
   // Agrupar endpoints por producto
   const endpointsByProduct = filteredEndpoints.reduce((acc, ep) => {
     if (!acc[ep.product]) {

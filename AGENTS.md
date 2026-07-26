@@ -211,3 +211,14 @@
 - **Type Hardening**: Eliminación total de `as any` en `src/config/terminalMiddleware.test.ts`, migrando a tipado estricto con `ReturnType<typeof vi.fn>` y directivas `@ts-expect-error` para acceso a mocks internos.
 - **Hygiene AAA**: Auditoría de entropía técnica confirmando la ausencia de código muerto y statements de depuración en el núcleo del sistema.
 - **Verificación Global**: Zero-warning build log, lint audit impecable y 230 tests exitosos.
+
+### Mejora #17: V2 Mechanical Cleanup + Design Critique Fixes
+- **V2 Cleanup**: 47 residuales V2 erradicados en 3 surfaces (Repo Detail, Health Monitor, Fetcher) basados en critiques dual-agent con `impeccable` skill.
+- **Confirmation Steps**: Los 3 dialogs high-stakes (PromoteDialog, FreezeDialog, ForceRedeployDialog) ahora tienen step 'confirm' antes de ejecutar. Pattern: config → confirm → success.
+- **Health Monitor SRE**: ErrorCell expandible (no más truncado a 50 chars), status dots w-2.5 h-2.5, response time thresholds decoupled de health (<200ms=success, 200-500ms=warning, >500ms=destructive), "All systems operational" banner, stats summary en header.
+- **PipelineSummaryBar**: Nuevo componente en repo detail con chips compactos de status por ambiente (staging/production) usando useSekiPipelinesByEnv + usePulsarBuilds.
+- **NoPipelineDataHint**: Empty state informativo cuando un repo no tiene Seki ni Pulsar configurado.
+- **Success Links**: PromoteDialog success incluye link al tag en GitHub. FreezeDialog success incluye link a branch settings.
+- **Fetcher**: isTokenExpired dead code removido. Re-run action siempre visible (no hover). Header simplificado sin labels redundantes.
+- **ForceRedeployDialog**: Pasos del proceso collapsibles con `<details>/<summary>`. Hardcoded bg-blue-600 reemplazado por bg-primary.
+- **Verificación Global**: Zero-warning build, 270 tests exitosos.

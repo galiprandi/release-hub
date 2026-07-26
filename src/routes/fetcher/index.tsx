@@ -465,17 +465,33 @@ function SentCell({ query }: { query: QueryRecord }) {
 }
 
 function StatusCell({ query }: { query: QueryRecord }) {
+	const [showBody, setShowBody] = useState(false)
+
 	if (query.response?.status) {
-		const { status } = query.response
+		const { status, body } = query.response
 		let style = "bg-muted/30 text-muted-foreground border-border"
 		if (status >= 200 && status < 300) style = "bg-success/20 text-success border-success/40"
 		else if (status >= 400 && status < 500) style = "bg-warning/20 text-warning border-warning/30"
 		else if (status >= 500) style = "bg-destructive/20 text-destructive border-destructive/40"
 
+		const isError = status >= 400
+		const hasBody = body && body.trim().length > 0
+
 		return (
-			<span className={`px-2 py-0.5 rounded-md border text-xs font-medium ${style}`}>
-				{status}
-			</span>
+			<div className="flex flex-col gap-1">
+				<button
+					onClick={() => isError && hasBody && setShowBody(!showBody)}
+					className={`px-2 py-0.5 rounded-md border text-xs font-medium ${style} ${isError && hasBody ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
+					title={isError && hasBody ? 'Click to see error body' : undefined}
+				>
+					{status}
+				</button>
+				{showBody && hasBody && (
+					<pre className="text-xs font-mono text-muted-foreground bg-muted p-2 rounded-md max-h-32 overflow-y-auto whitespace-pre-wrap mt-1">
+						{body.slice(0, 500)}{body.length > 500 ? '...' : ''}
+					</pre>
+				)}
+			</div>
 		)
 	}
 	return <span className="text-muted-foreground text-xs font-medium">-</span>

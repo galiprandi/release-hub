@@ -13,6 +13,7 @@ import { Table } from "@/components/ui/Table"
 import { Boxes } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
+import { EmptyState } from "@/components/shared/EmptyState"
 
 export interface ContainerListRef {
 	refetch: () => void
@@ -107,17 +108,11 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 
 	if (!Array.isArray(filteredContainers) || filteredContainers.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center py-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
-				<div className="p-4 rounded-full bg-muted/30 border border-border mb-4">
-					<Boxes className="w-8 h-8 text-muted-foreground" />
-				</div>
-				<h3 className="text-xs font-medium text-muted-foreground">
-					{searchQuery ? "No se encontraron resultados" : "No hay contenedores"}
-				</h3>
-				<p className="text-xs text-muted-foreground mt-1 max-w-[300px] text-center">
-					{searchQuery ? `No hay contenedores que coincidan con "${searchQuery}"` : "No se detectaron contenedores en este entorno."}
-				</p>
-			</div>
+			<EmptyState
+				icon={<Boxes className="w-8 h-8 text-muted-foreground" />}
+				label={searchQuery ? "No se encontraron resultados" : "No hay contenedores"}
+				caption={searchQuery ? `No hay contenedores que coincidan con "${searchQuery}"` : "No se detectaron contenedores en este entorno."}
+			/>
 		)
 	}
 

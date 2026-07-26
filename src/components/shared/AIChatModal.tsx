@@ -332,7 +332,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 						</div>
 					)}
 
-					<div className="relative flex items-end gap-2 bg-muted/30 border border-border rounded-md p-2 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-ai/40 transition-all">
+					<div className="relative flex items-end gap-2 bg-muted/30 border border-border rounded-md p-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:border-ai/40 transition-all">
 						<input
 							type="file"
 							ref={fileInputRef}
@@ -366,7 +366,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							<button
 								onClick={() => reset()}
 								aria-label="Detener respuesta"
-								className="p-2 rounded-lg bg-destructive text-destructive-foreground shadow-sm hover:opacity-90 transition-all focus:ring-2 focus:ring-destructive/20"
+								className="p-2 rounded-lg bg-destructive text-destructive-foreground shadow-sm hover:opacity-90 transition-all focus-visible:ring-2 focus-visible:ring-destructive/30 focus-visible:outline-none"
 							>
 								<StopCircle className="w-4 h-4" />
 							</button>

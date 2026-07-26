@@ -8,6 +8,7 @@ import { Terminal } from "@/components/shared/Terminal"
 import { BaseDialog } from "@/components/ui/BaseDialog"
 import { StatusCard } from "@/components/ui/StatusCard"
 import { Table } from "@/components/ui/Table"
+import { EmptyState } from "@/components/shared/EmptyState"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useUserCollections, type Project } from "@/hooks/useUserCollections"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
@@ -265,9 +266,10 @@ export const DeploymentList = ({
 	// Si no hay datos cacheados ni live después de cargar
 	if (!isLoading && groupedContent.length === 0) {
 		return (
-			<StatusCard
-				type="offline"
-				message={activeTab === 'favorites' ? "No hay deployments favoritos disponibles." : "No hay despliegues en tus proyectos."}
+			<EmptyState
+				icon={<Boxes className="w-8 h-8 text-muted-foreground" />}
+				label={activeTab === 'favorites' ? "No hay deployments favoritos" : "No hay deployments en proyectos"}
+				caption={activeTab === 'favorites' ? "Añade deployments a favoritos para verlos aquí." : "Asigna deployments a tus proyectos para verlos aquí."}
 			/>
 		)
 	}

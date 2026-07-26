@@ -438,7 +438,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 					{/* Step: Success */}
 					{step === "success" && (
 						<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-6">
-							<div className="w-16 h-16 rounded-full bg-success/20 border border-success/40 flex items-center justify-center shadow-[0_0_20px_rgba(var(--success),0.1)]">
+							<div className="w-16 h-16 rounded-full bg-success/20 border border-success/40 flex items-center justify-center shadow-sm">
 								<CheckCircle2 className="w-8 h-8 text-success" />
 							</div>
 							<div className="space-y-4">
@@ -487,7 +487,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 									</div>
 								) : (
 									<div className="space-y-4">
-										<div className="w-16 h-16 rounded-full bg-destructive/20 border border-destructive/40 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(var(--destructive),0.1)]">
+										<div className="w-16 h-16 rounded-full bg-destructive/20 border border-destructive/40 flex items-center justify-center mx-auto shadow-sm">
 											<AlertCircle className="w-8 h-8 text-destructive" />
 										</div>
 										<div className="flex items-center justify-center gap-2">

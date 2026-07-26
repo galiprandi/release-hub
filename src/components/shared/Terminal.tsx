@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { Terminal as XTerm } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
@@ -12,13 +12,32 @@ interface TerminalProps {
   context?: string;
   container?: string;
   className?: string;
+  onReady?: () => void;
+  onError?: () => void;
 }
 
-export function Terminal({ type, name, podName, namespace, context, container, className }: TerminalProps) {
+export interface TerminalHandle {
+  focus: () => void;
+  clear: () => void;
+}
+
+export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Terminal(
+  { type, name, podName, namespace, context, container, className, onReady, onError },
+  ref,
+) {
   const terminalRef = useRef<HTMLDivElement>(null);
   const xtermRef = useRef<XTerm | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      xtermRef.current?.focus();
+    },
+    clear: () => {
+      xtermRef.current?.clear();
+    },
+  }), []);
 
   useEffect(() => {
     if (!terminalRef.current) return;
@@ -82,6 +101,11 @@ export function Terminal({ type, name, podName, namespace, context, container, c
       if (dims) {
         ws.send(JSON.stringify({ type: 'resize', cols: dims.cols, rows: dims.rows }));
       }
+      onReady?.();
+    };
+
+    ws.onerror = () => {
+      onError?.();
     };
 
     ws.onmessage = (event) => {
@@ -114,7 +138,7 @@ export function Terminal({ type, name, podName, namespace, context, container, c
       ws.close();
       term.dispose();
     };
-  }, [type, name, podName, namespace, context, container]);
+  }, [type, name, podName, namespace, context, container, onReady, onError]);
 
   return (
     <div
@@ -122,4 +146,4 @@ export function Terminal({ type, name, podName, namespace, context, container, c
       className={`w-full h-full min-h-[400px] bg-[#09090b] rounded-lg overflow-hidden border border-border ${className}`}
     />
   );
-}
+});

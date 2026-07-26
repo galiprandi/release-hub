@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es";
@@ -9,12 +10,15 @@ import { PromoteDialog } from "@/github/components/PromoteDialog";
 import { ForceRedeployDialog } from "@/github/components/ForceRedeployDialog";
 import { FreezeDialog } from "@/github/components/FreezeDialog";
 import { PipelineSummaryBar } from "@/github/components/PipelineSummaryBar";
+import { useSekiPipelinesByEnv } from "@/plugins/pipeline/seki/hooks/useSekiPipelinesByEnv";
+import { usePulsarBuilds } from "@/plugins/pipeline/pulsar/hooks/usePulsarBuilds";
+import { pulsarAdapter } from "@/plugins/pipeline/pulsar/adapter";
 import { ProjectSelector } from "@/github/components/ProjectSelector";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTags } from "@/hooks/useGitTags";
 import { useOpenPullRequests } from "@/hooks/useOpenPullRequests";
 import { useGitHubActionsSummary } from "@/hooks/useGitHubActionsSummary";
-import { GitPullRequest, Play, GitCommit, Tag } from "lucide-react";
+import { GitPullRequest, Play, GitCommit, Tag, Info } from "lucide-react";
 import { PageLayout } from "@/layouts/PageLayout";
 import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
 
@@ -155,6 +159,7 @@ function ProductIndex() {
 					org={org}
 					repo={repo}
 				/>
+				<NoPipelineDataHint org={org} repo={repo} />
 			</div>
 
 			<div className="mt-2">
@@ -167,4 +172,31 @@ function ProductIndex() {
 			</div>
 		</PageLayout>
 	);
+}
+
+function NoPipelineDataHint({ org, repo }: { org: string; repo: string }) {
+	const { data: sekiData, isLoading: sekiLoading } = useSekiPipelinesByEnv({ org, repo })
+	const { data: isPulsar } = useQuery({
+		queryKey: ['pulsar-detection', org, repo],
+		queryFn: () => pulsarAdapter.isPulsarRepo(org, repo),
+		staleTime: 5 * 60 * 1000,
+	})
+	const { data: pulsarData, isLoading: pulsarLoading } = usePulsarBuilds({ org, repo, enabled: !!isPulsar })
+
+	// Only show hint when all data has loaded and there's nothing
+	if (sekiLoading || pulsarLoading) return null
+	if (sekiData || pulsarData) return null
+
+	return (
+		<div className="flex items-start gap-3 p-4 rounded-md border border-border bg-card">
+			<Info className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+			<div className="space-y-1">
+				<p className="text-sm font-medium">No pipeline data detected</p>
+				<p className="text-xs text-muted-foreground">
+					This repository doesn't have Seki or Pulsar pipelines configured.
+					You can still promote tags and manage branches using the actions above.
+				</p>
+			</div>
+		</div>
+	)
 }

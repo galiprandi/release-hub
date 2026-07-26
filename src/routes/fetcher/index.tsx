@@ -239,64 +239,59 @@ function FetcherPage() {
 	);
 
 	const searchComponent = (
-		<div className="flex items-center gap-4">
-			<div className="flex items-center gap-2">
-				<span className="text-xs font-medium text-muted-foreground">Búsqueda</span>
-				<div className="relative">
-					<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
-					<input
-						type="text"
-						value={search.q || ''}
-						onChange={(e) => {
-							handleQuerySearch(e.target.value);
+		<div className="flex items-center gap-3">
+			<div className="relative">
+				<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
+				<input
+					type="text"
+					value={search.q || ''}
+					onChange={(e) => {
+						handleQuerySearch(e.target.value);
+					}}
+					placeholder="Buscar en historial..."
+					aria-label="Buscar en historial"
+					className="w-48 pl-8 pr-3 py-1.5 bg-muted/30 border border-border rounded-md text-xs focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground font-medium uppercase tracking-tight"
+				/>
+				{search.q && (
+					<button
+						type="button"
+						onClick={() => {
+							handleQuerySearch('');
 						}}
-						placeholder="Buscar en historial..."
-						className="w-48 pl-8 pr-3 py-1.5 bg-muted/30 border border-border rounded-md text-xs focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground font-medium uppercase tracking-tight"
-					/>
-					{search.q && (
-						<button
-							type="button"
-							onClick={() => {
-								handleQuerySearch('');
-							}}
-							className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted/30 rounded-full text-muted-foreground transition-all"
-						>
-							<X className="w-2.5 h-2.5" />
-						</button>
-					)}
-				</div>
+						className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted/30 rounded-full text-muted-foreground transition-all"
+						aria-label="Limpiar búsqueda"
+					>
+						<X className="w-2.5 h-2.5" />
+					</button>
+				)}
 			</div>
-			<div className="w-px h-6 bg-border mx-1" />
-			<div className="flex items-center gap-2">
-				<span className="text-xs font-medium text-muted-foreground">Método</span>
-				<IndustrialTabs
-					options={[
-						{ id: 'ALL', label: 'Todos' },
-						{ id: 'GET', label: 'GET' },
-						{ id: 'POST', label: 'POST' },
-						{ id: 'PUT', label: 'PUT' },
-						{ id: 'DELETE', label: 'DELETE' },
-						{ id: 'PATCH', label: 'PATCH' },
-					]}
-					activeId={search.method || 'ALL'}
-					onChange={handleFilterChange}
-					className="w-[320px]"
-				/>
-			</div>
-			<div className="flex items-center gap-2">
-				<span className="text-xs font-medium text-muted-foreground">Orden</span>
-				<IndustrialTabs
-					options={[
-						{ id: 'recent', label: 'Recientes' },
-						{ id: 'method', label: 'Método' },
-						{ id: 'status', label: 'Status' },
-						{ id: 'duration', label: 'Duración' },
-					]}
-					activeId={search.sortBy || 'recent'}
-					onChange={handleSortChange}
-					className="w-[280px]"
-				/>
-			</div>
+			<div className="w-px h-6 bg-border" />
+			<IndustrialTabs
+				options={[
+					{ id: 'ALL', label: 'Todos' },
+					{ id: 'GET', label: 'GET' },
+					{ id: 'POST', label: 'POST' },
+					{ id: 'PUT', label: 'PUT' },
+					{ id: 'DELETE', label: 'DELETE' },
+					{ id: 'PATCH', label: 'PATCH' },
+				]}
+				activeId={search.method || 'ALL'}
+				onChange={handleFilterChange}
+				className="w-[320px]"
+				aria-label="Filtrar por método"
+			/>
+			<IndustrialTabs
+				options={[
+					{ id: 'recent', label: 'Recientes' },
+					{ id: 'method', label: 'Método' },
+					{ id: 'status', label: 'Status' },
+					{ id: 'duration', label: 'Duración' },
+				]}
+				activeId={search.sortBy || 'recent'}
+				onChange={handleSortChange}
+				className="w-[280px]"
+				aria-label="Ordenar por"
+			/>
 		</div>
 	);
 

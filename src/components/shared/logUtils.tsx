@@ -46,7 +46,7 @@ export function highlightLogLine(line: string, filter?: string, customHighlight?
 	// Reemplazar niveles de log
 	highlighted = highlighted.replace(logLevelPattern, (match) => {
 		const level = match.toUpperCase();
-		let colorClass = 'text-gray-400';
+		let colorClass = 'text-muted-foreground';
 		if (level === 'ERROR' || level === 'ERR' || level === 'FATAL') {
 			colorClass = 'text-red-400 font-bold';
 		} else if (level === 'WARN' || level === 'WARNING') {

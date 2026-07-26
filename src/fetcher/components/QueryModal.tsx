@@ -254,7 +254,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 										setRequestTab('body');
 									}
 								}}
-								className="appearance-none bg-muted/30 px-3 py-2 pr-8 text-xs font-medium focus:outline-none cursor-pointer hover:bg-muted/30 transition-colors"
+								className="appearance-none bg-muted/30 px-3 py-2 pr-8 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 cursor-pointer hover:bg-muted/30 transition-colors"
 							>
 								{['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
 									<option key={m} value={m}>{m}</option>

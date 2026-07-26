@@ -6,6 +6,7 @@ import { IconButton } from "@/components/shared/IconButton"
 import { useSettings } from "@/hooks/useSettings"
 import { useToken } from "@/hooks/useToken"
 import { BaseDialog } from "@/components/ui/BaseDialog"
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog"
 
 export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpenChange }: { showTrigger?: boolean, open?: boolean, onOpenChange?: (open: boolean) => void }) {
 	const queryClient = useQueryClient()
@@ -19,6 +20,8 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 	const [showSekiToken, setShowSekiToken] = useState(false)
 	const [showDiscordWebhook, setShowDiscordWebhook] = useState(false)
 	const [isClearingCache, setIsClearingCache] = useState(false)
+	const [confirmRevoke, setConfirmRevoke] = useState(false)
+	const [confirmWebhook, setConfirmWebhook] = useState(false)
 
 	const handleSaveSekiToken = () => {
 		if (sekiTokenInput.trim()) {
@@ -129,8 +132,8 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 
 								<button
 									type="button"
-									onClick={handleClearSekiToken}
-									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/40 transition-all w-full"
+									onClick={() => setConfirmRevoke(true)}
+									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-md border border-transparent hover:border-destructive/40 transition-all w-full"
 								>
 									<Trash2 className="w-3.5 h-3.5" />
 									Revocar Acceso
@@ -200,8 +203,8 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 
 								<button
 									type="button"
-									onClick={handleClearDiscordWebhook}
-									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/40 transition-all w-full"
+									onClick={() => setConfirmWebhook(true)}
+									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-md border border-transparent hover:border-destructive/40 transition-all w-full"
 								>
 									<Trash2 className="w-3.5 h-3.5" />
 									Eliminar Webhook
@@ -282,6 +285,26 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 					</Dialog.Close>
 				</div>
 			</BaseDialog>
+
+			<ConfirmDialog
+				open={confirmRevoke}
+				onOpenChange={setConfirmRevoke}
+				onConfirm={handleClearSekiToken}
+				title="¿Revocar acceso a Seki?"
+				description="Se eliminará el token JWT guardado. Tendrás que volver a configurarlo para acceder a los pipelines."
+				variant="destructive"
+				actions={{ confirmText: "Sí, revocar", cancelText: "Cancelar" }}
+			/>
+
+			<ConfirmDialog
+				open={confirmWebhook}
+				onOpenChange={setConfirmWebhook}
+				onConfirm={handleClearDiscordWebhook}
+				title="¿Eliminar webhook de Discord?"
+				description="Se eliminará la URL del webhook configurado. Las notificaciones de promociones y freezes dejarán de enviarse."
+				variant="destructive"
+				actions={{ confirmText: "Sí, eliminar", cancelText: "Cancelar" }}
+			/>
 		</>
 	)
 }

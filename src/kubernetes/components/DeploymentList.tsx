@@ -347,8 +347,8 @@ export const DeploymentList = ({
 								<select
 									value={activePodName || ''}
 									onChange={(e) => setSelectedPodName(e.target.value || null)}
-									className="text-xs bg-muted border rounded px-2 py-1 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
-									aria-label="Seleccionar pod"
+									className="text-xs bg-muted border rounded px-2 py-1 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+									aria-label="Seleccionar pod para terminal o logs"
 								>
 									{deploymentPods.map((pod) => (
 										<option key={pod.name} value={pod.name}>

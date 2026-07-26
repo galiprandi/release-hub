@@ -130,7 +130,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 							<Dialog.Trigger asChild>
 								<button
 									type="button"
-									className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
+									className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 								>
 									<RefreshCw className="w-4 h-4" />
 									<span>Re Deploy</span>
@@ -320,7 +320,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 									setStep("config");
 									setError("");
 								}}
-								className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+								className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
 							>
 								Reintentar
 							</button>

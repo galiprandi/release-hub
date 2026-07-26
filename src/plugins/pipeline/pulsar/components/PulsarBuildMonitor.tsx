@@ -42,25 +42,25 @@ function statusConfig(state: PulsarBuildState) {
 		case 'COMPLETED':
 			return {
 				icon: CheckCircle2,
-				color: 'text-emerald-600 dark:text-emerald-400',
-				bg: 'bg-emerald-500',
-				badge: 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800',
+				color: 'text-success',
+				bg: 'bg-success',
+				badge: 'bg-success/15 text-success border border-success/30',
 				label: 'OK',
 			}
 		case 'FAILED':
 			return {
 				icon: XCircle,
-				color: 'text-red-600 dark:text-red-400',
-				bg: 'bg-red-500',
-				badge: 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800',
+				color: 'text-destructive',
+				bg: 'bg-destructive',
+				badge: 'bg-destructive/15 text-destructive border border-destructive/30',
 				label: 'FALLÓ',
 			}
 		case 'RUNNING':
 			return {
 				icon: Loader2,
-				color: 'text-blue-600 dark:text-blue-400',
-				bg: 'bg-blue-500 animate-pulse',
-				badge: 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800',
+				color: 'text-primary',
+				bg: 'bg-primary animate-pulse',
+				badge: 'bg-primary/15 text-primary border border-primary/30',
 				label: 'BUILDING',
 			}
 		case 'SKIPPED':
@@ -74,9 +74,9 @@ function statusConfig(state: PulsarBuildState) {
 		case 'CANCELLED':
 			return {
 				icon: XCircle,
-				color: 'text-amber-600 dark:text-amber-400',
-				bg: 'bg-amber-500',
-				badge: 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800',
+				color: 'text-warning',
+				bg: 'bg-warning',
+				badge: 'bg-warning/15 text-warning border border-warning/30',
 				label: 'CANCELADO',
 			}
 		default:
@@ -323,7 +323,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 							className={`px-1.5 py-0 text-xs rounded-md font-medium ${
 								data.refType === 'TAG'
 									? 'bg-purple-50 text-purple-700 border border-purple-100 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800'
-									: 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800'
+									: 'bg-primary/15 text-primary border border-primary/30'
 							}`}
 						>
 							{data.refType}

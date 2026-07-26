@@ -8,6 +8,7 @@ import { LogsViewer } from "@/components/shared/LogsViewer"
 import { Terminal } from "@/components/shared/Terminal"
 import { BaseDialog } from "@/components/ui/BaseDialog"
 import { StatusCard } from "@/components/ui/StatusCard"
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog"
 import { Table } from "@/components/ui/Table"
 import { Boxes } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -313,7 +314,7 @@ function ImageCell({ container }: { container: ContainerInfo }) {
 	const tag = hasTag ? image.slice(lastColon + 1) : 'latest'
 
 	return (
-		<div className="flex items-center gap-1 max-w-[200px] truncate">
+		<div className="flex items-center gap-1 max-w-[200px] truncate" title={image}>
 			<span className="text-xs font-medium text-muted-foreground truncate">{imageName}</span>
 			<span className="text-xs text-muted-foreground/60">:{tag}</span>
 		</div>
@@ -405,7 +406,7 @@ function PortsCell({ container }: { container: ContainerInfo }) {
 			<select
 				value={selectedPort}
 				onChange={(e) => setSelectedPort(e.target.value)}
-				className="text-xs font-medium border border-border rounded-lg px-2 py-1 bg-muted/30 hover:bg-muted/30 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 cursor-pointer"
+				className="text-xs font-medium border border-border rounded-md px-2 py-1 bg-muted/30 hover:bg-muted/30 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 cursor-pointer"
 				aria-label="Seleccionar puerto"
 			>
 				{externalPorts.map((port, index) => (
@@ -440,6 +441,7 @@ function ActionsCell({
 	onOpenTerminal: (container: ContainerInfo) => void
 }) {
 	const running = isRunning(container.status)
+	const [confirmStop, setConfirmStop] = useState(false)
 
 	return (
 		<div className="flex items-center justify-end gap-1.5">
@@ -469,10 +471,27 @@ function ActionsCell({
 				/>
 				<ActionButton
 					action={ACTION_DEFINITIONS.stopContainer}
-					onClick={() => onStop(container.id)}
+					onClick={() => setConfirmStop(true)}
 					disabled={!running}
 				/>
 			</div>
+			<ConfirmDialog
+				open={confirmStop}
+				onOpenChange={setConfirmStop}
+				onConfirm={() => {
+					onStop(container.id)
+					setConfirmStop(false)
+				}}
+				title="¿Detener contenedor?"
+				description={
+					<>
+						Vas a detener el contenedor <code className="font-mono bg-muted px-1 rounded">{container.name}</code>.
+						Sus procesos se terminarán inmediatamente.
+					</>
+				}
+				variant="destructive"
+				actions={{ confirmText: "Sí, detener", cancelText: "Cancelar" }}
+			/>
 		</div>
 	)
 }

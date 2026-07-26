@@ -3,6 +3,7 @@ import { Sparkles, Send, Trash2, Loader2, User, Bot, X, Wand2, Terminal, Papercl
 import { useAIPrompt, type AIPromptMessage } from "@galiprandi/react-tools";
 import { Streamdown } from "streamdown";
 import { BaseDialog } from "@/components/ui/BaseDialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ActionButton } from "@/components/ui/ActionButton";
 import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
 
@@ -86,6 +87,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 
 	// Reset chat when profile changes
 	const [prevProfileId, setPrevProfileId] = useState(activeProfileId);
+	const [confirmClear, setConfirmClear] = useState(false);
 	if (activeProfileId !== prevProfileId) {
 		setMessages([
 			{ role: "assistant", content: `Cambiado a perfil: **${activeProfile.label}**. ¿En qué puedo ayudarte?` }
@@ -156,12 +158,26 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 	};
 
 	const handleClearChat = () => {
+		if (messages.length > 1) {
+			setConfirmClear(true)
+			return
+		}
 		reset();
 		setMessages([
 			{ role: "assistant", content: "Conversación reiniciada. ¿En qué más puedo ayudarte?" }
 		]);
 		setAttachedFile(null);
 		setPreviewUrl(null);
+	};
+
+	const confirmClearChat = () => {
+		reset();
+		setMessages([
+			{ role: "assistant", content: "Conversación reiniciada. ¿En qué más puedo ayudarte?" }
+		]);
+		setAttachedFile(null);
+		setPreviewUrl(null);
+		setConfirmClear(false);
 	};
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,6 +207,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 	};
 
 	return (
+		<>
 		<BaseDialog
 			open={isOpen}
 			onOpenChange={(open) => !open && onClose()}
@@ -375,5 +392,15 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 				</div>
 			</div>
 		</BaseDialog>
+			<ConfirmDialog
+				open={confirmClear}
+				onOpenChange={setConfirmClear}
+				onConfirm={confirmClearChat}
+				title="¿Limpiar conversación?"
+				description="Se eliminarán todos los mensajes de esta conversación. Esta acción no se puede deshacer."
+				variant="destructive"
+				actions={{ confirmText: "Sí, limpiar", cancelText: "Cancelar" }}
+			/>
+	</>
 	);
 }

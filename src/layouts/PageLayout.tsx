@@ -629,7 +629,7 @@ function TerminalIconModal() {
 				maxWidth="max-w-6xl"
 				className="w-[90vw] h-[80vh] !p-0"
 			>
-				<div className="flex-1 min-h-0 bg-zinc-950 rounded-b-xl overflow-hidden border-t border-border">
+				<div className="flex-1 min-h-0 bg-zinc-950 rounded-b-md overflow-hidden border-t border-border">
 					<Terminal type="local" className="border-none rounded-none h-full" />
 				</div>
 			</BaseDialog>

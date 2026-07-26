@@ -643,7 +643,7 @@ export function LogsViewer({
 							<select
 								value={selectedResourceId || resources[0].id}
 								onChange={(e) => onResourceChange?.(e.target.value)}
-									className="bg-muted/30 border border-border rounded-lg px-2 py-1 text-xs font-medium focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+									className="bg-muted/30 border border-border rounded-md px-2 py-1 text-xs font-medium focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 								aria-label="Seleccionar recurso"
 							>
 								{resources.map((resource) => (
@@ -681,7 +681,7 @@ export function LogsViewer({
 						<select
 							value={selectedResourceId || resources[0].id}
 							onChange={(e) => onResourceChange?.(e.target.value)}
-							className="bg-muted/30 border border-border rounded-lg px-2 py-1 text-xs font-medium focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+							className="bg-muted/30 border border-border rounded-md px-2 py-1 text-xs font-medium focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 							aria-label="Seleccionar recurso"
 						>
 							{resources.map((resource) => (

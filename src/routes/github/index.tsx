@@ -297,7 +297,8 @@ function Dashboard() {
 							<button
 								type="button"
 								onClick={toggleAllCollapse}
-								className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all border border-transparent hover:border-border"
+								aria-label={isAllCollapsed ? "Expandir todas las organizaciones" : "Colapsar todas las organizaciones"}
+								className="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all border border-transparent hover:border-border"
 							>
 								{isAllCollapsed ? (
 									<>
@@ -790,6 +791,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 								<button
 									type="button"
 									onClick={() => setIsCommitsModalOpen(true)}
+										aria-label={`Ver ${pendingCount} commits pendientes de promoción`}
 									className="inline-flex items-center gap-1 text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full border border-warning/30 font-bold cursor-pointer hover:bg-warning/30 hover:border-warning/40 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 								>
 									<GitPullRequestCreateArrow className="w-2.5 h-2.5" />

@@ -192,10 +192,6 @@
 - should return the same text if no ANSI codes are present
 - should strip ANSI codes before highlighting
 
-## Module: DiffViewer
-- renders empty state initially
-- toggles expanded state when the expand/restore button is clicked
-
 ## Module: BaseDialog
 - should accept maxWidth prop
 - should call onOpenChange when close button is clicked
@@ -233,6 +229,10 @@
 - renders loading state correctly
 - renders offline state correctly
 - renders warn state with retry button
+
+## Module: DiffViewer
+- renders empty state initially
+- toggles expanded state when the expand/restore button is clicked
 
 ## Module: ContainerSearch
 - calls setQuery on change

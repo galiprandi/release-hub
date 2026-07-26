@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import * as Tooltip from "@radix-ui/react-tooltip"
-import { Rocket, Loader2, CheckCircle2, ChevronRight, ChevronLeft, GitCommit, Sparkles } from "lucide-react"
+import { Rocket, Loader2, CheckCircle2, ChevronRight, ChevronLeft, GitCommit, Sparkles, ExternalLink } from "lucide-react"
 import axios from "axios"
 import { runCommand } from "@/api/exec"
 import { useRepoPermission } from "@/hooks/useRepoPermission"
@@ -441,13 +441,24 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 									</p>
 								)}
 							</div>
-							<button
-								type="button"
-								onClick={() => handleOpenChange(false)}
-								className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:outline-none shadow-sm"
-							>
-								Cerrar
-							</button>
+							<div className="flex items-center gap-2 mt-2">
+								<a
+									href={`https://github.com/${repo}/releases/tag/${tagName}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium border border-border bg-background text-foreground rounded-md hover:bg-muted/30 transition-colors"
+								>
+									<ExternalLink className="w-3.5 h-3.5" />
+									Ver en GitHub
+								</a>
+								<button
+									type="button"
+									onClick={() => handleOpenChange(false)}
+									className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:outline-none shadow-sm"
+								>
+									Cerrar
+								</button>
+							</div>
 						</div>
 					)}
 			</BaseDialog>

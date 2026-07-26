@@ -323,8 +323,19 @@ function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>
 }
 
 function LastCheckedCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
+  const fullTimestamp = endpoint.lastChecked
+    ? new Date(endpoint.lastChecked).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZoneName: 'short',
+      })
+    : 'Unknown'
   return (
-    <span className="text-xs font-medium text-muted-foreground">
+    <span className="text-xs font-medium text-muted-foreground" title={fullTimestamp}>
       {DayJS(endpoint.lastChecked).fromNow()}
     </span>
   )

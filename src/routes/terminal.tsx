@@ -31,16 +31,16 @@ function TerminalPage() {
               <span className="text-xs font-medium text-muted-foreground">Sesión Local Activa</span>
             </div>
             <div className="w-px h-3 bg-border" />
-            <span className="text-xs font-medium text-muted-foreground/70 font-mono">/bin/{shell}</span>
+            <span className="text-xs font-medium text-muted-foreground font-mono">/bin/{shell}</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
-               <span className="text-xs font-medium text-muted-foreground/70">Status</span>
-               <span className="px-1.5 py-0.5 rounded bg-success/20 border border-success/30 text-xs font-bold text-success">Connected</span>
+               <span className="text-xs font-medium text-muted-foreground">Status</span>
+               <span className="px-1.5 py-0.5 rounded bg-success/20 border border-success/40 text-xs font-bold text-success">Connected</span>
             </div>
             <div className="w-px h-3 bg-border" />
             <div className="flex items-center gap-1.5">
-               <span className="text-xs font-medium text-muted-foreground/70">OS</span>
+               <span className="text-xs font-medium text-muted-foreground">OS</span>
                <span className="px-1.5 py-0.5 rounded bg-primary/10 border border-primary/30 text-xs font-bold text-primary">{os}</span>
             </div>
           </div>

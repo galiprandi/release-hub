@@ -118,7 +118,7 @@ function ProductSection({
       {/* Header del producto */}
       <div className="flex items-center justify-between bg-muted/30 border-b border-border px-4 py-2">
         <div className="flex items-center gap-2">
-          <Box className="w-4 h-4 text-primary/60" />
+          <Box className="w-4 h-4 text-primary" />
           <Link
             to="/github/$org/$repo"
             params={{ org, repo: productName }}
@@ -136,7 +136,7 @@ function ProductSection({
             return (
               <>
                 {healthy > 0 && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-success/20 border border-success/30 text-xs font-medium text-success">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-success/20 border border-success/40 text-xs font-medium text-success">
                     <div className="w-1.5 h-1.5 rounded-full bg-success" />
                     {healthy} OK
                   </span>
@@ -148,7 +148,7 @@ function ProductSection({
                   </span>
                 )}
                 {unhealthy > 0 && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-destructive/20 border border-destructive/30 text-xs font-medium text-destructive">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-destructive/20 border border-destructive/40 text-xs font-medium text-destructive">
                     <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
                     {unhealthy} Error
                   </span>
@@ -258,7 +258,7 @@ function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMo
       className={`px-2 py-0.5 rounded-md border text-xs font-medium ${
         isProd
           ? 'bg-primary/20 text-primary border-primary/30'
-          : 'bg-info/20 text-info border-info/30'
+          : 'bg-info/20 text-info border-info/40'
       }`}
     >
       {endpoint.environment}
@@ -274,11 +274,11 @@ function ResponseTimeCell({ endpoint }: { endpoint: ReturnType<typeof useHealthM
       </span>
     )
   }
-  return <span className="text-xs font-medium text-muted-foreground/70">-</span>
+  return <span className="text-xs font-medium text-muted-foreground">-</span>
 }
 
 function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
-  if (!endpoint.error) return <span className="text-xs font-medium text-muted-foreground/70">-</span>
+  if (!endpoint.error) return <span className="text-xs font-medium text-muted-foreground">-</span>
 
   const errorMessage = (() => {
     if (endpoint.details) {
@@ -515,7 +515,7 @@ function HealthMonitorPage() {
           }}
           loading={isChecking}
           showLabel
-          className="bg-destructive/10 border border-destructive/30"
+          className="bg-destructive/10 border border-destructive/40"
         />
       )}
     </div>
@@ -577,7 +577,7 @@ function HealthMonitorPage() {
       {/* Endpoints by product */}
       {filteredEndpoints.length === 0 ? (
         <EmptyState
-          icon={<Activity className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />}
+          icon={<Activity className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />}
           label="Sin resultados"
           caption={!activeFilter
             ? 'Navega a un producto favorito para detectar servicios automáticamente y comenzar el monitoreo.'

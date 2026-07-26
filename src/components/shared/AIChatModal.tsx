@@ -283,7 +283,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 					)}
 
 					{error && (
-						<div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-xs text-destructive flex items-center gap-2 ml-11">
+						<div className="p-3 bg-destructive/10 border border-destructive/40 rounded-lg text-xs text-destructive flex items-center gap-2 ml-11">
 							<X className="w-3 h-3" />
 							<span>Error: {error.message}</span>
 						</div>
@@ -341,7 +341,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 						/>
 						<div className="flex items-center gap-2">
 							{contextUsage !== undefined && contextUsage > 0 && (
-								<span className="text-xs font-bold text-muted-foreground/70">
+								<span className="text-xs font-bold text-muted-foreground">
 									CTX: {contextUsage}
 								</span>
 							)}
@@ -361,7 +361,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 									className={`p-2 rounded-lg transition-all focus:ring-2 focus:ring-primary/30 ${
 										input.trim()
 											? "bg-ai text-ai-foreground shadow-sm hover:opacity-90"
-											: "bg-muted text-muted-foreground/70 cursor-not-allowed"
+											: "bg-muted text-muted-foreground cursor-not-allowed"
 									}`}
 								>
 									<Send className="w-4 h-4" />
@@ -369,7 +369,7 @@ export function AIChatModal({ isOpen, onClose, initialFile }: AIChatModalProps) 
 							)}
 						</div>
 					</div>
-					<p className="mt-2 text-xs font-medium text-center text-muted-foreground/70">
+					<p className="mt-2 text-xs font-medium text-center text-muted-foreground">
 						La IA puede cometer errores. El procesamiento ocurre localmente en tu navegador.
 					</p>
 				</div>

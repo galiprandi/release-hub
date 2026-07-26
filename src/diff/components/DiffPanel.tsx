@@ -39,7 +39,7 @@ export function DiffPanel({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="absolute inset-0 w-full h-full p-4 text-[13px] font-mono bg-transparent border-none focus:ring-2 focus:ring-primary/30 outline-none resize-none z-10 overflow-auto scrollbar-hide text-foreground/90 placeholder:text-muted-foreground/30"
+          className="absolute inset-0 w-full h-full p-4 text-xs font-mono bg-transparent border-none focus:ring-2 focus:ring-primary/30 outline-none resize-none z-10 overflow-auto scrollbar-hide text-foreground/90 placeholder:text-muted-foreground/30"
           spellCheck={false}
         />
       </div>

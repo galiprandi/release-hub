@@ -18,7 +18,7 @@ export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps)
 			iconClass: 'animate-spin',
 		},
 		error: {
-			borderClass: 'border-destructive/30',
+			borderClass: 'border-destructive/40',
 			textClass: 'text-destructive',
 			icon: XCircle,
 			iconClass: '',
@@ -54,7 +54,7 @@ export function StatusCard({ type, message, onClose, onRetry }: StatusCardProps)
 						type="button"
 						onClick={onRetry}
 						className={`text-xs font-medium px-3 py-1.5 rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 shadow-sm ${
-							type === 'error' ? 'bg-destructive/20 text-destructive hover:bg-destructive/30 border border-destructive/30' :
+							type === 'error' ? 'bg-destructive/20 text-destructive hover:bg-destructive/30 border border-destructive/40' :
 							type === 'warn' ? 'bg-warning/20 text-warning hover:bg-warning/30 border border-warning/30' :
 							'bg-muted text-foreground hover:bg-accent border border-border'
 						}`}

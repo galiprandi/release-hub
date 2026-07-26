@@ -189,7 +189,7 @@ export function DiffViewer({ mode, onModeChange }: DiffViewerProps) {
         <div
           ref={diffScrollRef}
           onScroll={handleDiffScroll}
-          className="flex-1 overflow-auto p-4 font-mono text-[13px] scrollbar-hide flex flex-col bg-zinc-950/30"
+          className="flex-1 overflow-auto p-4 font-mono text-xs scrollbar-hide flex flex-col bg-zinc-950/30"
         >
           {!textA && !textB ? (
             <EmptyState
@@ -250,7 +250,7 @@ function DiffLineRow({ line, mode }: { line: DiffLine; mode: DiffMode }) {
       {/* Left side */}
       <div className={clsx(
         "flex-1 flex border-r border-border transition-colors",
-        line.left?.type === 'removed' && "bg-destructive/20 text-destructive/90 border-l-2 border-destructive/40",
+        line.left?.type === 'removed' && "bg-destructive/20 text-destructive border-l-2 border-destructive/40",
         line.left?.type === 'changed' && "bg-warning/20 text-warning/90 border-l-2 border-warning/40",
         !line.left && "bg-muted/5 opacity-40"
       )}>

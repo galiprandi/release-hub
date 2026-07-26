@@ -419,7 +419,7 @@ function DeploymentsTable({
 			accessorKey: "name",
 			header: () => (
 				<div className="flex items-center gap-2">
-					{icon && <span className="text-primary/40">{icon}</span>}
+					{icon && <span className="text-primary">{icon}</span>}
 					<span className="text-xs font-medium text-muted-foreground">{label}</span>
 				</div>
 			),
@@ -508,9 +508,9 @@ function StatusCell({ deployment, isLoading }: { deployment: DeploymentInfo; isL
 	}
 
 	const variants: Record<string, { className: string; label: string }> = {
-		healthy: { className: 'bg-success/20 text-success border-success/30', label: 'Saludable' },
-		progressing: { className: 'bg-info/20 text-info border-info/30', label: 'Procesando' },
-		degraded: { className: 'bg-destructive/20 text-destructive border-destructive/30', label: 'Degradado' },
+		healthy: { className: 'bg-success/20 text-success border-success/40', label: 'Saludable' },
+		progressing: { className: 'bg-info/20 text-info border-info/40', label: 'Procesando' },
+		degraded: { className: 'bg-destructive/20 text-destructive border-destructive/40', label: 'Degradado' },
 		unknown: { className: 'bg-muted/30 text-muted-foreground border-border', label: 'Desconocido' },
 	}
 

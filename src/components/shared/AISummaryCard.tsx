@@ -68,7 +68,7 @@ export function AISummaryCard({
 						<Streamdown>{summary}</Streamdown>
 					</div>
 					{error && (
-						<p className="text-destructive-foreground font-medium text-xs mt-3 bg-destructive/20 p-2 rounded border border-destructive/30">
+						<p className="text-destructive-foreground font-medium text-xs mt-3 bg-destructive/20 p-2 rounded border border-destructive/40">
 							{error}
 						</p>
 					)}

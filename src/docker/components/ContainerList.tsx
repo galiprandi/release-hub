@@ -108,7 +108,7 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 		return (
 			<div className="flex flex-col items-center justify-center py-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
 				<div className="p-4 rounded-full bg-muted/30 border border-border mb-4">
-					<Boxes className="w-8 h-8 text-muted-foreground/70" />
+					<Boxes className="w-8 h-8 text-muted-foreground" />
 				</div>
 				<h3 className="text-xs font-medium text-muted-foreground">
 					{searchQuery ? "No se encontraron resultados" : "No hay contenedores"}
@@ -271,11 +271,11 @@ function StatusCell({ container }: { container: ContainerInfo }) {
 	let label = 'Detenido'
 
 	if (running) {
-		colorClass = 'bg-success/20 text-success border-success/30'
+		colorClass = 'bg-success/20 text-success border-success/40'
 		dotClass = 'bg-success  animate-pulse'
 		label = 'OK'
 	} else if (exited) {
-		colorClass = 'bg-destructive/20 text-destructive border-destructive/30'
+		colorClass = 'bg-destructive/20 text-destructive border-destructive/40'
 		dotClass = 'bg-destructive '
 		label = 'ERROR'
 	}
@@ -283,7 +283,7 @@ function StatusCell({ container }: { container: ContainerInfo }) {
 	return (
 		<div className="flex items-center gap-2">
 			<div className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
-			<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-xs font-bold tracking-widest uppercase ${colorClass}`}>
+			<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-xs font-medium ${colorClass}`}>
 				{label}
 			</span>
 		</div>
@@ -356,7 +356,7 @@ function PortsCell({ container }: { container: ContainerInfo }) {
 			<select
 				value={selectedPort}
 				onChange={(e) => setSelectedPort(e.target.value)}
-				className="text-xs font-medium border border-border rounded-lg px-2 py-1 bg-muted/30 hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 cursor-pointer"
+				className="text-xs font-medium border border-border rounded-lg px-2 py-1 bg-muted/30 hover:bg-muted/30 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 cursor-pointer"
 				aria-label="Seleccionar puerto"
 			>
 				{externalPorts.map((port, index) => (
@@ -393,7 +393,7 @@ function ActionsCell({
 	const running = isRunning(container.status)
 
 	return (
-		<div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200">
+		<div className="flex items-center justify-end gap-1.5">
 			<div className="flex items-center gap-1">
 				<ActionButton
 					action={ACTION_DEFINITIONS.viewLogs}
@@ -406,9 +406,8 @@ function ActionsCell({
 				/>
 			</div>
 
-			<div className="w-px h-4 bg-border mx-1" aria-hidden="true" />
-
-			<div className="flex items-center gap-1">
+			<div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200">
+				<div className="w-px h-4 bg-border mx-1" aria-hidden="true" />
 				<ActionButton
 					action={ACTION_DEFINITIONS.startContainer}
 					onClick={() => onStart(container.id)}

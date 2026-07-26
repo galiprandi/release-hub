@@ -131,7 +131,7 @@ function CommitsTable({
 		{
 			accessorKey: "date",
 			header: "Fecha",
-			cell: ({ row }) => <DisplayInfo value={row.original.date} type="dates" className="font-mono text-[13px]" />,
+			cell: ({ row }) => <DisplayInfo value={row.original.date} type="dates" className="font-mono text-xs" />,
 		},
 		{
 			accessorKey: "author",
@@ -172,7 +172,7 @@ function TagsTable({
 		{
 			accessorKey: "date",
 			header: "Fecha",
-			cell: ({ row }) => <DisplayInfo value={row.original.date} type="dates" className="font-mono text-[13px]" />,
+			cell: ({ row }) => <DisplayInfo value={row.original.date} type="dates" className="font-mono text-xs" />,
 		},
 		{
 			accessorKey: "author",

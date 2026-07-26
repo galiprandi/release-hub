@@ -118,7 +118,7 @@ function KubernetesPage() {
 			isLoading={isCheckingInstall && !hasContent}
 			showEmptyState={!hasContent}
 			emptyState={{
-				icon: <Star className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />,
+				icon: <Star className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />,
 				label: activeTab === 'favorites' ? "Sin favoritos" : "Sin despliegues en proyectos",
 				caption: activeTab === 'favorites'
 					? "Agrega deployments a tus favoritos para verlos aquí y monitorear sus logs."

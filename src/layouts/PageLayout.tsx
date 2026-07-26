@@ -334,7 +334,7 @@ function NavIcon({
 			className={`p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none ${
 				isActive
 					? "bg-primary text-primary-foreground shadow-sm"
-					: "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+					: "text-muted-foreground hover:text-foreground hover:bg-muted/30"
 			}`}
 			aria-label={label}
 			aria-current={isActive ? "page" : undefined}
@@ -378,7 +378,7 @@ function FeedbackIcon() {
 	const buttonContent = (
 		<button
 			onClick={() => setOpen(true)}
-			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none text-muted-foreground hover:text-foreground hover:bg-muted/60"
+			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none text-muted-foreground hover:text-foreground hover:bg-muted/30"
 			aria-label="Feedback"
 			type="button"
 		>
@@ -523,7 +523,7 @@ function SettingsIcon() {
 	const buttonContent = (
 		<button
 			onClick={() => setOpen(true)}
-			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none text-muted-foreground hover:text-foreground hover:bg-muted/60"
+			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none text-muted-foreground hover:text-foreground hover:bg-muted/30"
 			aria-label="Configuración"
 			type="button"
 		>
@@ -562,7 +562,7 @@ function TerminalIconModal() {
 	const buttonContent = (
 		<button
 			onClick={() => setOpen(true)}
-			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none text-muted-foreground hover:text-foreground hover:bg-muted/60"
+			className="p-2.5 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none text-muted-foreground hover:text-foreground hover:bg-muted/30"
 			aria-label="Terminal"
 			type="button"
 		>
@@ -607,7 +607,7 @@ function TerminalIconModal() {
 								</span>
 							</div>
 							<div className="w-px h-3 bg-border" />
-							<span className="text-xs font-medium text-muted-foreground/70 font-mono">
+							<span className="text-xs font-medium text-muted-foreground font-mono">
 								Local
 							</span>
 						</div>

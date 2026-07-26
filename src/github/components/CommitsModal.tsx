@@ -145,7 +145,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 									onChange={(e) => setFilter(e.target.value)}
 									placeholder="FILTRAR COMMITS"
 									aria-label="Filtrar commits"
-									className="w-full pl-9 pr-10 py-1.5 text-xs font-medium bg-muted/30 border border-border rounded-lg placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
+									className="w-full pl-9 pr-10 py-1.5 text-xs font-medium bg-muted/30 border border-border rounded-lg placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
 								/>
 								{filter && (
 									<button

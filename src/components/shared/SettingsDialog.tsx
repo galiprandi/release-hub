@@ -106,7 +106,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 					<section className="space-y-4">
 						<div className="pb-3 border-b border-border">
 							<h3 className="text-xs font-medium text-foreground">Token de Seki</h3>
-							<p className="text-xs font-medium text-muted-foreground/70 mt-1">
+							<p className="text-xs font-medium text-muted-foreground mt-1">
 								Autenticación técnica para el núcleo de pipelines
 							</p>
 						</div>
@@ -130,7 +130,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									type="button"
 									onClick={handleClearSekiToken}
-									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/30 transition-all w-full"
+									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/40 transition-all w-full"
 								>
 									<Trash2 className="w-3.5 h-3.5" />
 									Revocar Acceso
@@ -170,7 +170,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 										</button>
 									</div>
 								</div>
-								<p className="text-xs font-medium text-muted-foreground/70 text-center">
+								<p className="text-xs font-medium text-muted-foreground text-center">
 									Persistencia local en el entorno del navegador
 								</p>
 							</div>
@@ -181,7 +181,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 					<section className="space-y-4">
 						<div className="pb-3 border-b border-border">
 							<h3 className="text-xs font-medium text-foreground">Notificaciones Discord</h3>
-							<p className="text-xs font-medium text-muted-foreground/70 mt-1">
+							<p className="text-xs font-medium text-muted-foreground mt-1">
 								Canal global de eventos y alertas técnicas
 							</p>
 						</div>
@@ -201,7 +201,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 								<button
 									type="button"
 									onClick={handleClearDiscordWebhook}
-									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/30 transition-all w-full"
+									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg border border-transparent hover:border-destructive/40 transition-all w-full"
 								>
 									<Trash2 className="w-3.5 h-3.5" />
 									Eliminar Webhook
@@ -247,7 +247,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 					<section className="space-y-4">
 						<div className="pb-3 border-b border-border">
 							<h3 className="text-xs font-medium text-foreground">Gestión de Datos</h3>
-							<p className="text-xs font-medium text-muted-foreground/70 mt-1">
+							<p className="text-xs font-medium text-muted-foreground mt-1">
 								Invalidación de caché y resincronización global
 							</p>
 						</div>

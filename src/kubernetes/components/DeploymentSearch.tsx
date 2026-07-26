@@ -152,7 +152,7 @@ export function DeploymentSearch() {
           onBlur={() => setIsEditable(false)}
           placeholder={`Buscar por namespace... (ej: yumi-ticket-control)`}
           aria-label="Búsqueda de deployments"
-          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all hover:bg-muted/50`}
+          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all hover:bg-muted/30`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -199,7 +199,7 @@ export function DeploymentSearch() {
           ) : !hasResults ? (
             <EmptyState
               className="min-h-0 py-8"
-              icon={<Terminal className="w-5 h-5 text-muted-foreground/70" />}
+              icon={<Terminal className="w-5 h-5 text-muted-foreground" />}
               label={debouncedQuery.length > 0 ? 'Sin resultados' : 'Búsqueda de deployments'}
               caption={debouncedQuery.length > 0
                 ? `Sin deployments en namespace "${debouncedQuery}"`
@@ -219,13 +219,13 @@ export function DeploymentSearch() {
                     aria-selected={isSelected}
                     id={`deployment-option-${index}`}
                     className={`group p-3 border-b border-border last:border-b-0 transition-colors ${
-                      isSelected ? 'bg-muted' : 'hover:bg-muted/50'
+                      isSelected ? 'bg-muted' : 'hover:bg-muted/30'
                     }`}
                   >
                     <div className="flex items-start gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <Terminal className="w-3.5 h-3.5 text-primary/60" />
+                          <Terminal className="w-3.5 h-3.5 text-primary" />
                           <span className="font-bold tracking-tight text-sm truncate">
                             {deployment.name}
                           </span>
@@ -233,23 +233,23 @@ export function DeploymentSearch() {
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-xs font-medium text-muted-foreground">{deployment.namespace}</span>
                           <div className="w-px h-2.5 bg-border mx-0.5" />
-                          <span className="text-xs font-medium text-muted-foreground/70 truncate">{deployment.context}</span>
+                          <span className="text-xs font-medium text-muted-foreground truncate">{deployment.context}</span>
                         </div>
                         <div className="flex items-center gap-4 mt-2">
                           <div className="flex items-center gap-1.5">
-                             <span className="text-xs font-medium text-muted-foreground/70">Ready</span>
+                             <span className="text-xs font-medium text-muted-foreground">Ready</span>
                              <span className="px-1.5 py-0.5 rounded bg-muted/30 border border-border text-xs font-mono font-bold text-foreground">
                                {deployment.ready}
                              </span>
                           </div>
                           <div className="flex items-center gap-1.5">
-                             <span className="text-xs font-medium text-muted-foreground/70">Up-to-date</span>
+                             <span className="text-xs font-medium text-muted-foreground">Up-to-date</span>
                              <span className="px-1.5 py-0.5 rounded bg-muted/30 border border-border text-xs font-mono font-bold text-foreground">
                                {deployment.upToDate}
                              </span>
                           </div>
                           <div className="flex items-center gap-1.5">
-                             <span className="text-xs font-medium text-muted-foreground/70">Available</span>
+                             <span className="text-xs font-medium text-muted-foreground">Available</span>
                              <span className="px-1.5 py-0.5 rounded bg-muted/30 border border-border text-xs font-mono font-bold text-foreground">
                                {deployment.available}
                              </span>
@@ -278,7 +278,7 @@ export function DeploymentSearch() {
           )}
 
           {/* Footer hint */}
-          <div className="px-3 py-2 bg-muted/60 border-t border-border text-xs font-medium  text-muted-foreground flex items-center justify-between">
+          <div className="px-3 py-2 bg-muted/30 border-t border-border text-xs font-medium  text-muted-foreground flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1.5">
                 <kbd className="px-1.5 py-0.5 rounded bg-background border border-border shadow-sm font-sans text-xs">↑↓</kbd> NAVEGAR

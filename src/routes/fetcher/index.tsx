@@ -225,7 +225,7 @@ function FetcherPage() {
 					value={curlInput}
 					onChange={(e) => setCurlInput(e.target.value)}
 					placeholder="Importar cURL... (curl -X GET...)"
-					className="w-80 px-3 py-1.5 text-sm border border-border bg-muted/30 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 font-mono transition-shadow placeholder:text-muted-foreground/70"
+					className="w-80 px-3 py-1.5 text-sm border border-border bg-muted/30 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 font-mono transition-shadow placeholder:text-muted-foreground"
 				/>
 			</div>
 			<ActionButton
@@ -251,7 +251,7 @@ function FetcherPage() {
 							handleQuerySearch(e.target.value);
 						}}
 						placeholder="Buscar en historial..."
-						className="w-48 pl-8 pr-3 py-1.5 bg-muted/30 border border-border rounded-lg text-xs focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/70 font-medium uppercase tracking-tight"
+						className="w-48 pl-8 pr-3 py-1.5 bg-muted/30 border border-border rounded-lg text-xs focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground font-medium uppercase tracking-tight"
 					/>
 					{search.q && (
 						<button
@@ -317,7 +317,7 @@ function FetcherPage() {
 					<StatusCard type="loading" message="Cargando historial..." />
 				) : history.length === 0 ? (
 					<EmptyState
-						icon={<Send className="w-8 h-8 text-muted-foreground/70" />}
+						icon={<Send className="w-8 h-8 text-muted-foreground" />}
 						label="Historial Vacío"
 						caption="Pega un comando cURL en la barra superior o copia uno al portapapeles para comenzar."
 					/>
@@ -428,11 +428,11 @@ function MethodCell({ query }: { query: QueryRecord }) {
 	if (!parsed) return null
 
 	const methodStyles: Record<string, string> = {
-		GET: "bg-success/20 text-success border-success/30",
-		POST: "bg-info/20 text-info border-info/30",
+		GET: "bg-success/20 text-success border-success/40",
+		POST: "bg-info/20 text-info border-info/40",
 		PUT: "bg-warning/20 text-warning border-warning/30",
 		PATCH: "bg-warning/20 text-warning border-warning/30",
-		DELETE: "bg-destructive/20 text-destructive border-destructive/30",
+		DELETE: "bg-destructive/20 text-destructive border-destructive/40",
 	}
 
 	const style = methodStyles[parsed.method.toUpperCase()] || "bg-muted/30 text-muted-foreground border-border"
@@ -473,9 +473,9 @@ function StatusCell({ query }: { query: QueryRecord }) {
 	if (query.response?.status) {
 		const { status } = query.response
 		let style = "bg-muted/30 text-muted-foreground border-border"
-		if (status >= 200 && status < 300) style = "bg-success/20 text-success border-success/30"
+		if (status >= 200 && status < 300) style = "bg-success/20 text-success border-success/40"
 		else if (status >= 400 && status < 500) style = "bg-warning/20 text-warning border-warning/30"
-		else if (status >= 500) style = "bg-destructive/20 text-destructive border-destructive/30"
+		else if (status >= 500) style = "bg-destructive/20 text-destructive border-destructive/40"
 
 		return (
 			<span className={`px-2 py-0.5 rounded-md border text-xs font-medium ${style}`}>
@@ -483,15 +483,15 @@ function StatusCell({ query }: { query: QueryRecord }) {
 			</span>
 		)
 	}
-	return <span className="text-muted-foreground/70 text-xs font-medium">-</span>
+	return <span className="text-muted-foreground text-xs font-medium">-</span>
 }
 
 function ResponseTimeCell({ query }: { query: QueryRecord }) {
 	if (query.response?.responseTime) {
 		const { responseTime } = query.response
 		let style = "bg-muted/30 text-muted-foreground border-border"
-		if (responseTime < 200) style = "bg-success/20 text-success border-success/30"
-		else if (responseTime > 1000) style = "bg-destructive/20 text-destructive border-destructive/30"
+		if (responseTime < 200) style = "bg-success/20 text-success border-success/40"
+		else if (responseTime > 1000) style = "bg-destructive/20 text-destructive border-destructive/40"
 
 		return (
 			<span className={`px-2 py-0.5 rounded-md border text-xs font-medium ${style}`}>
@@ -499,7 +499,7 @@ function ResponseTimeCell({ query }: { query: QueryRecord }) {
 			</span>
 		)
 	}
-	return <span className="text-muted-foreground/70 text-xs font-medium">-</span>
+	return <span className="text-muted-foreground text-xs font-medium">-</span>
 }
 
 function ActionsCell({

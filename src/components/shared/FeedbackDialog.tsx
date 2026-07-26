@@ -284,13 +284,13 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 												? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm cursor-pointer"
 													: s.id === step 
 													? "bg-primary text-primary-foreground shadow-sm cursor-pointer"
-													: "bg-muted/30 text-muted-foreground/70 border border-border cursor-default"
+													: "bg-muted/30 text-muted-foreground border border-border cursor-default"
 											} focus:outline-none focus:ring-2 focus:ring-primary/30`}
 										>
 											{isCompleted(s.id) ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
 										</button>
 										<span className={`text-xs font-medium  ${
-											s.id === step ? "text-foreground" : "text-muted-foreground/70"
+											s.id === step ? "text-foreground" : "text-muted-foreground"
 										}`} aria-hidden="true">
 											{s.label}
 										</span>
@@ -320,18 +320,18 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 										onChange={(e) => setDescription(e.target.value)}
 										placeholder="Explica en detalle tu idea, problema o sugerencia. El sistema utilizará IA para normalizar el reporte..."
 										rows={8}
-										className="w-full px-4 py-3 text-xs bg-muted/30 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none transition-all duration-200 leading-relaxed font-mono placeholder:text-muted-foreground/70"
+										className="w-full px-4 py-3 text-xs bg-muted/30 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none transition-all duration-200 leading-relaxed font-mono placeholder:text-muted-foreground"
 									/>
 								</div>
 
 								{aiError && (
-									<div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 flex items-center gap-2">
+									<div className="p-3 rounded-lg bg-destructive/10 border border-destructive/40 flex items-center gap-2">
 										<AlertCircle className="w-4 h-4 text-destructive" />
 										<p className="text-xs font-medium text-destructive">{aiError.message}</p>
 									</div>
 								)}
 								{error && (
-									<div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 flex items-center gap-2">
+									<div className="p-3 rounded-lg bg-destructive/10 border border-destructive/40 flex items-center gap-2">
 										<AlertCircle className="w-4 h-4 text-destructive" />
 										<p className="text-xs font-medium text-destructive">{error}</p>
 									</div>
@@ -428,7 +428,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 							</div>
 							<div className="space-y-2">
 								<p className="text-xs font-medium text-foreground">Sincronizando con GitHub</p>
-								<p className="text-xs font-medium text-muted-foreground/70">
+								<p className="text-xs font-medium text-muted-foreground">
 									Creando registro técnico en <span className="text-foreground/60">galiprandi/release-hub</span>
 								</p>
 							</div>
@@ -438,7 +438,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 					{/* Step: Success */}
 					{step === "success" && (
 						<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-6">
-							<div className="w-16 h-16 rounded-full bg-success/20 border border-success/30 flex items-center justify-center shadow-[0_0_20px_rgba(var(--success),0.1)]">
+							<div className="w-16 h-16 rounded-full bg-success/20 border border-success/40 flex items-center justify-center shadow-[0_0_20px_rgba(var(--success),0.1)]">
 								<CheckCircle2 className="w-8 h-8 text-success" />
 							</div>
 							<div className="space-y-4">
@@ -480,14 +480,14 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 											<div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
 											<Loader2 className="w-16 h-16 animate-spin text-primary relative z-10" />
 										</div>
-										<div className="flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground/70">
+										<div className="flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground">
 											<Sparkles className="w-4 h-4" />
 											<span>Análisis IA en curso</span>
 										</div>
 									</div>
 								) : (
 									<div className="space-y-4">
-										<div className="w-16 h-16 rounded-full bg-destructive/20 border border-destructive/30 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(var(--destructive),0.1)]">
+										<div className="w-16 h-16 rounded-full bg-destructive/20 border border-destructive/40 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(var(--destructive),0.1)]">
 											<AlertCircle className="w-8 h-8 text-destructive" />
 										</div>
 										<div className="flex items-center justify-center gap-2">
@@ -495,7 +495,7 @@ export function FeedbackDialog({ showTrigger = true, open: controlledOpen, onOpe
 												onClick={() => setShowOriginalError(!showOriginalError)}
 												className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 border ${
 													showOriginalError 
-														? 'bg-destructive/10 text-destructive border-destructive/30 '
+														? 'bg-destructive/10 text-destructive border-destructive/40 '
 														: 'bg-muted/30 text-muted-foreground border-border'
 												}`}
 											>

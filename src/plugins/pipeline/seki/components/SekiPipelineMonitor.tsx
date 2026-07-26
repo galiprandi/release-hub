@@ -530,11 +530,11 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 						{filteredData.commit?.author && (
 							<span className="font-medium text-foreground/80 truncate max-w-[200px]">{filteredData.commit.author}</span>
 						)}
-						<span className="text-muted-foreground/70">·</span>
+						<span className="text-muted-foreground">·</span>
 						<span>{lastUpdated}</span>
 						{totalDuration && (
 							<>
-								<span className="text-muted-foreground/70">·</span>
+								<span className="text-muted-foreground">·</span>
 								<span className="inline-flex items-center gap-1 tabular-nums">
 									<Clock className="w-2.5 h-2.5" />
 									{totalDuration}
@@ -580,7 +580,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 													? 'bg-foreground/10 text-foreground ring-1 ring-border'
 													: isFailed
 														? `${stageConfig.badge} hover:scale-105`
-														: 'bg-muted/30 text-muted-foreground border border-border hover:bg-muted/60'
+														: 'bg-muted/30 text-muted-foreground border border-border hover:bg-muted/30'
 											}`}
 										>
 											<StageIcon className={`w-3 h-3 ${stageConfig.color} ${stage.state === 'RUNNING' || stage.state === 'STARTED' ? 'animate-spin' : ''}`} />

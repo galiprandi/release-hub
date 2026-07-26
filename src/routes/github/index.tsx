@@ -320,9 +320,9 @@ function Dashboard() {
 					<EmptyState
 						icon={
 							activeTab === "favorites" ? (
-								<Star className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />
+								<Star className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
 							) : (
-								<FolderPlus className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />
+								<FolderPlus className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
 							)
 						}
 						label={
@@ -415,7 +415,7 @@ function Dashboard() {
 												<ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
 											)}
 											<div className="flex items-center gap-2">
-												<Building2 className="w-4 h-4 text-primary/60" />
+												<Building2 className="w-4 h-4 text-primary" />
 												<h2 className="text-xs font-medium  text-foreground">
 													{org}
 												</h2>
@@ -427,7 +427,7 @@ function Dashboard() {
 
 										{isCollapsed && (
 											<div className="flex items-center gap-4">
-												<span className="text-xs font-medium text-muted-foreground/70 italic">
+												<span className="text-xs font-medium text-muted-foreground italic">
 													Click para expandir
 												</span>
 											</div>
@@ -766,7 +766,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 		return (
 			<div className="flex items-center gap-2">
 				<div className="w-4 h-4 bg-muted/30 rounded-full flex-shrink-0 flex items-center justify-center">
-					<Loader2 className="w-3 h-3 animate-spin text-muted-foreground/70" />
+					<Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
 				</div>
 				<div className="h-4 bg-muted/30 rounded w-32 animate-pulse" />
 			</div>
@@ -869,7 +869,7 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 			navigateToRepo={true}
 		/>
 	) : (
-		<span className="text-muted-foreground/70 text-xs font-medium italic">
+		<span className="text-muted-foreground text-xs font-medium italic">
 			Sin tags
 		</span>
 	);
@@ -919,7 +919,7 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 			navigateToRepo={true}
 		/>
 	) : (
-		<span className="text-muted-foreground/70 text-xs font-medium italic">
+		<span className="text-muted-foreground text-xs font-medium italic">
 			Sin commits
 		</span>
 	);
@@ -982,7 +982,7 @@ function HealthCell({ repo }: { repo: RepoInfo }) {
 							>
 								{statusLabel}
 							</span>
-							<span className="text-xs font-bold text-muted-foreground/70">
+							<span className="text-xs font-bold text-muted-foreground">
 								({endpoints.length})
 							</span>
 						</div>
@@ -1115,7 +1115,7 @@ function ActionsStatusCell({
 						className={clsx(
 							"inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 border",
 							hasFailure
-								? "bg-destructive/20 text-destructive border-destructive/30 hover:bg-destructive/30"
+								? "bg-destructive/20 text-destructive border-destructive/40 hover:bg-destructive/30"
 								: isRunning
 									? "bg-warning/20 text-warning border-warning/30 hover:bg-warning/30"
 									: "bg-success/20 text-success border-success/20 hover:bg-success/30",

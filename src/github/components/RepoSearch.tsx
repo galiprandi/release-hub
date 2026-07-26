@@ -189,7 +189,7 @@ export function RepoSearch() {
             ? 'Buscar archivo: file:AGENTS.md'
             : `Búsqueda en ${summaryData?.total || 0} repositorios... (Cmd+K)`}
           aria-label="Búsqueda de repositorios"
-          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground/70`}
+          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -239,9 +239,9 @@ export function RepoSearch() {
             <EmptyState
               className="min-h-0 py-8"
               icon={isFileMode ? (
-                <FileCode className="w-5 h-5 text-muted-foreground/70" />
+                <FileCode className="w-5 h-5 text-muted-foreground" />
               ) : (
-                <GitBranch className="w-5 h-5 text-muted-foreground/70" />
+                <GitBranch className="w-5 h-5 text-muted-foreground" />
               )}
               label={query.length >= 2 ? 'Sin resultados' : 'Búsqueda de repositorios'}
               caption={query.length >= 2 ? `No se encontraron coincidencias para "${query}"` : 'Ingresa texto para iniciar la búsqueda'}
@@ -259,7 +259,7 @@ export function RepoSearch() {
                       aria-selected={isSelected}
                       id={`repo-option-${index}`}
                       className={`group p-3 border-b border-border last:border-b-0 transition-colors ${
-                        isSelected ? 'bg-muted' : 'hover:bg-muted/50'
+                        isSelected ? 'bg-muted' : 'hover:bg-muted/30'
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -311,7 +311,7 @@ export function RepoSearch() {
                     aria-selected={isSelected}
                     id={`repo-option-${index}`}
                     className={`group p-3 border-b border-border last:border-b-0 transition-colors ${
-                      isSelected ? 'bg-muted' : 'hover:bg-muted/50'
+                      isSelected ? 'bg-muted' : 'hover:bg-muted/30'
                     }`}
                   >
                     <div className="flex items-start gap-3">

@@ -258,7 +258,8 @@ export function LogsViewer({
 	};
 
 	const headerExtra = (
-		<div className="flex items-center gap-0">
+		<div className="flex items-center gap-3">
+			{/* Status group: Live indicator + last log timestamp */}
 			{!isLoading && logs && (
 				<Tooltip.Root>
 					<Tooltip.Trigger asChild>
@@ -278,13 +279,15 @@ export function LogsViewer({
 					</Tooltip.Portal>
 				</Tooltip.Root>
 			)}
+
+			{/* AI group */}
 			<Tooltip.Root>
 				<Tooltip.Trigger asChild>
 					<button
 						type="button"
 						onClick={handleSummarizeWithAI}
 						disabled={isGenerating || availability !== "available" || !currentLogs}
-						className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-ai bg-ai/10 border border-ai/20 hover:bg-ai/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+						className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-ai bg-ai/10 border border-ai/20 hover:bg-ai/20 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 					>
 						{isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
 						{isGenerating ? getStatusMessage : "Resumir"}
@@ -300,121 +303,91 @@ export function LogsViewer({
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
-			<div className="w-px h-6 bg-border mx-2" />
-			<div className="flex items-center gap-2">
-				<Tooltip.Root>
-					<Tooltip.Trigger asChild>
-						<select
-							value={logLevelFilter}
-							onChange={(e) => setLogLevelFilter(e.target.value as "all" | "ERROR" | "WARN" | "INFO" | "DEBUG")}
-							className="bg-muted/30 border border-border rounded-lg px-2 py-1 text-xs font-medium focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
-							aria-label="Filtrar por nivel de log"
-						>
-							<option value="all">Todos</option>
-							<option value="ERROR">ERROR</option>
-							<option value="WARN">WARN</option>
-							<option value="INFO">INFO</option>
-							<option value="DEBUG">DEBUG</option>
-						</select>
-					</Tooltip.Trigger>
-					<Tooltip.Portal>
-						<Tooltip.Content
-							className="bg-popover text-popover-foreground border px-2 py-1 text-xs font-medium rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
-							sideOffset={5}
-						>
-							FILTRAR POR NIVEL DE LOG
-							<Tooltip.Arrow className="fill-popover" />
-						</Tooltip.Content>
-					</Tooltip.Portal>
-				</Tooltip.Root>
-				<Tooltip.Root>
-					<Tooltip.Trigger asChild>
-						<div className="relative">
-							<Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
-							<input
-								ref={searchInputRef}
-								type="text"
-								value={filter}
-								onChange={(e) => {
-									setFilter(e.target.value);
-									setCurrentMatchIndex(0);
-								}}
-								placeholder="BUSCAR (CMD+F)"
-								aria-label="Buscar logs"
-								className="pl-7 pr-8 py-1 text-xs font-medium bg-muted/30 border border-border rounded-lg w-48 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 placeholder:text-muted-foreground/70"
-							/>
-							{filter && (
-								<Tooltip.Root delayDuration={0}>
-									<Tooltip.Trigger asChild>
-										<button
-											type="button"
-											onClick={() => {
-												setFilter("");
-												setCurrentMatchIndex(0);
-												searchInputRef.current?.focus();
-											}}
-											className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted/30 rounded-full text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
-											aria-label="Limpiar búsqueda"
-										>
-											<X className="w-3 h-3" />
-										</button>
-									</Tooltip.Trigger>
-									<Tooltip.Portal>
-										<Tooltip.Content
-											className="bg-popover text-popover-foreground border px-2 py-1 text-xs font-medium rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
-											sideOffset={5}
-										>
-											Limpiar búsqueda
-											<Tooltip.Arrow className="fill-popover" />
-										</Tooltip.Content>
-									</Tooltip.Portal>
-								</Tooltip.Root>
-							)}
-						</div>
-					</Tooltip.Trigger>
-					<Tooltip.Portal>
-						<Tooltip.Content
-							className="bg-popover text-popover-foreground border px-2 py-1 text-xs font-medium rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
-							sideOffset={5}
-						>
-							BUSCAR LOGS POR TEXTO
-							<Tooltip.Arrow className="fill-popover" />
-						</Tooltip.Content>
-					</Tooltip.Portal>
-				</Tooltip.Root>
 
-				{filter.trim() !== "" && (
-					<div className="flex items-center gap-0.5 border border-border rounded px-1.5 bg-muted h-8 ml-2">
-						<span className="text-xs text-muted-foreground select-none font-mono min-w-[2.5rem] text-center">
-							{matchCount > 0 ? `${currentMatchIndex + 1}/${matchCount}` : "0/0"}
-						</span>
-						<IconButton
-							icon={<ChevronUp className="w-3.5 h-3.5" />}
-							onClick={() => {
-								const found = xtermRef.current?.findPrevious(filter);
-								if (found && matchCount > 0) {
-									setCurrentMatchIndex((prev) => (prev - 1 + matchCount) % matchCount);
-								}
-							}}
-							tooltip="Coincidencia anterior"
-							disabled={matchCount === 0}
-						/>
-						<IconButton
-							icon={<ChevronDown className="w-3.5 h-3.5" />}
-							onClick={() => {
-								const found = xtermRef.current?.findNext(filter);
-								if (found && matchCount > 0) {
-									setCurrentMatchIndex((prev) => (prev + 1) % matchCount);
-								}
-							}}
-							tooltip="Coincidencia siguiente"
-							disabled={matchCount === 0}
-						/>
-					</div>
-				)}
+			<div className="w-px h-6 bg-border" />
 
+			{/* Filter group: log level tabs + search */}
+			<div className="flex items-center gap-1 bg-muted/30 p-0.5 rounded-md border border-border">
+				{(["all", "ERROR", "WARN", "INFO", "DEBUG"] as const).map((level) => (
+					<button
+						key={level}
+						type="button"
+						onClick={() => setLogLevelFilter(level)}
+						aria-pressed={logLevelFilter === level}
+						className={`px-2 py-0.5 text-xs font-medium rounded transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none ${
+							logLevelFilter === level
+								? "bg-background shadow-sm text-foreground"
+								: "text-muted-foreground hover:bg-accent hover:text-foreground"
+						}`}
+					>
+						{level === "all" ? "Todos" : level}
+					</button>
+				))}
 			</div>
-			<div className="w-px h-6 bg-border mx-2" />
+
+			<div className="relative">
+				<Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+				<input
+					ref={searchInputRef}
+					type="text"
+					value={filter}
+					onChange={(e) => {
+						setFilter(e.target.value);
+						setCurrentMatchIndex(0);
+					}}
+					placeholder="Buscar (Cmd+F)"
+					aria-label="Buscar logs"
+					className="pl-7 pr-8 py-1 text-xs font-medium bg-muted/30 border border-border rounded-md w-56 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 placeholder:text-muted-foreground/60"
+				/>
+				{filter && (
+					<button
+						type="button"
+						onClick={() => {
+							setFilter("");
+							setCurrentMatchIndex(0);
+							searchInputRef.current?.focus();
+						}}
+						className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted/30 rounded text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+						aria-label="Limpiar búsqueda"
+					>
+						<X className="w-3 h-3" />
+					</button>
+				)}
+			</div>
+
+			{filter.trim() !== "" && (
+				<div className="flex items-center gap-0.5 border border-border rounded px-1.5 bg-muted h-7">
+					<span className="text-xs text-muted-foreground select-none font-mono min-w-[2.5rem] text-center">
+						{matchCount > 0 ? `${currentMatchIndex + 1}/${matchCount}` : "0/0"}
+					</span>
+					<IconButton
+						icon={<ChevronUp className="w-3.5 h-3.5" />}
+						onClick={() => {
+							const found = xtermRef.current?.findPrevious(filter);
+							if (found && matchCount > 0) {
+								setCurrentMatchIndex((prev) => (prev - 1 + matchCount) % matchCount);
+							}
+						}}
+						tooltip="Coincidencia anterior"
+						disabled={matchCount === 0}
+					/>
+					<IconButton
+						icon={<ChevronDown className="w-3.5 h-3.5" />}
+						onClick={() => {
+							const found = xtermRef.current?.findNext(filter);
+							if (found && matchCount > 0) {
+								setCurrentMatchIndex((prev) => (prev + 1) % matchCount);
+							}
+						}}
+						tooltip="Coincidencia siguiente"
+						disabled={matchCount === 0}
+					/>
+				</div>
+			)}
+
+			<div className="w-px h-6 bg-border" />
+
+			{/* Actions group */}
 			<IconButton
 				icon={autoScrollEnabled ? <Pause className="w-4 h-4 text-destructive" /> : <Play className="w-4 h-4" />}
 				onClick={() => setAutoScrollEnabled(!autoScrollEnabled)}
@@ -443,37 +416,43 @@ export function LogsViewer({
 			aria-label="Panel de logs"
 			className="flex-1 min-h-0 flex flex-col bg-black p-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset focus-visible:outline-none rounded-b-md"
 		>
-				{processedError && (
-					<div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg sticky top-0 z-10 shrink-0">
-						<div className="flex items-center justify-between gap-2 mb-2">
-							<div className="flex items-center gap-2">
-								<AlertCircle className="w-4 h-4 text-destructive" />
-								<span className="text-destructive font-semibold text-sm">Error</span>
+				{(processedError || summary) && (
+					<div className="sticky top-0 z-20 shrink-0 space-y-2 mb-2">
+						{processedError && (
+							<div className="p-3 bg-destructive/10 border border-destructive/40 rounded-md">
+								<div className="flex items-center justify-between gap-2 mb-2">
+									<div className="flex items-center gap-2">
+										<AlertCircle className="w-4 h-4 text-destructive" />
+										<span className="text-destructive font-semibold text-sm">Error</span>
+									</div>
+									<button
+										type="button"
+										onClick={() => setProcessedError(null)}
+										className="text-xs text-destructive hover:bg-destructive/10 rounded px-2 py-1 transition-colors focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none focus-visible:ring-offset-1"
+										aria-label="Cerrar error"
+									>
+										<X className="w-3 h-3" />
+									</button>
+								</div>
+								<p className="text-destructive text-xs whitespace-pre-wrap">{processedError}</p>
 							</div>
-							<button
-								type="button"
-								onClick={() => setProcessedError(null)}
-								className="text-xs text-destructive/80 hover:text-destructive hover:bg-destructive/10 rounded px-2 py-1 transition-colors focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none focus-visible:ring-offset-1"
-								aria-label="Cerrar error"
-							>
-								<X className="w-3 h-3" />
-							</button>
-						</div>
-						<p className="text-destructive/90 text-xs whitespace-pre-wrap">{processedError}</p>
+						)}
+						{summary && (
+							<AISummaryCard
+								summary={summary}
+								isGenerating={isGenerating}
+								error={aiError?.message || null}
+								onRegenerate={handleRegenerateSummary}
+								onCopy={handleCopyAiSummary}
+								isCollapsed={isAiSummaryCollapsed}
+								onToggleCollapse={() => setIsAiSummaryCollapsed(!isAiSummaryCollapsed)}
+								isCopied={aiSummaryCopied}
+								variant="compact"
+							/>
+						)}
 					</div>
 				)}
-				<AISummaryCard
-					summary={summary}
-					isGenerating={isGenerating}
-					error={aiError?.message || null}
-					onRegenerate={handleRegenerateSummary}
-					onCopy={handleCopyAiSummary}
-					isCollapsed={isAiSummaryCollapsed}
-					onToggleCollapse={() => setIsAiSummaryCollapsed(!isAiSummaryCollapsed)}
-					isCopied={aiSummaryCopied}
-					variant="compact"
-				/>
-				<div className="flex-1 min-h-0 relative mt-2">
+				<div className="flex-1 min-h-0 relative">
 					{currentIsLoading ? (
 						<div className="flex items-center justify-center gap-2 h-full text-muted-foreground py-8">
 							<Loader2 className="w-4 h-4 animate-spin" />

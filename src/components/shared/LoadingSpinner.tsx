@@ -13,7 +13,7 @@ export function LoadingSpinner({ label, caption, className }: LoadingSpinnerProp
 			<div className="flex flex-col items-center gap-4">
 				<Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
 				{label && <p className="text-muted-foreground text-sm">{label}</p>}
-				{caption && <p className="text-muted-foreground/70 text-xs">{caption}</p>}
+				{caption && <p className="text-muted-foreground text-xs">{caption}</p>}
 			</div>
 		</div>
 	);

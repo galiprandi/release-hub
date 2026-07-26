@@ -255,7 +255,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 										setRequestTab('body');
 									}
 								}}
-								className="appearance-none bg-muted/30 px-3 py-2 pr-8 text-xs font-medium focus:outline-none cursor-pointer hover:bg-muted/60 transition-colors"
+								className="appearance-none bg-muted/30 px-3 py-2 pr-8 text-xs font-medium focus:outline-none cursor-pointer hover:bg-muted/30 transition-colors"
 							>
 								{['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
 									<option key={m} value={m}>{m}</option>
@@ -532,9 +532,9 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 							<div className="flex items-center gap-3">
 								<span className={`px-2 py-0.5 rounded-md border text-xs font-medium ${
 										response.status >= 200 && response.status < 300
-											? 'bg-success/20 text-success border-success/30'
+											? 'bg-success/20 text-success border-success/40'
 											: response.status >= 400
-												? 'bg-destructive/20 text-destructive border-destructive/30'
+												? 'bg-destructive/20 text-destructive border-destructive/40'
 												: 'bg-warning/20 text-warning border-warning/30'
 									}`} title={query?.updatedAt ? DayJS(query.updatedAt).format('LLL') : DayJS().format('LLL')}>
 									{response.status} {response.statusText}
@@ -543,7 +543,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 									{response.responseTime}ms
 								</span>
 							</div>
-							<span className="text-xs font-medium text-muted-foreground/70">
+							<span className="text-xs font-medium text-muted-foreground">
 								{DayJS(query?.updatedAt || new Date()).fromNow()}
 							</span>
 						</div>

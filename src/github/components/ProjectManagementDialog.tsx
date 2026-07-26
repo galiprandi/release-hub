@@ -73,7 +73,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 						{projects.length === 0 && !isCreating && (
 							<EmptyState
 								className="min-h-0 py-12"
-								icon={<FolderKanban className="w-5 h-5 text-muted-foreground/70" />}
+								icon={<FolderKanban className="w-5 h-5 text-muted-foreground" />}
 								label="No tienes proyectos creados"
 								caption="Crea una colección para organizar tus repositorios y deployments de forma centralizada."
 							/>
@@ -132,7 +132,7 @@ export function ProjectManagementDialog({ isOpen, onOpenChange }: ProjectManagem
 												<h4 className="font-bold tracking-tight text-foreground text-xs">
 													{project.name}
 												</h4>
-												<span className="text-xs font-bold text-muted-foreground/70 bg-muted/30 px-1.5 rounded">
+												<span className="text-xs font-bold text-muted-foreground bg-muted/30 px-1.5 rounded">
 													{project.repos.length} REPOS
 												</span>
 											</div>

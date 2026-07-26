@@ -351,11 +351,11 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 								{data.commit.author}
 							</span>
 						)}
-						<span className="text-muted-foreground/70">·</span>
+						<span className="text-muted-foreground">·</span>
 						<span>{lastUpdated}</span>
 						{totalDuration && (
 							<>
-								<span className="text-muted-foreground/70">·</span>
+								<span className="text-muted-foreground">·</span>
 								<span className="inline-flex items-center gap-1 tabular-nums">
 									<Clock className="w-2.5 h-2.5" />
 									{totalDuration}
@@ -364,7 +364,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 						)}
 						{data.externalUrl && (
 							<>
-								<span className="text-muted-foreground/70">·</span>
+								<span className="text-muted-foreground">·</span>
 								<a
 									href={data.externalUrl}
 									target="_blank"
@@ -422,7 +422,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 						<button
 							type="button"
 							onClick={() => setIsErrorModalOpen(true)}
-							className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-destructive bg-destructive/5 border border-destructive/30 rounded-md hover:bg-destructive/10 transition-colors"
+							className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-destructive bg-destructive/5 border border-destructive/40 rounded-md hover:bg-destructive/10 transition-colors"
 						>
 							<AlertCircle className="w-3 h-3" />
 							{failedImages.length} imagen{failedImages.length > 1 ? 'es' : ''} fallida{failedImages.length > 1 ? 's' : ''}

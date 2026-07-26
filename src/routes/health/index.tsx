@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Activity, ExternalLink, Box, HelpCircle } from 'lucide-react';
+import { Activity, ExternalLink, Box, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { useHealthMonitor } from '@/plugins/pipeline/seki/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
 import { Table } from '@/components/ui/Table';
@@ -35,23 +35,23 @@ function HealthHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
       title={
         <div className="flex items-center gap-2">
           <HelpCircle className="w-4 h-4 text-primary" />
-          <span>Monitoreo de Salud</span>
+          <span>Health Monitor</span>
         </div>
       }
     >
       <div className="space-y-4 py-4">
         <p className="text-sm text-muted-foreground leading-relaxed">
-          El Monitor de Salud permite supervisar el estado de disponibilidad de tus servicios en tiempo real.
+          The Health Monitor tracks the availability of your services in real time.
         </p>
 
         <div className="space-y-3">
-          <h4 className="text-xs font-medium text-muted-foreground">Funcionamiento Técnico</h4>
+          <h4 className="text-xs font-medium text-muted-foreground">How it works</h4>
           <ul className="space-y-2">
             {[
-              "Detección automática de endpoints desde pipelines de despliegue",
-              "Verificación periódica del endpoint /health en cada URL detectada",
-              "Limpieza automática de servicios al remover repositorios de favoritos",
-              "Persistencia de estados de salud para análisis de estabilidad"
+              "Automatic endpoint detection from deployment pipelines",
+              "Periodic health checks on the /health endpoint of each detected URL",
+              "Automatic cleanup when repositories are removed from favorites",
+              "Health state persistence for stability analysis"
             ].map((text, i) => (
               <li key={i} className="flex items-start gap-3 text-sm">
                 <div className="mt-1.5 w-1 h-1 rounded-full bg-primary shrink-0" />
@@ -63,7 +63,7 @@ function HealthHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
 
         <div className="p-3 rounded-md bg-card border border-border">
           <p className="text-xs text-muted-foreground leading-relaxed italic">
-            Tip: Puedes filtrar por ambiente o estado de error directamente desde la barra superior para focalizar tu atención.
+            Tip: Filter by environment or error state from the header bar to focus your attention during incidents.
           </p>
         </div>
       </div>
@@ -594,6 +594,17 @@ function HealthMonitorPage() {
     >
       <div className="space-y-6">
       <HealthHelpDialog open={isHelpOpen} onOpenChange={setIsHelpOpen} />
+
+      {/* All systems operational banner */}
+      {filteredEndpoints.length > 0 && stats.unhealthy === 0 && stats.pending === 0 && (
+        <div className="flex items-center gap-3 p-3 rounded-md border border-success/30 bg-success/15">
+          <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
+          <div>
+            <span className="text-sm font-medium text-foreground">All systems operational</span>
+            <span className="text-xs text-muted-foreground ml-2">{stats.healthy} endpoint{stats.healthy !== 1 ? 's' : ''} healthy</span>
+          </div>
+        </div>
+      )}
 
       {/* Endpoints by product */}
       {filteredEndpoints.length === 0 ? (

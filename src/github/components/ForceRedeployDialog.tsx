@@ -180,16 +180,18 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 								merge.
 							</p>
 
-							<div className="border rounded-md p-4 space-y-2">
-								<div className="text-sm font-medium">Pasos:</div>
-								<ul className="text-sm space-y-1 text-muted-foreground list-disc list-inside">
+							<details className="border rounded-md p-4">
+								<summary className="text-sm font-medium cursor-pointer hover:text-primary transition-colors">
+									Pasos del proceso
+								</summary>
+								<ul className="text-sm space-y-1 text-muted-foreground list-disc list-inside mt-2">
 									<li>Crear rama temporal</li>
 									<li>Modificar archivo dedicado</li>
 									<li>Crear PR con auto merge</li>
 									<li>Esperar checks de seguridad</li>
-									<li>Merge automático o manual</li>
+									<li>Merge automatico o manual</li>
 								</ul>
-							</div>
+							</details>
 						</div>
 
 						<div className="mt-4 pt-4 border-t flex justify-end gap-2 flex-shrink-0">

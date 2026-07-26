@@ -224,7 +224,7 @@ export const DeploymentList = ({
 		setIsProjectSelectionOpen(true)
 	}
 
-	// Fetch pods for the selected deployment (for terminal pod selector)
+	// Fetch pods for the selected deployment (for terminal + logs pod selector)
 	const { data: deploymentPods } = useQuery({
 		queryKey: ['kubectl', 'pods-for-deployment', selectedDeployment?.name, selectedDeployment?.namespace, selectedContext],
 		queryFn: async () => {
@@ -232,7 +232,7 @@ export const DeploymentList = ({
 			const { getPodsForDeployment } = await import('@/api/kubectl')
 			return getPodsForDeployment(selectedDeployment.name, selectedDeployment.namespace, selectedContext)
 		},
-		enabled: isTerminalModalOpen && !!selectedDeployment && !!selectedContext,
+		enabled: (isTerminalModalOpen || isLogsModalOpen) && !!selectedDeployment && !!selectedContext,
 		refetchOnWindowFocus: false,
 		retry: 0,
 	})
@@ -315,6 +315,8 @@ export const DeploymentList = ({
 						resources={resources}
 						selectedResourceId={selectedResourceId}
 						onResourceChange={handleResourceChange}
+						context="k8s"
+						pods={(deploymentPods || []).map(p => ({ id: p.name, name: p.name, status: p.status }))}
 					/>,
 					document.body
 				)

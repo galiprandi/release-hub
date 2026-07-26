@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2, X, ClipboardCopy, Check, Sparkles, AlertCircle, Pause, Play, Terminal, Maximize2, Minimize2, Search, ChevronUp, ChevronDown } from "lucide-react";
+import { Loader2, X, ClipboardCopy, Check, Sparkles, AlertCircle, Pause, Play, Terminal, Maximize2, Minimize2, Search, ChevronUp, ChevronDown, AlertTriangle } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { useAISummarize } from "@galiprandi/react-tools";
 import { useAIErrorProcessor } from "@/hooks/useAIErrorProcessor";
@@ -9,8 +9,23 @@ import { AISummaryCard } from "@/components/shared/AISummaryCard";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { XTermLogs, type XTermLogsHandle } from "./XTermLogs";
 import { groupLogs, logLevelPattern } from "./logUtils";
+import { detectLogPatterns, type LogContext, type DetectedPattern } from "./logPatterns";
+import { getContextualPrompt } from "./logAiPrompts";
 import { IconButton } from "./IconButton";
 import { cn } from "@/lib/utils";
+
+export interface ContainerMetadata {
+	imageTag?: string;
+	restartCount?: number;
+	exitCode?: number;
+	startedAt?: string;
+}
+
+export interface PodInfo {
+	id: string;
+	name: string;
+	status?: string;
+}
 
 export interface LogsViewerProps {
 	/**
@@ -23,6 +38,16 @@ export interface LogsViewerProps {
 	resources?: { id: string; name: string; type: string }[];
 	selectedResourceId?: string;
 	onResourceChange?: (resourceId: string) => void;
+	/** Context for context-aware features (k8s error patterns, Docker metadata, AI prompts) */
+	context?: LogContext;
+	/** Docker container metadata to display in logs header */
+	metadata?: ContainerMetadata;
+	/** K8s pods within a deployment for pod-level log selection */
+	pods?: PodInfo[];
+	/** Currently selected pod ID */
+	selectedPodId?: string;
+	/** Callback when pod selection changes */
+	onPodChange?: (podId: string) => void;
 }
 
 export function LogsViewer({
@@ -32,6 +57,11 @@ export function LogsViewer({
 	resources,
 	selectedResourceId,
 	onResourceChange,
+	context = "generic",
+	metadata,
+	pods,
+	selectedPodId,
+	onPodChange,
 }: LogsViewerProps) {
 	const queryClient = useQueryClient();
 
@@ -54,6 +84,8 @@ export function LogsViewer({
 	});
 
 	const [filter, setFilter] = useState("");
+	const [useRegex, setUseRegex] = useState(false);
+	const [caseSensitive, setCaseSensitive] = useState(false);
 	const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const xtermRef = useRef<XTermLogsHandle>(null);
@@ -66,12 +98,21 @@ export function LogsViewer({
 		}
 	}, [isExpanded]);
 	
-	const { data: logsData, isLoading, error } = useLogsAccumulator({
+	const { data: logsData, isLoading, error, dataUpdatedAt } = useLogsAccumulator({
 		fetchFn,
 		resourceId: selectedResourceId || '',
 		autoScrollEnabled,
 		refetchInterval: 3000,
 	});
+
+	const lastLogTime = useMemo(() => {
+		if (!dataUpdatedAt) return null;
+		const diff = Math.floor((Date.now() - dataUpdatedAt) / 1000);
+		if (diff < 5) return "ahora";
+		if (diff < 60) return `hace ${diff}s`;
+		if (diff < 3600) return `hace ${Math.floor(diff / 60)}m`;
+		return `hace ${Math.floor(diff / 3600)}h`;
+	}, [dataUpdatedAt]);
 
 	// Concatenate all pages to get accumulated logs
 	const logs = logsData?.pages?.join('\n') || "";
@@ -176,13 +217,23 @@ export function LogsViewer({
 		return groupsToProcess.flatMap(group => group.split("\n"));
 	})();
 
+	const detectedPatterns = useMemo<DetectedPattern[]>(() => {
+		if (!currentLogs || context === "generic") return [];
+		return detectLogPatterns(currentLogs, context);
+	}, [currentLogs, context]);
+
 	const matchCount = useMemo(() => {
 		if (!filter || !filter.trim()) return 0;
-		const escaped = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-		const regex = new RegExp(escaped, 'gi');
-		const text = filteredLines.join('\n');
-		return (text.match(regex) || []).length;
-	}, [filteredLines, filter]);
+		try {
+			const pattern = useRegex ? filter : filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			const flags = caseSensitive ? 'g' : 'gi';
+			const regex = new RegExp(pattern, flags);
+			const text = filteredLines.join('\n');
+			return (text.match(regex) || []).length;
+		} catch {
+			return 0;
+		}
+	}, [filteredLines, filter, useRegex, caseSensitive]);
 
 	useEffect(() => {
 		if (filter.trim()) {
@@ -218,9 +269,9 @@ export function LogsViewer({
 		if (!currentLogs) return;
 
 		const logsToSummarize = filteredLines.join('\n');
-		const context = 'Analiza los logs SOLO para identificar problemas. Si los logs están en formato JSON, extrae el mensaje de error y el nivel (level). REGLAS ESTRICTAS: 1) NO repitas los logs completos o en JSON, 2) NO menciones configuración, rutas, startup, Swagger, mapeo de controladores, debug info, 3) Solo reporta ERRORES, WARNINGS, EXCEPCIONES, TIMEOUTS, FALLOS DE CONEXIÓN en lenguaje natural, 4) Compliance: secretos expuestos, credenciales en texto plano. ESTRUCTURA EXACTA (máximo 4 líneas, texto plano): * Errores críticos: [descripción en lenguaje natural o "ninguno"] * Warnings: [descripción en lenguaje natural o "ninguno"] * Compliance: [problemas o "ninguno"] * Estado general: HEALTHY/DEGRADED/CRITICAL. NO agregues secciones adicionales. Usa minúsculas en las etiquetas.';
-		const textWithContext = `INSTRUCCIÓN: ${context}\n\n${logsToSummarize}`;
-		const aiSummaryQueryKey = ['ai-summary', logsToSummarize, context];
+		const aiPrompt = getContextualPrompt(context);
+		const textWithContext = `INSTRUCCIÓN: ${aiPrompt}\n\n${logsToSummarize}`;
+		const aiSummaryQueryKey = ['ai-summary', logsToSummarize, aiPrompt];
 
 		setIsGeneratingLocal(true);
 
@@ -261,23 +312,63 @@ export function LogsViewer({
 		<div className="flex items-center gap-3">
 			{/* Status group: Live indicator + last log timestamp */}
 			{!isLoading && logs && (
-				<Tooltip.Root>
-					<Tooltip.Trigger asChild>
-						<span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-success bg-success/10 rounded-md cursor-default">
-							<span className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
-							Live
+				<div className="flex items-center gap-2">
+					<Tooltip.Root>
+						<Tooltip.Trigger asChild>
+							<span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-success bg-success/10 rounded-md cursor-default">
+								<span className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
+								Live
+							</span>
+						</Tooltip.Trigger>
+						<Tooltip.Portal>
+							<Tooltip.Content
+								className="bg-popover text-popover-foreground border px-2 py-1 text-xs font-medium rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
+								sideOffset={5}
+							>
+								Conexión en vivo activa
+								<Tooltip.Arrow className="fill-popover" />
+							</Tooltip.Content>
+						</Tooltip.Portal>
+					</Tooltip.Root>
+					{lastLogTime && (
+						<span className="text-xs text-muted-foreground font-mono" title="Última actualización de logs">
+							{lastLogTime}
 						</span>
-					</Tooltip.Trigger>
-					<Tooltip.Portal>
-						<Tooltip.Content
-							className="bg-popover text-popover-foreground border px-2 py-1 text-xs font-medium rounded-md shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000]"
-							sideOffset={5}
-						>
-							Conexión en vivo activa
-							<Tooltip.Arrow className="fill-popover" />
-						</Tooltip.Content>
-					</Tooltip.Portal>
-				</Tooltip.Root>
+					)}
+				</div>
+			)}
+
+			{/* K8s pod selector */}
+			{context === "k8s" && pods && pods.length > 0 && onPodChange && (
+				<select
+					value={selectedPodId || ""}
+					onChange={(e) => onPodChange(e.target.value)}
+					className="bg-muted/30 border border-border rounded-md px-2 py-1 text-xs font-medium focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none max-w-[200px]"
+					aria-label="Seleccionar pod"
+				>
+					{pods.map((pod) => (
+						<option key={pod.id} value={pod.id}>
+							{pod.name}{pod.status ? ` (${pod.status})` : ""}
+						</option>
+					))}
+				</select>
+			)}
+
+			{/* Docker container metadata */}
+			{context === "docker" && metadata && (
+				<div className="flex items-center gap-2 text-xs text-muted-foreground">
+					{metadata.imageTag && (
+						<span className="font-mono">{metadata.imageTag}</span>
+					)}
+					{metadata.restartCount !== undefined && metadata.restartCount > 0 && (
+						<span className={metadata.restartCount > 5 ? "text-destructive font-medium" : "text-warning font-medium"}>
+							{metadata.restartCount} restarts
+						</span>
+					)}
+					{metadata.exitCode !== undefined && metadata.exitCode !== 0 && (
+						<span className="text-destructive font-medium">exit {metadata.exitCode}</span>
+					)}
+				</div>
 			)}
 
 			{/* AI group */}
@@ -325,34 +416,82 @@ export function LogsViewer({
 				))}
 			</div>
 
-			<div className="relative">
-				<Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
-				<input
-					ref={searchInputRef}
-					type="text"
-					value={filter}
-					onChange={(e) => {
-						setFilter(e.target.value);
-						setCurrentMatchIndex(0);
-					}}
-					placeholder="Buscar (Cmd+F)"
-					aria-label="Buscar logs"
-					className="pl-7 pr-8 py-1 text-xs font-medium bg-muted/30 border border-border rounded-md w-56 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 placeholder:text-muted-foreground/60"
-				/>
-				{filter && (
-					<button
-						type="button"
-						onClick={() => {
-							setFilter("");
+			<div className="flex items-center gap-1">
+				<div className="relative">
+					<Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+					<input
+						ref={searchInputRef}
+						type="text"
+						value={filter}
+						onChange={(e) => {
+							setFilter(e.target.value);
 							setCurrentMatchIndex(0);
-							searchInputRef.current?.focus();
 						}}
-						className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted/30 rounded text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
-						aria-label="Limpiar búsqueda"
-					>
-						<X className="w-3 h-3" />
-					</button>
-				)}
+						placeholder={useRegex ? "Regex (Cmd+F)" : "Buscar (Cmd+F)"}
+						aria-label="Buscar logs"
+						className="pl-7 pr-8 py-1 text-xs font-medium bg-muted/30 border border-border rounded-md w-56 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 placeholder:text-muted-foreground/60 font-mono"
+					/>
+					{filter && (
+						<button
+							type="button"
+							onClick={() => {
+								setFilter("");
+								setCurrentMatchIndex(0);
+								searchInputRef.current?.focus();
+							}}
+							className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted/30 rounded text-muted-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+							aria-label="Limpiar búsqueda"
+						>
+							<X className="w-3 h-3" />
+						</button>
+					)}
+				</div>
+				<Tooltip.Root>
+					<Tooltip.Trigger asChild>
+						<button
+							type="button"
+							onClick={() => setUseRegex(!useRegex)}
+							aria-pressed={useRegex}
+							className={`px-1.5 py-1 text-xs font-mono rounded transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none ${
+								useRegex ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:bg-muted/30 border border-transparent"
+							}`}
+						>
+							.*
+						</button>
+					</Tooltip.Trigger>
+					<Tooltip.Portal>
+						<Tooltip.Content
+							className="bg-popover text-popover-foreground border px-2 py-1 text-xs font-medium rounded-md shadow-md z-[10000]"
+							sideOffset={5}
+						>
+							Modo regex
+							<Tooltip.Arrow className="fill-popover" />
+						</Tooltip.Content>
+					</Tooltip.Portal>
+				</Tooltip.Root>
+				<Tooltip.Root>
+					<Tooltip.Trigger asChild>
+						<button
+							type="button"
+							onClick={() => setCaseSensitive(!caseSensitive)}
+							aria-pressed={caseSensitive}
+							className={`px-1.5 py-1 text-xs font-medium rounded transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none ${
+								caseSensitive ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:bg-muted/30 border border-transparent"
+							}`}
+						>
+							Aa
+						</button>
+					</Tooltip.Trigger>
+					<Tooltip.Portal>
+						<Tooltip.Content
+							className="bg-popover text-popover-foreground border px-2 py-1 text-xs font-medium rounded-md shadow-md z-[10000]"
+							sideOffset={5}
+						>
+							Distinguir mayúsculas
+							<Tooltip.Arrow className="fill-popover" />
+						</Tooltip.Content>
+					</Tooltip.Portal>
+				</Tooltip.Root>
 			</div>
 
 			{filter.trim() !== "" && (
@@ -416,8 +555,28 @@ export function LogsViewer({
 			aria-label="Panel de logs"
 			className="flex-1 min-h-0 flex flex-col bg-black p-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset focus-visible:outline-none rounded-b-md"
 		>
-				{(processedError || summary) && (
+				{(processedError || summary || detectedPatterns.length > 0) && (
 					<div className="sticky top-0 z-20 shrink-0 space-y-2 mb-2">
+						{detectedPatterns.length > 0 && (
+							<div className={`p-3 border rounded-md ${detectedPatterns.some(p => p.severity === "critical") ? "bg-destructive/10 border-destructive/40" : "bg-warning/10 border-warning/40"}`}>
+								<div className="flex items-center gap-2 mb-2">
+									<AlertTriangle className={`w-4 h-4 ${detectedPatterns.some(p => p.severity === "critical") ? "text-destructive" : "text-warning"}`} />
+									<span className={`font-semibold text-sm ${detectedPatterns.some(p => p.severity === "critical") ? "text-destructive" : "text-warning"}`}>
+										{context === "k8s" ? "Patrones K8s detectados" : "Patrones Docker detectados"}
+									</span>
+									<span className="text-xs text-muted-foreground ml-auto">{detectedPatterns.length}</span>
+								</div>
+								<ul className="space-y-1">
+									{detectedPatterns.slice(0, 5).map((p) => (
+										<li key={p.pattern} className="flex items-center gap-2 text-xs">
+											<span className={`font-mono font-medium ${p.severity === "critical" ? "text-destructive" : "text-warning"}`}>{p.pattern}</span>
+											<span className="text-muted-foreground">{p.message}</span>
+											<span className="text-muted-foreground/60 ml-auto font-mono">{p.lineNumbers.length}x</span>
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
 						{processedError && (
 							<div className="p-3 bg-destructive/10 border border-destructive/40 rounded-md">
 								<div className="flex items-center justify-between gap-2 mb-2">

@@ -8,6 +8,7 @@ export interface ContainerInfo {
 	image: string;
 	created: string;
 	runningFor?: string;
+	restartCount?: number;
 }
 
 /**
@@ -71,6 +72,7 @@ function parseContainers(output: string): ContainerInfo[] {
 				CreatedAt: string
 				Names: string
 				RunningFor: string
+				RestartCount?: number
 			}
 
 			containers.push({
@@ -81,6 +83,7 @@ function parseContainers(output: string): ContainerInfo[] {
 				created: container.CreatedAt || '',
 				name: container.Names || 'unnamed',
 				runningFor: container.RunningFor || '',
+				restartCount: container.RestartCount ?? 0,
 			})
 		} catch (e) {
 			console.warn('[Docker] Failed to parse container line:', trimmedLine, e);

@@ -8,21 +8,31 @@ LogsViewer is a reusable component for displaying and managing logs from various
 
 ```typescript
 export interface LogsViewerProps {
-  queryFn: () => Promise<string>;
+  fetchFn: (cursor?: number) => Promise<string>;
   onClose: () => void;
   asModal?: boolean;
   resources?: { id: string; name: string; type: string }[];
   selectedResourceId?: string;
   onResourceChange?: (resourceId: string) => void;
+  context?: "k8s" | "docker" | "generic";
+  metadata?: { imageTag?: string; restartCount?: number; exitCode?: number; startedAt?: string };
+  pods?: { id: string; name: string; status?: string }[];
+  selectedPodId?: string;
+  onPodChange?: (podId: string) => void;
 }
 ```
 
-- **queryFn**: Function that fetches logs as a Promise<string>
+- **fetchFn**: Function that fetches logs as a Promise<string>
 - **onClose**: Callback to close the viewer
 - **asModal**: Whether to render as a modal (default: true)
 - **resources**: List of available resources (pods, deployments, containers)
 - **selectedResourceId**: Currently selected resource ID
 - **onResourceChange**: Callback when resource selection changes
+- **context**: Context for context-aware features (k8s error patterns, Docker metadata, AI prompts). Default: "generic"
+- **metadata**: Docker container metadata to display in logs header (image tag, restart count, exit code)
+- **pods**: K8s pods within a deployment for pod-level log selection
+- **selectedPodId**: Currently selected pod ID
+- **onPodChange**: Callback when pod selection changes
 
 ## Key Features
 

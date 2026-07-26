@@ -90,8 +90,8 @@ describe('LogsViewer', () => {
 		renderLogsViewer();
 		await waitFor(() => expect(screen.getByText(/Log 1/)).toBeTruthy());
 
-		const levelSelect = screen.getByLabelText(/Filtrar por nivel/);
-		fireEvent.change(levelSelect, { target: { value: 'ERROR' } });
+		const errorTab = screen.getByRole('button', { name: 'ERROR' });
+		fireEvent.click(errorTab);
 
 		expect(screen.queryByText(/Log 1/)).toBeNull();
 		expect(screen.getByText(/Log 2/)).toBeTruthy();

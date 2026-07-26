@@ -143,6 +143,11 @@ export const ContainerList = forwardRef<ContainerListRef, ContainerListProps>(({
 						resources={resources}
 						selectedResourceId={selectedResourceId}
 						onResourceChange={handleResourceChange}
+						context="docker"
+						metadata={{
+							imageTag: selectedContainer.image,
+							restartCount: selectedContainer.restartCount,
+						}}
 					/>,
 					document.body
 				)
@@ -220,6 +225,16 @@ function ContainersTable({
 			filterFn: 'equalsString',
 		},
 		{
+			accessorKey: "image",
+			header: () => <span className="text-xs font-medium text-muted-foreground">Image</span>,
+			cell: ({ row }) => <ImageCell container={row.original} />,
+		},
+		{
+			accessorKey: "restartCount",
+			header: () => <span className="text-xs font-medium text-muted-foreground">Restarts</span>,
+			cell: ({ row }) => <RestartsCell container={row.original} />,
+		},
+		{
 			accessorKey: "runningFor",
 			header: "Iniciado",
 			cell: ({ row }) => <StartedCell container={row.original} />,
@@ -288,6 +303,40 @@ function StatusCell({ container }: { container: ContainerInfo }) {
 			</span>
 		</div>
 	)
+}
+
+function ImageCell({ container }: { container: ContainerInfo }) {
+	const image = container.image || ''
+	const lastColon = image.lastIndexOf(':')
+	const hasTag = lastColon > 0 && !image.slice(lastColon + 1).includes('/')
+	const imageName = hasTag ? image.slice(0, lastColon) : image
+	const tag = hasTag ? image.slice(lastColon + 1) : 'latest'
+
+	return (
+		<div className="flex items-center gap-1 max-w-[200px] truncate">
+			<span className="text-xs font-medium text-muted-foreground truncate">{imageName}</span>
+			<span className="text-xs text-muted-foreground/60">:{tag}</span>
+		</div>
+	)
+}
+
+function RestartsCell({ container }: { container: ContainerInfo }) {
+	const restarts = container.restartCount ?? 0
+
+	if (restarts === 0) {
+		return <span className="text-xs font-medium text-muted-foreground">0</span>
+	}
+
+	if (restarts > 5) {
+		return (
+			<div className="flex items-center gap-1.5">
+				<span className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
+				<span className="text-xs font-medium text-destructive">{restarts}</span>
+			</div>
+		)
+	}
+
+	return <span className="text-xs font-medium text-warning">{restarts}</span>
 }
 
 function StartedCell({ container }: { container: ContainerInfo }) {

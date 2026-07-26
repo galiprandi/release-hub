@@ -240,7 +240,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 			<>
 				{/* URL and method controls */}
 				<div className="flex items-center gap-3 p-4 border-b bg-muted/30 flex-shrink-0">
-					<div className="flex-1 flex items-center gap-0.5 bg-background border border-border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1 transition-all">
+					<div className="flex-1 flex items-center gap-0.5 bg-background border border-border rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1 transition-all">
 						<div className="relative border-r border-border">
 							<select
 								value={form.method}
@@ -294,7 +294,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 						onClick={handleExecute}
 						disabled={isExecuting}
 						showLabel
-						className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg font-bold uppercase tracking-tight flex-shrink-0"
+						className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md font-bold uppercase tracking-tight flex-shrink-0"
 					/>
 				</div>
 
@@ -507,7 +507,7 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 												onSearchChange={setBodySearchQuery}
 											/>
 										) : (
-											<div className="text-xs font-mono space-y-1.5 bg-muted/30 border border-border rounded-lg p-4 h-full overflow-auto">
+											<div className="text-xs font-mono space-y-1.5 bg-muted/30 border border-border rounded-md p-4 h-full overflow-auto">
 												{Object.entries(response.headers).map(([key, value]) => (
 													<div key={key} className="flex gap-2 pb-1 border-b border-border last:border-0">
 														<span className="font-bold text-muted-foreground min-w-[120px] shrink-0 uppercase tracking-tighter">{key}:</span>

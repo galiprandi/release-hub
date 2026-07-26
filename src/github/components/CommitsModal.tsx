@@ -145,7 +145,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 									onChange={(e) => setFilter(e.target.value)}
 									placeholder="FILTRAR COMMITS"
 									aria-label="Filtrar commits"
-									className="w-full pl-9 pr-10 py-1.5 text-xs font-medium bg-muted/30 border border-border rounded-lg placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
+									className="w-full pl-9 pr-10 py-1.5 text-xs font-medium bg-background border border-border rounded-md placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all"
 								/>
 								{filter && (
 									<button
@@ -209,7 +209,7 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 								{filteredCommits.map((commit) => (
 									<div
 										key={commit.hash}
-										className="group p-4 bg-muted/30 rounded-md border border-transparent hover:bg-accent hover:border-primary/30 transition-all duration-200 focus-visible:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+										className="group p-4 bg-card rounded-md border border-transparent hover:bg-accent hover:border-primary/30 transition-all duration-200 focus-visible:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
 										onClick={() => toggleCommitExpansion(commit.hash)}
 										role="button"
 										aria-expanded={expandedCommits.has(commit.hash)}
@@ -251,12 +251,12 @@ export function CommitsModal({ isOpen, onClose, commits, prodCommitHash, prodTag
 														/>
 													</div>
 													<span>•</span>
-													<span className="font-medium text-foreground/70">{commit.author}</span>
+													<span className="font-medium text-muted-foreground">{commit.author}</span>
 													<span>•</span>
 													<span>{commit.date}</span>
 												</div>
 												{expandedCommits.has(commit.hash) && commit.body && (
-													<div className="mt-4 p-3 rounded-lg bg-background/50 border border-border text-xs text-muted-foreground whitespace-pre-wrap animate-in fade-in slide-in-from-top-2 duration-300">
+													<div className="mt-4 p-3 rounded-md bg-background border border-border text-xs text-muted-foreground whitespace-pre-wrap animate-in fade-in slide-in-from-top-2 duration-300">
 														{commit.body}
 													</div>
 												)}

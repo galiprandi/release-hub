@@ -137,7 +137,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 								<button
 									type="button"
 									disabled={!canManage}
-									className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors shadow-sm ${
+									className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors shadow-sm ${
 										isLocked
 											? "bg-warning text-warning-foreground hover:bg-warning/90"
 											: "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -188,7 +188,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 										type="text"
 										value={branch}
 										onChange={(e) => setBranch(e.target.value)}
-										className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
+										className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-md focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 										placeholder="main"
 									/>
 								</div>
@@ -215,7 +215,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 							<button
 								onClick={handleToggleFreeze}
 								disabled={isToggling}
-								className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none ${
+								className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none ${
 									isLocked ? "bg-info hover:bg-info/90" : "bg-muted-foreground hover:bg-muted-foreground/90"
 								}`}
 							>
@@ -241,7 +241,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 							)}
 						</div>
 						<Dialog.Close asChild>
-							<button className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all shadow-sm">
+							<button className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all shadow-sm">
 								Cerrar
 							</button>
 						</Dialog.Close>

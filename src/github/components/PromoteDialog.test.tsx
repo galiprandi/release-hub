@@ -121,9 +121,9 @@ describe("PromoteDialog", () => {
 		fireEvent.click(screen.getByRole("button", { name: /promocionar/i }))
 
 		const input = screen.getByLabelText(/nombre del tag/i)
-		expect(input).toHaveClass("focus-visible:ring-2", "focus-visible:ring-primary")
+		expect(input).toHaveClass("focus-visible:ring-2", "focus-visible:ring-primary/30")
 
 		const textarea = screen.getByLabelText(/descripción/i)
-		expect(textarea).toHaveClass("focus-visible:ring-2", "focus-visible:ring-primary")
+		expect(textarea).toHaveClass("focus-visible:ring-2", "focus-visible:ring-primary/30")
 	})
 })

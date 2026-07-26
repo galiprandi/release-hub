@@ -61,7 +61,7 @@ function HealthHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
           </ul>
         </div>
 
-        <div className="p-3 rounded-lg bg-muted/30 border border-border">
+        <div className="p-3 rounded-md bg-card border border-border">
           <p className="text-xs text-muted-foreground leading-relaxed italic">
             Tip: Puedes filtrar por ambiente o estado de error directamente desde la barra superior para focalizar tu atención.
           </p>
@@ -114,9 +114,9 @@ function ProductSection({
   });
 
   return (
-    <div className="bg-muted/30 rounded-md border border-border overflow-hidden shadow-sm">
+    <div className="bg-card rounded-md border border-border overflow-hidden shadow-sm">
       {/* Header del producto */}
-      <div className="flex items-center justify-between bg-muted/30 border-b border-border px-4 py-2">
+      <div className="flex items-center justify-between bg-background border-b border-border px-4 py-2">
         <div className="flex items-center gap-2">
           <Box className="w-4 h-4 text-primary" />
           <Link
@@ -142,7 +142,7 @@ function ProductSection({
                   </span>
                 )}
                 {pending > 0 && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-muted/30 border border-border text-xs font-medium text-muted-foreground">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-card border border-border text-xs font-medium text-muted-foreground">
                     <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
                     {pending} Pendiente
                   </span>
@@ -499,7 +499,7 @@ function HealthMonitorPage() {
         }}
         onClick={() => setIsHelpOpen(true)}
         size="md"
-        className="bg-muted/30 hover:bg-muted/30"
+        className="bg-background hover:bg-muted/30"
       />
       <div className="w-px h-6 bg-border mx-1" />
       {stats.unhealthy > 0 && (
@@ -515,7 +515,7 @@ function HealthMonitorPage() {
           }}
           loading={isChecking}
           showLabel
-          className="bg-destructive/10 border border-destructive/40"
+          className="bg-destructive/15 border border-destructive/40"
         />
       )}
     </div>
@@ -585,7 +585,7 @@ function HealthMonitorPage() {
           action={!activeFilter && (
             <Link
               to="/github"
-              className={`inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground text-xs font-medium rounded-lg shadow-sm hover:opacity-90 transition-all ${FOCUS_RING}`}
+              className={`inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground text-xs font-medium rounded-md shadow-sm hover:opacity-90 transition-all ${FOCUS_RING}`}
             >
               <ExternalLink className="w-4 h-4" />
               Explorar Repositorios

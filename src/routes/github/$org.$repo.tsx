@@ -94,12 +94,12 @@ function ProductIndex() {
 								href={openPRs?.repoUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted border border-border rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-background hover:bg-muted/30 border border-border rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 							>
 								<GitPullRequest className="w-3.5 h-3.5 text-primary" />
 								<span>PRs</span>
 								{openPRs && openPRs.count > 0 && (
-									<span className="inline-flex items-center justify-center px-1.5 py-0 text-xs font-bold bg-primary/20 text-primary border border-primary/30 rounded-full min-w-[1.25rem] h-4">
+									<span className="inline-flex items-center justify-center px-1.5 py-0 text-xs font-bold bg-primary/15 text-primary border border-primary/30 rounded-full min-w-[1.25rem] h-4">
 										{openPRs.count}
 									</span>
 								)}
@@ -108,20 +108,20 @@ function ProductIndex() {
 								href={actionsSummary?.repoUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted border border-border rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-background hover:bg-muted/30 border border-border rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 							>
 								<Play className="w-3.5 h-3.5 text-primary" />
 								<span>Actions</span>
 								{actionsSummary && actionsSummary.total > 0 && (
 									<div className="flex items-center gap-1 ml-0.5">
 										{actionsSummary.running > 0 && (
-											<span className="inline-flex items-center gap-0.5 px-1.5 py-0 text-xs font-bold bg-warning/20 text-warning border border-warning/30 rounded-full h-4">
+											<span className="inline-flex items-center gap-0.5 px-1.5 py-0 text-xs font-bold bg-warning/15 text-warning border border-warning/30 rounded-full h-4">
 												<span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
 												{actionsSummary.running}
 											</span>
 										)}
 										{actionsSummary.failed > 0 && (
-											<span className="inline-flex items-center justify-center px-1.5 py-0 text-xs font-bold bg-destructive/20 text-destructive border border-destructive/40 rounded-full min-w-[1rem] h-4">
+											<span className="inline-flex items-center justify-center px-1.5 py-0 text-xs font-bold bg-destructive/15 text-destructive border border-destructive/40 rounded-full min-w-[1rem] h-4">
 												{actionsSummary.failed}
 											</span>
 										)}

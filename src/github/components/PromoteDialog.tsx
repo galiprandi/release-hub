@@ -258,7 +258,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 												type="button"
 												onClick={() => generateCommitSummary(pendingCommits)}
 												disabled={isGeneratingSummary || !summaryAvailable || !hasPendingCommits}
-												className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-ai hover:bg-ai/10 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
+												className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-ai hover:bg-ai/15 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 												title="Regenerar descripción con IA"
 											>
 												{isGeneratingSummary ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
@@ -289,7 +289,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 											onClick={() => setShowCommits(!showCommits)}
 											aria-expanded={showCommits}
 											aria-controls="pending-commits-list"
-											className="w-full flex items-center justify-between px-3 py-2 bg-muted/50 hover:bg-muted border rounded-md transition-all text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
+											className="w-full flex items-center justify-between px-3 py-2 bg-muted hover:bg-muted border rounded-md transition-all text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 										>
 											<span className="flex items-center gap-2">
 												<GitCommit className="w-4 h-4 text-muted-foreground" />
@@ -306,7 +306,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 									{error && <p className="text-sm text-destructive">{error}</p>}
 
 									{!canCreateTags && !isLoadingPerms && (
-										<p className="text-xs text-warning bg-warning/10 p-2 rounded-lg border border-warning/30">
+										<p className="text-xs text-warning bg-warning/15 p-2 rounded-md border border-warning/30">
 											No tienes permisos de escritura en este repositorio para crear tags.
 										</p>
 									)}
@@ -377,7 +377,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 							<button
 								type="button"
 								onClick={() => handleOpenChange(false)}
-								className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none shadow-sm"
+								className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:outline-none shadow-sm"
 							>
 								Cerrar
 							</button>

@@ -66,7 +66,7 @@ function statusConfig(state: PulsarBuildState) {
 		case 'SKIPPED':
 			return {
 				icon: Circle,
-				color: 'text-muted-foreground/50',
+				color: 'text-muted-foreground',
 				bg: 'bg-muted/30',
 				badge: 'bg-muted/30 text-muted-foreground border border-border',
 				label: 'SKIPPED',
@@ -128,7 +128,7 @@ function ImageChip({
 				className={`w-3 h-3 ${config.color} ${image.state === 'RUNNING' ? 'animate-spin' : ''}`}
 			/>
 			<span>{image.app}</span>
-			<span className="text-xs opacity-60 normal-case font-medium">{image.appType}</span>
+			<span className="text-xs text-muted-foreground normal-case font-medium">{image.appType}</span>
 			{isClickable && (
 				<ChevronRight
 					className={`w-2.5 h-2.5 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
@@ -146,8 +146,8 @@ function ImagePanel({ image }: { image: PulsarImageJob }) {
 	const failedSteps = image.steps.filter((s) => s.state === 'FAILED')
 
 	return (
-		<div className="border border-border rounded-lg overflow-hidden bg-muted/30">
-			<div className="flex items-center justify-between px-3 py-2 bg-muted/30 border-b border-border">
+		<div className="border border-border rounded-lg overflow-hidden bg-card">
+			<div className="flex items-center justify-between px-3 py-2 bg-background border-b border-border">
 				<div className="flex items-center gap-2">
 					<config.icon className={`w-4 h-4 ${config.color}`} />
 					<span className="text-xs font-bold text-foreground">{image.app}</span>
@@ -203,16 +203,16 @@ function ImagePanel({ image }: { image: PulsarImageJob }) {
 
 			{/* Error detail */}
 			{failedSteps.length > 0 && (
-				<div className="px-3 py-3 border-t border-border bg-destructive/5 space-y-2">
+				<div className="px-3 py-3 border-t border-border bg-destructive/15 space-y-2">
 					<div className="flex items-center gap-2">
-						<AlertCircle className="w-3.5 h-3.5 shrink-0 text-destructive/60" />
-						<span className="text-xs font-medium text-destructive/70 dark:text-destructive/60">
+						<AlertCircle className="w-3.5 h-3.5 shrink-0 text-destructive" />
+						<span className="text-xs font-medium text-destructive dark:text-destructive">
 							Step{failedSteps.length > 1 ? 's' : ''} fallido{failedSteps.length > 1 ? 's' : ''}
 						</span>
 					</div>
 					{failedSteps.map((step) => (
 						<div key={step.number} className="space-y-0.5">
-							<p className="text-xs text-foreground/90 font-medium">{step.name}</p>
+							<p className="text-xs text-foreground font-medium">{step.name}</p>
 							{image.url && (
 								<a
 									href={`${image.url}#step-${step.number}:1`}
@@ -241,8 +241,8 @@ function FallbackPanel({ data }: { data: PulsarBuildData }) {
 	const Icon = config.icon
 
 	return (
-		<div className="border border-border rounded-lg overflow-hidden bg-destructive/5">
-			<div className="flex items-center justify-between px-3 py-2 bg-destructive/10 border-b border-border">
+		<div className="border border-border rounded-lg overflow-hidden bg-destructive/15">
+			<div className="flex items-center justify-between px-3 py-2 bg-destructive/15 border-b border-border">
 				<div className="flex items-center gap-2">
 					<Icon className={`w-4 h-4 ${config.color}`} />
 					<span className="text-xs font-bold text-foreground">{fb.name}</span>
@@ -264,10 +264,10 @@ function FallbackPanel({ data }: { data: PulsarBuildData }) {
 			</div>
 			{fb.errorStep && (
 				<div className="px-3 py-2.5 space-y-1">
-					<span className="text-xs font-medium text-destructive/70 dark:text-destructive/60">
+					<span className="text-xs font-medium text-destructive dark:text-destructive">
 						Step fallido
 					</span>
-					<p className="text-xs text-foreground/90 font-medium">{fb.errorStep.name}</p>
+					<p className="text-xs text-foreground font-medium">{fb.errorStep.name}</p>
 				</div>
 			)}
 		</div>
@@ -347,7 +347,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 					{/* Meta: author · time · duration */}
 					<div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
 						{data.commit?.author && (
-							<span className="font-medium text-foreground/80 truncate max-w-[200px]">
+							<span className="font-medium text-foreground truncate max-w-[200px]">
 								{data.commit.author}
 							</span>
 						)}
@@ -422,7 +422,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 						<button
 							type="button"
 							onClick={() => setIsErrorModalOpen(true)}
-							className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-destructive bg-destructive/5 border border-destructive/40 rounded-md hover:bg-destructive/10 transition-colors"
+							className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-destructive bg-destructive/15 border border-destructive/40 rounded-md hover:bg-destructive/15 transition-colors"
 						>
 							<AlertCircle className="w-3 h-3" />
 							{failedImages.length} imagen{failedImages.length > 1 ? 'es' : ''} fallida{failedImages.length > 1 ? 's' : ''}

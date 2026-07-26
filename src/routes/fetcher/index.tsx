@@ -225,7 +225,7 @@ function FetcherPage() {
 					value={curlInput}
 					onChange={(e) => setCurlInput(e.target.value)}
 					placeholder="Importar cURL... (curl -X GET...)"
-					className="w-80 px-3 py-1.5 text-sm border border-border bg-muted/30 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 font-mono transition-shadow placeholder:text-muted-foreground"
+					className="w-80 px-3 py-1.5 text-sm border border-border bg-muted/30 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 font-mono transition-shadow placeholder:text-muted-foreground"
 				/>
 			</div>
 			<ActionButton
@@ -233,7 +233,7 @@ function FetcherPage() {
 				onClick={handleSendCurl}
 				disabled={!isCurlValid}
 				size="md"
-				className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
+				className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
 			/>
 		</form>
 	);
@@ -251,7 +251,7 @@ function FetcherPage() {
 							handleQuerySearch(e.target.value);
 						}}
 						placeholder="Buscar en historial..."
-						className="w-48 pl-8 pr-3 py-1.5 bg-muted/30 border border-border rounded-lg text-xs focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground font-medium uppercase tracking-tight"
+						className="w-48 pl-8 pr-3 py-1.5 bg-muted/30 border border-border rounded-md text-xs focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground font-medium uppercase tracking-tight"
 					/>
 					{search.q && (
 						<button

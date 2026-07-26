@@ -83,7 +83,15 @@ export function PageLayout({
 	emptyState,
 	showEmptyState,
 }: PageLayoutProps) {
-	const [isDark, setIsDark] = useState(true);
+	const [isDark, setIsDark] = useState(() => {
+		try {
+			const saved = localStorage.getItem("release_hub_theme");
+			if (saved !== null) return JSON.parse(saved) as boolean;
+		} catch {
+			/* noop */
+		}
+		return true;
+	});
 	const routerState = useRouterState();
 	const pathname = routerState.location.pathname;
 	const { data: gitUser } = useGitUser();
@@ -98,6 +106,11 @@ export function PageLayout({
 			document.documentElement.classList.add("dark");
 		} else {
 			document.documentElement.classList.remove("dark");
+		}
+		try {
+			localStorage.setItem("release_hub_theme", JSON.stringify(isDark));
+		} catch {
+			/* noop */
 		}
 	}, [isDark]);
 

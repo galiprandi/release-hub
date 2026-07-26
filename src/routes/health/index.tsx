@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Activity, ExternalLink, Box, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { Activity, ExternalLink, Box, HelpCircle, CheckCircle2, XCircle, Circle } from 'lucide-react';
 import { useHealthMonitor } from '@/plugins/pipeline/seki/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
 import { Table } from '@/components/ui/Table';
@@ -575,6 +575,28 @@ function HealthMonitorPage() {
             <span>Health Monitor</span>
             {isChecking && (
               <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" title="Revalidando..." />
+            )}
+            {stats.total > 0 && (
+              <div className="flex items-center gap-2 ml-2 text-xs">
+                {stats.healthy > 0 && (
+                  <span className="flex items-center gap-1 text-success">
+                    <CheckCircle2 className="w-3 h-3" />
+                    {stats.healthy}
+                  </span>
+                )}
+                {stats.unhealthy > 0 && (
+                  <span className="flex items-center gap-1 text-destructive">
+                    <XCircle className="w-3 h-3" />
+                    {stats.unhealthy}
+                  </span>
+                )}
+                {stats.pending > 0 && (
+                  <span className="flex items-center gap-1 text-muted-foreground">
+                    <Circle className="w-3 h-3" />
+                    {stats.pending}
+                  </span>
+                )}
+              </div>
             )}
           </div>
         ),

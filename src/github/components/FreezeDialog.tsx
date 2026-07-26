@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import * as Dialog from "@radix-ui/react-dialog"
 import * as Tooltip from "@radix-ui/react-tooltip"
-import { Unlock, Lock, Loader2, CheckCircle2 } from "lucide-react"
+import { Unlock, Lock, Loader2, CheckCircle2, ExternalLink } from "lucide-react"
 import { runCommand } from "@/api/exec"
 import { useBranchProtection } from "@/hooks/useBranchProtection"
 import { useDiscordChannel } from "@/hooks/useDiscordChannel"
@@ -292,11 +292,22 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 								</p>
 							)}
 						</div>
-						<Dialog.Close asChild>
-							<button className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all shadow-sm">
-								Cerrar
-							</button>
-						</Dialog.Close>
+						<div className="flex items-center gap-2 mt-2">
+							<a
+								href={`https://github.com/${repo}/settings/branches`}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium border border-border bg-background text-foreground rounded-md hover:bg-muted/30 transition-colors"
+							>
+								<ExternalLink className="w-3.5 h-3.5" />
+								Ver reglas de branch
+							</a>
+							<Dialog.Close asChild>
+								<button className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all shadow-sm">
+									Cerrar
+								</button>
+							</Dialog.Close>
+						</div>
 					</div>
 				)}
 			</BaseDialog>

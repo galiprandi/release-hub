@@ -12,7 +12,7 @@ interface ForceRedeployDialogProps {
 	showLabel?: boolean;
 }
 
-type Step = "config" | "executing" | "success" | "error";
+type Step = "config" | "confirm" | "executing" | "success" | "error";
 
 export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false }: ForceRedeployDialogProps) {
 	const [open, setOpen] = useState(false);
@@ -204,27 +204,58 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 								</button>
 							</Dialog.Close>
 							<button
-								onClick={handleForceRedeploy}
-								disabled={isExecuting}
-								className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
+								onClick={() => setStep("confirm")}
+								className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 							>
-								{isExecuting ? (
-									<>
-										<Loader2 className="w-4 h-4 animate-spin" />
-										Ejecutando...
-									</>
-								) : (
-									<>
-										<RefreshCw className="w-4 h-4" />
-										Comenzar
-									</>
-								)}
+								<RefreshCw className="w-4 h-4" />
+								Comenzar
 							</button>
 						</div>
 					</div>
 				)}
 
-				{/* Step 2: Executing */}
+
+			{/* Step 2: Confirm */}
+			{step === "confirm" && (
+				<div className="flex flex-col flex-1 overflow-y-auto">
+					<div className="space-y-4">
+						<div className="p-4 rounded-md border bg-warning/15 border-warning/30">
+							<div className="flex items-start gap-3">
+								<AlertCircle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+								<div className="space-y-2">
+									<p className="text-sm font-semibold">¿Forzar redeploy de staging?</p>
+									<p className="text-sm text-muted-foreground">
+										Se creará un PR en <code className="font-mono bg-muted px-1 rounded">{repo}</code> para
+										forzar el redeploy de staging. El PR se mergeará automáticamente cuando pasen los checks.
+									</p>
+									<p className="text-xs text-muted-foreground">
+										Esto modificará un archivo dedicado en el repo y disparará el pipeline de staging.
+									</p>
+								</div>
+							</div>
+						</div>
+
+						{error && <p className="text-sm text-destructive">{error}</p>}
+					</div>
+
+					<div className="mt-4 pt-4 border-t flex justify-end gap-2 flex-shrink-0">
+						<button
+							onClick={() => setStep("config")}
+							className="px-4 py-2 text-sm font-medium border border-border bg-background text-foreground rounded-md hover:bg-muted/30 transition-colors"
+						>
+							Volver
+						</button>
+						<button
+							onClick={handleForceRedeploy}
+							disabled={isExecuting}
+							className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
+						>
+							{isExecuting ? <><Loader2 className="w-4 h-4 animate-spin" /> Iniciando...</> : <><RefreshCw className="w-4 h-4" /> Sí, forzar redeploy</>}
+						</button>
+					</div>
+				</div>
+			)}
+				{/* Step 3: Executing */}
 				{step === "executing" && (
 					<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
 						<Loader2 className="w-12 h-12 animate-spin text-blue-600" />

@@ -8,6 +8,7 @@ import { StageCommitsTable } from "@/github/components/StageCommitsTable";
 import { PromoteDialog } from "@/github/components/PromoteDialog";
 import { ForceRedeployDialog } from "@/github/components/ForceRedeployDialog";
 import { FreezeDialog } from "@/github/components/FreezeDialog";
+import { PipelineSummaryBar } from "@/github/components/PipelineSummaryBar";
 import { ProjectSelector } from "@/github/components/ProjectSelector";
 import { useGitCommits } from "@/hooks/useGitCommits";
 import { useGitTags } from "@/hooks/useGitTags";
@@ -145,6 +146,7 @@ function ProductIndex() {
 			refreshFn={handleRefetchPipeline}
 		>
 			<div className="space-y-4 mb-4">
+				<PipelineSummaryBar org={org} repo={repo} />
 				<PulsarBuildMonitor
 					org={org}
 					repo={repo}

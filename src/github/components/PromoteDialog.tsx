@@ -22,7 +22,7 @@ interface PromoteDialogProps {
 	showLabel?: boolean
 }
 
-type Step = 'config' | 'success'
+type Step = 'config' | 'confirm' | 'success'
 
 export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = false }: PromoteDialogProps) {
 	const queryClient = useQueryClient()
@@ -54,6 +54,10 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 	}, [commits, latestTagData])
 
 	const hasPendingCommits = pendingCommits.length > 0
+	const prodCommitNotFound = useMemo(() => {
+		if (!commits || !latestTagData?.commit) return false
+		return commits.findIndex(c => c.hash === latestTagData.commit) === -1
+	}, [commits, latestTagData])
 
 	// Hook para generar resumen de commits con IA
 	const { generateCommitSummary, isGenerating: isGeneratingSummary, summary, isAvailable: summaryAvailable, getStatusMessage } = useCommitSummary()
@@ -172,7 +176,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 		}
 	}
 
-	const dialogWidth = step === 'success' ? 'max-w-md' : (hasPendingCommits && showCommits ? 'max-w-5xl' : 'max-w-xl')
+	const dialogWidth = step === 'success' ? 'max-w-md' : step === 'confirm' ? 'max-w-md' : (hasPendingCommits && showCommits ? 'max-w-5xl' : 'max-w-xl')
 
 	return (
 		<>
@@ -216,6 +220,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 				title={
 					<>
 						{step === 'config' && <><Rocket className="w-4 h-4" /> Configurar Lanzamiento</>}
+						{step === "confirm" && <><Rocket className="w-4 h-4" /> Confirmar Lanzamiento</>}
 						{step === 'success' && <><CheckCircle2 className="w-4 h-4 text-success" /> Lanzamiento Exitoso</>}
 					</>
 				}
@@ -303,7 +308,13 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 										</button>
 									)}
 
-									{error && <p className="text-sm text-destructive">{error}</p>}
+									{prodCommitNotFound && (
+									<p className="text-xs text-warning bg-warning/15 p-2 rounded-md border border-warning/30">
+										No se pudo determinar el commit de producción. Mostrando todos los commits. Verificá antes de promocionar.
+									</p>
+								)}
+
+								{error && <p className="text-sm text-destructive">{error}</p>}
 
 									{!canCreateTags && !isLoadingPerms && (
 										<p className="text-xs text-warning bg-warning/15 p-2 rounded-md border border-warning/30">
@@ -314,11 +325,11 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 
 								<div className="mt-4 pt-4 border-t border-border flex justify-end flex-shrink-0">
 									<button
-										onClick={handleCreateTag}
+										onClick={() => setStep("confirm")}
 										disabled={isCreating || !tagName.trim() || (!canCreateTags && !isLoadingPerms)}
 										className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none shadow-sm"
 									>
-										{isCreating ? <><Loader2 className="w-4 h-4 animate-spin" /> Publicando...</> : <><Rocket className="w-4 h-4" /> Publicar Tag</>}
+										<Rocket className="w-4 h-4" /> Publicar Tag
 									</button>
 								</div>
 							</div>
@@ -358,6 +369,62 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 									</div>
 								</div>
 							)}
+						</div>
+					)}
+
+					{/* Step 2: Confirm */}
+					{step === 'confirm' && (
+						<div className="flex flex-col flex-1 overflow-y-auto">
+							<div className="space-y-4">
+								<div className="p-4 rounded-md border bg-primary/15 border-primary/30">
+									<div className="flex items-start gap-3">
+										<Rocket className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+										<div className="space-y-3">
+											<p className="text-sm font-semibold">¿Promocionar a producción?</p>
+											<div className="space-y-2 text-sm">
+												<div className="flex justify-between gap-4">
+													<span className="text-muted-foreground">Tag:</span>
+													<span className="font-mono font-medium">{tagName}</span>
+												</div>
+												<div className="flex justify-between gap-4">
+													<span className="text-muted-foreground">Repo:</span>
+													<span className="font-mono font-medium">{repo}</span>
+												</div>
+												<div className="flex justify-between gap-4">
+													<span className="text-muted-foreground">Commits:</span>
+													<span className="font-medium">{pendingCommits.length} commit{pendingCommits.length !== 1 ? 's' : ''}</span>
+												</div>
+												<div className="flex justify-between gap-4">
+													<span className="text-muted-foreground">Notificación Discord:</span>
+													<span className="font-medium">{notificationsEnabled && webhookUrl ? "Sí" : "No"}</span>
+												</div>
+											</div>
+											<p className="text-xs text-muted-foreground pt-2 border-t border-border">
+												Se creará el tag <strong className="font-mono">{tagName}</strong> en el commit más reciente de main.
+												Esto puede disparar el pipeline de producción.
+											</p>
+										</div>
+									</div>
+								</div>
+
+								{error && <p className="text-sm text-destructive">{error}</p>}
+							</div>
+
+							<div className="mt-4 pt-4 border-t border-border flex justify-end gap-2 flex-shrink-0">
+								<button
+									onClick={() => setStep('config')}
+									className="px-4 py-2 text-sm font-medium border border-border bg-background text-foreground rounded-md hover:bg-muted/30 transition-colors"
+								>
+									Volver
+								</button>
+								<button
+									onClick={handleCreateTag}
+									disabled={isCreating}
+									className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none shadow-sm"
+								>
+									{isCreating ? <><Loader2 className="w-4 h-4 animate-spin" /> Publicando...</> : <><Rocket className="w-4 h-4" /> Sí, publicar</>}
+								</button>
+							</div>
 						</div>
 					)}
 

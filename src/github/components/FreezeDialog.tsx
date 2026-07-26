@@ -17,7 +17,7 @@ interface FreezeDialogProps {
 	showLabel?: boolean
 }
 
-type Step = 'config' | 'success'
+type Step = 'config' | 'confirm' | 'success'
 
 export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: FreezeDialogProps) {
 	const queryClient = useQueryClient()
@@ -141,7 +141,7 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 										isLocked
 											? "bg-warning text-warning-foreground hover:bg-warning/90"
 											: "bg-muted text-muted-foreground hover:bg-muted/80"
-									} disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none`}
+									} focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none`}
 								>
 									{isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
 									<span>{isLocked ? "Desbloquear" : "Bloquear"}</span>
@@ -213,19 +213,71 @@ export function FreezeDialog({ repo, iconOnly = false, showLabel = false }: Free
 
 						<div className="mt-4 pt-4 border-t border-border flex justify-end flex-shrink-0">
 							<button
-								onClick={handleToggleFreeze}
-								disabled={isToggling}
-								className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none ${
-									isLocked ? "bg-info hover:bg-info/90" : "bg-muted-foreground hover:bg-muted-foreground/90"
+								onClick={() => setStep("confirm")}
+								className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors shadow-sm inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none ${
+									isLocked ? "bg-primary hover:bg-primary/90" : "bg-warning hover:bg-warning/90"
 								}`}
 							>
-								{isToggling ? <><Loader2 className="w-4 h-4 animate-spin" /> Procesando...</> : <>{isLocked ? <><Lock className="w-4 h-4" /> Desbloquear</> : <><Lock className="w-4 h-4" /> Bloquear</>}</>}
+								{isLocked ? <><Unlock className="w-4 h-4" /> Desbloquear</> : <><Lock className="w-4 h-4" /> Bloquear</>}
 							</button>
 						</div>
 					</div>
-				)}
 
-				{/* Step 2: Success */}
+			)}
+
+			{/* Step 2: Confirm */}
+			{step === 'confirm' && (
+				<div className="flex flex-col flex-1 overflow-y-auto">
+					<div className="space-y-4">
+						<div className={`p-4 rounded-md border ${isLocked ? 'bg-primary/15 border-primary/30' : 'bg-warning/15 border-warning/30'}`}>
+							<div className="flex items-start gap-3">
+								{isLocked
+									? <Unlock className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+									: <Lock className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+								}
+								<div className="space-y-2">
+									<p className="text-sm font-semibold">
+										{isLocked ? "¿Desbloquear branch?" : "¿Bloquear branch?"}
+									</p>
+									<p className="text-sm text-muted-foreground">
+										Vas a <strong>{isLocked ? "desbloquear" : "bloquear"}</strong> el branch{" "}
+										<code className="font-mono bg-muted px-1 rounded">{branch}</code> de{" "}
+										<code className="font-mono bg-muted px-1 rounded">{repo}</code>.
+									</p>
+									<p className="text-xs text-muted-foreground">
+										{isLocked
+											? "Se permitirán merges y pushes nuevamente. El equipo podrá continuar con releases."
+											: "Se bloquearán todos los merges y pushes. Esto detendrá los releases hasta que se desbloquee."
+									}
+								</p>
+								</div>
+							</div>
+						</div>
+
+						{error && <p className="text-sm text-destructive">{error}</p>}
+					</div>
+
+					<div className="mt-4 pt-4 border-t border-border flex justify-end gap-2 flex-shrink-0">
+						<button
+							onClick={() => setStep('config')}
+							className="px-4 py-2 text-sm font-medium border border-border bg-background text-foreground rounded-md hover:bg-muted/30 transition-colors"
+						>
+							Volver
+						</button>
+						<button
+							onClick={handleToggleFreeze}
+							disabled={isToggling}
+							className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none ${
+								isLocked ? "bg-primary hover:bg-primary/90" : "bg-warning hover:bg-warning/90"
+							}`}
+						>
+							{isToggling ? <><Loader2 className="w-4 h-4 animate-spin" /> Procesando...</> : <>{isLocked ? <><Unlock className="w-4 h-4" /> Sí, desbloquear</> : <><Lock className="w-4 h-4" /> Sí, bloquear</>}</>}
+						</button>
+					</div>
+				</div>
+			)}
+
+			{/* Step 3: Success */}
 				{step === 'success' && (
 					<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
 						<CheckCircle2 className="w-12 h-12 text-success" />

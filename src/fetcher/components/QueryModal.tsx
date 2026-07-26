@@ -1,6 +1,6 @@
 
 import { useState, type Dispatch, type SetStateAction } from 'react';
-import { Send, AlertTriangle, Plus } from 'lucide-react';
+import { Send, Plus } from 'lucide-react';
 import { BaseDialog } from '@/components/ui/BaseDialog';
 import { JsonEditor } from '@/fetcher/components/JsonEditor';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
@@ -33,7 +33,6 @@ interface ParsedCurl {
 	headers: Record<string, string>;
 	body: string;
 	queryParams: Record<string, string>;
-	isTokenExpired?: boolean;
 }
 
 function parseInitialCurl(curl?: string): ParsedCurl {
@@ -420,15 +419,8 @@ export function QueryModal({ query, setQuery, onClose }: QueryModalProps) {
 																					headers: { ...prev.headers, [key]: e.target.value }
 																				}))}
 																			placeholder="Value"
-																			className={`w-full px-2.5 py-1.5 pr-8 text-xs border bg-background rounded-md focus:outline-none focus-visible:ring-2 transition-shadow ${
-																				form.isTokenExpired && value.trim().length > 0
-																						? 'bg-warning/10 border-warning text-warning-foreground focus-visible:ring-warning'
-																						: 'focus-visible:ring-primary border-input'
-																				}`}
-																	/>
-																	{form.isTokenExpired && value.trim().length > 0 && (
-																		<AlertTriangle className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-warning" />
-																	)}
+																	className="w-full px-2.5 py-1.5 text-xs border border-input bg-background rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 transition-shadow"
+																/>
 																</div>
 															) : (
 																	<input

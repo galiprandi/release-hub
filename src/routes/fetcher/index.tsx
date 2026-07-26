@@ -514,33 +514,35 @@ function ActionsCell({
 	isDeleting: boolean
 }) {
 	return (
-		<div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-all duration-200">
+		<div className="flex items-center justify-end gap-1">
 			<ActionButton
 				action={ACTION_DEFINITIONS.send}
 				onClick={() => onOpenModal(query)}
 				size="sm"
 				className="text-success hover:bg-success/20"
 			/>
-			<div className="w-px h-4 bg-border mx-0.5" />
-			<CopyButton
-				text={query.curl}
-				tooltip="Copiar cURL"
-				className="opacity-100 hover:bg-accent focus-visible:ring-offset-1"
-			/>
-			{query.response?.body && (
+			<div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-all duration-200">
+				<div className="w-px h-4 bg-border mx-0.5" />
 				<CopyButton
-					text={query.response.body}
-					tooltip="Copiar respuesta"
+					text={query.curl}
+					tooltip="Copiar cURL"
 					className="opacity-100 hover:bg-accent focus-visible:ring-offset-1"
 				/>
-			)}
-			<div className="w-px h-4 bg-border mx-0.5" />
-			<ActionButton
-				action={ACTION_DEFINITIONS.delete}
-				onClick={() => onDelete(query)}
-				disabled={isDeleting}
-				size="sm"
-			/>
+				{query.response?.body && (
+					<CopyButton
+						text={query.response.body}
+						tooltip="Copiar respuesta"
+						className="opacity-100 hover:bg-accent focus-visible:ring-offset-1"
+					/>
+				)}
+				<div className="w-px h-4 bg-border mx-0.5" />
+				<ActionButton
+					action={ACTION_DEFINITIONS.delete}
+					onClick={() => onDelete(query)}
+					disabled={isDeleting}
+					size="sm"
+				/>
+			</div>
 		</div>
 	)
 }

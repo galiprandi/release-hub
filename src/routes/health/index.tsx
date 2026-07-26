@@ -137,19 +137,19 @@ function ProductSection({
               <>
                 {healthy > 0 && (
                   <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-success/20 border border-success/40 text-xs font-medium text-success">
-                    <div className="w-1.5 h-1.5 rounded-full bg-success" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-success" />
                     {healthy} OK
                   </span>
                 )}
                 {pending > 0 && (
                   <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-card border border-border text-xs font-medium text-muted-foreground">
-                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/40" />
                     {pending} Pendiente
                   </span>
                 )}
                 {unhealthy > 0 && (
                   <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-destructive/20 border border-destructive/40 text-xs font-medium text-destructive">
-                    <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-destructive" />
                     {unhealthy} Error
                   </span>
                 )}
@@ -246,9 +246,9 @@ function EndpointsTable({
 }
 
 function StatusCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
-  if (endpoint.isHealthy === null) return <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
-  if (endpoint.isHealthy === true) return <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse " />
-  return <div className="w-1.5 h-1.5 rounded-full bg-destructive " />
+  if (endpoint.isHealthy === null) return <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/40" title="Pendiente" />
+  if (endpoint.isHealthy === true) return <div className="w-2.5 h-2.5 rounded-full bg-success animate-pulse" title="Healthy" />
+  return <div className="w-2.5 h-2.5 rounded-full bg-destructive ring-2 ring-destructive/30" title="Error" />
 }
 
 function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
@@ -268,9 +268,12 @@ function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMo
 
 function ResponseTimeCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
   if (endpoint.responseTime !== undefined) {
+    // Performance thresholds decoupled from health status
+    const rt = endpoint.responseTime
+    const perfColor = rt < 200 ? 'text-success' : rt < 500 ? 'text-warning' : 'text-destructive'
     return (
-      <span className={`text-xs font-medium ${endpoint.isHealthy ? 'text-success' : 'text-destructive'}`}>
-        {endpoint.responseTime}ms
+      <span className={`text-xs font-medium ${perfColor}`} title={`${rt}ms`}>
+        {rt}ms
       </span>
     )
   }
@@ -278,6 +281,8 @@ function ResponseTimeCell({ endpoint }: { endpoint: ReturnType<typeof useHealthM
 }
 
 function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
+  const [expanded, setExpanded] = useState(false)
+
   if (!endpoint.error) return <span className="text-xs font-medium text-muted-foreground">-</span>
 
   const errorMessage = (() => {
@@ -292,12 +297,28 @@ function ErrorCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>
     return endpoint.error;
   })()
 
-  const truncatedMessage = errorMessage.length > 50 ? `${errorMessage.slice(0, 50)}...` : errorMessage
+  const isLong = errorMessage.length > 50
+  const displayMessage = isLong && !expanded ? `${errorMessage.slice(0, 50)}...` : errorMessage
 
   return (
-    <span className="text-xs font-medium text-destructive" title={errorMessage}>
-      {truncatedMessage}
-    </span>
+    <div className="flex flex-col gap-1">
+      <span className="text-xs font-medium text-destructive">
+        {displayMessage}
+      </span>
+      {isLong && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors w-fit"
+        >
+          {expanded ? "Ver menos" : "Ver más"}
+        </button>
+      )}
+      {expanded && endpoint.details && (
+        <pre className="text-xs font-mono text-muted-foreground bg-muted p-2 rounded-md mt-1 max-h-32 overflow-y-auto whitespace-pre-wrap">
+          {endpoint.details}
+        </pre>
+      )}
+    </div>
   )
 }
 
@@ -542,7 +563,7 @@ function HealthMonitorPage() {
             <Activity className="w-4 h-4 text-primary" />
             <span>Health Monitor</span>
             {isChecking && (
-              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" title="Revalidando..." />
+              <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" title="Revalidando..." />
             )}
           </div>
         ),

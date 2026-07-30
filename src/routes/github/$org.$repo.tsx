@@ -9,7 +9,6 @@ import { StageCommitsTable } from "@/github/components/StageCommitsTable";
 import { PromoteDialog } from "@/github/components/PromoteDialog";
 import { ForceRedeployDialog } from "@/github/components/ForceRedeployDialog";
 import { FreezeDialog } from "@/github/components/FreezeDialog";
-import { PipelineSummaryBar } from "@/github/components/PipelineSummaryBar";
 import { useSekiPipelinesByEnv } from "@/plugins/pipeline/seki/hooks/useSekiPipelinesByEnv";
 import { usePulsarBuilds } from "@/plugins/pipeline/pulsar/hooks/usePulsarBuilds";
 import { pulsarAdapter } from "@/plugins/pipeline/pulsar/adapter";
@@ -150,7 +149,6 @@ function ProductIndex() {
 			refreshFn={handleRefetchPipeline}
 		>
 			<div className="space-y-4 mb-4">
-				<PipelineSummaryBar org={org} repo={repo} />
 				<PulsarBuildMonitor
 					org={org}
 					repo={repo}

@@ -97,6 +97,12 @@
 - debe retornar objeto vacío si el JSON es inválido
 - debe retornar permisos cuando el comando es exitoso
 
+## Module: useSekiTokenRefresh
+- falla si el comando no devuelve token
+- falla si el token no tiene formato JWT
+- obtiene y devuelve el token correctamente
+- propaga errores del comando
+
 ## Module: useWebMCP
 - get_repo_details tool calls runCommand correctly
 - promote_to_production tool calls APIs correctly

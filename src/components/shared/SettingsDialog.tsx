@@ -1,10 +1,11 @@
 import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import * as Dialog from "@radix-ui/react-dialog"
-import { Settings, Trash2, Save, RefreshCw, Eye, EyeOff } from "lucide-react"
+import { Settings, Trash2, Save, RefreshCw, Eye, EyeOff, Download, CheckCircle2, AlertCircle } from "lucide-react"
 import { IconButton } from "@/components/shared/IconButton"
 import { useSettings } from "@/hooks/useSettings"
 import { useToken } from "@/hooks/useToken"
+import { useSekiTokenRefresh } from "@/hooks/useSekiTokenRefresh"
 import { BaseDialog } from "@/components/ui/BaseDialog"
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog"
 
@@ -22,6 +23,20 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 	const [isClearingCache, setIsClearingCache] = useState(false)
 	const [confirmRevoke, setConfirmRevoke] = useState(false)
 	const [confirmWebhook, setConfirmWebhook] = useState(false)
+	const [refreshFeedback, setRefreshFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+
+	const { refreshToken: refreshSekiToken, isRefreshing: isRefreshingSekiToken } = useSekiTokenRefresh({
+		onSuccess: (token) => {
+			saveSekiToken(token)
+			setSekiToken(token)
+			setRefreshFeedback({ type: 'success', message: 'Token actualizado automáticamente' })
+			setTimeout(() => setRefreshFeedback(null), 4000)
+		},
+		onError: (message) => {
+			setRefreshFeedback({ type: 'error', message })
+			setTimeout(() => setRefreshFeedback(null), 6000)
+		},
+	})
 
 	const handleSaveSekiToken = () => {
 		if (sekiTokenInput.trim()) {
@@ -67,6 +82,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 			setDiscordWebhookInput("")
 			setShowSekiToken(false)
 			setShowDiscordWebhook(false)
+			setRefreshFeedback(null)
 		}
 	}
 
@@ -130,14 +146,40 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 									)}
 								</div>
 
-								<button
-									type="button"
-									onClick={() => setConfirmRevoke(true)}
-									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-md border border-transparent hover:border-destructive/40 transition-all w-full"
-								>
-									<Trash2 className="w-3.5 h-3.5" />
-									Revocar Acceso
-								</button>
+								{refreshFeedback && (
+									<div className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium ${refreshFeedback.type === 'success' ? 'bg-success/10 text-success border border-success/30' : 'bg-destructive/10 text-destructive border border-destructive/30'}`}>
+										{refreshFeedback.type === 'success' ? <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" /> : <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />}
+										<span>{refreshFeedback.message}</span>
+									</div>
+								)}
+
+								<div className="flex gap-2">
+									<button
+										type="button"
+										onClick={() => refreshSekiToken()}
+										disabled={isRefreshingSekiToken}
+										className="flex items-center justify-center gap-2 text-xs font-medium bg-primary text-primary-foreground hover:opacity-90 px-4 py-2 rounded-md border border-transparent transition-all w-full disabled:opacity-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+									>
+										{isRefreshingSekiToken ? (
+											<>
+												<RefreshCw className="w-3.5 h-3.5 animate-spin" />
+												<span>Obteniendo...</span>
+											</>
+										) : (
+											<>
+												<RefreshCw className="w-3.5 h-3.5" />
+												<span>Actualizar Token</span>
+											</>
+										)}
+									</button>
+									<button
+										type="button"
+										onClick={() => setConfirmRevoke(true)}
+										className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-md border border-transparent hover:border-destructive/40 transition-all"
+									>
+										<Trash2 className="w-3.5 h-3.5" />
+									</button>
+								</div>
 							</div>
 						) : (
 							<div className="space-y-3">
@@ -173,6 +215,33 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 										</button>
 									</div>
 								</div>
+
+								<button
+									type="button"
+									onClick={() => refreshSekiToken()}
+									disabled={isRefreshingSekiToken}
+									className="flex items-center justify-center gap-2 text-xs font-medium bg-muted hover:bg-muted/80 px-4 py-2 rounded-md border border-border transition-all w-full disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+								>
+									{isRefreshingSekiToken ? (
+										<>
+											<RefreshCw className="w-3.5 h-3.5 animate-spin text-primary" />
+											<span>Obteniendo token...</span>
+										</>
+									) : (
+										<>
+											<Download className="w-3.5 h-3.5 text-muted-foreground" />
+											<span>Obtener automáticamente</span>
+										</>
+									)}
+								</button>
+
+								{refreshFeedback && (
+									<div className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium ${refreshFeedback.type === 'success' ? 'bg-success/10 text-success border border-success/30' : 'bg-destructive/10 text-destructive border border-destructive/30'}`}>
+										{refreshFeedback.type === 'success' ? <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" /> : <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />}
+										<span>{refreshFeedback.message}</span>
+									</div>
+								)}
+
 								<p className="text-xs font-medium text-muted-foreground text-center">
 									Persistencia local en el entorno del navegador
 								</p>

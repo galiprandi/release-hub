@@ -12,6 +12,13 @@
 
 ## Aprendizaje de Mejoras Implementadas
 
+### Mejora #18: Seki Token Auto-Refresh CTA
+- **CLI Integration**: `seki auth get --token-only` devuelve el JWT directamente en stdout (~723 chars). Comando agregado a `SAFE_COMMANDS` en `src/utils/security.ts`.
+- **Hook**: `useSekiTokenRefresh` (`src/hooks/useSekiTokenRefresh.ts`) ejecuta el comando via `runCommand(['seki', 'auth', 'get', '--token-only'])`, valida formato JWT (3 partes separadas por dots) y guarda el token via `useSettings.setSekiToken` + `useToken.saveToken`.
+- **UI CTA**: `SettingsDialog` ahora tiene dos botones: "Actualizar Token" (token existente) y "Obtener automáticamente" (sin token). Ambos ejecutan el refresh automático con feedback visual (success/error).
+- **Security**: `seki` agregado a la allow-list de `SAFE_COMMANDS`. El comando se ejecuta via `spawn` con `shell: false`, sin riesgo de inyección.
+- **Verificación**: Build zero-warning, 274 tests exitosos.
+
 ### Mejora #15: Diff Viewer Evolution & Architectural Alignment
 - **Architectural Alignment**: Relocación de `EmptyState.tsx` a `src/components/shared/` cumpliendo con el estándar de componentes compartidos.
 - **Diff Viewer Evolution**: Integración de `EmptyState` V2 para estados iniciales, estandarización de badges técnicos y aplicación de tipografía de alta densidad.

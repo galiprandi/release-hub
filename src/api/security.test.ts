@@ -280,6 +280,7 @@ describe('Security Hardening', () => {
       expect(SAFE_COMMANDS).toContain('kubectl');
       expect(SAFE_COMMANDS).toContain('docker');
       expect(SAFE_COMMANDS).toContain('curl');
+      expect(SAFE_COMMANDS).toContain('seki');
     });
 
     it('should not contain shells or node', () => {

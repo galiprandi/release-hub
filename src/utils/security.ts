@@ -23,6 +23,7 @@ export const SAFE_COMMANDS = [
   'echo',
   'jq',
   'helm',
+  'seki',
 ];
 
 /**

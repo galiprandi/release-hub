@@ -21,7 +21,6 @@ import {
 	Github,
 	GitPullRequest,
 	GitPullRequestCreateArrow,
-	Loader2,
 	Play,
 	RefreshCw,
 	Search,
@@ -73,8 +72,7 @@ function Dashboard() {
 	});
 	const navigate = useNavigate({ from: "/github/" });
 	const { favorites, projects, toggleFavorite } = useUserCollections();
-	const { isLoading: isLoadingRepos, data: summaryData } =
-		useUserReposSummary();
+	const { data: summaryData } = useUserReposSummary();
 	const { location } = useRouterState();
 	const isIndexRoute = location.pathname === "/github";
 	const [isManageProjectsOpen, setIsManageProjectsOpen] = useState(false);
@@ -245,7 +243,6 @@ function Dashboard() {
 					size="md"
 				/>,
 			]}
-			isLoading={isLoadingRepos}
 			footer={
 				summaryData
 					? {
@@ -763,17 +760,6 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 	const latestTag = queryData?.latestTag;
 	const pendingCount = queryData?.pendingCount || 0;
 
-	if (isLoading) {
-		return (
-			<div className="flex items-center gap-2">
-				<div className="w-4 h-4 bg-muted/30 rounded-full flex-shrink-0 flex items-center justify-center">
-					<Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
-				</div>
-				<div className="h-4 bg-muted/30 rounded w-32 animate-pulse" />
-			</div>
-		);
-	}
-
 	return (
 		<>
 			<div className="flex items-center gap-2 group/name">
@@ -785,7 +771,9 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 				>
 					{name}
 				</Link>
-				{pendingCount > 0 && (
+				{isLoading ? (
+					<div className="h-4 w-8 bg-muted/30 rounded animate-pulse" />
+				) : pendingCount > 0 && (
 						<Tooltip.Root>
 							<Tooltip.Trigger asChild>
 								<button

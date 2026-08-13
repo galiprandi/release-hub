@@ -445,11 +445,11 @@ export const cachePolicies: Record<QueryKeyDomain, CachePolicy> = {
 		retry: 0, // No reintentar si falla
 	},
 
-	// GIT: Cachear corto, refrescar al volver a la tab
+	// GIT: Cachear corto, persistir para carga instantánea, refrescar al volver a la tab
 	git: {
 		staleTime: 60 * 1000, // 1 minuto
 		gcTime: 5 * 60 * 1000, // 5 minutos
-		persistInLocalStorage: false, // No persistir
+		persistInLocalStorage: true, // Persistir para carga instantánea de /github
 		refetchOnWindowFocus: true, // Refrescar al volver a la tab
 		refetchInterval: false,
 		retry: 2,
@@ -495,11 +495,11 @@ export const cachePolicies: Record<QueryKeyDomain, CachePolicy> = {
 		retry: 2,
 	},
 
-	// USER: Cachear infinito, NO persistir en LS (manejo manual en useUserCollections)
+	// USER: Cachear infinito, persistir reposSummary para carga instantánea
 	user: {
 		staleTime: Infinity, // Nunca stale
 		gcTime: Infinity, // Nunca garbage collect
-		persistInLocalStorage: false, // NO persistir (manejo manual con localStorage directo)
+		persistInLocalStorage: true, // Persistir reposSummary para /github instantáneo
 		refetchOnWindowFocus: false,
 		refetchInterval: false,
 		retry: 0,

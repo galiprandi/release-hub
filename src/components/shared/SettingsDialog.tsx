@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import * as Dialog from "@radix-ui/react-dialog"
-import { Settings, Trash2, Save, RefreshCw, Eye, EyeOff, Download, CheckCircle2, AlertCircle } from "lucide-react"
+import * as Tooltip from "@radix-ui/react-tooltip"
+import { Settings, Trash2, Save, RefreshCw, Eye, EyeOff, Download, CheckCircle2, AlertCircle, Bell } from "lucide-react"
 import { IconButton } from "@/components/shared/IconButton"
 import { useSettings } from "@/hooks/useSettings"
 import { useToken } from "@/hooks/useToken"
@@ -11,7 +12,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog"
 
 export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpenChange }: { showTrigger?: boolean, open?: boolean, onOpenChange?: (open: boolean) => void }) {
 	const queryClient = useQueryClient()
-	const { settings, setSekiToken, setDiscordWebhook, isUpdating } = useSettings()
+	const { settings, setSekiToken, setDiscordWebhook, updateSettings, isUpdating } = useSettings()
 	const { saveToken: saveSekiToken, clearToken: clearSekiToken, isExpired, expirationDate } = useToken()
 	const [internalOpen, setInternalOpen] = useState(false)
 	const open = controlledOpen !== undefined ? controlledOpen : internalOpen
@@ -315,7 +316,60 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 						)}
 					</section>
 
-					{/* Clear Cache Section */}
+					{/* Seki Deploy Notifications Section */}
+				<section className="space-y-4">
+					<div className="pb-3 border-b border-border">
+						<h3 className="text-xs font-medium text-foreground">Notificaciones de Despliegue</h3>
+						<p className="text-xs font-medium text-muted-foreground mt-1">
+							Alertas nativas del navegador con sonido para pipelines Seki
+						</p>
+					</div>
+
+					<div className="border border-border rounded-md bg-muted/5 p-4">
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-2">
+								<Bell className="w-4 h-4 text-muted-foreground" />
+								<span className="text-sm font-medium">Notificar despliegues Seki</span>
+							</div>
+							<Tooltip.Root>
+								<Tooltip.Trigger asChild>
+									<button
+										type="button"
+										role="switch"
+										aria-checked={settings.sekiNotificationsEnabled}
+										aria-label="Notificar despliegues Seki"
+										onClick={() => {
+											const next = !settings.sekiNotificationsEnabled
+											updateSettings({ sekiNotificationsEnabled: next })
+											if (next && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+												Notification.requestPermission().catch(() => {})
+											}
+										}}
+										className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${settings.sekiNotificationsEnabled ? 'bg-primary' : 'bg-muted'} focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1`}
+									>
+										<span
+											className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${settings.sekiNotificationsEnabled ? 'translate-x-5' : 'translate-x-1'}`}
+										/>
+									</button>
+								</Tooltip.Trigger>
+								<Tooltip.Portal>
+									<Tooltip.Content
+										className="bg-popover text-popover-foreground border px-3 py-2 rounded-md shadow-md text-xs font-medium z-50"
+										sideOffset={5}
+									>
+										{settings.sekiNotificationsEnabled ? 'Desactivar notificaciones' : 'Activar notificaciones'}
+										<Tooltip.Arrow className="fill-popover" />
+									</Tooltip.Content>
+								</Tooltip.Portal>
+							</Tooltip.Root>
+						</div>
+						<p className="text-xs font-medium text-muted-foreground mt-3 ml-1">
+							Notifica cuando un despliegue inicia o finaliza en los repos favoritos. Incluye sonido de alerta.
+						</p>
+					</div>
+				</section>
+
+				{/* Clear Cache Section */}
 					<section className="space-y-4">
 						<div className="pb-3 border-b border-border">
 							<h3 className="text-xs font-medium text-foreground">Gestión de Datos</h3>

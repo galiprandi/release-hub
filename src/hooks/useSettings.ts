@@ -11,11 +11,13 @@ const SETTINGS_KEY = 'releasehub_settings'
 export interface Settings {
 	sekiToken: string | null
 	discordWebhook: string | null
+	sekiNotificationsEnabled: boolean
 }
 
 const DEFAULT_SETTINGS: Settings = {
 	sekiToken: null,
 	discordWebhook: null,
+	sekiNotificationsEnabled: false,
 }
 
 /**
@@ -25,7 +27,11 @@ function loadSettings(): Settings {
 	try {
 		const stored = localStorage.getItem(SETTINGS_KEY)
 		if (stored) {
-			return JSON.parse(stored) as Settings
+			const parsed = JSON.parse(stored) as Partial<Settings>
+			return {
+				...DEFAULT_SETTINGS,
+				...parsed,
+			}
 		}
 
 		// Migration: Try to migrate from old per-repo discord webhooks

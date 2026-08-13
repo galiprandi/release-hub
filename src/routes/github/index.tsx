@@ -43,6 +43,8 @@ import { ItemProjectSelectionDialog } from "@/components/shared/ItemProjectSelec
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useUserCollections } from "@/hooks/useUserCollections";
 import { useUserReposSummary } from "@/hooks/useUserReposSummary";
+import { useSettings } from "@/hooks/useSettings";
+import { useSekiDeployNotifications } from "@/hooks/useSekiDeployNotifications";
 import { usePipelineWithHealth } from "@/plugins/pipeline/seki/hooks/usePipelineWithHealth";
 import { useHealthMonitor } from "@/plugins/pipeline/seki/hooks/useHealthMonitor";
 import {
@@ -73,6 +75,11 @@ function Dashboard() {
 	const navigate = useNavigate({ from: "/github/" });
 	const { favorites, projects, toggleFavorite } = useUserCollections();
 	const { data: summaryData } = useUserReposSummary();
+	const { settings } = useSettings();
+	useSekiDeployNotifications({
+		repos: favorites,
+		enabled: settings.sekiNotificationsEnabled,
+	});
 	const { location } = useRouterState();
 	const isIndexRoute = location.pathname === "/github";
 	const [isManageProjectsOpen, setIsManageProjectsOpen] = useState(false);

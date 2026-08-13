@@ -54,7 +54,7 @@ export function useSekiPipelinesByEnv({
 		enabled: enabled && hasToken && !!org && !!repo,
 		refetchInterval: (query) => {
 			const pipelines = query.state.data as SekiPipelinesByEnv | undefined
-			if (!pipelines) return false
+			if (!pipelines) return 30000 // 30s baseline to detect new deploys
 
 			const activeStates = ['STARTED', 'RUNNING']
 			const hasActiveStaging = pipelines.staging?.events.some((e) =>
@@ -65,10 +65,10 @@ export function useSekiPipelinesByEnv({
 			) || activeStates.includes(pipelines.production?.state ?? '')
 
 			if (hasActiveStaging || hasActiveProd) {
-				return 15000 // 15 seconds
+				return 15000 // 15 seconds when deploy in progress
 			}
 
-			return false
+			return 30000 // 30s baseline to detect new deploys
 		},
 		staleTime: 5000,
 		retry: (failureCount, error) => {

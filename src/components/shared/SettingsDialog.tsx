@@ -7,6 +7,7 @@ import { IconButton } from "@/components/shared/IconButton"
 import { useSettings } from "@/hooks/useSettings"
 import { useToken } from "@/hooks/useToken"
 import { useSekiTokenRefresh } from "@/hooks/useSekiTokenRefresh"
+import { testSekiNotification } from "@/hooks/useSekiDeployNotifications"
 import { BaseDialog } from "@/components/ui/BaseDialog"
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog"
 
@@ -366,6 +367,16 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 						<p className="text-xs font-medium text-muted-foreground mt-3 ml-1">
 							Notifica cuando un despliegue inicia o finaliza en los repos favoritos. Incluye sonido de alerta.
 						</p>
+						{settings.sekiNotificationsEnabled && (
+							<button
+								type="button"
+								onClick={() => testSekiNotification()}
+								className="mt-3 flex items-center gap-2 text-xs font-medium bg-muted hover:bg-muted/80 px-3 py-1.5 rounded-md border border-border transition-all focus:outline-none focus:ring-2 focus:ring-primary/30"
+							>
+								<Bell className="w-3 h-3" />
+								Probar notificación
+							</button>
+						)}
 					</div>
 				</section>
 

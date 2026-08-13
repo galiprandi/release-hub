@@ -163,6 +163,15 @@ function fireNotification(title: string, body: string) {
 
 let audioCtx: AudioContext | null = null
 
+/**
+ * Dispara una notificación de prueba + sonido.
+ * Útil para verificar permisos y audio desde Settings.
+ */
+export function testSekiNotification() {
+	fireNotification('ReleaseHub — Notificación de prueba', '🔔 Las notificaciones funcionan correctamente')
+	playSound(false)
+}
+
 function playSound(isError: boolean = false) {
 	try {
 		if (!audioCtx) {

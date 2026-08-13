@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import * as Dialog from "@radix-ui/react-dialog"
 import * as Tooltip from "@radix-ui/react-tooltip"
-import { Settings, Trash2, Save, RefreshCw, Eye, EyeOff, Download, CheckCircle2, AlertCircle, Bell } from "lucide-react"
+import { Settings, Trash2, Save, RefreshCw, Eye, EyeOff, Download, CheckCircle2, AlertCircle, Bell, Send } from "lucide-react"
 import { IconButton } from "@/components/shared/IconButton"
 import { useSettings } from "@/hooks/useSettings"
 import { useToken } from "@/hooks/useToken"
@@ -26,6 +26,8 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 	const [confirmRevoke, setConfirmRevoke] = useState(false)
 	const [confirmWebhook, setConfirmWebhook] = useState(false)
 	const [refreshFeedback, setRefreshFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+	const [discordTestFeedback, setDiscordTestFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+	const [isTestingDiscord, setIsTestingDiscord] = useState(false)
 
 	const { refreshToken: refreshSekiToken, isRefreshing: isRefreshingSekiToken } = useSekiTokenRefresh({
 		onSuccess: (token) => {
@@ -65,6 +67,34 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 		setDiscordWebhook(null)
 	}
 
+	const handleTestDiscordWebhook = async () => {
+		if (!settings.discordWebhook) return
+		setIsTestingDiscord(true)
+		setDiscordTestFeedback(null)
+		try {
+			const response = await fetch(settings.discordWebhook, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					embeds: [{
+						title: 'ReleaseHub — Notificación de prueba',
+						description: 'Las notificaciones de Discord funcionan correctamente 🔔',
+						color: 0x6366f1,
+						timestamp: new Date().toISOString(),
+						footer: { text: 'ReleaseHub — Test' },
+					}],
+				}),
+			})
+			if (!response.ok) throw new Error(`HTTP ${response.status}`)
+			setDiscordTestFeedback({ type: 'success', message: 'Notificación enviada a Discord' })
+		} catch {
+			setDiscordTestFeedback({ type: 'error', message: 'Error al enviar a Discord' })
+		} finally {
+			setIsTestingDiscord(false)
+			setTimeout(() => setDiscordTestFeedback(null), 4000)
+		}
+	}
+
 	const handleClearCache = async () => {
 		setIsClearingCache(true)
 		try {
@@ -85,6 +115,7 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 			setShowSekiToken(false)
 			setShowDiscordWebhook(false)
 			setRefreshFeedback(null)
+			setDiscordTestFeedback(null)
 		}
 	}
 
@@ -272,14 +303,40 @@ export function SettingsDialog({ showTrigger = true, open: controlledOpen, onOpe
 									</p>
 								</div>
 
-								<button
-									type="button"
-									onClick={() => setConfirmWebhook(true)}
-									className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-md border border-transparent hover:border-destructive/40 transition-all w-full"
-								>
-									<Trash2 className="w-3.5 h-3.5" />
-									Eliminar Webhook
-								</button>
+								<div className="flex gap-2">
+									<button
+										type="button"
+										onClick={handleTestDiscordWebhook}
+										disabled={isTestingDiscord}
+										className="flex items-center justify-center gap-2 text-xs font-medium bg-muted hover:bg-muted/80 px-4 py-2 rounded-md border border-border transition-all flex-1 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+									>
+										{isTestingDiscord ? (
+											<>
+												<RefreshCw className="w-3.5 h-3.5 animate-spin" />
+												<span>Enviando...</span>
+											</>
+										) : (
+											<>
+												<Send className="w-3.5 h-3.5" />
+												<span>Probar</span>
+											</>
+										)}
+									</button>
+									<button
+										type="button"
+										onClick={() => setConfirmWebhook(true)}
+										className="flex items-center justify-center gap-2 text-xs font-medium text-destructive hover:bg-destructive/10 px-4 py-2 rounded-md border border-transparent hover:border-destructive/40 transition-all"
+									>
+										<Trash2 className="w-3.5 h-3.5" />
+									</button>
+								</div>
+
+								{discordTestFeedback && (
+									<div className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium ${discordTestFeedback.type === 'success' ? 'bg-success/10 text-success border border-success/30' : 'bg-destructive/10 text-destructive border border-destructive/30'}`}>
+										{discordTestFeedback.type === 'success' ? <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" /> : <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />}
+										<span>{discordTestFeedback.message}</span>
+									</div>
+								)}
 							</div>
 						) : (
 							<div className="space-y-1.5">

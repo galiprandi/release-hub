@@ -119,18 +119,30 @@ function flattenSekiEvents(events: SekiEvent[]): SekiPipelineEvent[] {
 function buildStages(events: SekiEvent[]): SekiStage[] {
 	return events.map((event) => {
 		const subevents: SekiPipelineEvent[] = (event.subevents || []).map(mapSubEvent)
+		const eventState = mapSekiState(event.state)
 
-		// Recalcular estado del stage basado en sus subevents
+		// Usar el estado del event de Seki como fuente primaria.
+		// Solo refinar con subevents si el event está COMPLETED (puede haber
+		// subevents FAILED/WARN que el event-level no reflejó).
 		const hasFail = subevents.some((s) => s.state === 'FAILED')
 		const hasWarn = subevents.some((s) => s.state === 'WARN')
 		const hasRunning = subevents.some((s) => s.state === 'RUNNING' || s.state === 'STARTED')
-		const stageState: SekiPipelineState = hasFail
-			? 'FAILED'
-			: hasRunning
-				? 'RUNNING'
-				: hasWarn
-					? 'WARN'
-					: 'COMPLETED'
+		const allIdle = subevents.length > 0 && subevents.every((s) => s.state === 'IDLE')
+
+		let stageState: SekiPipelineState
+		if (eventState === 'STARTED' || eventState === 'RUNNING') {
+			stageState = 'RUNNING'
+		} else if (eventState === 'IDLE' || allIdle) {
+			stageState = 'IDLE'
+		} else if (hasFail) {
+			stageState = 'FAILED'
+		} else if (hasRunning) {
+			stageState = 'RUNNING'
+		} else if (hasWarn) {
+			stageState = 'WARN'
+		} else {
+			stageState = eventState
+		}
 
 		return {
 			id: event.id || `stage-${event.label?.en || 'unknown'}`,
@@ -169,7 +181,7 @@ function extractErrorMarkdown(events: SekiEvent[]): string | undefined {
  * Transform a single environment's Seki response to SekiPipelineData.
  * The refType is inferred from git.event: 'tag' → TAG, anything else → COMMIT.
  */
-function transformSekiData(data: PipelineStatusResponse): SekiPipelineData {
+export function transformSekiData(data: PipelineStatusResponse): SekiPipelineData {
 	const isTag = data.git.event === 'tag'
 	const ref = isTag && data.git.ref ? data.git.ref : data.git.commit.slice(0, 7)
 	const state = mapSekiState(data.state)

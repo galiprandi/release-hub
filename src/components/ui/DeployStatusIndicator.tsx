@@ -1,5 +1,5 @@
 import * as Tooltip from "@radix-ui/react-tooltip"
-import { CheckCircle, XCircle, Loader2, AlertTriangle, HelpCircle } from "lucide-react"
+import { CheckCircle, XCircle, Loader2, AlertTriangle, HelpCircle, Circle } from "lucide-react"
 import DayJS from "@/lib/dayjs"
 
 interface DeployStatusIndicatorProps {
@@ -78,6 +78,13 @@ export function DeployStatusIndicator({
 					iconProps: {},
 					badgeClass: "bg-warning/20 text-warning",
 					label: "Warning"
+				}
+			case "idle":
+				return {
+					icon: Circle,
+					iconProps: {},
+					badgeClass: "bg-muted/30 text-muted-foreground",
+					label: "Idle"
 				}
 			default:
 				return {
@@ -206,6 +213,15 @@ export function DeployStatusIndicator({
 								Por: {commitInfo.author}
 							</div>
 						)}
+					</div>
+				)
+			case "idle":
+				return (
+					<div className="text-xs space-y-1">
+						<div className="font-medium">Pipeline sin ejecutar</div>
+						<div className="text-muted-foreground">
+							El pipeline aún no ha iniciado
+						</div>
 					</div>
 				)
 			default:

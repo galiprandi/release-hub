@@ -31,6 +31,10 @@ import {
 	AlertCircle,
 	Sparkles,
 	ChevronRight,
+	Server,
+	Globe,
+	Bell,
+	Box,
 } from 'lucide-react'
 import { useAIPrompt } from '@galiprandi/react-tools'
 import DayJS from '@/lib/dayjs'
@@ -193,8 +197,26 @@ function filterStage(stage: SekiStage): SekiStage {
 	const filteredSubs = stage.subevents.filter((s) => !isJiraSubevent(s))
 	const hasFail = filteredSubs.some((s) => s.state === 'FAILED')
 	const hasWarn = filteredSubs.some((s) => s.state === 'WARN')
-	const newState = hasFail ? 'FAILED' : hasWarn ? 'WARN' : 'COMPLETED'
-	return { ...stage, subevents: filteredSubs, state: newState as SekiPipelineState }
+	const hasRunning = filteredSubs.some((s) => s.state === 'RUNNING' || s.state === 'STARTED')
+	const allIdle = filteredSubs.length > 0 && filteredSubs.every((s) => s.state === 'IDLE')
+	const allCompleted = filteredSubs.length > 0 && filteredSubs.every((s) => s.state === 'COMPLETED' || s.state === 'SUCCESS')
+	let newState: SekiPipelineState
+	if (hasFail) {
+		newState = 'FAILED'
+	} else if (hasRunning) {
+		newState = 'RUNNING'
+	} else if (hasWarn) {
+		newState = 'WARN'
+	} else if (allIdle || stage.state === 'IDLE') {
+		newState = 'IDLE'
+	} else if (stage.state === 'RUNNING' || stage.state === 'STARTED') {
+		newState = 'RUNNING'
+	} else if (allCompleted) {
+		newState = 'COMPLETED'
+	} else {
+		newState = stage.state
+	}
+	return { ...stage, subevents: filteredSubs, state: newState }
 }
 
 function filterPipelineData(data: SekiPipelineData): SekiPipelineData {
@@ -202,14 +224,30 @@ function filterPipelineData(data: SekiPipelineData): SekiPipelineData {
 	const filteredStages = data.stages.map(filterStage)
 	const hasFail = filteredStages.some((s) => s.state === 'FAILED')
 	const hasWarn = filteredStages.some((s) => s.state === 'WARN')
-	const newState = hasFail ? 'FAILED' : hasWarn ? 'WARN' : 'COMPLETED'
+	const hasRunning = filteredStages.some((s) => s.state === 'RUNNING' || s.state === 'STARTED')
+	const hasIdle = filteredStages.some((s) => s.state === 'IDLE')
+	const allCompleted = filteredStages.length > 0 && filteredStages.every((s) => s.state === 'COMPLETED' || s.state === 'SUCCESS')
+	let newState: SekiPipelineState
+	if (hasFail) {
+		newState = 'FAILED'
+	} else if (hasRunning) {
+		newState = 'RUNNING'
+	} else if (hasWarn) {
+		newState = 'WARN'
+	} else if (hasIdle) {
+		newState = data.state === 'STARTED' || data.state === 'RUNNING' ? 'RUNNING' : 'IDLE'
+	} else if (allCompleted) {
+		newState = 'COMPLETED'
+	} else {
+		newState = data.state
+	}
 	const errorSubs = filteredStages
 		.flatMap((s) => s.subevents)
 		.filter((s) => (s.state === 'FAILED' || s.state === 'WARN') && s.markdown)
 	const newErrorMarkdown = errorSubs.length > 0
 		? errorSubs.map((s) => s.markdown).join('\n\n---\n\n')
 		: undefined
-	return { ...data, stages: filteredStages, state: newState as SekiPipelineState, errorMarkdown: newErrorMarkdown }
+	return { ...data, stages: filteredStages, state: newState, errorMarkdown: newErrorMarkdown }
 }
 
 // === Status helpers ===
@@ -274,16 +312,46 @@ function formatDuration(start?: string, end?: string): string | undefined {
 
 // === Subevent Row ===
 
+/** Mapea el prefijo del label de un subevent a un icono representativo */
+function getSubeventKindIcon(label: string): { icon: typeof Server; kind: string } | null {
+	const lower = label.toLowerCase()
+	if (lower.startsWith('api:')) return { icon: Server, kind: 'api' }
+	if (lower.startsWith('web:')) return { icon: Globe, kind: 'web' }
+	if (lower.startsWith('subscriber:')) return { icon: Bell, kind: 'subscriber' }
+	if (lower.startsWith('golden:')) return { icon: Box, kind: 'golden' }
+	if (lower.startsWith('validation:')) return { icon: CheckCircle2, kind: 'validation' }
+	if (lower.startsWith('workspace:')) return { icon: Box, kind: 'workspace' }
+	if (lower.startsWith('google_bucket:')) return { icon: Box, kind: 'google_bucket' }
+	if (lower.startsWith('kafka:')) return { icon: Box, kind: 'kafka' }
+	if (lower.startsWith('mongodb:')) return { icon: Box, kind: 'mongodb' }
+	if (lower.startsWith('redis:')) return { icon: Box, kind: 'redis' }
+	if (lower.startsWith('cgt:')) return { icon: AlertTriangle, kind: 'cgt' }
+	if (lower.startsWith('jira:')) return { icon: AlertTriangle, kind: 'jira' }
+	return null
+}
+
+/** Extrae el nombre del subevent sin el prefijo "api:", "web:", etc. */
+function stripPrefix(label: string): string {
+	const idx = label.indexOf(':')
+	return idx >= 0 ? label.slice(idx + 1).trim() : label
+}
+
 function SubeventRow({ sub }: { sub: SekiPipelineEvent }) {
 	const config = statusConfig(sub.state)
 	const Icon = config.icon
 	const duration = formatDuration(sub.startedAt, sub.completedAt)
+	const rawLabel = sub.label || sub.name || ''
+	const kindInfo = getSubeventKindIcon(rawLabel)
+	const cleanLabel = kindInfo ? stripPrefix(rawLabel) : rawLabel
 
 	return (
 		<div className="flex items-center justify-between gap-2 py-1 px-2 rounded hover:bg-muted/30 transition-colors">
 			<div className="flex items-center gap-2 min-w-0">
 				<Icon className={`w-3 h-3 shrink-0 ${config.color} ${sub.state === 'RUNNING' || sub.state === 'STARTED' ? 'animate-spin' : ''}`} />
-				<span className="text-xs text-foreground truncate">{sub.label || sub.name}</span>
+				{kindInfo && (
+					<kindInfo.icon className="w-3 h-3 shrink-0 text-muted-foreground" />
+				)}
+				<span className="text-xs text-foreground truncate">{cleanLabel}</span>
 			</div>
 			<div className="flex items-center gap-2 shrink-0">
 				{sub.deployUrl && (
@@ -307,6 +375,9 @@ function SubeventRow({ sub }: { sub: SekiPipelineEvent }) {
 // === Deploy URL chip with copy-to-clipboard ===
 
 function DeployUrlChip({ label, url }: { label: string; url: string }) {
+	const kindInfo = getSubeventKindIcon(label)
+	const cleanLabel = kindInfo ? stripPrefix(label) : label
+
 	return (
 		<span className="group inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-primary bg-primary/15 border border-primary/30 rounded-md hover:bg-primary/15 transition-colors">
 			<a
@@ -316,7 +387,8 @@ function DeployUrlChip({ label, url }: { label: string; url: string }) {
 				className="inline-flex items-center gap-1"
 				onClick={(e) => e.stopPropagation()}
 			>
-				{label}
+				{kindInfo && <kindInfo.icon className="w-3 h-3 shrink-0" />}
+				{cleanLabel}
 				<ExternalLink className="w-2.5 h-2.5" />
 			</a>
 			<CopyButton
@@ -392,7 +464,7 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 				</div>
 			</div>
 
-			<div className="p-2 space-y-0.5">
+			<div className="p-2 space-y-0.5 max-h-[280px] overflow-y-auto">
 				{stage.subevents.map((sub) => (
 					<SubeventRow key={sub.id} sub={sub} />
 				))}
@@ -462,10 +534,11 @@ function StagePanel({ stage, pipeline, aiAvailable, onOpenLog }: {
 interface EnvCardProps {
 	envLabel: string
 	envIcon: typeof Rocket
+	envColor: string
 	data: SekiPipelineData
 }
 
-function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
+function EnvCard({ envLabel, envIcon: EnvIcon, envColor, data }: EnvCardProps) {
 	const [expandedStageId, setExpandedStageId] = useState<string | null>(null)
 	const [isErrorModalOpen, setIsErrorModalOpen] = useState(false)
 
@@ -518,8 +591,8 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 							{config.label}
 						</span>
 						<div className="flex items-center gap-1 ml-auto">
-							<EnvIcon className="w-3.5 h-3.5 text-muted-foreground" />
-							<span className="text-xs font-medium text-muted-foreground">
+							<EnvIcon className={`w-3.5 h-3.5 ${envColor}`} />
+							<span className={`text-xs font-medium ${envColor}`}>
 								{envLabel}
 							</span>
 						</div>
@@ -552,9 +625,6 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 					{/* Deploy URLs (with copy-to-clipboard) */}
 					{deploySubs.length > 0 && (
 						<div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
-							<span className="text-xs font-medium text-muted-foreground shrink-0">
-								Deploy:
-							</span>
 							{deploySubs.map((sub) => (
 								<DeployUrlChip key={sub.id} label={sub.label || sub.name || sub.id} url={sub.deployUrl!} />
 							))}
@@ -577,7 +647,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 											onClick={() => handleStageClick(stage.id)}
 											className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all shrink-0 ${
 												isExpanded
-													? 'bg-background text-foreground ring-1 ring-border'
+													? 'bg-primary/10 text-foreground ring-1 ring-primary/30'
 													: isFailed
 														? `${stageConfig.badge} hover:scale-105`
 														: 'text-muted-foreground border border-border hover:bg-muted/30'
@@ -631,7 +701,7 @@ function EnvCard({ envLabel, envIcon: EnvIcon, data }: EnvCardProps) {
 										<div className="flex items-center justify-between px-3 py-2 bg-background border-b border-border">
 											<span className="text-xs font-bold text-foreground">{stage.label}</span>
 										</div>
-										<div className="p-2 space-y-0.5">
+										<div className="p-2 space-y-0.5 max-h-[280px] overflow-y-auto">
 											{stage.subevents.map((sub) => (
 												<SubeventRow key={sub.id} sub={sub} />
 											))}
@@ -675,10 +745,10 @@ export function SekiPipelineMonitor({ org, repo }: SekiPipelineMonitorProps) {
 	return (
 		<div className="space-y-3">
 			{data.staging && (
-				<EnvCard envLabel="Staging" envIcon={FlaskConical} data={data.staging} />
+				<EnvCard envLabel="Staging" envIcon={FlaskConical} envColor="text-primary" data={data.staging} />
 			)}
 			{data.production && (
-				<EnvCard envLabel="Production" envIcon={Rocket} data={data.production} />
+				<EnvCard envLabel="Production" envIcon={Rocket} envColor="text-purple-700 dark:text-purple-300" data={data.production} />
 			)}
 		</div>
 	)
@@ -696,10 +766,10 @@ export function SekiPipelineMonitorData({ data }: SekiPipelineMonitorDataProps) 
 	return (
 		<div className="space-y-3">
 			{data.staging && (
-				<EnvCard envLabel="Staging" envIcon={FlaskConical} data={data.staging} />
+				<EnvCard envLabel="Staging" envIcon={FlaskConical} envColor="text-primary" data={data.staging} />
 			)}
 			{data.production && (
-				<EnvCard envLabel="Production" envIcon={Rocket} data={data.production} />
+				<EnvCard envLabel="Production" envIcon={Rocket} envColor="text-purple-700 dark:text-purple-300" data={data.production} />
 			)}
 		</div>
 	)

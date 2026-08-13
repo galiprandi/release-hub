@@ -834,7 +834,15 @@ function TagCell({ repo }: { repo: RepoInfo }) {
 	const productionStatus = useMemo(
 		() =>
 			getPipelineStatusInfo(
-				prodPipeline.data?.production?.events,
+				prodPipeline.data?.production?.stages?.map((s) => ({
+					id: s.id,
+					name: s.label,
+					label: s.label,
+					state: s.state,
+					startedAt: s.startedAt,
+					completedAt: s.completedAt,
+					subevents: s.subevents,
+				})),
 				prodPipeline.data?.production?.updatedAt,
 			),
 		[prodPipeline.data?.production],
@@ -888,7 +896,15 @@ function CommitCell({ repo }: { repo: RepoInfo }) {
 	const stagingStatus = useMemo(
 		() =>
 			getPipelineStatusInfo(
-				stagingPipeline.data?.staging?.events,
+				stagingPipeline.data?.staging?.stages?.map((s) => ({
+					id: s.id,
+					name: s.label,
+					label: s.label,
+					state: s.state,
+					startedAt: s.startedAt,
+					completedAt: s.completedAt,
+					subevents: s.subevents,
+				})),
 				stagingPipeline.data?.staging?.updatedAt,
 			),
 		[stagingPipeline.data?.staging],

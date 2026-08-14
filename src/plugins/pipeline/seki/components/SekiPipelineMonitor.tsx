@@ -35,6 +35,7 @@ import {
 	Globe,
 	Bell,
 	Box,
+	Wand2,
 } from 'lucide-react'
 import { useAIPrompt } from '@galiprandi/react-tools'
 import DayJS from '@/lib/dayjs'
@@ -43,6 +44,7 @@ import { sekiAdapter } from '../adapter'
 import type { SekiPipelineData, SekiPipelineState, SekiStage, SekiPipelineEvent } from '../types'
 import { BaseDialog } from '@/components/ui/BaseDialog'
 import { CopyButton } from '@/components/shared/CopyButton'
+import { MarkdownLog } from '@/components/shared/MarkdownLog'
 
 // === AI Failure Summary ===
 
@@ -75,6 +77,23 @@ CORRECCION: Agregar 'express' a package.json del bff y reconstruir la imagen
 DIAGNOSTICO: scheduler-service — OOMKilled, límite 512Mi excedido. Evidencia: "Last State: Terminated (Reason: OOMKilled, Exit Code: 137)"
 COMANDO: kubectl describe pod -n linebreaker --selector=app=scheduler-service
 CORRECCION: Aumentar resources.limits.memory a 1Gi en deployment.yaml del scheduler-service`
+
+/** Prompt para filtrar y explicar el error concreto del log completo */
+const LOG_EXPLAIN_SYSTEM_PROMPT = `Sos un DevOps Engineer senior especializado en Kubernetes y CI/CD. Recibís el log crudo de un pipeline fallido y debés filtrar el ruido para explicar el error concreto.
+
+Reglas:
+- Hablá en español, directo y técnico.
+- Ignorá las líneas que sean output normal (logs de app funcionando, "secrets generated", etc).
+- Enfocate SOLO en lo que causó el fallo.
+- Cité la línea exacta del log entre comillas.
+- Sé conciso: máximo 4 líneas.
+- En ACCION sugerí SIEMPRE comandos concretos de kubectl (o docker/helm/gcloud si aplica) para debugear o fixear el problema. Incluí namespace, selector o nombre del pod extraídos del log. Si hay que investigar más, dajá el comando para obtener info adicional.
+
+Formato de salida (sin markdown):
+ERROR: <tipo de error en una frase>
+EVIDENCIA: "<línea exacta del log>"
+CAUSA: <por qué pasó, en una frase>
+ACCION: <comando kubectl/docker/helm concreto para debug o fix, con namespace y selector del log>`
 
 /** Fallback sin IA: extrae info básica del errorMarkdown con regex */
 function extractFallback(errorMarkdown?: string): { diagnosis: string | null; command: string | null } {
@@ -180,6 +199,56 @@ function useFailureSummary(pipelineData: SekiPipelineData | null, stage: SekiSta
 		hasResult: useFallback ? !!fallback.diagnosis : hasResult,
 		isFallback: useFallback,
 		error: useFallback ? null : (error?.message || null),
+		trigger,
+		regenerate,
+	}
+}
+
+/** Hook para filtrar y explicar el error concreto del log completo con IA */
+function useLogExplain(errorMarkdown: string | undefined, aiAvailable: boolean) {
+	const { data, status, error, prompt, reset } = useAIPrompt({
+		initialPrompts: [{ role: 'system', content: LOG_EXPLAIN_SYSTEM_PROMPT }],
+		streaming: true,
+		warmup: false,
+	})
+
+	const isGenerating = status === 'prompting' || status === 'initializing' || status === 'downloading'
+	const hasResult = !!data && !isGenerating
+
+	let errorLine: string | null = null
+	let evidence: string | null = null
+	let cause: string | null = null
+	let action: string | null = null
+	if (hasResult) {
+		for (const line of data.split('\n').map((l) => l.trim()).filter(Boolean)) {
+			const errMatch = line.match(/^ERROR\s*[:：]\s*(.+)/i)
+			const evMatch = line.match(/^EVIDENCIA\s*[:：]\s*(.+)/i)
+			const causeMatch = line.match(/^CAUSA\s*[:：]\s*(.+)/i)
+			const actMatch = line.match(/^ACCION\s*[:：]\s*(.+)/i)
+			if (errMatch) errorLine = errMatch[1].trim()
+			else if (evMatch) evidence = evMatch[1].trim()
+			else if (causeMatch) cause = causeMatch[1].trim()
+			else if (actMatch) action = actMatch[1].trim()
+		}
+	}
+
+	const trigger = useCallback(() => {
+		if (errorMarkdown && aiAvailable) prompt(errorMarkdown)
+	}, [errorMarkdown, aiAvailable, prompt])
+
+	const regenerate = useCallback(() => {
+		reset()
+		if (errorMarkdown && aiAvailable) prompt(errorMarkdown)
+	}, [errorMarkdown, aiAvailable, prompt, reset])
+
+	return {
+		errorLine,
+		evidence,
+		cause,
+		action,
+		isGenerating,
+		hasResult,
+		error: error?.message || null,
 		trigger,
 		regenerate,
 	}
@@ -559,6 +628,8 @@ function EnvCard({ envLabel, envIcon: EnvIcon, envColor, data }: EnvCardProps) {
 
 	const aiAvailable = typeof window !== 'undefined' && typeof (window as unknown as { LanguageModel?: unknown }).LanguageModel !== 'undefined'
 
+	const logExplain = useLogExplain(filteredData.errorMarkdown, aiAvailable)
+
 	const expandedStage = expandedStageId ? stages.find((s) => s.id === expandedStageId) : null
 
 	const handleStageClick = (stageId: string) => {
@@ -711,12 +782,89 @@ function EnvCard({ envLabel, envIcon: EnvIcon, envColor, data }: EnvCardProps) {
 							</div>
 						)}
 						<div className="mt-4">
-							<span className="text-xs font-medium text-muted-foreground mb-2 block">
-								Log completo
-							</span>
-							<pre className="text-xs whitespace-pre-wrap font-mono text-foreground bg-card p-4 rounded-lg border overflow-x-auto">
-								{filteredData.errorMarkdown}
-							</pre>
+							<div className="flex items-center justify-between mb-2">
+								<span className="text-xs font-medium text-muted-foreground">
+									Log completo
+								</span>
+								<div className="flex items-center gap-1.5">
+									<CopyButton
+										text={filteredData.errorMarkdown}
+										className="opacity-100 p-1 w-auto h-auto"
+										tooltip="Copiar log"
+										copiedTooltip="¡Log copiado!"
+									/>
+									{aiAvailable && !logExplain.hasResult && !logExplain.isGenerating && (
+										<button
+											type="button"
+											onClick={logExplain.trigger}
+											className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 px-2 py-1 rounded-md hover:bg-primary/10 transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
+										>
+											<Wand2 className="w-3 h-3" />
+											Explicar error con IA
+										</button>
+									)}
+									{logExplain.hasResult && !logExplain.isGenerating && (
+										<button
+											type="button"
+											onClick={logExplain.regenerate}
+											className="text-xs text-muted-foreground hover:text-foreground transition-colors px-1"
+											title="Regenerar análisis"
+										>
+											↻
+										</button>
+									)}
+								</div>
+							</div>
+
+							{/* AI explanation panel */}
+							{logExplain.isGenerating && (
+								<div className="mb-3 flex items-center gap-2 px-3 py-2.5 rounded-md bg-primary/10 border border-primary/30">
+									<Loader2 className="w-3.5 h-3.5 shrink-0 animate-spin text-primary" />
+									<span className="text-xs text-muted-foreground italic">Filtrando error con IA...</span>
+								</div>
+							)}
+							{!logExplain.isGenerating && logExplain.hasResult && (logExplain.errorLine || logExplain.evidence || logExplain.cause || logExplain.action) && (
+								<div className="mb-3 px-3 py-3 rounded-md bg-destructive/5 border border-destructive/30 space-y-2">
+									<div className="flex items-center gap-1.5">
+										<Sparkles className="w-3.5 h-3.5 shrink-0 text-primary" />
+										<span className="text-xs font-medium text-foreground">Análisis del error</span>
+									</div>
+									{logExplain.errorLine && (
+										<div className="space-y-0.5">
+											<span className="text-xs font-medium text-destructive">Error</span>
+											<p className="text-xs text-foreground font-medium leading-relaxed">{logExplain.errorLine}</p>
+										</div>
+									)}
+									{logExplain.evidence && (
+										<div className="space-y-0.5">
+											<span className="text-xs font-medium text-muted-foreground">Evidencia</span>
+											<p className="text-xs text-foreground font-mono leading-relaxed bg-muted/30 px-2 py-1 rounded">{logExplain.evidence}</p>
+										</div>
+									)}
+									{logExplain.cause && (
+										<div className="space-y-0.5">
+											<span className="text-xs font-medium text-muted-foreground">Causa</span>
+											<p className="text-xs text-foreground leading-relaxed">{logExplain.cause}</p>
+										</div>
+									)}
+									{logExplain.action && (
+										<div className="space-y-0.5">
+											<span className="text-xs font-medium text-success">Acción</span>
+											<p className="text-xs text-foreground leading-relaxed">{logExplain.action}</p>
+										</div>
+									)}
+								</div>
+							)}
+							{logExplain.error && !logExplain.isGenerating && !logExplain.hasResult && (
+								<div className="mb-3 flex items-center gap-2 px-3 py-2 rounded-md bg-muted/30 border border-border">
+									<AlertCircle className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
+									<span className="text-xs text-muted-foreground">{logExplain.error}</span>
+								</div>
+							)}
+
+							<div className="text-foreground bg-card p-4 rounded-lg border overflow-x-auto">
+								<MarkdownLog content={filteredData.errorMarkdown} />
+							</div>
 						</div>
 					</div>
 				</BaseDialog>

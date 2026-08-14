@@ -46,6 +46,7 @@
     "dayjs": "^1.11.19",
     "html2canvas": "^1.4.1",
     "lucide-react": "^0.563.0",
+    "marked": "^18.0.9",
     "node-pty": "^1.2.0-beta.13",
     "radix-ui": "^1.4.3",
     "react": "^19.2.0",

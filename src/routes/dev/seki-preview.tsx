@@ -21,6 +21,7 @@
  * - Considerar colapsar stages OK por defecto y expandir sólo el fallido
  */
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { SekiPipelineMonitorData } from "@/plugins/pipeline/seki/components";
 import { transformSekiData } from "@/plugins/pipeline/seki/adapter";
 import type { SekiPipelinesByEnv } from "@/plugins/pipeline/seki/adapter";
@@ -31,6 +32,7 @@ import { CommitLink } from "@/github/components/CommitLink";
 import { TagLink } from "@/github/components/TagLink";
 import { PageLayout } from "@/layouts/PageLayout";
 import mockRaw from "@/plugins/pipeline/seki/dev/sek.mock.json";
+import { failedDeployMock } from "@/plugins/pipeline/seki/dev/failedDeployMock";
 
 export const Route = createFileRoute("/dev/seki-preview")({
 	component: SekiPreviewPage,
@@ -55,6 +57,9 @@ function stagesToEvents(data: SekiPipelineData): SekiPipelineEvent[] {
 }
 
 function SekiPreviewPage() {
+	const [scenario, setScenario] = useState<"normal" | "failed">("normal");
+	const activeData = scenario === "failed" ? failedDeployMock : mockData;
+
 	const stagingStatus = getPipelineStatusInfo(
 		mockData.staging ? stagesToEvents(mockData.staging) : undefined,
 		mockData.staging?.updatedAt,
@@ -75,10 +80,29 @@ function SekiPreviewPage() {
 					Sandbox de iteración visual con datos mokeados de la API real (sek.mock.json). Usa el componente productivo SekiPipelineMonitor + adapter. Ruta permanente — no borrar.
 				</p>
 
+				{/* Scenario toggle */}
+				<div className="flex items-center gap-2">
+					<span className="text-xs font-medium text-muted-foreground">Escenario:</span>
+					<button
+						type="button"
+						onClick={() => setScenario("normal")}
+						className={`text-xs font-medium px-3 py-1 rounded-md border transition-colors ${scenario === "normal" ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-border hover:bg-muted/30"}`}
+					>
+						Normal (STARTED)
+					</button>
+					<button
+						type="button"
+						onClick={() => setScenario("failed")}
+						className={`text-xs font-medium px-3 py-1 rounded-md border transition-colors ${scenario === "failed" ? "bg-destructive text-destructive-foreground border-destructive" : "bg-background text-foreground border-border hover:bg-muted/30"}`}
+					>
+						Deploy fallido (FAILED)
+					</button>
+				</div>
+
 				{/* Monitor completo — vista de repo */}
 				<section className="space-y-2">
 					<h2 className="text-sm font-semibold text-muted-foreground">Monitor completo (vista repo)</h2>
-					<SekiPipelineMonitorData data={mockData} />
+					<SekiPipelineMonitorData data={activeData} />
 				</section>
 
 				{/* Monitor reducido — vista dashboard /github */}

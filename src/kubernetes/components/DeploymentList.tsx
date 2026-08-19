@@ -18,9 +18,25 @@ import { usePortForward } from "@/hooks/usePortForward"
 import { usePortFree } from "@/hooks/usePortFree"
 import { DEFAULT_START_PORT } from "@/config/portForward"
 
-type DeploymentWithContext = DeploymentInfo & { context: string }
+type DeploymentWithContext = DeploymentInfo & { context: string; isPlaceholder?: boolean }
 
 const STORAGE_KEY = "kubernetes-deployments-metadata"
+
+function buildPlaceholder(id: string): DeploymentWithContext {
+	const [context, namespace, name] = id.split('/')
+	return {
+		namespace: namespace || '',
+		name: name || id,
+		ready: '',
+		upToDate: '',
+		available: '',
+		age: '',
+		images: [],
+		status: 'unknown',
+		context: context || '',
+		isPlaceholder: true,
+	}
+}
 
 function loadDeploymentsFromStorage(): Record<string, DeploymentInfo> {
 	try {
@@ -118,22 +134,26 @@ export const DeploymentList = ({
 	})
 
 	// Get grouped deployments for display based on active tab
+	// Favorites/projects without cached metadata render as placeholders (name from ID)
+	// so the UI shows immediately; real data fills in when the query resolves.
 	const groupedContent = useMemo(() => {
 		if (activeTab === 'favorites') {
-			const groups: Record<string, DeploymentInfo[]> = {}
+			const groups: Record<string, DeploymentWithContext[]> = {}
 			favorites?.forEach(favId => {
 				const cached = cachedDeployments[favId]
+				const [context] = favId.split('/')
+				if (!groups[context]) groups[context] = []
 				if (cached) {
-					const [context] = favId.split('/')
-					if (!groups[context]) groups[context] = []
-					groups[context].push(cached)
+					groups[context].push({ ...cached, context })
+				} else {
+					groups[context].push(buildPlaceholder(favId))
 				}
 			})
 			return Object.entries(groups).map(([context, deployments]) => ({
 				id: context,
 				label: context,
 				icon: <Boxes className="w-4 h-4" />,
-				deployments: deployments.map(d => ({ ...d, context })) as DeploymentWithContext[]
+				deployments,
 			}))
 		} else {
 			return projects
@@ -144,11 +164,10 @@ export const DeploymentList = ({
 							const cached = cachedDeployments[id]
 							if (cached) {
 								const [context] = id.split('/')
-								return { ...cached, context }
+								return { ...cached, context } as DeploymentWithContext
 							}
-							return null
-						})
-						.filter(Boolean) as DeploymentWithContext[]
+							return buildPlaceholder(id)
+						}) as DeploymentWithContext[]
 
 					return {
 						id: project.id,
@@ -495,7 +514,9 @@ function DeploymentsTable({
 }
 
 function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentWithContext; isLoading: boolean }) {
-	if (isLoading) {
+	// Name is always known from the favorite ID — show it immediately even for placeholders.
+	// Only show skeleton if we truly don't have a name (edge case).
+	if (isLoading && !deployment.name) {
 		return (
 			<div className="flex items-center gap-2">
 				<div className="h-4 bg-muted/30 rounded w-32 animate-pulse" />
@@ -503,11 +524,18 @@ function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentW
 		)
 	}
 
-	return <span className="font-medium tracking-tight text-foreground text-sm">{deployment.name}</span>
+	return (
+		<span className="font-medium tracking-tight text-foreground text-sm">
+			{deployment.name}
+			{deployment.isPlaceholder && (
+				<span className="ml-2 inline-block h-3 w-3 animate-pulse rounded-full bg-primary/40 align-middle" />
+			)}
+		</span>
+	)
 }
 
 function StatusCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
-	if (isLoading) {
+	if (isLoading || (deployment as DeploymentWithContext).isPlaceholder) {
 		return <div className="h-6 bg-muted/30 rounded w-16 animate-pulse" />
 	}
 
@@ -528,8 +556,8 @@ function StatusCell({ deployment, isLoading }: { deployment: DeploymentInfo; isL
 }
 
 function AgeCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {
-	if (isLoading) {
-		return <div className="h-4 bg-muted rounded w-10" />
+	if (isLoading || (deployment as DeploymentWithContext).isPlaceholder) {
+		return <div className="h-4 bg-muted rounded w-10 animate-pulse" />
 	}
 	return <span className="text-xs font-medium text-muted-foreground">{deployment.age}</span>
 }
@@ -543,8 +571,8 @@ function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isL
 		})
 	}, [deployment.images])
 
-	if (isLoading) {
-		return <div className="h-4 bg-muted rounded w-24" />
+	if (isLoading || (deployment as DeploymentWithContext).isPlaceholder) {
+		return <div className="h-4 bg-muted rounded w-24 animate-pulse" />
 	}
 
 	return (
@@ -604,6 +632,8 @@ function ActionsCell({
 }
 
 function PortForwardCell({ deployment, context }: { deployment: DeploymentWithContext; context: string }) {
+	const isPlaceholder = deployment.isPlaceholder === true
+
 	const { connect, disconnect, status, error, isActive, localPort } = usePortForward({
 		deployment: deployment.name,
 		namespace: deployment.namespace,
@@ -619,6 +649,10 @@ function PortForwardCell({ deployment, context }: { deployment: DeploymentWithCo
 
 	const handleConnect = async (port: number) => {
 		await connect(port, 8080)
+	}
+
+	if (isPlaceholder) {
+		return <div className="h-8 bg-muted/30 rounded w-32 animate-pulse" />
 	}
 
 	return (

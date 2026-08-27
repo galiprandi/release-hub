@@ -12,6 +12,12 @@
 
 ## Aprendizaje de Mejoras Implementadas
 
+### Mejora #20: Repository Detail Action Bar Simplification & Visual Realignment
+- **Promocionar CTA**: Elevado como acción principal fija y destacada en rojo (`bg-destructive`) con etiqueta `Promocionar`.
+- **Icon Disambiguation**: `ForceRedeployDialog` actualizado con ícono `Zap` (rayo) y etiqueta `Re Deploy` para diferenciarse de `RefreshCw` ("Actualizar").
+- **Tab Consistency**: Pestañas de detalle reordenadas a `Tags` (Producción) luego `Commits` (Staging) para alineación 1:1 con las columnas de `ReposTable`.
+- **Verificación**: Build zero-warning, 274 tests unitarios exitosos.
+
 ### Mejora #19: GitHub Favorites & Collections Dropdown (shadcn UI)
 - **Component**: Integración del componente `DropdownMenu` de shadcn UI (`@radix-ui/react-dropdown-menu`) en `src/components/ui/dropdown-menu.tsx`.
 - **CollectionDropdown**: Integración en el header de `/github` para navegación entre Favoritos y Proyectos/Colecciones del usuario, sincronizado con el parámetro `tab` de la URL.

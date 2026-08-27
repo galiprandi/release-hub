@@ -38,7 +38,6 @@ function ProductIndex() {
 	const search = Route.useSearch();
 	const viewMode = search.view || "commits";
 	const fullProduct = `${org}/${repo}`;
-	const isCommits = viewMode === "commits";
 
 	const { refetch: refreshCommits } = useGitCommits({ repo: fullProduct });
 	const { latestTag, refetch: refreshTags } = useGitTags({ repo: fullProduct });
@@ -59,51 +58,46 @@ function ProductIndex() {
 			header={{
 				title: fullProduct,
 				searchComponent: (
-					<div className="flex items-center gap-4">
-						<div className="flex items-center gap-2">
-							<span className="text-xs font-medium text-muted-foreground">
-								Vista:
-							</span>
-							<IndustrialTabs
-								activeId={viewMode}
-								onChange={(val) =>
-									navigate({ search: { view: val as "commits" | "tags" } })
-								}
-								options={[
-									{
-										id: "commits",
-										label: (
-											<div className="flex items-center gap-1.5">
-												<GitCommit className="w-3 h-3" />
-												<span>Commits</span>
-											</div>
-										),
-									},
-									{
-										id: "tags",
-										label: (
-											<div className="flex items-center gap-1.5">
-												<Tag className="w-3 h-3" />
-												<span>Tags</span>
-											</div>
-										),
-									},
-								]}
-								className="w-48"
-							/>
-						</div>
-						<div className="w-px h-6 bg-border mx-1" />
+					<div className="flex items-center gap-3">
+						<IndustrialTabs
+							activeId={viewMode}
+							onChange={(val) =>
+								navigate({ search: { view: val as "commits" | "tags" } })
+							}
+							options={[
+								{
+									id: "tags",
+									label: (
+										<div className="flex items-center gap-1.5">
+											<Tag className="w-3.5 h-3.5" />
+											<span>Tags</span>
+										</div>
+									),
+								},
+								{
+									id: "commits",
+									label: (
+										<div className="flex items-center gap-1.5">
+											<GitCommit className="w-3.5 h-3.5" />
+											<span>Commits</span>
+										</div>
+									),
+								},
+							]}
+							className="w-44"
+						/>
+						<div className="w-px h-5 bg-border" />
 						<div className="flex items-center gap-2">
 							<a
 								href={openPRs?.repoUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-background hover:bg-muted/30 border border-border rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+								className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-background hover:bg-muted/30 border border-border rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary/30"
 							>
 								<GitPullRequest className="w-3.5 h-3.5 text-primary" />
 								<span>PRs</span>
 								{openPRs && openPRs.count > 0 && (
-									<span className="inline-flex items-center justify-center px-1.5 py-0 text-xs font-bold bg-primary/15 text-primary border border-primary/30 rounded-full min-w-[1.25rem] h-4">
+									<span className="inline-flex items-center justify-center px-1.5 py-0 text-xs font-semibold bg-primary/15 text-primary border border-primary/30 rounded-full h-4 min-w-[1.25rem]">
 										{openPRs.count}
 									</span>
 								)}
@@ -112,20 +106,20 @@ function ProductIndex() {
 								href={actionsSummary?.repoUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-background hover:bg-muted/30 border border-border rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+								className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-background hover:bg-muted/30 border border-border rounded-md transition-all focus-visible:ring-2 focus-visible:ring-primary/30"
 							>
 								<Play className="w-3.5 h-3.5 text-primary" />
 								<span>Actions</span>
 								{actionsSummary && actionsSummary.total > 0 && (
 									<div className="flex items-center gap-1 ml-0.5">
 										{actionsSummary.running > 0 && (
-											<span className="inline-flex items-center gap-0.5 px-1.5 py-0 text-xs font-bold bg-warning/15 text-warning border border-warning/30 rounded-full h-4">
+											<span className="inline-flex items-center gap-0.5 px-1.5 py-0 text-xs font-semibold bg-warning/15 text-warning border border-warning/30 rounded-full h-4">
 												<span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
 												{actionsSummary.running}
 											</span>
 										)}
 										{actionsSummary.failed > 0 && (
-											<span className="inline-flex items-center justify-center px-1.5 py-0 text-xs font-bold bg-destructive/15 text-destructive border border-destructive/40 rounded-full min-w-[1rem] h-4">
+											<span className="inline-flex items-center justify-center px-1.5 py-0 text-xs font-semibold bg-destructive/15 text-destructive border border-destructive/40 rounded-full min-w-[1rem] h-4">
 												{actionsSummary.failed}
 											</span>
 										)}
@@ -137,13 +131,25 @@ function ProductIndex() {
 				),
 			}}
 			actions={[
-				<FreezeDialog key="freeze" repo={fullProduct} iconOnly={true} showLabel={true} />,
-				isCommits ? (
-					<ForceRedeployDialog key="redeploy" repo={fullProduct} iconOnly={true} showLabel={true} />
-				) : (
-					<PromoteDialog key="promote" repo={fullProduct} latestTag={latestTag?.name} iconOnly={true} showLabel={true} />
-				),
-				<div key="divider" className="w-px h-6 bg-border mx-1" />,
+				<PromoteDialog
+					key="promote"
+					repo={fullProduct}
+					latestTag={latestTag?.name}
+					iconOnly={false}
+				/>,
+				<ForceRedeployDialog
+					key="redeploy"
+					repo={fullProduct}
+					iconOnly={true}
+					showLabel={true}
+				/>,
+				<FreezeDialog
+					key="freeze"
+					repo={fullProduct}
+					iconOnly={true}
+					showLabel={true}
+				/>,
+				<div key="divider" className="w-px h-5 bg-border mx-1" />,
 				<ProjectSelector key="project" repo={fullProduct} />,
 			]}
 			refreshFn={handleRefetchPipeline}

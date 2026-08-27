@@ -1,7 +1,7 @@
 import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { RefreshCw, Loader2, CheckCircle2, ExternalLink, Circle, AlertCircle } from "lucide-react";
+import { Zap, Loader2, CheckCircle2, ExternalLink, Circle, AlertCircle } from "lucide-react";
 import { usePrStatus } from "@/hooks/usePrStatus";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton";
@@ -130,9 +130,9 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 							<Dialog.Trigger asChild>
 								<button
 									type="button"
-									className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
+									className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-muted text-muted-foreground border border-border rounded-md hover:bg-accent hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 								>
-									<RefreshCw className="w-4 h-4" />
+									<Zap className="w-4 h-4 text-primary" />
 									<span>Re Deploy</span>
 								</button>
 							</Dialog.Trigger>
@@ -157,10 +157,10 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 				onOpenChange={handleOpenChange}
 				title={
 					<>
-						{step === "config" && <><RefreshCw className="w-4 h-4" /> Trigger Staging Redeploy</>}
+						{step === "config" && <><Zap className="w-4 h-4 text-primary" /> Trigger Staging Redeploy</>}
 						{step === "executing" && <><Loader2 className="w-4 h-4 animate-spin" /> Ejecutando...</>}
 						{step === "success" && <><CheckCircle2 className="w-4 h-4 text-green-600" /> Redeploy Iniciado</>}
-						{step === "error" && <><RefreshCw className="w-4 h-4 text-red-600" /> Error</>}
+						{step === "error" && <><Zap className="w-4 h-4 text-red-600" /> Error</>}
 					</>
 				}
 				description="Proceso de forzar redeploy a staging"
@@ -207,7 +207,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 								onClick={() => setStep("confirm")}
 								className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 							>
-								<RefreshCw className="w-4 h-4" />
+								<Zap className="w-4 h-4" />
 								Comenzar
 							</button>
 						</div>
@@ -250,7 +250,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 							disabled={isExecuting}
 							className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
 						>
-							{isExecuting ? <><Loader2 className="w-4 h-4 animate-spin" /> Iniciando...</> : <><RefreshCw className="w-4 h-4" /> Sí, forzar redeploy</>}
+							{isExecuting ? <><Loader2 className="w-4 h-4 animate-spin" /> Iniciando...</> : <><Zap className="w-4 h-4" /> Sí, forzar redeploy</>}
 						</button>
 					</div>
 				</div>
@@ -304,7 +304,7 @@ export function ForceRedeployDialog({ repo, iconOnly = false, showLabel = false 
 				{/* Step 4: Error */}
 				{step === "error" && (
 					<div className="flex flex-col items-center justify-center flex-1 py-8 text-center space-y-4">
-						<RefreshCw className="w-12 h-12 text-red-600" />
+						<Zap className="w-12 h-12 text-red-600" />
 						<div className="space-y-2">
 							<p className="text-lg font-semibold">Error</p>
 							<p className="text-sm text-red-600">{error}</p>

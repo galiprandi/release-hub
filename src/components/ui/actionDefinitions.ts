@@ -41,6 +41,7 @@ import {
 	Link,
 	Github,
 	GitPullRequestCreateArrow,
+	Zap,
 } from "lucide-react"
 
 export const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
@@ -123,7 +124,7 @@ export const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
 	removeFavorite: { icon: Star, label: "Eliminar de favoritos", color: "warning" },
 	freezeBranch: { icon: Lock, label: "Bloquear", color: "warning" },
 	unfreezeBranch: { icon: Unlock, label: "Desbloquear", color: "success" },
-	promoteToProd: { icon: Rocket, label: "Promocionar a producción", color: "destructive" },
-	forceRedeploy: { icon: RefreshCw, label: "Redeploy", color: "primary" },
+	promoteToProd: { icon: Rocket, label: "Promocionar", color: "destructive" },
+	forceRedeploy: { icon: Zap, label: "Re Deploy", color: "default" },
 	manageProjects: { icon: FolderPlus, label: "Gestionar Proyectos", color: "default" },
 }

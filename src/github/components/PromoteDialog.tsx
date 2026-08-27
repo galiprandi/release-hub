@@ -193,7 +193,7 @@ export function PromoteDialog({ repo, latestTag, iconOnly = false, showLabel = f
 								type="button"
 								onClick={() => handleOpenChange(true)}
 								aria-haspopup="dialog"
-								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none shadow-sm"
+								className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 transition-colors focus-visible:ring-2 focus-visible:ring-destructive/30 focus-visible:outline-none shadow-sm"
 							>
 								<Rocket className="w-4 h-4" />
 								<span>Promocionar</span>

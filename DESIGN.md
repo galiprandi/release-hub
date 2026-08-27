@@ -98,6 +98,11 @@
 - Estilo: `inline-flex items-center gap-1 p-1 bg-muted/30 rounded-md`. Tab activo: `bg-background text-foreground shadow-sm`. Tab inactivo: `text-muted-foreground hover:text-foreground`.
 - Sin `bg-muted/40` containers alrededor.
 
+### DropdownMenu (shadcn)
+- Trigger: `bg-muted/30 border border-border rounded-md text-xs font-medium`. Focus: `focus-visible:ring-2 focus-visible:ring-primary/30`.
+- Content: `rounded-md border border-border bg-popover shadow-md`. Items: `text-sm`, `focus:bg-accent`.
+- Usado para selector de colección en `/github` (Favoritos + proyectos).
+
 ### AI Chat
 - User bubble: `bg-primary text-primary-foreground rounded-lg`. Sin `shadow-[0_0_15px_rgba(...)]`.
 - Assistant bubble: `bg-muted/30 border border-border rounded-lg`.
@@ -164,7 +169,7 @@
 - Deployment status: badges `rounded text-xs font-medium` con `/15` opacity. Labels localizados.
 
 ### GitHub
-- Dashboard: Tabs + project actions en PageLayout header.
+- Dashboard: selector de colección (Favoritos + proyectos) es `DropdownMenu` (shadcn) en el PageLayout header; sync `tab` param. Acciones de proyecto en header.
 - Org grouping: `border border-border rounded-md bg-card`. Collapsible. Header con `text-sm font-medium` + count.
 - `HealthCell`: dot semántico + `text-xs font-medium` (OK/Error).
 - `OperationsCell`: hover-to-reveal.

@@ -15,15 +15,13 @@ test('verify github dashboard industrial resonance v2', async ({ page }) => {
 
   await page.goto('http://localhost:5173/github');
 
-  // Verify "Colecciones" label and IndustrialTabs
-  await expect(page.getByText('Colecciones:')).toBeVisible();
-
-  // Verify IndustrialTabs contains "Favoritos" and "Proyecto Alpha"
-  await expect(page.getByRole('button', { name: /Favoritos/i })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Proyecto Alpha/i })).toBeVisible();
-
-  // Switch to "Proyecto Alpha"
-  await page.getByRole('button', { name: /Proyecto Alpha/i }).click();
+  const collectionTrigger = page.getByRole('button', { name: 'Seleccionar colección' });
+  await expect(collectionTrigger).toBeVisible();
+  await expect(collectionTrigger).toContainText('Favoritos');
+  await collectionTrigger.click();
+  await expect(page.getByRole('menuitem', { name: /Favoritos/i })).toBeVisible();
+  await expect(page.getByRole('menuitem', { name: /Proyecto Alpha/i })).toBeVisible();
+  await page.getByRole('menuitem', { name: /Proyecto Alpha/i }).click();
 
   // Verify search params
   await expect(page).toHaveURL(/tab=proj-1/);

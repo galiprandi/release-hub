@@ -20,11 +20,13 @@ test('GitHub Dashboard V2 Layout and High Density', async ({ page }) => {
   const header = page.locator('header');
   await expect(header).toBeVisible();
 
-  // Verify IndustrialTabs for collections in header
-  const collectionsTabs = header.locator('div.flex.items-center.gap-2:has-text("Colecciones:")');
-  await expect(collectionsTabs).toBeVisible();
-  await expect(collectionsTabs.locator('button:has-text("Favoritos")')).toBeVisible();
-  await expect(collectionsTabs.locator('button:has-text("Productivity")')).toBeVisible();
+  const collectionTrigger = header.getByRole('button', { name: 'Seleccionar colección' });
+  await expect(collectionTrigger).toBeVisible();
+  await expect(collectionTrigger).toContainText('Favoritos');
+  await collectionTrigger.click();
+  await expect(page.getByRole('menuitem', { name: /Favoritos/ })).toBeVisible();
+  await expect(page.getByRole('menuitem', { name: /Productivity/ })).toBeVisible();
+  await page.keyboard.press('Escape');
 
   // Verify Gestionar Proyectos button in header actions
   const manageProjectsBtn = header.locator('button:has-text("Gestionar Proyectos")');

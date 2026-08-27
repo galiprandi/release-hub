@@ -14,6 +14,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import {
 	Building2,
+	Check,
 	ChevronDown,
 	ChevronRight,
 	FolderOpen,
@@ -38,6 +39,14 @@ import { CommitsModal } from "@/github/components/CommitsModal";
 import { PageLayout } from "@/layouts/PageLayout";
 import { RepoSearch } from "@/github/components/RepoSearch";
 import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ProjectManagementDialog } from "@/github/components/ProjectManagementDialog";
 import { ItemProjectSelectionDialog } from "@/components/shared/ItemProjectSelectionDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -196,31 +205,18 @@ function Dashboard() {
 				title: "Repositorios",
 				searchComponent: (
 					<div className="flex items-center gap-3">
-							<IndustrialTabs
-								options={tabs.map((t) => ({
-									id: t.value,
-									label: (
-										<div className="flex items-center gap-1.5">
-											{t.icon && <t.icon className="w-3 h-3" />}
-											<span>{t.label}</span>
-											{t.count !== undefined && t.count > 0 && (
-												<span className="ml-1 px-1.5 py-0.5 rounded-full bg-muted/30 text-xs">
-													{t.count}
-												</span>
-											)}
-										</div>
-									),
-								}))}
-								activeId={activeTab}
-								onChange={(id) =>
-									navigate({
-										search: (prev: Record<string, unknown>) => ({
-											...prev,
-											tab: id as string,
-										}),
-									})
-								}
-							/>
+						<CollectionDropdown
+							tabs={tabs}
+							activeTab={activeTab}
+							onChange={(id) =>
+								navigate({
+									search: (prev: Record<string, unknown>) => ({
+										...prev,
+										tab: id,
+									}),
+								})
+							}
+						/>
 						<RepoSearch />
 					</div>
 				),
@@ -460,6 +456,74 @@ function Dashboard() {
 				onOpenChange={setIsManageProjectsOpen}
 			/>
 		</PageLayout>
+	);
+}
+
+interface CollectionTab {
+	value: string;
+	label: string;
+	icon: typeof Star;
+	count: number;
+	description: string;
+}
+
+function CollectionDropdown({
+	tabs,
+	activeTab,
+	onChange,
+}: {
+	tabs: CollectionTab[];
+	activeTab: string;
+	onChange: (id: string) => void;
+}) {
+	const active = tabs.find((t) => t.value === activeTab) ?? tabs[0];
+	const ActiveIcon = active?.icon ?? Star;
+
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<button
+					type="button"
+					aria-label="Seleccionar colección"
+					className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted/30 border border-border rounded-md text-xs font-medium text-foreground hover:bg-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+				>
+					<ActiveIcon className="w-3.5 h-3.5 text-muted-foreground" />
+					<span>{active?.label ?? "Colección"}</span>
+					{active && active.count > 0 && (
+						<span className="px-1.5 py-0.5 rounded bg-muted text-xs font-medium text-muted-foreground">
+							{active.count}
+						</span>
+					)}
+					<ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+				</button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="start" className="w-56">
+				<DropdownMenuLabel>Colecciones</DropdownMenuLabel>
+				<DropdownMenuSeparator />
+				{tabs.map((tab) => {
+					const Icon = tab.icon;
+					const isActive = tab.value === activeTab;
+					return (
+						<DropdownMenuItem
+							key={tab.value}
+							onSelect={() => onChange(tab.value)}
+							className="justify-between"
+						>
+							<span className="flex items-center gap-2 min-w-0">
+								<Icon className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
+								<span className="truncate">{tab.label}</span>
+								{tab.count > 0 && (
+									<span className="text-xs text-muted-foreground">
+										{tab.count}
+									</span>
+								)}
+							</span>
+							{isActive && <Check className="w-3.5 h-3.5 text-primary shrink-0" />}
+						</DropdownMenuItem>
+					);
+				})}
+			</DropdownMenuContent>
+		</DropdownMenu>
 	);
 }
 

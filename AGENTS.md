@@ -12,6 +12,11 @@
 
 ## Aprendizaje de Mejoras Implementadas
 
+### Mejora #19: GitHub Favorites & Collections Dropdown (shadcn UI)
+- **Component**: Integración del componente `DropdownMenu` de shadcn UI (`@radix-ui/react-dropdown-menu`) en `src/components/ui/dropdown-menu.tsx`.
+- **CollectionDropdown**: Integración en el header de `/github` para navegación entre Favoritos y Proyectos/Colecciones del usuario, sincronizado con el parámetro `tab` de la URL.
+- **Verificación**: Build zero-warning, 274 tests unitarios exitosos.
+
 ### Mejora #18: Seki Token Auto-Refresh CTA
 - **CLI Integration**: `seki auth get --token-only` devuelve el JWT directamente en stdout (~723 chars). Comando agregado a `SAFE_COMMANDS` en `src/utils/security.ts`.
 - **Hook**: `useSekiTokenRefresh` (`src/hooks/useSekiTokenRefresh.ts`) ejecuta el comando via `runCommand(['seki', 'auth', 'get', '--token-only'])`, valida formato JWT (3 partes separadas por dots) y guarda el token via `useSettings.setSekiToken` + `useToken.saveToken`.

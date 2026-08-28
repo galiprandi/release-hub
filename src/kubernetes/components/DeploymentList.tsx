@@ -16,6 +16,9 @@ import { ItemProjectSelectionDialog } from "@/components/shared/ItemProjectSelec
 import { PortForwardControl } from "@/components/ui/PortForwardControl"
 import { usePortForward } from "@/hooks/usePortForward"
 import { usePortFree } from "@/hooks/usePortFree"
+import { useDeployedCommitStatus } from "@/hooks/useDeployedCommitStatus"
+import { usePodCommitSync } from "@/hooks/usePodCommitSync"
+import { CopyButton } from "@/components/shared/CopyButton"
 import { DEFAULT_START_PORT } from "@/config/portForward"
 
 type DeploymentWithContext = DeploymentInfo & { context: string; isPlaceholder?: boolean }
@@ -466,6 +469,13 @@ function DeploymentsTable({
 			cell: ({ row }) => <AgeCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
+			id: "gitCommit",
+			accessorKey: "gitCommit",
+			header: () => <span className="text-xs font-medium text-muted-foreground">Commit</span>,
+			enableSorting: false,
+			cell: ({ row }) => <CommitCell deployment={row.original} isLoading={isLoading} />,
+		},
+		{
 			accessorKey: "images",
 			header: () => <span className="text-xs font-medium text-muted-foreground">Imágenes</span>,
 			cell: ({ row }) => <ImagesCell deployment={row.original} isLoading={isLoading} />,
@@ -560,6 +570,83 @@ function AgeCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoad
 		return <div className="h-4 bg-muted rounded w-10 animate-pulse" />
 	}
 	return <span className="text-xs font-medium text-muted-foreground">{deployment.age}</span>
+}
+
+function CommitCell({ deployment, isLoading }: { deployment: DeploymentWithContext; isLoading: boolean }) {
+	const isPlaceholder = deployment.isPlaceholder === true
+	const enabled = !isPlaceholder && !isLoading
+	const { status, behindBy, isLoading: isComparing } = useDeployedCommitStatus({
+		namespace: deployment.namespace,
+		gitCommit: deployment.gitCommit,
+		enabled,
+	})
+	const podSync = usePodCommitSync({
+		deploymentName: deployment.name,
+		namespace: deployment.namespace,
+		context: deployment.context || undefined,
+		specCommit: deployment.gitCommit,
+		enabled,
+	})
+
+	if (isLoading || isPlaceholder) {
+		return <div className="h-4 bg-muted rounded w-20 animate-pulse" />
+	}
+
+	if (!deployment.gitCommit) {
+		return <span className="text-xs font-medium text-muted-foreground">—</span>
+	}
+
+	const stalePodsDetail = podSync.stalePods
+		.map(p => `${p.name} → ${p.gitCommit ? p.gitCommit.slice(0, 7) : 'sin GIT_COMMIT'}`)
+		.join('\n')
+
+	return (
+		<div className="flex items-center gap-1.5">
+			<span
+				className="font-mono text-xs font-medium text-muted-foreground"
+				title={deployment.gitCommit}
+			>
+				{deployment.gitCommit.slice(0, 7)}
+			</span>
+			<CopyButton
+				text={deployment.gitCommit}
+				tooltip="Copiar commit"
+				className="p-0.5"
+			/>
+			{isComparing && (
+				<div className="h-4 bg-muted rounded w-14 animate-pulse" />
+			)}
+			{!isComparing && status === 'up-to-date' && (
+				<span className="inline-flex items-center px-1.5 py-0.5 rounded bg-success/15 text-success border border-success/30 text-xs font-medium">
+					Actualizado
+				</span>
+			)}
+			{!isComparing && status === 'behind' && (
+				<span className="inline-flex items-center px-1.5 py-0.5 rounded bg-warning/15 text-warning border border-warning/30 text-xs font-medium">
+					Atrasado · {behindBy}
+				</span>
+			)}
+			{podSync.isLoading && (
+				<div className="h-4 bg-muted rounded w-12 animate-pulse" />
+			)}
+			{!podSync.isLoading && podSync.status === 'synced' && (
+				<span
+					className="inline-flex items-center px-1.5 py-0.5 rounded bg-success/15 text-success border border-success/30 text-xs font-medium"
+					title={`Todos los pods corren ${deployment.gitCommit.slice(0, 7)}`}
+				>
+					Pods {podSync.syncedCount}/{podSync.totalCount}
+				</span>
+			)}
+			{!podSync.isLoading && podSync.status === 'drift' && (
+				<span
+					className="inline-flex items-center px-1.5 py-0.5 rounded bg-destructive/15 text-destructive border border-destructive/30 text-xs font-medium"
+					title={`Pods con versión vieja:\n${stalePodsDetail}`}
+				>
+					Pods {podSync.syncedCount}/{podSync.totalCount}
+				</span>
+			)}
+		</div>
+	)
 }
 
 function ImagesCell({ deployment, isLoading }: { deployment: DeploymentInfo; isLoading: boolean }) {

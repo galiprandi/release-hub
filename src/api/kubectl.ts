@@ -22,6 +22,7 @@ export interface DeploymentInfo {
   age: string;
   images: string[];
   status: 'healthy' | 'progressing' | 'degraded' | 'unknown';
+  gitCommit?: string;
 }
 
 export interface PodInfo {
@@ -134,7 +135,7 @@ interface K8sDeploymentItem {
     replicas?: number;
     template: {
       spec: {
-        containers: { image: string }[];
+        containers: { image: string; env?: { name: string; value?: string }[] }[];
       };
     };
   };
@@ -144,6 +145,14 @@ interface K8sDeploymentItem {
     availableReplicas?: number;
     conditions?: { type: string; status: string }[];
   };
+}
+
+function extractGitCommit(containers: { env?: { name: string; value?: string }[] }[]): string | undefined {
+  for (const container of containers) {
+    const envVar = container.env?.find(e => e.name === 'GIT_COMMIT');
+    if (envVar?.value) return envVar.value;
+  }
+  return undefined;
 }
 
 function parseDeploymentsJson(output: string, defaultNamespace?: string): DeploymentInfo[] {
@@ -166,6 +175,7 @@ function parseDeploymentsJson(output: string, defaultNamespace?: string): Deploy
         age: formatAge(item.metadata.creationTimestamp),
         images: item.spec.template.spec.containers.map(c => c.image),
         status: deriveStatus(item.status.conditions),
+        gitCommit: extractGitCommit(item.spec.template.spec.containers),
       };
     });
   } catch {
@@ -239,6 +249,7 @@ export async function getDeployment(name: string, namespace: string, context?: s
       age: formatAge(item.metadata.creationTimestamp),
       images: item.spec.template.spec.containers.map(c => c.image),
       status: deriveStatus(item.status.conditions),
+      gitCommit: extractGitCommit(item.spec.template.spec.containers),
     };
   } catch {
     return null;
@@ -333,6 +344,58 @@ export async function getPodsForDeployment(deploymentName: string, namespace?: s
 
   const result = await runCommand(podsArgs);
   return parsePods(result.stdout);
+}
+
+export interface PodCommitInfo {
+  name: string;
+  phase: string;
+  gitCommit?: string;
+  images: string[];
+}
+
+interface K8sPodItem {
+  metadata: { name: string };
+  status: { phase?: string };
+  spec: {
+    containers: { image: string; env?: { name: string; value?: string }[] }[];
+  };
+}
+
+/**
+ * Returns the GIT_COMMIT and images actually running in each pod of a deployment.
+ * Useful to detect incomplete rollouts where old pods survive a failed deploy.
+ */
+export async function getPodCommits(deploymentName: string, namespace: string, context?: string): Promise<PodCommitInfo[]> {
+  const sanitizedDeploymentName = sanitizeK8sName(deploymentName);
+
+  const getArgs = ['kubectl', 'get', 'deployment', sanitizedDeploymentName, '-n', sanitizeNamespace(namespace)];
+  if (context) getArgs.push(`--context=${sanitizeContext(context)}`);
+  getArgs.push('-o', "jsonpath='{.spec.selector.matchLabels}'");
+
+  const selectorResult = await runCommand(getArgs);
+  const selector = selectorResult.stdout.trim().replace(/'/g, '');
+  if (!selector) return [];
+
+  const labels = JSON.parse(selector);
+  const labelSelector = Object.entries(labels).map(([k, v]) => `${k}=${v}`).join(',');
+
+  const podsArgs = ['kubectl', 'get', 'pods', '-l', labelSelector, '-n', sanitizeNamespace(namespace)];
+  if (context) podsArgs.push(`--context=${sanitizeContext(context)}`);
+  podsArgs.push('-o', 'json');
+
+  const result = await runCommand(podsArgs);
+  try {
+    const json = JSON.parse(result.stdout);
+    const items: K8sPodItem[] = json.items || [];
+    return items.map((item) => ({
+      name: item.metadata.name,
+      phase: item.status.phase || 'Unknown',
+      gitCommit: extractGitCommit(item.spec.containers),
+      images: item.spec.containers.map(c => c.image),
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export async function getResourceLogs(resourceType: 'deployment' | 'pod', name: string, namespace?: string, tail = 100, context?: string, since?: number): Promise<string> {

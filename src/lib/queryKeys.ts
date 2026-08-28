@@ -65,6 +65,14 @@ interface KubectlPodsKey extends BaseQueryKey {
 	context?: string;
 }
 
+interface KubectlPodCommitsKey extends BaseQueryKey {
+	domain: "kubectl";
+	type: "pod-commits";
+	namespace: string;
+	deploymentName: string;
+	context?: string;
+}
+
 interface KubectlLogsKey extends BaseQueryKey {
 	domain: "kubectl";
 	type: "logs";
@@ -81,6 +89,7 @@ type KubectlQueryKey =
 	| KubectlDeploymentsKey
 	| KubectlDeploymentKey
 	| KubectlPodsKey
+	| KubectlPodCommitsKey
 	| KubectlLogsKey;
 
 // Docker
@@ -140,11 +149,19 @@ interface GitDiffKey extends BaseQueryKey {
 	head: string;
 }
 
+interface GitCompareKey extends BaseQueryKey {
+	domain: "git";
+	type: "compare";
+	repo: string;
+	sha: string;
+}
+
 type GitQueryKey =
 	| GitUserKey
 	| GitCommitsKey
 	| GitTagsKey
-	| GitDiffKey;
+	| GitDiffKey
+	| GitCompareKey;
 
 // Pipeline
 interface PipelineStagingKey extends BaseQueryKey {
@@ -311,6 +328,8 @@ export const queryKeys = {
 			["kubectl", "deployment", namespace, name, context],
 		pods: (namespace: string, deploymentName?: string, context?: string): readonly ["kubectl", "pods", string, string | undefined, string | undefined] =>
 			["kubectl", "pods", namespace, deploymentName, context],
+		podCommits: (namespace: string, deploymentName: string, context?: string): readonly ["kubectl", "pod-commits", string, string, string | undefined] =>
+			["kubectl", "pod-commits", namespace, deploymentName, context],
 		logs: (namespace: string, resourceType: "deployment" | "pod", resourceName: string, tailSize?: number, context?: string): readonly ["kubectl", "logs", string, "deployment" | "pod", string, number | undefined, string | undefined] =>
 			["kubectl", "logs", namespace, resourceType, resourceName, tailSize, context],
 	},
@@ -333,6 +352,8 @@ export const queryKeys = {
 		dashboardDetails: (repo: string): readonly ["git", "dashboard-details", string] => ["git", "dashboard-details", repo],
 		diff: (repo: string, base: string, head: string): readonly ["git", "diff", string, string, string] =>
 			["git", "diff", repo, base, head],
+		compare: (repo: string, sha: string): readonly ["git", "compare", string, string] =>
+			["git", "compare", repo, sha],
 	},
 
 	// Pipeline

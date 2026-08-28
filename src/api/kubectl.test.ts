@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { checkKubectlInstalled, getDeployments, getCurrentContext } from './kubectl';
+import { checkKubectlInstalled, getDeployments, getCurrentContext, getPodCommits } from './kubectl';
 import { runCommand } from '@/api/exec';
 
 vi.mock('@/api/exec', () => ({
@@ -59,5 +59,100 @@ describe('kubectl api', () => {
     expect(res[0].name).toBe('dep1');
     expect(res[0].status).toBe('progressing');
     expect(res[0].age).toBe('0s');
+  });
+
+  it('getDeployments extracts GIT_COMMIT env var from containers', async () => {
+    const mockOut = JSON.stringify({
+      items: [{
+        metadata: { name: 'bff-dp', namespace: 'milocal-ar', creationTimestamp: new Date().toISOString() },
+        spec: {
+          replicas: 1,
+          template: {
+            spec: {
+              containers: [{
+                image: 'registry/app:2589dda4',
+                env: [
+                  { name: 'ENVIRONMENT', value: 'staging' },
+                  { name: 'GIT_COMMIT', value: '4b34588f308580bdbab9a86d0248b8729442e4c9' },
+                ],
+              }],
+            },
+          },
+        },
+        status: { readyReplicas: 1, updatedReplicas: 1, availableReplicas: 1, conditions: [{ type: 'Available', status: 'True' }] }
+      }]
+    });
+    vi.mocked(runCommand).mockResolvedValue({ stdout: mockOut, stderr: '', success: true });
+    const res = await getDeployments('milocal-ar');
+    expect(res[0].gitCommit).toBe('4b34588f308580bdbab9a86d0248b8729442e4c9');
+  });
+
+  it('getDeployments returns undefined gitCommit when env var is absent', async () => {
+    const mockOut = JSON.stringify({
+      items: [{
+        metadata: { name: 'dep1', namespace: 'default', creationTimestamp: new Date().toISOString() },
+        spec: { replicas: 1, template: { spec: { containers: [{ image: 'nginx:1.2.3', env: [{ name: 'ENVIRONMENT', value: 'staging' }] }] } } },
+        status: { readyReplicas: 1, updatedReplicas: 1, availableReplicas: 1, conditions: [{ type: 'Available', status: 'True' }] }
+      }]
+    });
+    vi.mocked(runCommand).mockResolvedValue({ stdout: mockOut, stderr: '', success: true });
+    const res = await getDeployments('default');
+    expect(res[0].gitCommit).toBeUndefined();
+  });
+
+  it('getDeployments extracts GIT_COMMIT from a secondary container', async () => {
+    const mockOut = JSON.stringify({
+      items: [{
+        metadata: { name: 'dep1', namespace: 'default', creationTimestamp: new Date().toISOString() },
+        spec: {
+          replicas: 1,
+          template: {
+            spec: {
+              containers: [
+                { image: 'sidecar:v1' },
+                { image: 'app:v1', env: [{ name: 'GIT_COMMIT', value: 'abc1234' }] },
+              ],
+            },
+          },
+        },
+        status: { readyReplicas: 1, updatedReplicas: 1, availableReplicas: 1, conditions: [{ type: 'Available', status: 'True' }] }
+      }]
+    });
+    vi.mocked(runCommand).mockResolvedValue({ stdout: mockOut, stderr: '', success: true });
+    const res = await getDeployments('default');
+    expect(res[0].gitCommit).toBe('abc1234');
+  });
+
+  it('getPodCommits extracts GIT_COMMIT and phase from each pod', async () => {
+    const podsOut = JSON.stringify({
+      items: [
+        {
+          metadata: { name: 'bff-dp-86bcf78459-nrrb7' },
+          status: { phase: 'Running' },
+          spec: { containers: [{ image: 'registry/api:2589dda4', env: [{ name: 'GIT_COMMIT', value: 'newsha1234' }] }] },
+        },
+        {
+          metadata: { name: 'bff-dp-79dbd65d9d-old11' },
+          status: { phase: 'Running' },
+          spec: { containers: [{ image: 'registry/api:d01be8eb', env: [{ name: 'GIT_COMMIT', value: 'oldsha9999' }] }] },
+        },
+      ],
+    });
+    vi.mocked(runCommand)
+      .mockResolvedValueOnce({ stdout: "'{\"app\":\"bff\"}'", stderr: '', success: true })
+      .mockResolvedValueOnce({ stdout: podsOut, stderr: '', success: true });
+
+    const res = await getPodCommits('bff-dp', 'milocal-ar');
+    expect(res).toHaveLength(2);
+    expect(res[0]).toEqual({ name: 'bff-dp-86bcf78459-nrrb7', phase: 'Running', gitCommit: 'newsha1234', images: ['registry/api:2589dda4'] });
+    expect(res[1].gitCommit).toBe('oldsha9999');
+    expect(vi.mocked(runCommand).mock.calls[1][0]).toContain('-l');
+    expect(vi.mocked(runCommand).mock.calls[1][0]).toContain('app=bff');
+  });
+
+  it('getPodCommits returns empty array when deployment has no selector', async () => {
+    vi.mocked(runCommand).mockResolvedValueOnce({ stdout: "''", stderr: '', success: true });
+    const res = await getPodCommits('bff-dp', 'milocal-ar');
+    expect(res).toEqual([]);
   });
 });

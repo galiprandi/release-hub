@@ -33,12 +33,13 @@
 - getCurrentContext returns null on error
 - getDeployments extracts GIT_COMMIT env var from containers
 - getDeployments extracts GIT_COMMIT from a secondary container
+- getDeployments extracts the selector matchLabels
 - getDeployments parses JSON output for single namespace
 - getDeployments parses JSON output with all-namespaces
 - getDeployments returns undefined gitCommit when env var is absent
 - getDeployments throws for invalid namespace format
-- getPodCommits extracts GIT_COMMIT and phase from each pod
-- getPodCommits returns empty array when deployment has no selector
+- getNamespacePodCommits fetches all pods of a namespace in one call
+- getNamespacePodCommits returns empty array on invalid JSON
 
 ## Module: Security Hardening
 - should allow commands in the safe list
@@ -97,11 +98,15 @@
 - retorna unknown sin fetch cuando el sha es inválido
 - retorna up-to-date cuando el commit desplegado es idéntico a HEAD
 
+## Module: podMatchesSelector
+- matchea cuando todas las labels del selector están en el pod
+
 ## Module: usePodCommitSync
-- retorna drift cuando algún pod corre un commit viejo
+- retorna drift cuando algún pod del selector corre un commit viejo
 - retorna drift cuando un pod no expone GIT_COMMIT
-- retorna synced cuando todos los pods corren el commit del spec
-- retorna unknown cuando no hay pods
+- retorna synced cuando todos los pods del selector corren el commit del spec
+- retorna unknown cuando ningún pod matchea el selector
+- retorna unknown sin fetch cuando no hay selector
 - retorna unknown sin fetch cuando no hay specCommit
 
 ## Module: usePortForward
@@ -266,6 +271,14 @@
 - renders correctly with placeholder
 - shows clear button when query is present and clears on click
 
+## Module: JsonEditor
+- calls onChange when text is updated
+- copies text to clipboard when copy button is clicked
+- formats JSON on format button click
+- renders JsonEditor in editable mode
+- renders JsonEditor in readOnly mode
+- toggles search input when search button is clicked
+
 ## Module: CommitsModal
 - should filter commits
 - should render commits when open
@@ -294,13 +307,31 @@
 - should suggest next version correctly
 - should toggle commits list with accessibility attributes
 
-## Module: JsonEditor
-- calls onChange when text is updated
-- copies text to clipboard when copy button is clicked
-- formats JSON on format button click
-- renders JsonEditor in editable mode
-- renders JsonEditor in readOnly mode
-- toggles search input when search button is clicked
+## Module: sekiAdapter
+- should extract error markdown from failed subevents
+- should fetch and transform both environments
+- should handle null environments in response
+- should return null on API errors
+- should transform events and subevents correctly
+
+## Module: Seki Types
+- should accept valid state values
+- should create a valid pipeline event
+- should create valid pipeline data structure
+- should support TAG refType
+
+## Module: extractRoutes
+- deduplicates URLs
+- extracts URLs from DEPLOY events markdown
+- filters out internal Kubernetes URLs
+- returns empty array for non-DEPLOY events
+
+## Module: getPipelineStatusInfo
+- detects FAILED from deploy events
+- detects SUCCESS when all deploy events succeed
+- falls back to last event state
+- returns undefined status for empty events
+- returns undefined status for undefined events
 
 ## Module: pulsarAdapter
 - detects failed image and extracts error step
@@ -361,29 +392,3 @@
 - formats minutes and seconds
 - formats only seconds
 - returns undefined for missing start
-
-## Module: sekiAdapter
-- should extract error markdown from failed subevents
-- should fetch and transform both environments
-- should handle null environments in response
-- should return null on API errors
-- should transform events and subevents correctly
-
-## Module: Seki Types
-- should accept valid state values
-- should create a valid pipeline event
-- should create valid pipeline data structure
-- should support TAG refType
-
-## Module: extractRoutes
-- deduplicates URLs
-- extracts URLs from DEPLOY events markdown
-- filters out internal Kubernetes URLs
-- returns empty array for non-DEPLOY events
-
-## Module: getPipelineStatusInfo
-- detects FAILED from deploy events
-- detects SUCCESS when all deploy events succeed
-- falls back to last event state
-- returns undefined status for empty events
-- returns undefined status for undefined events

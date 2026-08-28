@@ -23,6 +23,7 @@ export interface DeploymentInfo {
   images: string[];
   status: 'healthy' | 'progressing' | 'degraded' | 'unknown';
   gitCommit?: string;
+  selector?: Record<string, string>;
 }
 
 export interface PodInfo {
@@ -133,6 +134,7 @@ interface K8sDeploymentItem {
   };
   spec: {
     replicas?: number;
+    selector?: { matchLabels?: Record<string, string> };
     template: {
       spec: {
         containers: { image: string; env?: { name: string; value?: string }[] }[];
@@ -176,6 +178,7 @@ function parseDeploymentsJson(output: string, defaultNamespace?: string): Deploy
         images: item.spec.template.spec.containers.map(c => c.image),
         status: deriveStatus(item.status.conditions),
         gitCommit: extractGitCommit(item.spec.template.spec.containers),
+        selector: item.spec.selector?.matchLabels,
       };
     });
   } catch {
@@ -250,6 +253,7 @@ export async function getDeployment(name: string, namespace: string, context?: s
       images: item.spec.template.spec.containers.map(c => c.image),
       status: deriveStatus(item.status.conditions),
       gitCommit: extractGitCommit(item.spec.template.spec.containers),
+      selector: item.spec.selector?.matchLabels,
     };
   } catch {
     return null;
@@ -351,10 +355,11 @@ export interface PodCommitInfo {
   phase: string;
   gitCommit?: string;
   images: string[];
+  labels: Record<string, string>;
 }
 
 interface K8sPodItem {
-  metadata: { name: string };
+  metadata: { name: string; labels?: Record<string, string> };
   status: { phase?: string };
   spec: {
     containers: { image: string; env?: { name: string; value?: string }[] }[];
@@ -362,24 +367,13 @@ interface K8sPodItem {
 }
 
 /**
- * Returns the GIT_COMMIT and images actually running in each pod of a deployment.
- * Useful to detect incomplete rollouts where old pods survive a failed deploy.
+ * Returns the GIT_COMMIT, images and labels actually running in every pod of
+ * a namespace, in a single kubectl call. Consumers filter pods per deployment
+ * by matching the deployment's selector against pod labels. Useful to detect
+ * incomplete rollouts where old pods survive a failed deploy.
  */
-export async function getPodCommits(deploymentName: string, namespace: string, context?: string): Promise<PodCommitInfo[]> {
-  const sanitizedDeploymentName = sanitizeK8sName(deploymentName);
-
-  const getArgs = ['kubectl', 'get', 'deployment', sanitizedDeploymentName, '-n', sanitizeNamespace(namespace)];
-  if (context) getArgs.push(`--context=${sanitizeContext(context)}`);
-  getArgs.push('-o', "jsonpath='{.spec.selector.matchLabels}'");
-
-  const selectorResult = await runCommand(getArgs);
-  const selector = selectorResult.stdout.trim().replace(/'/g, '');
-  if (!selector) return [];
-
-  const labels = JSON.parse(selector);
-  const labelSelector = Object.entries(labels).map(([k, v]) => `${k}=${v}`).join(',');
-
-  const podsArgs = ['kubectl', 'get', 'pods', '-l', labelSelector, '-n', sanitizeNamespace(namespace)];
+export async function getNamespacePodCommits(namespace: string, context?: string): Promise<PodCommitInfo[]> {
+  const podsArgs = ['kubectl', 'get', 'pods', '-n', sanitizeNamespace(namespace)];
   if (context) podsArgs.push(`--context=${sanitizeContext(context)}`);
   podsArgs.push('-o', 'json');
 
@@ -392,10 +386,18 @@ export async function getPodCommits(deploymentName: string, namespace: string, c
       phase: item.status.phase || 'Unknown',
       gitCommit: extractGitCommit(item.spec.containers),
       images: item.spec.containers.map(c => c.image),
+      labels: item.metadata.labels || {},
     }));
   } catch {
     return [];
   }
+}
+
+/**
+ * Checks whether a pod's labels satisfy a deployment's matchLabels selector.
+ */
+export function podMatchesSelector(podLabels: Record<string, string>, selector: Record<string, string>): boolean {
+  return Object.entries(selector).every(([key, value]) => podLabels[key] === value);
 }
 
 export async function getResourceLogs(resourceType: 'deployment' | 'pod', name: string, namespace?: string, tail = 100, context?: string, since?: number): Promise<string> {

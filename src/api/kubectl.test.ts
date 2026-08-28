@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { checkKubectlInstalled, getDeployments, getCurrentContext, getPodCommits } from './kubectl';
+import { checkKubectlInstalled, getDeployments, getCurrentContext, getNamespacePodCommits } from './kubectl';
 import { runCommand } from '@/api/exec';
 
 vi.mock('@/api/exec', () => ({
@@ -123,36 +123,51 @@ describe('kubectl api', () => {
     expect(res[0].gitCommit).toBe('abc1234');
   });
 
-  it('getPodCommits extracts GIT_COMMIT and phase from each pod', async () => {
+  it('getDeployments extracts the selector matchLabels', async () => {
+    const mockOut = JSON.stringify({
+      items: [{
+        metadata: { name: 'bff-dp', namespace: 'milocal-ar', creationTimestamp: new Date().toISOString() },
+        spec: {
+          replicas: 1,
+          selector: { matchLabels: { app: 'bff' } },
+          template: { spec: { containers: [{ image: 'api:aaa' }] } },
+        },
+        status: { readyReplicas: 1, updatedReplicas: 1, availableReplicas: 1, conditions: [{ type: 'Available', status: 'True' }] }
+      }]
+    });
+    vi.mocked(runCommand).mockResolvedValue({ stdout: mockOut, stderr: '', success: true });
+    const res = await getDeployments('milocal-ar');
+    expect(res[0].selector).toEqual({ app: 'bff' });
+  });
+
+  it('getNamespacePodCommits fetches all pods of a namespace in one call', async () => {
     const podsOut = JSON.stringify({
       items: [
         {
-          metadata: { name: 'bff-dp-86bcf78459-nrrb7' },
+          metadata: { name: 'bff-dp-86bcf78459-nrrb7', labels: { app: 'bff' } },
           status: { phase: 'Running' },
           spec: { containers: [{ image: 'registry/api:2589dda4', env: [{ name: 'GIT_COMMIT', value: 'newsha1234' }] }] },
         },
         {
-          metadata: { name: 'bff-dp-79dbd65d9d-old11' },
+          metadata: { name: 'portal-dp-79dbd65d9d-old11', labels: { app: 'portal' } },
           status: { phase: 'Running' },
-          spec: { containers: [{ image: 'registry/api:d01be8eb', env: [{ name: 'GIT_COMMIT', value: 'oldsha9999' }] }] },
+          spec: { containers: [{ image: 'registry/web:d01be8eb', env: [{ name: 'GIT_COMMIT', value: 'oldsha9999' }] }] },
         },
       ],
     });
-    vi.mocked(runCommand)
-      .mockResolvedValueOnce({ stdout: "'{\"app\":\"bff\"}'", stderr: '', success: true })
-      .mockResolvedValueOnce({ stdout: podsOut, stderr: '', success: true });
+    vi.mocked(runCommand).mockResolvedValueOnce({ stdout: podsOut, stderr: '', success: true });
 
-    const res = await getPodCommits('bff-dp', 'milocal-ar');
+    const res = await getNamespacePodCommits('milocal-ar', 'ctx-1');
     expect(res).toHaveLength(2);
-    expect(res[0]).toEqual({ name: 'bff-dp-86bcf78459-nrrb7', phase: 'Running', gitCommit: 'newsha1234', images: ['registry/api:2589dda4'] });
+    expect(res[0]).toEqual({ name: 'bff-dp-86bcf78459-nrrb7', phase: 'Running', gitCommit: 'newsha1234', images: ['registry/api:2589dda4'], labels: { app: 'bff' } });
     expect(res[1].gitCommit).toBe('oldsha9999');
-    expect(vi.mocked(runCommand).mock.calls[1][0]).toContain('-l');
-    expect(vi.mocked(runCommand).mock.calls[1][0]).toContain('app=bff');
+    expect(vi.mocked(runCommand)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(runCommand).mock.calls[0][0]).toEqual(['kubectl', 'get', 'pods', '-n', 'milocal-ar', '--context=ctx-1', '-o', 'json']);
   });
 
-  it('getPodCommits returns empty array when deployment has no selector', async () => {
-    vi.mocked(runCommand).mockResolvedValueOnce({ stdout: "''", stderr: '', success: true });
-    const res = await getPodCommits('bff-dp', 'milocal-ar');
+  it('getNamespacePodCommits returns empty array on invalid JSON', async () => {
+    vi.mocked(runCommand).mockResolvedValueOnce({ stdout: 'not-json', stderr: '', success: true });
+    const res = await getNamespacePodCommits('milocal-ar');
     expect(res).toEqual([]);
   });
 });

@@ -69,7 +69,6 @@ interface KubectlPodCommitsKey extends BaseQueryKey {
 	domain: "kubectl";
 	type: "pod-commits";
 	namespace: string;
-	deploymentName: string;
 	context?: string;
 }
 
@@ -328,8 +327,8 @@ export const queryKeys = {
 			["kubectl", "deployment", namespace, name, context],
 		pods: (namespace: string, deploymentName?: string, context?: string): readonly ["kubectl", "pods", string, string | undefined, string | undefined] =>
 			["kubectl", "pods", namespace, deploymentName, context],
-		podCommits: (namespace: string, deploymentName: string, context?: string): readonly ["kubectl", "pod-commits", string, string, string | undefined] =>
-			["kubectl", "pod-commits", namespace, deploymentName, context],
+		podCommits: (namespace: string, context?: string): readonly ["kubectl", "pod-commits", string, string | undefined] =>
+			["kubectl", "pod-commits", namespace, context],
 		logs: (namespace: string, resourceType: "deployment" | "pod", resourceName: string, tailSize?: number, context?: string): readonly ["kubectl", "logs", string, "deployment" | "pod", string, number | undefined, string | undefined] =>
 			["kubectl", "logs", namespace, resourceType, resourceName, tailSize, context],
 	},

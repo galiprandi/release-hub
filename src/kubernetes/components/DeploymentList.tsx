@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery } from "@tanstack/react-query"
-import { Boxes, Terminal as TerminalIcon, Folder } from "lucide-react"
+import { Boxes, Terminal as TerminalIcon, Folder, CheckCircle2, ArrowDownCircle } from "lucide-react"
 import type { DeploymentInfo } from "@/api/kubectl"
 import { LogsViewer } from "@/components/shared/LogsViewer"
 import { Terminal } from "@/components/shared/Terminal"
@@ -21,7 +21,8 @@ import { usePodCommitSync } from "@/hooks/usePodCommitSync"
 import { CopyButton } from "@/components/shared/CopyButton"
 import { DEFAULT_START_PORT } from "@/config/portForward"
 
-type DeploymentWithContext = DeploymentInfo & { context: string; isPlaceholder?: boolean }
+type CachedDeployment = DeploymentInfo & { fetchedAt?: number; isStale?: boolean }
+type DeploymentWithContext = CachedDeployment & { context: string; isPlaceholder?: boolean }
 
 const STORAGE_KEY = "kubernetes-deployments-metadata"
 
@@ -41,7 +42,7 @@ function buildPlaceholder(id: string): DeploymentWithContext {
 	}
 }
 
-function loadDeploymentsFromStorage(): Record<string, DeploymentInfo> {
+function loadDeploymentsFromStorage(): Record<string, CachedDeployment> {
 	try {
 		const stored = localStorage.getItem(STORAGE_KEY)
 		if (stored) {
@@ -53,7 +54,7 @@ function loadDeploymentsFromStorage(): Record<string, DeploymentInfo> {
 	return {}
 }
 
-function saveDeploymentsToStorage(deployments: Record<string, DeploymentInfo>): void {
+function saveDeploymentsToStorage(deployments: Record<string, CachedDeployment>): void {
 	try {
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(deployments))
 	} catch (error) {
@@ -83,7 +84,7 @@ export const DeploymentList = ({
 	const [isLogsModalOpen, setIsLogsModalOpen] = useState(false)
 	const [isTerminalModalOpen, setIsTerminalModalOpen] = useState(false)
 	const [selectedPodName, setSelectedPodName] = useState<string | null>(null)
-	const [cachedDeployments, setCachedDeployments] = useState<Record<string, DeploymentInfo>>(loadDeploymentsFromStorage())
+	const [cachedDeployments, setCachedDeployments] = useState<Record<string, CachedDeployment>>(loadDeploymentsFromStorage())
 	const { toggleDeploymentFavorite } = useUserCollections()
 
 	// All unique deployment IDs from favorites and projects
@@ -117,10 +118,15 @@ export const DeploymentList = ({
 					try {
 						const deployment = await getDeployment(name, namespace, context)
 						if (deployment) {
-							updatedMetadata[id] = deployment
+							updatedMetadata[id] = { ...deployment, fetchedAt: Date.now(), isStale: false }
+						} else if (updatedMetadata[id]) {
+							// Cluster inalcanzable o deployment inexistente: marcar el cache como stale
+							updatedMetadata[id] = { ...updatedMetadata[id], isStale: true }
 						}
 					} catch {
-						// Silenciar errores de deployments que no existen
+						if (updatedMetadata[id]) {
+							updatedMetadata[id] = { ...updatedMetadata[id], isStale: true }
+						}
 					}
 				})
 			)
@@ -534,11 +540,23 @@ function DeploymentNameCell({ deployment, isLoading }: { deployment: DeploymentW
 		)
 	}
 
+	const staleSince = deployment.fetchedAt
+		? new Date(deployment.fetchedAt).toLocaleString()
+		: 'fecha desconocida'
+
 	return (
 		<span className="font-medium tracking-tight text-foreground text-sm">
 			{deployment.name}
 			{deployment.isPlaceholder && (
 				<span className="ml-2 inline-block h-3 w-3 animate-pulse rounded-full bg-primary/40 align-middle" />
+			)}
+			{!deployment.isPlaceholder && deployment.isStale && (
+				<span
+					className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded bg-warning/15 text-warning border border-warning/30 text-xs font-medium align-middle"
+					title={`No se pudo actualizar desde el cluster (¿VPN?). Mostrando datos de cache del ${staleSince}. El commit y estado pueden estar desactualizados.`}
+				>
+					Cache
+				</span>
 			)}
 		</span>
 	)
@@ -581,9 +599,9 @@ function CommitCell({ deployment, isLoading }: { deployment: DeploymentWithConte
 		enabled,
 	})
 	const podSync = usePodCommitSync({
-		deploymentName: deployment.name,
 		namespace: deployment.namespace,
 		context: deployment.context || undefined,
+		selector: deployment.selector,
 		specCommit: deployment.gitCommit,
 		enabled,
 	})
@@ -617,13 +635,17 @@ function CommitCell({ deployment, isLoading }: { deployment: DeploymentWithConte
 				<div className="h-4 bg-muted rounded w-14 animate-pulse" />
 			)}
 			{!isComparing && status === 'up-to-date' && (
-				<span className="inline-flex items-center px-1.5 py-0.5 rounded bg-success/15 text-success border border-success/30 text-xs font-medium">
-					Actualizado
+				<span title="Actualizado: es el último commit del repo">
+					<CheckCircle2 className="w-3.5 h-3.5 text-success" aria-label="Actualizado" />
 				</span>
 			)}
 			{!isComparing && status === 'behind' && (
-				<span className="inline-flex items-center px-1.5 py-0.5 rounded bg-warning/15 text-warning border border-warning/30 text-xs font-medium">
-					Atrasado · {behindBy}
+				<span
+					className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-destructive/15 text-destructive border border-destructive/30 text-xs font-medium"
+					title={`Atrasado: el repo tiene ${behindBy} commit${behindBy === 1 ? '' : 's'} más nuevo${behindBy === 1 ? '' : 's'} que el desplegado`}
+				>
+					<ArrowDownCircle className="w-3.5 h-3.5" aria-label="Atrasado" />
+					{behindBy}
 				</span>
 			)}
 			{podSync.isLoading && (

@@ -131,7 +131,7 @@
 - **Dashboard Data**: Usar `useRepoDashboardDetails` para acceder a datos de repositorios en el dashboard de GitHub.
 - **Build Log**: Zero-warning build is mandatory. Outdated hook signatures in mocks/tests must be synchronized immediately.
 - **Dead Code Elimination**: Components and hooks identified as orphans must be removed immediately. Legacy hooks `usePipeline.ts`, `usePipelineDetector.ts`, `useKubectlNamespaceAccess.ts`, and `useGitHubActions.ts` have been eradicated. Excepción: la ruta `/dev/seki-preview` y sus archivos en `src/plugins/pipeline/seki/dev/` son un sandbox permanente de iteración visual y NO deben ser borrados.
-- **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) with search params. Setup page uses `SetupCard` with `rounded-md` and `text-xs font-medium` labels.
+- **Kubernetes**: Dashboard must sync 'tab' (favorites|projects) and 'namespace' with search params. View and namespace selection use the shared `CollectionDropdown` (`src/components/shared/CollectionDropdown.tsx`, same pattern as /github), not `IndustrialTabs`. Setup page uses `SetupCard` with `rounded-md` and `text-xs font-medium` labels.
 - **Setup Unification Standard**: Setup pages must use the centralized `SetupCard` component (`src/components/shared/SetupCard.tsx`) and `detectOS` utility (`src/utils/os.ts`). Navigation buttons use `rounded-md` geometry and `text-sm font-medium` typography.
 - **Mutaciones**: Optimistic update + revalidación selectiva. Nunca `window.location.reload()`.
 - **Resiliencia**: Si CLI falla (`kubectl`, `docker`), redirigir a `<module>/setup`.

@@ -1,9 +1,9 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { Search, Star } from "lucide-react";
+import { Boxes, FolderOpen, Layers, Search, Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { DeploymentList } from "@/kubernetes/components/DeploymentList";
 import { DeploymentSearch } from "@/kubernetes/components/DeploymentSearch";
-import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
+import { CollectionDropdown } from "@/components/shared/CollectionDropdown";
 import { applyCachePolicy } from "@/lib/queryKeys";
 import { PageLayout } from "@/layouts/PageLayout";
 import { useUserCollections } from "@/hooks/useUserCollections";
@@ -59,21 +59,52 @@ function KubernetesPage() {
 		...applyCachePolicy("kubectl"),
 	});
 
-	// Extract unique namespaces from all deployments for global filtering
-	const availableNamespaces = useMemo(() => {
-		const nsSet = new Set<string>();
-		safeDeploymentFavorites.forEach(id => {
-			const [, ns] = id.split('/');
-			if (ns) nsSet.add(ns);
-		});
+	// Extract unique namespaces (with deployment counts) for global filtering
+	const namespaceCounts = useMemo(() => {
+		const counts = new Map<string, number>();
+		const allIds = new Set<string>(safeDeploymentFavorites);
 		projects.forEach(p => {
-			p.deployments?.forEach((id: string) => {
-				const [, ns] = id.split('/');
-				if (ns) nsSet.add(ns);
-			});
+			p.deployments?.forEach((id: string) => allIds.add(id));
 		});
-		return Array.from(nsSet).sort();
+		allIds.forEach(id => {
+			const [, ns] = id.split('/');
+			if (ns) counts.set(ns, (counts.get(ns) || 0) + 1);
+		});
+		return counts;
 	}, [safeDeploymentFavorites, projects]);
+
+	const viewTabs = useMemo(() => [
+		{
+			value: 'favorites',
+			label: 'Favoritos',
+			icon: Star,
+			count: safeDeploymentFavorites.length,
+		},
+		{
+			value: 'projects',
+			label: 'Proyectos',
+			icon: FolderOpen,
+			count: projects.reduce((acc, p) => acc + (p.deployments?.length || 0), 0),
+		},
+	], [safeDeploymentFavorites.length, projects]);
+
+	const namespaceTabs = useMemo(() => {
+		const namespaces = Array.from(namespaceCounts.keys()).sort();
+		return [
+			{
+				value: 'all',
+				label: 'Todos',
+				icon: Layers,
+				count: namespaces.reduce((acc, ns) => acc + (namespaceCounts.get(ns) || 0), 0),
+			},
+			...namespaces.map(ns => ({
+				value: ns,
+				label: ns,
+				icon: Boxes,
+				count: namespaceCounts.get(ns) || 0,
+			})),
+		];
+	}, [namespaceCounts]);
 
 	const hasContent = activeTab === 'favorites' ? safeDeploymentFavorites.length > 0 : projects.some(p => p.deployments.length > 0);
 
@@ -82,33 +113,22 @@ function KubernetesPage() {
 			header={{
 				title: "Kubernetes",
 				searchComponent: isInstalled ? (
-					<div className="flex items-center gap-6">
-						<div className="flex items-center gap-2">
-							<span className="text-xs font-medium text-muted-foreground">Vistas:</span>
-							<IndustrialTabs
-								options={[
-									{ id: 'favorites', label: 'Favoritos' },
-									{ id: 'projects', label: 'Proyectos' },
-								]}
-								activeId={activeTab}
-								onChange={handleTabChange}
-								className="w-48"
+					<div className="flex items-center gap-3">
+						<CollectionDropdown
+							menuLabel="Vistas"
+							ariaLabel="Seleccionar vista"
+							tabs={viewTabs}
+							activeTab={activeTab}
+							onChange={(id) => handleTabChange(id as 'favorites' | 'projects')}
+						/>
+						{namespaceTabs.length > 1 && (
+							<CollectionDropdown
+								menuLabel="Namespaces"
+								ariaLabel="Seleccionar namespace"
+								tabs={namespaceTabs}
+								activeTab={search.namespace || 'all'}
+								onChange={(id) => handleFilterChange(id === 'all' ? null : { id: 'namespace', value: id })}
 							/>
-						</div>
-
-						{availableNamespaces.length > 0 && (
-							<div className="flex items-center gap-2">
-								<span className="text-xs font-medium text-muted-foreground">Namespace:</span>
-								<IndustrialTabs
-									options={[
-										{ id: 'all', label: 'Todos' },
-										...availableNamespaces.map(ns => ({ id: ns, label: ns }))
-									]}
-									activeId={search.namespace || 'all'}
-									onChange={(id) => handleFilterChange(id === 'all' ? null : { id: 'namespace', value: id })}
-									className="min-w-[120px]"
-								/>
-							</div>
 						)}
 						<div className="w-px h-6 bg-border mx-1" />
 						<DeploymentSearch />

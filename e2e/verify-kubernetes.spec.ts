@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('Kubernetes Dashboard - Industrial Resonance V2', async ({ page }) => {
+test('Kubernetes Dashboard - Linear/Vercel Canon', async ({ page }) => {
   // Mock localStorage for user collections
   await page.addInitScript(() => {
     window.localStorage.setItem('releasehub_user_collections', JSON.stringify({
@@ -46,9 +46,18 @@ test('Kubernetes Dashboard - Industrial Resonance V2', async ({ page }) => {
   // Verify Header
   await expect(page.getByRole('heading', { name: /KUBERNETES/i })).toBeVisible();
 
-  // Verify IndustrialTabs
-  await expect(page.getByRole('button', { name: 'Favoritos', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Proyectos', exact: true })).toBeVisible();
+  // Verify view selector dropdown (CollectionDropdown, like /github)
+  const viewDropdown = page.getByRole('button', { name: 'Seleccionar vista' });
+  await expect(viewDropdown).toBeVisible();
+  await expect(viewDropdown).toContainText('Favoritos');
+  await viewDropdown.click();
+  await expect(page.getByRole('menuitem', { name: /Proyectos/i })).toBeVisible();
+  await page.keyboard.press('Escape');
+
+  // Verify namespace selector dropdown
+  const nsDropdown = page.getByRole('button', { name: 'Seleccionar namespace' });
+  await expect(nsDropdown).toBeVisible();
+  await expect(nsDropdown).toContainText('Todos');
 
   // Wait for table to be visible
   await expect(page.locator('table')).toBeVisible({ timeout: 10000 });
@@ -61,16 +70,16 @@ test('Kubernetes Dashboard - Industrial Resonance V2', async ({ page }) => {
 
   // Verify technical metadata styling (Namespace)
   const nsCell = page.locator('tbody tr').first().locator('td').nth(1).locator('span');
-  await expect(nsCell).toHaveClass(/text-\[10px\] font-bold uppercase tracking-wider/);
+  await expect(nsCell).toHaveClass(/text-xs font-medium text-muted-foreground/);
 
   // Verify Status Badge
   const statusBadge = page.locator('tbody tr').first().locator('td').nth(2).locator('span');
   await expect(statusBadge).toHaveClass(/bg-success\/20/);
 
   // Verify Search styling
-  const searchInput = page.getByPlaceholder(/Buscar despliegues/i);
-  await expect(searchInput).toHaveClass(/bg-muted\/40/);
-  await expect(searchInput).toHaveClass(/border-border\/60/);
+  const searchInput = page.getByLabel('Búsqueda de deployments');
+  await expect(searchInput).toHaveClass(/bg-muted\/30/);
+  await expect(searchInput).toHaveClass(/border-border/);
 
   // Take screenshot
   await page.screenshot({ path: 'verification/kubernetes-resonance.png', fullPage: true });

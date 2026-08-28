@@ -28,6 +28,11 @@
 - should throw error when success is false
 - should use default error message when success is false and no error provided
 
+## Module: getRepoSearchScope
+- cachea el resultado a nivel módulo
+- cae a user-only si no puede listar orgs
+- construye el scope con user y todas las orgs
+
 ## Module: kubectl api
 - checkKubectlInstalled returns true when found
 - getCurrentContext returns null on error
@@ -271,14 +276,6 @@
 - renders correctly with placeholder
 - shows clear button when query is present and clears on click
 
-## Module: JsonEditor
-- calls onChange when text is updated
-- copies text to clipboard when copy button is clicked
-- formats JSON on format button click
-- renders JsonEditor in editable mode
-- renders JsonEditor in readOnly mode
-- toggles search input when search button is clicked
-
 ## Module: CommitsModal
 - should filter commits
 - should render commits when open
@@ -307,31 +304,13 @@
 - should suggest next version correctly
 - should toggle commits list with accessibility attributes
 
-## Module: sekiAdapter
-- should extract error markdown from failed subevents
-- should fetch and transform both environments
-- should handle null environments in response
-- should return null on API errors
-- should transform events and subevents correctly
-
-## Module: Seki Types
-- should accept valid state values
-- should create a valid pipeline event
-- should create valid pipeline data structure
-- should support TAG refType
-
-## Module: extractRoutes
-- deduplicates URLs
-- extracts URLs from DEPLOY events markdown
-- filters out internal Kubernetes URLs
-- returns empty array for non-DEPLOY events
-
-## Module: getPipelineStatusInfo
-- detects FAILED from deploy events
-- detects SUCCESS when all deploy events succeed
-- falls back to last event state
-- returns undefined status for empty events
-- returns undefined status for undefined events
+## Module: JsonEditor
+- calls onChange when text is updated
+- copies text to clipboard when copy button is clicked
+- formats JSON on format button click
+- renders JsonEditor in editable mode
+- renders JsonEditor in readOnly mode
+- toggles search input when search button is clicked
 
 ## Module: pulsarAdapter
 - detects failed image and extracts error step
@@ -392,3 +371,29 @@
 - formats minutes and seconds
 - formats only seconds
 - returns undefined for missing start
+
+## Module: sekiAdapter
+- should extract error markdown from failed subevents
+- should fetch and transform both environments
+- should handle null environments in response
+- should return null on API errors
+- should transform events and subevents correctly
+
+## Module: Seki Types
+- should accept valid state values
+- should create a valid pipeline event
+- should create valid pipeline data structure
+- should support TAG refType
+
+## Module: extractRoutes
+- deduplicates URLs
+- extracts URLs from DEPLOY events markdown
+- filters out internal Kubernetes URLs
+- returns empty array for non-DEPLOY events
+
+## Module: getPipelineStatusInfo
+- detects FAILED from deploy events
+- detects SUCCESS when all deploy events succeed
+- falls back to last event state
+- returns undefined status for empty events
+- returns undefined status for undefined events

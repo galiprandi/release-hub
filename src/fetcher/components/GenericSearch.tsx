@@ -232,7 +232,7 @@ export function GenericSearch<T>({
                 <kbd className="px-1.5 py-0.5 rounded bg-background border shadow-sm font-sans">Esc</kbd> Cerrar
               </span>
             </div>
-            <span className="font-medium">{results.length} resultados</span>
+            <span className="font-medium">{results.length} items</span>
           </div>
         </div>
       )}

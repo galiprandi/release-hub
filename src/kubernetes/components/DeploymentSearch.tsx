@@ -290,7 +290,7 @@ export function DeploymentSearch() {
                 <kbd className="px-1.5 py-0.5 rounded bg-background border border-border shadow-sm font-sans text-xs">ESC</kbd> CERRAR
               </span>
             </div>
-            <span className="opacity-60">{results.length} RESULTADOS</span>
+            <span className="opacity-60">{results.length} ITEMS</span>
           </div>
         </div>
       )}

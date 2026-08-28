@@ -382,7 +382,7 @@ export function RepoSearch() {
             <span className="font-medium">
               {isFileMode && results.length > 0 && results[0]?.type === 'file'
                 ? `${results.length} archivos`
-                : `${results.length} resultados`}
+                : `${results.length} items`}
             </span>
           </div>
         </div>

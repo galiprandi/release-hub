@@ -39,7 +39,7 @@
           "state": "FAIL",
           "started_at": "2026-06-03T16:15:00Z",
           "completed_at": "2026-06-03T16:30:00Z",
-          "markdown": "# Kubernetes Deployment Failed\n\n**Error:** Deployment rollout failed\n\n**Details:**\n- Deployment: mobile-bff-deployment\n- Namespace: argentina-arcus\n- Reason: Liveness probe failed\n- Pod: mobile-bff-7d8f9c6b5d-x4k2p\n\n**Logs:**\n```\nLiveness probe failed: HTTP GET http://localhost:3000/health failed: status 503 Service Unavailable\nReadiness probe failed: HTTP GET http://localhost:3000/ready failed: status 503 Service Unavailable\n```\n\n**Solution:** Check application logs and ensure health endpoints are responding correctly"
+          "markdown": "# Kubernetes Deployment Failed\n\n**Error:** Deployment rollout failed\n\n**Details:**\n- Deployment: mobile-bff-deployment\n- Namespace: my-product\n- Reason: Liveness probe failed\n- Pod: mobile-bff-7d8f9c6b5d-x4k2p\n\n**Logs:**\n```\nLiveness probe failed: HTTP GET http://localhost:3000/health failed: status 503 Service Unavailable\nReadiness probe failed: HTTP GET http://localhost:3000/ready failed: status 503 Service Unavailable\n```\n\n**Solution:** Check application logs and ensure health endpoints are responding correctly"
         },
         {
           "id": "validation",
@@ -47,7 +47,7 @@
           "state": "FAIL",
           "started_at": "2026-06-03T16:20:00Z",
           "completed_at": "2026-06-03T16:25:00Z",
-          "markdown": "# JIRA Validation Failed\n\n**Error:** JIRA ticket validation failed\n\n**Details:**\n- Ticket: ARARG-9999\n- Status: Invalid transition\n- Current status: In Progress\n- Required status: Ready for Deploy\n\n**Solution:** Update JIRA ticket status to 'Ready for Deploy' before deploying"
+          "markdown": "# JIRA Validation Failed\n\n**Error:** JIRA ticket validation failed\n\n**Details:**\n- Ticket: PROJ-9999\n- Status: Invalid transition\n- Current status: In Progress\n- Required status: Ready for Deploy\n\n**Solution:** Update JIRA ticket status to 'Ready for Deploy' before deploying"
         }
       ]
     }

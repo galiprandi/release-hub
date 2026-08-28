@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { runCommand } from '@/api/exec'
+import { getRepoSearchScope } from '@/api/githubSearch'
 import axios from 'axios'
 
 /**
@@ -61,8 +62,7 @@ export function useWebMCP() {
       execute: async ({ query }: { query: string }) => {
         if (typeof query !== 'string') throw new Error('Query must be a string');
         try {
-          const userResult = await runCommand(['gh', 'api', '/user', '--jq', '.login'])
-          const username = userResult.stdout.trim()
+          const searchScope = await getRepoSearchScope()
 
           const gqlQuery = `
             query($searchTerm: String!) {
@@ -80,7 +80,7 @@ export function useWebMCP() {
 
           const searchQuery = query.includes('/')
             ? query
-            : `${query} org:Cencosud-Cencommerce org:Cencosud-xlabs user:${username}`
+            : `${query} ${searchScope}`
 
           const result = await runCommand([
             'gh',

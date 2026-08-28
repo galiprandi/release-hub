@@ -101,7 +101,7 @@ describe('Security Hardening', () => {
       expect(validateRepo('org/repo --help')).toBe(false)
       expect(validateRepo('-flag-injection')).toBe(false) // Must start with alphanumeric
       expect(validateRepo('org/repo/../../etc/passwd')).toBe(false)
-      expect(validateRepo('Cencosud-xlabs/release-hub')).toBe(true)
+      expect(validateRepo('acme-org/release-hub')).toBe(true)
     })
   })
 

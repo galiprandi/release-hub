@@ -17,7 +17,7 @@
 - **Hook**: `useDeployedCommitStatus` (`src/hooks/useDeployedCommitStatus.ts`) resuelve `org/repo` matcheando el namespace del deployment contra repos favoritos/de proyectos (patrón: namespace = nombre repo) y compara con `gh api repos/{org}/{repo}/compare/{sha}...HEAD` (en esa dirección, `ahead_by` = commits de atraso del deploy). Query key `queryKeys.git.compare(repo, sha)` con cache policy `git`. Sha validado con `/^[0-9a-f]{7,40}$/i` antes de interpolar.
 - **UI**: Columna `Commit` en `DeploymentList.tsx` con hash corto monospace + `CopyButton` + badge semántico (`Actualizado` success / `Atrasado · N` warning). Deployments sin `GIT_COMMIT` o sin repo resuelto muestran solo `—`/hash.
 - **Pod Sync (rollouts fallidos)**: `getPodCommits` (`src/api/kubectl.ts`) lee el `GIT_COMMIT` real de cada pod via selector del deployment (`kubectl get pods -l ... -o json`). `usePodCommitSync` (`src/hooks/usePodCommitSync.ts`, key `queryKeys.kubectl.podCommits`) compara cada pod contra el commit del spec: badge `Pods N/N` (success) o `Pods X/N` (destructive) con tooltip listando pods viejos y sus commits. Detecta deploys fallidos donde quedan pods con imágenes viejas.
-- **Verificación**: Build zero-warning, 291 tests exitosos, lint sin problemas nuevos. Verificado contra cluster real (milocal-ar: pods exponen GIT_COMMIT heredado del ReplicaSet).
+- **Verificación**: Build zero-warning, 291 tests exitosos, lint sin problemas nuevos. Verificado contra cluster real (los pods exponen GIT_COMMIT heredado del ReplicaSet).
 
 ### Mejora #20: Repository Detail Action Bar Simplification & Visual Realignment
 - **Promocionar CTA**: Elevado como acción principal fija y destacada en rojo (`bg-destructive`) con etiqueta `Promocionar`.
@@ -104,6 +104,7 @@
 | 6 | No `useQuery` crudo. Todo dato es un **Recurso** (ADR-001). | `ADR.md` |
 | 7 | URL sync: todo estado visual vive en search params (TanStack Router). | `ADR.md` |
 | 8 | Tests: `.test.ts[x]` junto al código. No `__tests__`. | — |
+| 9 | **Prohibido hardcodear nombres propiedad intelectual de Cencosud** (orgs, productos, namespaces, dominios) en código, tests, mocks o docs. Única excepción: `seki` (y su endpoint en el proxy de `vite.config.ts`). Usar genéricos: `acme-org`, `my-product`, `demo-*`, `example.com`. Orgs de búsqueda se resuelven dinámicamente via `getRepoSearchScope()` (`src/api/githubSearch.ts`). | — |
 
 ## Matriz de consulta
 

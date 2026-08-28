@@ -39,7 +39,7 @@ describe('useDeployedCommitStatus', () => {
 	});
 
 	it('retorna up-to-date cuando el commit desplegado es idéntico a HEAD', async () => {
-		mockCollections(['Cencosud-xlab/milocal-ar']);
+		mockCollections(['acme-org/my-product']);
 		vi.mocked(runCommand).mockResolvedValueOnce({
 			stdout: JSON.stringify({ status: 'identical', ahead_by: 0 }),
 			stderr: '',
@@ -47,17 +47,17 @@ describe('useDeployedCommitStatus', () => {
 		});
 
 		const { result } = renderHook(
-			() => useDeployedCommitStatus({ namespace: 'milocal-ar', gitCommit: SHA }),
+			() => useDeployedCommitStatus({ namespace: 'my-product', gitCommit: SHA }),
 			{ wrapper }
 		);
 
 		await waitFor(() => expect(result.current.status).toBe('up-to-date'));
-		expect(result.current.repo).toBe('Cencosud-xlab/milocal-ar');
+		expect(result.current.repo).toBe('acme-org/my-product');
 		expect(result.current.behindBy).toBe(0);
 	});
 
 	it('retorna behind con la cantidad de commits de atraso', async () => {
-		mockCollections(['Cencosud-xlab/milocal-ar']);
+		mockCollections(['acme-org/my-product']);
 		vi.mocked(runCommand).mockResolvedValueOnce({
 			stdout: JSON.stringify({ status: 'ahead', ahead_by: 3 }),
 			stderr: '',
@@ -65,7 +65,7 @@ describe('useDeployedCommitStatus', () => {
 		});
 
 		const { result } = renderHook(
-			() => useDeployedCommitStatus({ namespace: 'milocal-ar', gitCommit: SHA }),
+			() => useDeployedCommitStatus({ namespace: 'my-product', gitCommit: SHA }),
 			{ wrapper }
 		);
 
@@ -74,7 +74,7 @@ describe('useDeployedCommitStatus', () => {
 	});
 
 	it('resuelve el repo desde los repos de proyectos', async () => {
-		mockCollections([], ['Cencosud-xlab/milocal-ar']);
+		mockCollections([], ['acme-org/my-product']);
 		vi.mocked(runCommand).mockResolvedValueOnce({
 			stdout: JSON.stringify({ status: 'identical', ahead_by: 0 }),
 			stderr: '',
@@ -82,19 +82,19 @@ describe('useDeployedCommitStatus', () => {
 		});
 
 		const { result } = renderHook(
-			() => useDeployedCommitStatus({ namespace: 'milocal-ar', gitCommit: SHA }),
+			() => useDeployedCommitStatus({ namespace: 'my-product', gitCommit: SHA }),
 			{ wrapper }
 		);
 
 		await waitFor(() => expect(result.current.status).toBe('up-to-date'));
-		expect(result.current.repo).toBe('Cencosud-xlab/milocal-ar');
+		expect(result.current.repo).toBe('acme-org/my-product');
 	});
 
 	it('retorna unknown sin fetch cuando el namespace no matchea ningún repo', () => {
-		mockCollections(['Cencosud-xlab/otro-repo']);
+		mockCollections(['acme-org/otro-repo']);
 
 		const { result } = renderHook(
-			() => useDeployedCommitStatus({ namespace: 'milocal-ar', gitCommit: SHA }),
+			() => useDeployedCommitStatus({ namespace: 'my-product', gitCommit: SHA }),
 			{ wrapper }
 		);
 
@@ -104,10 +104,10 @@ describe('useDeployedCommitStatus', () => {
 	});
 
 	it('retorna unknown sin fetch cuando el sha es inválido', () => {
-		mockCollections(['Cencosud-xlab/milocal-ar']);
+		mockCollections(['acme-org/my-product']);
 
 		const { result } = renderHook(
-			() => useDeployedCommitStatus({ namespace: 'milocal-ar', gitCommit: 'no-es-un-sha;rm' }),
+			() => useDeployedCommitStatus({ namespace: 'my-product', gitCommit: 'no-es-un-sha;rm' }),
 			{ wrapper }
 		);
 
@@ -116,10 +116,10 @@ describe('useDeployedCommitStatus', () => {
 	});
 
 	it('retorna unknown cuando no hay gitCommit', () => {
-		mockCollections(['Cencosud-xlab/milocal-ar']);
+		mockCollections(['acme-org/my-product']);
 
 		const { result } = renderHook(
-			() => useDeployedCommitStatus({ namespace: 'milocal-ar' }),
+			() => useDeployedCommitStatus({ namespace: 'my-product' }),
 			{ wrapper }
 		);
 
@@ -128,7 +128,7 @@ describe('useDeployedCommitStatus', () => {
 	});
 
 	it('retorna unknown si la respuesta de gh no es JSON válido', async () => {
-		mockCollections(['Cencosud-xlab/milocal-ar']);
+		mockCollections(['acme-org/my-product']);
 		vi.mocked(runCommand).mockResolvedValueOnce({
 			stdout: 'invalid-json',
 			stderr: '',
@@ -136,7 +136,7 @@ describe('useDeployedCommitStatus', () => {
 		});
 
 		const { result } = renderHook(
-			() => useDeployedCommitStatus({ namespace: 'milocal-ar', gitCommit: SHA }),
+			() => useDeployedCommitStatus({ namespace: 'my-product', gitCommit: SHA }),
 			{ wrapper }
 		);
 

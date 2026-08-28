@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { runCommand } from '@/api/exec'
+import { getRepoSearchScope } from '@/api/githubSearch'
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys'
 import { useDebounce } from '@galiprandi/react-tools'
 
@@ -49,9 +50,8 @@ export function useRepoSearch({ searchTerm = '', enabled = true }: UseRepoSearch
   return useQuery<RepoSearchResponse>({
     queryKey: queryKeys.user.repoSearch(debouncedSearchTerm),
     queryFn: async () => {
-      // Get username for search query
-      const userResult = await runCommand(['gh', 'api', '/user', '--jq', '.login'])
-      const username = userResult.stdout.trim()
+      // Get search scope (user + orgs) for search query
+      const searchScope = await getRepoSearchScope()
 
       // Build search query with all orgs and user
       const query = `
@@ -78,7 +78,7 @@ export function useRepoSearch({ searchTerm = '', enabled = true }: UseRepoSearch
       // If searchTerm contains "/" (user/repo format), search without org/user filters
       const searchQuery = debouncedSearchTerm.includes('/')
         ? debouncedSearchTerm
-        : `${debouncedSearchTerm} org:Cencosud-Cencommerce org:Cencosud-xlabs user:${username}`
+        : `${debouncedSearchTerm} ${searchScope}`
 
       const result = await runCommand([
         'gh',

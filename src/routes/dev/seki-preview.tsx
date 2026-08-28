@@ -114,8 +114,8 @@ function SekiPreviewPage() {
 								<span className="text-xs font-medium text-muted-foreground">Commit</span>
 								<CommitLink
 									hash={mockData.staging.ref}
-									org="Cencosud-xlabs"
-									repo="argentina-arcus"
+									org="acme-org"
+									repo="my-product"
 									pipelineStatus={stagingStatus}
 									isLoading={false}
 									commitInfo={{
@@ -131,8 +131,8 @@ function SekiPreviewPage() {
 								<span className="text-xs font-medium text-muted-foreground">Tag</span>
 								<TagLink
 									tagName={mockData.production.ref}
-									org="Cencosud-xlabs"
-									repo="argentina-arcus"
+									org="acme-org"
+									repo="my-product"
 									pipelineStatus={productionStatus}
 									isLoading={false}
 									commitInfo={{

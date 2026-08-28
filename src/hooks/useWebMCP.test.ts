@@ -2,11 +2,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { useWebMCP } from './useWebMCP'
 import { runCommand } from '@/api/exec'
+import { getRepoSearchScope } from '@/api/githubSearch'
 import axios from 'axios'
 
 // Mock runCommand and axios
 vi.mock('@/api/exec', () => ({
   runCommand: vi.fn(),
+}))
+vi.mock('@/api/githubSearch', () => ({
+  getRepoSearchScope: vi.fn().mockResolvedValue('user:user_login org:acme-org'),
 }))
 vi.mock('axios')
 
@@ -42,7 +46,6 @@ describe('useWebMCP', () => {
     renderHook(() => useWebMCP())
     const searchTool = mockRegisterTool.mock.calls.find((call) => (call[0] as { name: string }).name === 'search_repositories')?.[0] as { execute: (input: Record<string, unknown>) => Promise<unknown> }
 
-    vi.mocked(runCommand).mockResolvedValueOnce({ stdout: 'user_login', stderr: '', success: true }) // for /user
     vi.mocked(runCommand).mockResolvedValueOnce({
       stdout: JSON.stringify({ data: { search: { nodes: [{ nameWithOwner: 'org/repo' }] } } }),
       stderr: '',
@@ -51,8 +54,10 @@ describe('useWebMCP', () => {
 
     const result = await searchTool.execute({ query: 'my-repo' })
 
-    expect(runCommand).toHaveBeenCalledWith(['gh', 'api', '/user', '--jq', '.login'])
+    expect(getRepoSearchScope).toHaveBeenCalled()
     expect(runCommand).toHaveBeenCalledWith(expect.arrayContaining(['gh', 'api', 'graphql']))
+    const graphqlArgs = vi.mocked(runCommand).mock.calls[0][0]
+    expect(graphqlArgs.join(' ')).toContain('my-repo user:user_login org:acme-org')
     expect(result).toEqual([{ nameWithOwner: 'org/repo' }])
   })
 

@@ -13,7 +13,7 @@ export const mockStagingData: PulsarBuildData = {
 	startedAt: '2026-07-07T16:05:02Z',
 	completedAt: '2026-07-07T16:17:32Z',
 	updatedAt: '2026-07-07T16:17:32Z',
-	externalUrl: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28880625904',
+	externalUrl: 'https://github.com/acme-org/demo-components/actions/runs/28880625904',
 	commit: {
 		message: 'fix(dashboard): show user display name in Top usuarios and fix Jira link',
 		author: 'Aliprandi, German Antonio',
@@ -26,7 +26,7 @@ export const mockStagingData: PulsarBuildData = {
 			app: 'ai-workflow',
 			appType: 'nodejs',
 			state: 'COMPLETED',
-			url: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28880625904/job/856765001',
+			url: 'https://github.com/acme-org/demo-components/actions/runs/28880625904/job/856765001',
 			startedAt: '2026-07-07T16:07:56Z',
 			completedAt: '2026-07-07T16:16:41Z',
 			steps: [
@@ -42,7 +42,7 @@ export const mockStagingData: PulsarBuildData = {
 			app: 'ai-workflow-dashboard',
 			appType: 'nextjs',
 			state: 'COMPLETED',
-			url: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28880625904/job/856765002',
+			url: 'https://github.com/acme-org/demo-components/actions/runs/28880625904/job/856765002',
 			startedAt: '2026-07-07T16:07:56Z',
 			completedAt: '2026-07-07T16:12:29Z',
 			steps: [
@@ -56,7 +56,7 @@ export const mockStagingData: PulsarBuildData = {
 			app: 'flow-canvas',
 			appType: 'nextjs',
 			state: 'COMPLETED',
-			url: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28880625904/job/856765003',
+			url: 'https://github.com/acme-org/demo-components/actions/runs/28880625904/job/856765003',
 			startedAt: '2026-07-07T16:07:56Z',
 			completedAt: '2026-07-07T16:13:10Z',
 			steps: [
@@ -70,7 +70,7 @@ export const mockStagingData: PulsarBuildData = {
 			app: 'cenco-skills-landing',
 			appType: 'nextjs',
 			state: 'COMPLETED',
-			url: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28880625904/job/856765004',
+			url: 'https://github.com/acme-org/demo-components/actions/runs/28880625904/job/856765004',
 			startedAt: '2026-07-07T16:07:56Z',
 			completedAt: '2026-07-07T16:14:00Z',
 			steps: [
@@ -84,7 +84,7 @@ export const mockStagingData: PulsarBuildData = {
 			app: 'cenco-skills-telemetry',
 			appType: 'nodejs',
 			state: 'COMPLETED',
-			url: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28880625904/job/856765005',
+			url: 'https://github.com/acme-org/demo-components/actions/runs/28880625904/job/856765005',
 			startedAt: '2026-07-07T16:07:56Z',
 			completedAt: '2026-07-07T16:15:25Z',
 			steps: [
@@ -104,7 +104,7 @@ export const mockProductionData: PulsarBuildData = {
 	startedAt: '2026-07-07T16:27:17Z',
 	completedAt: '2026-07-07T16:59:35Z',
 	updatedAt: '2026-07-07T16:59:35Z',
-	externalUrl: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28882017944',
+	externalUrl: 'https://github.com/acme-org/demo-components/actions/runs/28882017944',
 	commit: {
 		message: 'fix(dashboard): show user display name in Top usuarios and fix Jira link',
 		author: 'Aliprandi, German Antonio',
@@ -117,7 +117,7 @@ export const mockProductionData: PulsarBuildData = {
 			app: 'ai-workflow',
 			appType: 'nodejs',
 			state: 'COMPLETED',
-			url: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28882017944/job/85676959811',
+			url: 'https://github.com/acme-org/demo-components/actions/runs/28882017944/job/85676959811',
 			startedAt: '2026-07-07T16:49:05Z',
 			completedAt: '2026-07-07T16:58:30Z',
 			steps: [
@@ -131,7 +131,7 @@ export const mockProductionData: PulsarBuildData = {
 			app: 'cenco-skills-landing',
 			appType: 'nextjs',
 			state: 'COMPLETED',
-			url: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28882017944/job/85676959837',
+			url: 'https://github.com/acme-org/demo-components/actions/runs/28882017944/job/85676959837',
 			startedAt: '2026-07-07T16:49:05Z',
 			completedAt: '2026-07-07T16:55:57Z',
 			steps: [
@@ -145,7 +145,7 @@ export const mockProductionData: PulsarBuildData = {
 			app: 'ai-workflow-dashboard',
 			appType: 'nextjs',
 			state: 'FAILED',
-			url: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28882017944/job/85676959844',
+			url: 'https://github.com/acme-org/demo-components/actions/runs/28882017944/job/85676959844',
 			startedAt: '2026-07-07T16:49:04Z',
 			completedAt: '2026-07-07T16:55:43Z',
 			steps: [
@@ -175,7 +175,7 @@ export const mockProductionData: PulsarBuildData = {
 			app: 'flow-canvas',
 			appType: 'nextjs',
 			state: 'COMPLETED',
-			url: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28882017944/job/85676959861',
+			url: 'https://github.com/acme-org/demo-components/actions/runs/28882017944/job/85676959861',
 			startedAt: '2026-07-07T16:49:05Z',
 			completedAt: '2026-07-07T16:56:15Z',
 			steps: [
@@ -189,7 +189,7 @@ export const mockProductionData: PulsarBuildData = {
 			app: 'cenco-skills-telemetry',
 			appType: 'nodejs',
 			state: 'COMPLETED',
-			url: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28882017944/job/85676959893',
+			url: 'https://github.com/acme-org/demo-components/actions/runs/28882017944/job/85676959893',
 			startedAt: '2026-07-07T16:49:05Z',
 			completedAt: '2026-07-07T16:56:34Z',
 			steps: [
@@ -210,7 +210,7 @@ export const mockRunningData: PulsarBuildData = {
 	startedAt: '2026-07-07T17:30:00Z',
 	completedAt: undefined,
 	updatedAt: '2026-07-07T17:35:00Z',
-	externalUrl: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28883000000',
+	externalUrl: 'https://github.com/acme-org/demo-components/actions/runs/28883000000',
 	commit: {
 		message: 'feat: new dashboard widget',
 		author: 'Aliprandi, German Antonio',
@@ -223,7 +223,7 @@ export const mockRunningData: PulsarBuildData = {
 			app: 'ai-workflow',
 			appType: 'nodejs',
 			state: 'COMPLETED',
-			url: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28883000000/job/85678000001',
+			url: 'https://github.com/acme-org/demo-components/actions/runs/28883000000/job/85678000001',
 			startedAt: '2026-07-07T17:30:00Z',
 			completedAt: '2026-07-07T17:38:00Z',
 			steps: [
@@ -237,7 +237,7 @@ export const mockRunningData: PulsarBuildData = {
 			app: 'ai-workflow-dashboard',
 			appType: 'nextjs',
 			state: 'RUNNING',
-			url: 'https://github.com/Cencosud-Cencommerce/coe-utils-components/actions/runs/28883000000/job/85678000002',
+			url: 'https://github.com/acme-org/demo-components/actions/runs/28883000000/job/85678000002',
 			startedAt: '2026-07-07T17:30:00Z',
 			steps: [
 				{ number: 1, name: 'Set up job', state: 'COMPLETED', startedAt: '2026-07-07T17:30:00Z', completedAt: '2026-07-07T17:30:01Z' },

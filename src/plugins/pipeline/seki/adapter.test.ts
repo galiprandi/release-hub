@@ -15,8 +15,8 @@ const mockPipelineResponse = (overrides: Partial<{
 	updated_at: '2025-01-01T00:05:00Z',
 	events: [],
 	git: {
-		organization: 'Cencosud-xlabs',
-		product: 'argentina-arcus',
+		organization: 'acme-org',
+		product: 'my-product',
 		commit: overrides.commit ?? 'abcdef1234567890abcdef1234567890abcdef12',
 		commit_message: 'test commit',
 		commit_author: 'Test Author',
@@ -40,7 +40,7 @@ describe('sekiAdapter', () => {
 			data: mockData,
 		} as unknown as Awaited<ReturnType<typeof sekiApi.fetchPipelinesByEnvironment>>)
 
-		const result = await sekiAdapter.fetchByEnvironment('Cencosud-xlabs', 'argentina-arcus')
+		const result = await sekiAdapter.fetchByEnvironment('acme-org', 'my-product')
 
 		expect(result?.staging).not.toBeNull()
 		expect(result?.staging?.state).toBe('COMPLETED')

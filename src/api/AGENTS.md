@@ -49,7 +49,7 @@
 
 **Problem**: Production routes were not appearing in the `/health` monitor even though the pipeline data contained deployment URLs for production environments.
 
-**Root Cause**: The `detectEnvironment` function in `useHealthMonitor.ts` only recognized URLs as production if they contained specific patterns like `seki-prod` or `prod.`. However, actual production URLs like `https://yumi-ticket-control-bff-api.cencosudx.com` and `https://seki.cencosud.corp/yumi-ticket-control/api/reports` did not match these patterns, so they were incorrectly classified as staging by default.
+**Root Cause**: The `detectEnvironment` function in `useHealthMonitor.ts` only recognized URLs as production if they contained specific patterns like `seki-prod` or `prod.`. However, actual production URLs like `https://my-product-bff-api.example.com` and `https://seki.example.corp/my-product/api/reports` did not match these patterns, so they were incorrectly classified as staging by default.
 
 **Details**:
 - The `extractEndpointsFromEvents` function relied solely on URL pattern matching to determine the environment
@@ -73,8 +73,8 @@
 - `src/hooks/useHealthMonitor.ts` (lines 163-194): Added environment parameter to `extractEndpointsFromEvents`
 
 **Verification**: After the fix, production endpoints from tag-based pipelines now appear correctly in the health monitor with `environment: production`. The endpoints are:
-- `https://yumi-ticket-control-bff-api.cencosudx.com` (production)
-- `https://seki.cencosud.corp/yumi-ticket-control/api/reports` (production)
+- `https://my-product-bff-api.example.com` (production)
+- `https://seki.example.corp/my-product/api/reports` (production)
 
 **Note**: The health monitor automatically removes endpoints from products that are not in favorites. To see production endpoints, the product must be added to favorites first.
 
@@ -316,7 +316,7 @@ import { PulsarBuildMonitor } from '@/plugins/pipeline/pulsar/components'
 
 function MyComponent() {
   return (
-    <PulsarBuildMonitor org="Cencosud-Cencommerce" repo="coe-utils-components" />
+    <PulsarBuildMonitor org="acme-org" repo="demo-components" />
   )
   // Renders staging + production cards if repo uses Pulsar.
   // Renders null if repo doesn't have pulsar-nx-build.yml.

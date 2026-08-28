@@ -48,7 +48,7 @@ import { MarkdownLog } from '@/components/shared/MarkdownLog'
 
 // === AI Failure Summary ===
 
-const FAILURE_SYSTEM_PROMPT = `Sos un DevOps Engineer senior de Cencosud especializado en Kubernetes, CI/CD y observabilidad. Tu audiencia es un desarrollador que hizo un deploy que falló y necesita un diagnóstico rápido para actuar.
+const FAILURE_SYSTEM_PROMPT = `Sos un DevOps Engineer senior especializado en Kubernetes, CI/CD y observabilidad. Tu audiencia es un desarrollador que hizo un deploy que falló y necesita un diagnóstico rápido para actuar.
 
 Analizá el reporte del pipeline (stages, timings, log de error) y generá un informe estructurado.
 
@@ -66,16 +66,16 @@ COMANDO: <comando exacto para investigar, con namespace/selector del log>
 CORRECCION: <paso concreto para fix, o "revisar logs del pod con el comando anterior" si no hay info suficiente>
 
 Ejemplos:
-DIAGNOSTICO: docs — pods no encontrados en producción. Evidencia: "kubectl get pods --namespace=linebreaker --selector=project=docs"
-COMANDO: kubectl get pods -n linebreaker --selector=project=docs
-CORRECCION: Verificar que el deployment exista en producción: kubectl get deploy -n linebreaker project=docs
+DIAGNOSTICO: docs — pods no encontrados en producción. Evidencia: "kubectl get pods --namespace=my-product --selector=project=docs"
+COMANDO: kubectl get pods -n my-product --selector=project=docs
+CORRECCION: Verificar que el deployment exista en producción: kubectl get deploy -n my-product project=docs
 
 DIAGNOSTICO: bff — build falló por dependencia faltante. Evidencia: "npm ERR! Cannot find module 'express'"
 COMANDO: cd packages/bff && npm install
 CORRECCION: Agregar 'express' a package.json del bff y reconstruir la imagen
 
 DIAGNOSTICO: scheduler-service — OOMKilled, límite 512Mi excedido. Evidencia: "Last State: Terminated (Reason: OOMKilled, Exit Code: 137)"
-COMANDO: kubectl describe pod -n linebreaker --selector=app=scheduler-service
+COMANDO: kubectl describe pod -n my-product --selector=app=scheduler-service
 CORRECCION: Aumentar resources.limits.memory a 1Gi en deployment.yaml del scheduler-service`
 
 /** Prompt para filtrar y explicar el error concreto del log completo */

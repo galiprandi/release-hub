@@ -5,7 +5,7 @@
 
 set -e
 
-REPO="${1:-Cencosud-xlabs/yumi-ticket-control}"
+REPO="${1:?Usage: $0 <org/repo> [branch_name]}"
 BRANCH_NAME="${2:-chore/trigger-staging-redeploy-$(date +%s)}"
 FORCE_FILE=".releasehub-force-redeploy"
 

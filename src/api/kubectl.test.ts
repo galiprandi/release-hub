@@ -64,7 +64,7 @@ describe('kubectl api', () => {
   it('getDeployments extracts GIT_COMMIT env var from containers', async () => {
     const mockOut = JSON.stringify({
       items: [{
-        metadata: { name: 'bff-dp', namespace: 'milocal-ar', creationTimestamp: new Date().toISOString() },
+        metadata: { name: 'bff-dp', namespace: 'my-product', creationTimestamp: new Date().toISOString() },
         spec: {
           replicas: 1,
           template: {
@@ -83,7 +83,7 @@ describe('kubectl api', () => {
       }]
     });
     vi.mocked(runCommand).mockResolvedValue({ stdout: mockOut, stderr: '', success: true });
-    const res = await getDeployments('milocal-ar');
+    const res = await getDeployments('my-product');
     expect(res[0].gitCommit).toBe('4b34588f308580bdbab9a86d0248b8729442e4c9');
   });
 
@@ -126,7 +126,7 @@ describe('kubectl api', () => {
   it('getDeployments extracts the selector matchLabels', async () => {
     const mockOut = JSON.stringify({
       items: [{
-        metadata: { name: 'bff-dp', namespace: 'milocal-ar', creationTimestamp: new Date().toISOString() },
+        metadata: { name: 'bff-dp', namespace: 'my-product', creationTimestamp: new Date().toISOString() },
         spec: {
           replicas: 1,
           selector: { matchLabels: { app: 'bff' } },
@@ -136,7 +136,7 @@ describe('kubectl api', () => {
       }]
     });
     vi.mocked(runCommand).mockResolvedValue({ stdout: mockOut, stderr: '', success: true });
-    const res = await getDeployments('milocal-ar');
+    const res = await getDeployments('my-product');
     expect(res[0].selector).toEqual({ app: 'bff' });
   });
 
@@ -157,17 +157,17 @@ describe('kubectl api', () => {
     });
     vi.mocked(runCommand).mockResolvedValueOnce({ stdout: podsOut, stderr: '', success: true });
 
-    const res = await getNamespacePodCommits('milocal-ar', 'ctx-1');
+    const res = await getNamespacePodCommits('my-product', 'ctx-1');
     expect(res).toHaveLength(2);
     expect(res[0]).toEqual({ name: 'bff-dp-86bcf78459-nrrb7', phase: 'Running', gitCommit: 'newsha1234', images: ['registry/api:2589dda4'], labels: { app: 'bff' } });
     expect(res[1].gitCommit).toBe('oldsha9999');
     expect(vi.mocked(runCommand)).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(runCommand).mock.calls[0][0]).toEqual(['kubectl', 'get', 'pods', '-n', 'milocal-ar', '--context=ctx-1', '-o', 'json']);
+    expect(vi.mocked(runCommand).mock.calls[0][0]).toEqual(['kubectl', 'get', 'pods', '-n', 'my-product', '--context=ctx-1', '-o', 'json']);
   });
 
   it('getNamespacePodCommits returns empty array on invalid JSON', async () => {
     vi.mocked(runCommand).mockResolvedValueOnce({ stdout: 'not-json', stderr: '', success: true });
-    const res = await getNamespacePodCommits('milocal-ar');
+    const res = await getNamespacePodCommits('my-product');
     expect(res).toEqual([]);
   });
 });

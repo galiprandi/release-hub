@@ -43,7 +43,7 @@ describe('usePodCommitSync', () => {
 		]);
 
 		const { result } = renderHook(
-			() => usePodCommitSync({ namespace: 'milocal-ar', selector: SELECTOR, specCommit: SPEC_COMMIT }),
+			() => usePodCommitSync({ namespace: 'my-product', selector: SELECTOR, specCommit: SPEC_COMMIT }),
 			{ wrapper }
 		);
 
@@ -60,7 +60,7 @@ describe('usePodCommitSync', () => {
 		]);
 
 		const { result } = renderHook(
-			() => usePodCommitSync({ namespace: 'milocal-ar', selector: SELECTOR, specCommit: SPEC_COMMIT }),
+			() => usePodCommitSync({ namespace: 'my-product', selector: SELECTOR, specCommit: SPEC_COMMIT }),
 			{ wrapper }
 		);
 
@@ -77,7 +77,7 @@ describe('usePodCommitSync', () => {
 		]);
 
 		const { result } = renderHook(
-			() => usePodCommitSync({ namespace: 'milocal-ar', selector: SELECTOR, specCommit: SPEC_COMMIT }),
+			() => usePodCommitSync({ namespace: 'my-product', selector: SELECTOR, specCommit: SPEC_COMMIT }),
 			{ wrapper }
 		);
 
@@ -86,7 +86,7 @@ describe('usePodCommitSync', () => {
 
 	it('retorna unknown sin fetch cuando no hay specCommit', () => {
 		const { result } = renderHook(
-			() => usePodCommitSync({ namespace: 'milocal-ar', selector: SELECTOR }),
+			() => usePodCommitSync({ namespace: 'my-product', selector: SELECTOR }),
 			{ wrapper }
 		);
 
@@ -96,7 +96,7 @@ describe('usePodCommitSync', () => {
 
 	it('retorna unknown sin fetch cuando no hay selector', () => {
 		const { result } = renderHook(
-			() => usePodCommitSync({ namespace: 'milocal-ar', specCommit: SPEC_COMMIT }),
+			() => usePodCommitSync({ namespace: 'my-product', specCommit: SPEC_COMMIT }),
 			{ wrapper }
 		);
 
@@ -110,7 +110,7 @@ describe('usePodCommitSync', () => {
 		]);
 
 		const { result } = renderHook(
-			() => usePodCommitSync({ namespace: 'milocal-ar', selector: SELECTOR, specCommit: SPEC_COMMIT }),
+			() => usePodCommitSync({ namespace: 'my-product', selector: SELECTOR, specCommit: SPEC_COMMIT }),
 			{ wrapper }
 		);
 

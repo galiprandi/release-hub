@@ -298,7 +298,7 @@ const scriptHandler: Connect.NextHandleFunction = async (req, res) => {
 		req.on("end", resolve);
 	});
 
-	let repo = "Cencosud-xlabs/yumi-ticket-control";
+	let repo = "";
 	let action = "trigger-staging-redeploy";
 
 	try {
@@ -307,6 +307,12 @@ const scriptHandler: Connect.NextHandleFunction = async (req, res) => {
 		action = parsed.action || action;
 	} catch {
 		// Use defaults if body is invalid
+	}
+
+	if (!repo) {
+		res.statusCode = 400;
+		res.end(JSON.stringify({ error: "Missing required 'repo' (org/repo)", success: false }));
+		return;
 	}
 
 	// Sanitize action and repo to prevent path traversal and argument injection

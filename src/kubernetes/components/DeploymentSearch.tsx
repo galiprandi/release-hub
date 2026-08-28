@@ -150,7 +150,7 @@ export function DeploymentSearch() {
             if (query.length >= 2) setIsOpen(true);
           }}
           onBlur={() => setIsEditable(false)}
-          placeholder={`Buscar por namespace... (ej: yumi-ticket-control)`}
+          placeholder={`Buscar por namespace... (ej: my-product)`}
           aria-label="Búsqueda de deployments"
           className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all hover:bg-muted/30`}
           autoComplete="off"

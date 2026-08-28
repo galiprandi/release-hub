@@ -24,7 +24,7 @@ const SHA_REGEX = /^[0-9a-f]{7,40}$/i;
 /**
  * Resolves the GitHub repo (org/repo) for a Kubernetes namespace by matching
  * the namespace against the user's repo favorites and project repos
- * (Cencosud pattern: namespace = repo name).
+ * (convention: namespace = repo name).
  */
 function resolveRepoForNamespace(namespace: string, favorites: string[], projectRepos: string[]): string | null {
 	const candidates = [...favorites, ...projectRepos];

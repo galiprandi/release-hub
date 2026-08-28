@@ -48,9 +48,9 @@ function saveEndpoints(endpoints: HealthEndpoint[]) {
 
 function extractServiceName(url: string): string {
   // Extraer nombre del servicio de URLs tipo:
-  // https://seki-stag.cencosud.corp/argentina-arcus/api/stock-control
-  // https://seki-stag.cencosud.corp/yumi-shrinkage-record/api/
-  // https://yumi-shrinkage-record-bff-api-staging.cencosudx.com (root path -> /)
+  // https://seki-stag.example.corp/my-product/api/stock-control
+  // https://seki-stag.example.corp/my-product/api/
+  // https://my-product-bff-api-staging.example.com (root path -> /)
 
   try {
     const urlObj = new URL(url);
@@ -63,7 +63,7 @@ function extractServiceName(url: string): string {
       if (pathParts[apiIndex + 1]) {
         return pathParts[apiIndex + 1];
       }
-      // Si /api/ está al final (ej: /yumi-shrinkage-record/api/)
+      // Si /api/ está al final (ej: /my-product/api/)
       // usar el segmento anterior (el nombre del repo)
       if (apiIndex > 0) {
         return pathParts[apiIndex - 1];

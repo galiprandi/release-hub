@@ -73,7 +73,7 @@ export const mockStagingData: SekiPipelineData = {
 		},
 	],
 	commit: {
-		message: 'Merge pull request #272 from Cencosud-xlabs/fix/restore-nvmrc-staging-build\n\nfix: restore .nvmrc to unbreak seki staging build',
+		message: 'Merge pull request #272 from acme-org/fix/restore-nvmrc-staging-build\n\nfix: restore .nvmrc to unbreak seki staging build',
 		author: 'Aliprandi, German Antonio (Externos - RH-T)',
 	},
 	errorMarkdown: undefined,
@@ -143,13 +143,13 @@ export const mockProductionData: SekiPipelineData = {
 			completedAt: '2026-07-29T19:34:13.002Z',
 			subevents: [
 				{ id: 'CR_CGT_compliance', label: 'CGT: compliance', state: 'WARN', startedAt: '2026-07-29T19:32:38.045Z', completedAt: '2026-07-29T19:32:41.156Z', markdown: '# Event: CGT compliance\n\n## Status: **FAIL**\n\n## Details\n\n```terminal\n❌ El ID del issue de Jira no se encontró en el mensaje del pull request.\n\nEl mensaje del pull request debe contener el ID del issue de Jira entre corchetes.\nPor ejemplo: [CCMR-1234] reporte de ventas\n```' },
-				{ id: 'DEPLOY_api_bff', label: 'api: bff', state: 'COMPLETED', startedAt: '2026-07-29T19:32:38.047Z', completedAt: '2026-07-29T19:34:13.002Z', deployUrl: 'https://milocal-ar-bff-api.cencosudx.com' },
-				{ id: 'DEPLOY_web_portal', label: 'web: portal', state: 'COMPLETED', startedAt: '2026-07-29T19:32:38.044Z', completedAt: '2026-07-29T19:33:12.944Z', deployUrl: 'https://milocal-ar-portal-web.cencosudx.com' },
+				{ id: 'DEPLOY_api_bff', label: 'api: bff', state: 'COMPLETED', startedAt: '2026-07-29T19:32:38.047Z', completedAt: '2026-07-29T19:34:13.002Z', deployUrl: 'https://my-product-bff-api.example.com' },
+				{ id: 'DEPLOY_web_portal', label: 'web: portal', state: 'COMPLETED', startedAt: '2026-07-29T19:32:38.044Z', completedAt: '2026-07-29T19:33:12.944Z', deployUrl: 'https://my-product-portal-web.example.com' },
 			],
 		},
 	],
 	commit: {
-		message: 'Merge pull request #266 from Cencosud-xlabs/feature/ARARG-8395\n\nFeature/ararg 8395',
+		message: 'Merge pull request #266 from acme-org/feature/PROJ-8395\n\nFeature/ararg 8395',
 		author: 'Ortiz Tovar, Jose Gregorio (Externo - BC Tecnologia)',
 	},
 	errorMarkdown: undefined,

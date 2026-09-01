@@ -101,6 +101,15 @@ export async function getContexts(): Promise<string[]> {
   }
 }
 
+export async function getNamespaces(): Promise<string[]> {
+  try {
+    const result = await runCommand(['kubectl', 'get', 'namespaces', '-o', 'jsonpath={.items[*].metadata.name}']);
+    return result.stdout.trim().split(/\s+/).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
 
 function formatAge(timestamp: string): string {
   const diff = Date.now() - new Date(timestamp).getTime();

@@ -28,6 +28,19 @@ export function DeploymentSearch() {
     return () => clearTimeout(timer)
   }, [query])
 
+  // Fetch accessible namespace count for the placeholder
+  const { data: namespaces } = useQuery({
+    queryKey: ['kubectl', 'namespaces'],
+    queryFn: async () => {
+      const { getNamespaces } = await import('@/api/kubectl')
+      return getNamespaces()
+    },
+    ...applyCachePolicy('kubectl'),
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const namespaceCount = namespaces?.length ?? 0
+
   // Search deployments by namespace across all contexts in parallel
   const { data: searchResults, isLoading } = useQuery({
     queryKey: ['kubectl', 'search-namespace', debouncedQuery],
@@ -150,9 +163,9 @@ export function DeploymentSearch() {
             if (query.length >= 2) setIsOpen(true);
           }}
           onBlur={() => setIsEditable(false)}
-          placeholder={`Buscar por namespace... (ej: my-product)`}
+          placeholder={namespaceCount > 0 ? `Búsqueda en ${namespaceCount} namespaces... (Cmd+K)` : `Buscar por namespace... (Cmd+K)`}
           aria-label="Búsqueda de deployments"
-          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all hover:bg-muted/30`}
+          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -190,7 +203,7 @@ export function DeploymentSearch() {
 
       {/* Dropdown Results */}
       {isOpen && (
-        <div className={`absolute top-full left-0 mt-2 ${searchWidth} bg-popover text-popover-foreground border rounded-md shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100`}>
+        <div className={`absolute top-full left-0 mt-2 ${searchWidth} bg-popover text-popover-foreground border border-border rounded-md shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100`}>
           {isLoading ? (
             <div className="p-4 text-center text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
@@ -278,19 +291,19 @@ export function DeploymentSearch() {
           )}
 
           {/* Footer hint */}
-          <div className="px-3 py-2 bg-muted/30 border-t border-border text-xs font-medium  text-muted-foreground flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border shadow-sm font-sans text-xs">↑↓</kbd> NAVEGAR
+          <div className="px-3 py-2 bg-muted/30 border-t border-border text-xs text-muted-foreground flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1 font-medium">
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border shadow-sm font-sans">↑↓</kbd> Navegar
               </span>
-              <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border shadow-sm font-sans text-xs">↵</kbd> SELECCIONAR
+              <span className="flex items-center gap-1 font-medium">
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border shadow-sm font-sans">↵</kbd> Seleccionar
               </span>
-              <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border shadow-sm font-sans text-xs">ESC</kbd> CERRAR
+              <span className="flex items-center gap-1 font-medium">
+                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border shadow-sm font-sans">Esc</kbd> Cerrar
               </span>
             </div>
-            <span className="opacity-60">{results.length} ITEMS</span>
+            <span className="font-medium">{results.length} items</span>
           </div>
         </div>
       )}

@@ -195,11 +195,17 @@ export const DeploymentList = ({
 		}
 	}, [activeTab, favorites, projects, cachedDeployments])
 
-	// Filter groups by active context (from header dropdown)
+	// Filter groups by active context and namespace (from header dropdowns)
 	const filteredContent = useMemo(() => {
-		if (!activeContext) return groupedContent
-		return groupedContent.filter(group => group.context === activeContext)
-	}, [groupedContent, activeContext])
+		let result = groupedContent
+		if (activeContext) {
+			result = result.filter(group => group.context === activeContext)
+		}
+		if (activeFilter?.id === 'namespace' && activeFilter.value) {
+			result = result.filter(group => group.label === activeFilter.value)
+		}
+		return result
+	}, [groupedContent, activeContext, activeFilter])
 
 	// For LogsViewer selector, we need all accessible deployments
 	const allResolvedDeployments = useMemo(() => {

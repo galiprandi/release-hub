@@ -28,25 +28,8 @@ function KubernetesSetupPage() {
 		},
 	];
 
-	const optionalCommands: CommandDef[] = [
-		{
-			name: "helm",
-			command: "helm",
-			versionArgs: ["version", "--short"],
-			description: "Gestor de paquetes para Kubernetes. Opcional para funcionalidades avanzadas de gestión de releases.",
-			setupInfo: {
-				osCommands: [
-					{ os: "macOS", cmd: "brew install helm", label: "macOS (Homebrew)" },
-					{ os: "Linux", cmd: "curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash", label: "Linux (Script oficial)" },
-					{ os: "Windows", cmd: "winget install Helm.Helm", label: "Windows" },
-				],
-			},
-		},
-	];
-
 	const { results, allRequiredInstalled, isLoading } = useSetup({
 		required: requiredCommands,
-		optional: optionalCommands,
 	});
 
 	return (
@@ -61,7 +44,7 @@ function KubernetesSetupPage() {
 					</span>
 				</div>
 				<p className="text-muted-foreground text-sm">
-					El módulo Kubernetes requiere la instalación de kubectl. Helm es opcional para funcionalidades avanzadas.
+					El módulo Kubernetes requiere la instalación de kubectl para monitorear deployments y pods.
 				</p>
 			</div>
 
@@ -90,7 +73,7 @@ function KubernetesSetupPage() {
 						icon={<Ship className="w-4 h-4" />}
 						detectedOS={detectedOS}
 						commands={
-							[...requiredCommands, ...optionalCommands]
+							[...requiredCommands]
 								.find((c) => c.name === result.name)
 								?.setupInfo?.osCommands.map((c) => ({
 									label: c.label || c.os,

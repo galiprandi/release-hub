@@ -9,8 +9,8 @@ export interface CommandDef {
 	command: string;
 	/**
 	 * Arguments used to probe the command's version. Defaults to `['--version']`.
-	 * Some CLIs use a subcommand instead of a flag (e.g. `kubectl version`,
-	 * `helm version`), so this lets each command declare its own probe.
+	 * Some CLIs use a subcommand instead of a flag (e.g. `kubectl version`),
+	 * so this lets each command declare its own probe.
 	 */
 	versionArgs?: string[];
 	description?: string;

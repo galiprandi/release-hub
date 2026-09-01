@@ -22,7 +22,6 @@ export const SAFE_COMMANDS = [
   'ls',
   'echo',
   'jq',
-  'helm',
   'seki',
 ];
 

@@ -9,6 +9,7 @@ import { BaseDialog } from "@/components/ui/BaseDialog"
 import { StatusCard } from "@/components/ui/StatusCard"
 import { Table } from "@/components/ui/Table"
 import { EmptyState } from "@/components/shared/EmptyState"
+import { NamespaceHealthBanner } from "@/kubernetes/components/NamespaceHealthBanner"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useUserCollections, type Project } from "@/hooks/useUserCollections"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
@@ -326,7 +327,8 @@ export const DeploymentList = ({
 			{filteredContent.length > 0 && (
 				<div className="space-y-12">
 					{filteredContent.map(({ id, label, context, icon, deployments }) => (
-						<div key={id} className="space-y-3">
+						<div key={id} className="space-y-0">
+							<NamespaceHealthBanner namespace={label} context={context || ''} />
 							<DeploymentsTable
 								deployments={deployments}
 								label={label}

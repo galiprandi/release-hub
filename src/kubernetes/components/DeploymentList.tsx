@@ -68,6 +68,7 @@ interface DeploymentListProps {
 	activeTab?: 'favorites' | 'projects'
 	activeFilter?: { id: string; value: string } | null
 	onFilterChange?: (filter: { id: string; value: string } | null) => void
+	activeContext?: string
 	isKubectlInstalled?: boolean
 }
 
@@ -77,6 +78,7 @@ export const DeploymentList = ({
 	activeTab = 'favorites',
 	activeFilter,
 	onFilterChange,
+	activeContext,
 	isKubectlInstalled
 }: DeploymentListProps) => {
 	const [selectedDeployment, setSelectedDeployment] = useState<DeploymentInfo | null>(null)
@@ -193,6 +195,12 @@ export const DeploymentList = ({
 		}
 	}, [activeTab, favorites, projects, cachedDeployments])
 
+	// Filter groups by active context (from header dropdown)
+	const filteredContent = useMemo(() => {
+		if (!activeContext) return groupedContent
+		return groupedContent.filter(group => group.context === activeContext)
+	}, [groupedContent, activeContext])
+
 	// For LogsViewer selector, we need all accessible deployments
 	const allResolvedDeployments = useMemo(() => {
 		return allDeploymentIds.map(id => {
@@ -297,7 +305,7 @@ export const DeploymentList = ({
 	}
 
 	// Si no hay datos cacheados ni live después de cargar
-	if (!isLoading && groupedContent.length === 0) {
+	if (!isLoading && filteredContent.length === 0) {
 		return (
 			<EmptyState
 				icon={<Boxes className="w-8 h-8 text-muted-foreground" />}
@@ -309,9 +317,9 @@ export const DeploymentList = ({
 
 	return (
 		<>
-			{groupedContent.length > 0 && (
+			{filteredContent.length > 0 && (
 				<div className="space-y-12">
-					{groupedContent.map(({ id, label, context, icon, deployments }) => (
+					{filteredContent.map(({ id, label, context, icon, deployments }) => (
 						<div key={id} className="space-y-3">
 							<DeploymentsTable
 								deployments={deployments}

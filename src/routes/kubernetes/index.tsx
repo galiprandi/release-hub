@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { Boxes, FolderOpen, Layers, Search, Star } from "lucide-react";
+import { Boxes, FolderOpen, Layers, Search, Star, Server } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { DeploymentList } from "@/kubernetes/components/DeploymentList";
 import { DeploymentSearch } from "@/kubernetes/components/DeploymentSearch";
@@ -11,6 +11,7 @@ import { useMemo, useCallback } from "react";
 
 interface KubernetesSearch {
 	namespace?: string;
+	context?: string;
 	tab: 'favorites' | 'projects';
 }
 
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/kubernetes/")({
 	validateSearch: (search: Record<string, unknown>) => {
 		return {
 			namespace: typeof search.namespace === 'string' ? search.namespace : undefined,
+			context: typeof search.context === 'string' ? search.context : undefined,
 			tab: (search.tab === 'favorites' || search.tab === 'projects') ? search.tab : 'favorites',
 		};
 	},
@@ -40,6 +42,13 @@ function KubernetesPage() {
 		navigate({
 			to: '.',
 			search: (prev: KubernetesSearch) => ({ ...prev, namespace: filter?.value }),
+		});
+	}, [navigate]);
+
+	const handleContextChange = useCallback((context: string | null) => {
+		navigate({
+			to: '.',
+			search: (prev: KubernetesSearch) => ({ ...prev, context: context || undefined }),
 		});
 	}, [navigate]);
 
@@ -69,6 +78,20 @@ function KubernetesPage() {
 		allIds.forEach(id => {
 			const [, ns] = id.split('/');
 			if (ns) counts.set(ns, (counts.get(ns) || 0) + 1);
+		});
+		return counts;
+	}, [safeDeploymentFavorites, projects]);
+
+	// Extract unique contexts (with deployment counts) for global filtering
+	const contextCounts = useMemo(() => {
+		const counts = new Map<string, number>();
+		const allIds = new Set<string>(safeDeploymentFavorites);
+		projects.forEach(p => {
+			p.deployments?.forEach((id: string) => allIds.add(id));
+		});
+		allIds.forEach(id => {
+			const [ctx] = id.split('/');
+			if (ctx) counts.set(ctx, (counts.get(ctx) || 0) + 1);
 		});
 		return counts;
 	}, [safeDeploymentFavorites, projects]);
@@ -106,6 +129,24 @@ function KubernetesPage() {
 		];
 	}, [namespaceCounts]);
 
+	const contextTabs = useMemo(() => {
+		const contexts = Array.from(contextCounts.keys()).sort();
+		return [
+			{
+				value: 'all',
+				label: 'Todos',
+				icon: Server,
+				count: contexts.reduce((acc, ctx) => acc + (contextCounts.get(ctx) || 0), 0),
+			},
+			...contexts.map(ctx => ({
+				value: ctx,
+				label: ctx,
+				icon: Server,
+				count: contextCounts.get(ctx) || 0,
+			})),
+		];
+	}, [contextCounts]);
+
 	const hasContent = activeTab === 'favorites' ? safeDeploymentFavorites.length > 0 : projects.some(p => p.deployments.length > 0);
 
 	return (
@@ -128,6 +169,15 @@ function KubernetesPage() {
 								tabs={namespaceTabs}
 								activeTab={search.namespace || 'all'}
 								onChange={(id) => handleFilterChange(id === 'all' ? null : { id: 'namespace', value: id })}
+							/>
+						)}
+						{contextTabs.length > 1 && (
+							<CollectionDropdown
+								menuLabel="Contextos"
+								ariaLabel="Seleccionar contexto"
+								tabs={contextTabs}
+								activeTab={search.context || 'all'}
+								onChange={(id) => handleContextChange(id === 'all' ? null : id)}
 							/>
 						)}
 						<div className="w-px h-6 bg-border mx-1" />
@@ -166,6 +216,7 @@ function KubernetesPage() {
 				activeTab={activeTab}
 				activeFilter={activeFilter}
 				onFilterChange={handleFilterChange}
+				activeContext={search.context}
 				isKubectlInstalled={isInstalled}
 			/>
 		</PageLayout>

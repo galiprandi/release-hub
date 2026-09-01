@@ -19,8 +19,8 @@ export function DiffPanel({
   scrollRef
 }: DiffPanelProps) {
   return (
-    <div className="flex flex-col h-full border rounded-md bg-muted/5 shadow-sm overflow-hidden border-border group transition-all duration-200 hover:border-border">
-      <div className="flex items-center justify-between px-4 py-2 border-b bg-muted/30 border-border">
+    <div className="flex flex-col h-full border rounded-md bg-card shadow-sm overflow-hidden border-border group transition-all duration-200 hover:border-border">
+      <div className="flex items-center justify-between px-4 py-2 border-b bg-card border-border">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-primary/40 " />
           <h3 className="text-xs font-medium text-muted-foreground">
@@ -32,7 +32,7 @@ export function DiffPanel({
           className="opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity"
         />
       </div>
-      <div className="relative flex-1 bg-zinc-950/30">
+      <div className="relative flex-1 bg-card">
         <textarea
           ref={scrollRef}
           onScroll={onScroll}

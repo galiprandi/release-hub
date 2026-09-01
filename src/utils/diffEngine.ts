@@ -229,10 +229,43 @@ export function computeDiff(textA: string, textB: string): DiffLine[] {
 		}
 	}
 
-	// Post-process to detect 'changed' lines (when a removal is followed by an addition at the same logical position)
-	// For simplicity in this UI, we could keep them as separate rows or combine them.
-	// The user requested "rojo para eliminados/modificados en origen, verde para adiciones en destino".
-	// Our current rendering already handles this well by showing them side-by-side where possible.
+	// Post-process: pair consecutive removed/added lines onto the same row
+	// so that a change appears as left=removed (red) + right=added (green)
+	// instead of two separate rows that displace the content vertically.
+	const paired: DiffLine[] = [];
+	let k = 0;
+	while (k < diff.length) {
+		if (diff[k].left && !diff[k].right && diff[k].left!.type === 'removed') {
+			const removedStart = k;
+			while (k < diff.length && diff[k].left && !diff[k].right && diff[k].left!.type === 'removed') {
+				k++;
+			}
+			const removedLines = diff.slice(removedStart, k);
 
-	return diff;
+			const addedStart = k;
+			while (k < diff.length && diff[k].right && !diff[k].left && diff[k].right!.type === 'added') {
+				k++;
+			}
+			const addedLines = diff.slice(addedStart, k);
+
+			const pairCount = Math.min(removedLines.length, addedLines.length);
+			for (let p = 0; p < pairCount; p++) {
+				paired.push({
+					left: removedLines[p].left,
+					right: addedLines[p].right,
+				});
+			}
+			for (let p = pairCount; p < removedLines.length; p++) {
+				paired.push(removedLines[p]);
+			}
+			for (let p = pairCount; p < addedLines.length; p++) {
+				paired.push(addedLines[p]);
+			}
+		} else {
+			paired.push(diff[k]);
+			k++;
+		}
+	}
+
+	return paired;
 }

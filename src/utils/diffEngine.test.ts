@@ -64,10 +64,13 @@ describe('diffEngine', () => {
 			expect(diff[1].left?.type).toBe('equal');
 		});
 
-		it('should identify changed lines (as removal and addition)', () => {
+		it('should pair changed lines on the same row', () => {
 			const diff = computeDiff('line1', 'line2');
+			expect(diff).toHaveLength(1);
 			expect(diff[0].left?.type).toBe('removed');
-			expect(diff[1].right?.type).toBe('added');
+			expect(diff[0].left?.value).toBe('line1');
+			expect(diff[0].right?.type).toBe('added');
+			expect(diff[0].right?.value).toBe('line2');
 		});
 
 		it('should identify additions', () => {

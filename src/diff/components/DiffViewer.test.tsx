@@ -5,8 +5,8 @@ import { DiffViewer } from "./DiffViewer";
 describe("DiffViewer", () => {
 	it("renders empty state initially", () => {
 		render(<DiffViewer mode="json" />);
-		expect(screen.getByText("Esperando entrada técnica")).toBeInTheDocument();
-		expect(screen.getByText(/Pega contenido en los paneles superiores/i)).toBeInTheDocument();
+		expect(screen.getAllByText("Esperando entrada técnica")).toHaveLength(2);
+		expect(screen.getAllByText(/Pega contenido en los paneles superiores/i)).toHaveLength(2);
 	});
 
 	it("toggles expanded state when the expand/restore button is clicked", () => {

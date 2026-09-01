@@ -3,26 +3,10 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useDeployedCommitStatus } from './useDeployedCommitStatus';
 import { runCommand } from '@/api/exec';
-import { useUserCollections } from '@/hooks/useUserCollections';
 
 vi.mock('@/api/exec', () => ({
 	runCommand: vi.fn(),
 }));
-
-vi.mock('@/hooks/useUserCollections', () => ({
-	useUserCollections: vi.fn(),
-}));
-
-type CollectionsMock = ReturnType<typeof useUserCollections>;
-
-function mockCollections(favorites: string[], projectRepos: string[] = []) {
-	vi.mocked(useUserCollections).mockReturnValue({
-		favorites,
-		projects: projectRepos.length > 0
-			? [{ id: 'p1', name: 'P1', description: '', repos: projectRepos, deployments: [] }]
-			: [],
-	} as unknown as CollectionsMock);
-}
 
 const wrapper = ({ children }: { children: React.ReactNode }) => {
 	const queryClient = new QueryClient({
@@ -33,18 +17,27 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
 
 const SHA = '4b34588f308580bdbab9a86d0248b8729442e4c9';
 
+function mockSearchAndCompare(repo: string, status: string, aheadBy: number) {
+	vi.mocked(runCommand)
+		.mockResolvedValueOnce({
+			stdout: repo,
+			stderr: '',
+			success: true,
+		})
+		.mockResolvedValueOnce({
+			stdout: JSON.stringify({ status, ahead_by: aheadBy }),
+			stderr: '',
+			success: true,
+		});
+}
+
 describe('useDeployedCommitStatus', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
 	it('retorna up-to-date cuando el commit desplegado es idéntico a HEAD', async () => {
-		mockCollections(['acme-org/my-product']);
-		vi.mocked(runCommand).mockResolvedValueOnce({
-			stdout: JSON.stringify({ status: 'identical', ahead_by: 0 }),
-			stderr: '',
-			success: true,
-		});
+		mockSearchAndCompare('acme-org/my-product', 'identical', 0);
 
 		const { result } = renderHook(
 			() => useDeployedCommitStatus({ namespace: 'my-product', gitCommit: SHA }),
@@ -57,12 +50,7 @@ describe('useDeployedCommitStatus', () => {
 	});
 
 	it('retorna behind con la cantidad de commits de atraso', async () => {
-		mockCollections(['acme-org/my-product']);
-		vi.mocked(runCommand).mockResolvedValueOnce({
-			stdout: JSON.stringify({ status: 'ahead', ahead_by: 3 }),
-			stderr: '',
-			success: true,
-		});
+		mockSearchAndCompare('acme-org/my-product', 'ahead', 3);
 
 		const { result } = renderHook(
 			() => useDeployedCommitStatus({ namespace: 'my-product', gitCommit: SHA }),
@@ -73,10 +61,21 @@ describe('useDeployedCommitStatus', () => {
 		expect(result.current.behindBy).toBe(3);
 	});
 
-	it('resuelve el repo desde los repos de proyectos', async () => {
-		mockCollections([], ['acme-org/my-product']);
+	it('resuelve el repo desde el SHA sin depender del namespace', async () => {
+		mockSearchAndCompare('acme-org/my-product', 'identical', 0);
+
+		const { result } = renderHook(
+			() => useDeployedCommitStatus({ namespace: 'completely-different', gitCommit: SHA }),
+			{ wrapper }
+		);
+
+		await waitFor(() => expect(result.current.status).toBe('up-to-date'));
+		expect(result.current.repo).toBe('acme-org/my-product');
+	});
+
+	it('retorna unknown cuando search/commits no encuentra el repo', async () => {
 		vi.mocked(runCommand).mockResolvedValueOnce({
-			stdout: JSON.stringify({ status: 'identical', ahead_by: 0 }),
+			stdout: '',
 			stderr: '',
 			success: true,
 		});
@@ -86,26 +85,12 @@ describe('useDeployedCommitStatus', () => {
 			{ wrapper }
 		);
 
-		await waitFor(() => expect(result.current.status).toBe('up-to-date'));
-		expect(result.current.repo).toBe('acme-org/my-product');
-	});
-
-	it('retorna unknown sin fetch cuando el namespace no matchea ningún repo', () => {
-		mockCollections(['acme-org/otro-repo']);
-
-		const { result } = renderHook(
-			() => useDeployedCommitStatus({ namespace: 'my-product', gitCommit: SHA }),
-			{ wrapper }
-		);
-
+		await waitFor(() => expect(result.current.isLoading).toBe(false));
 		expect(result.current.status).toBe('unknown');
 		expect(result.current.repo).toBe(null);
-		expect(runCommand).not.toHaveBeenCalled();
 	});
 
 	it('retorna unknown sin fetch cuando el sha es inválido', () => {
-		mockCollections(['acme-org/my-product']);
-
 		const { result } = renderHook(
 			() => useDeployedCommitStatus({ namespace: 'my-product', gitCommit: 'no-es-un-sha;rm' }),
 			{ wrapper }
@@ -116,8 +101,6 @@ describe('useDeployedCommitStatus', () => {
 	});
 
 	it('retorna unknown cuando no hay gitCommit', () => {
-		mockCollections(['acme-org/my-product']);
-
 		const { result } = renderHook(
 			() => useDeployedCommitStatus({ namespace: 'my-product' }),
 			{ wrapper }
@@ -128,12 +111,17 @@ describe('useDeployedCommitStatus', () => {
 	});
 
 	it('retorna unknown si la respuesta de gh no es JSON válido', async () => {
-		mockCollections(['acme-org/my-product']);
-		vi.mocked(runCommand).mockResolvedValueOnce({
-			stdout: 'invalid-json',
-			stderr: '',
-			success: true,
-		});
+		vi.mocked(runCommand)
+			.mockResolvedValueOnce({
+				stdout: 'acme-org/my-product',
+				stderr: '',
+				success: true,
+			})
+			.mockResolvedValueOnce({
+				stdout: 'invalid-json',
+				stderr: '',
+				success: true,
+			});
 
 		const { result } = renderHook(
 			() => useDeployedCommitStatus({ namespace: 'my-product', gitCommit: SHA }),

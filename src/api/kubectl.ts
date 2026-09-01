@@ -36,6 +36,28 @@ export interface PodInfo {
   node?: string;
 }
 
+export interface PodContainerStatus {
+  name: string;
+  restartCount: number;
+  ready: boolean;
+  state: 'running' | 'waiting' | 'terminated' | 'unknown';
+  stateReason?: string;
+  stateMessage?: string;
+  lastStateReason?: string;
+  lastStateExitCode?: number;
+  lastStateFinishedAt?: string;
+  startedAt?: string;
+}
+
+export interface PodHealthInfo {
+  name: string;
+  namespace: string;
+  phase: string;
+  ready: string;
+  restarts: number;
+  containers: PodContainerStatus[];
+}
+
 /**
  * Sanitizes Kubernetes resource names to prevent command injection.
  * Kubernetes names must comply with: RFC 1123 subdomain (DNS subdomain)
@@ -452,4 +474,79 @@ function cleanLogs(logs: string): string {
   return logs
     .replace(/\\"/g, '"') // Fix escaped quotes
     .replace(/\\\\/g, '\\'); // Fix double backslashes
+}
+
+/**
+ * Gets all pods in a namespace (optionally in a specific context).
+ * Returns pod name, ready, status, restarts, age and node.
+ */
+export async function getPodsForNamespace(namespace: string, context?: string): Promise<PodInfo[]> {
+  const args = ['kubectl', 'get', 'pods', '-n', sanitizeNamespace(namespace)];
+  if (context) args.push(`--context=${sanitizeContext(context)}`);
+  try {
+    const result = await runCommand(args);
+    return parsePods(result.stdout);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Parses container statuses from a pod's JSON status.
+ */
+function parseContainerStatuses(containerStatuses: Record<string, unknown>[]): PodContainerStatus[] {
+  return containerStatuses.map((cs) => {
+    const state = (cs.state || {}) as Record<string, unknown>;
+    const lastState = (cs.lastState || {}) as Record<string, unknown>;
+    const terminated = (lastState.terminated || {}) as Record<string, unknown>;
+    const running = (state.running || {}) as Record<string, unknown>;
+    const waiting = (state.waiting || {}) as Record<string, unknown>;
+
+    let podState: PodContainerStatus['state'] = 'unknown';
+    if (state.running) podState = 'running';
+    else if (state.waiting) podState = 'waiting';
+    else if (state.terminated) podState = 'terminated';
+
+    return {
+      name: (cs.name as string) || '',
+      restartCount: (cs.restartCount as number) || 0,
+      ready: (cs.ready as boolean) || false,
+      state: podState,
+      stateReason: (waiting.reason || terminated.reason) as string | undefined,
+      stateMessage: (waiting.message || terminated.message) as string | undefined,
+      lastStateReason: terminated.reason as string | undefined,
+      lastStateExitCode: terminated.exitCode as number | undefined,
+      lastStateFinishedAt: terminated.finishedAt as string | undefined,
+      startedAt: running.startedAt as string | undefined,
+    };
+  });
+}
+
+/**
+ * Gets detailed pod health for a namespace, including container statuses
+ * with restart counts, last termination reason, exit code and timing.
+ */
+export async function getPodHealthForNamespace(namespace: string, context?: string): Promise<PodHealthInfo[]> {
+  const args = ['kubectl', 'get', 'pods', '-n', sanitizeNamespace(namespace), '-o', 'json'];
+  if (context) args.push(`--context=${sanitizeContext(context)}`);
+  try {
+    const result = await runCommand(args);
+    const data = JSON.parse(result.stdout) as { items: Record<string, unknown>[] };
+    return data.items.map((pod) => {
+      const status = (pod.status || {}) as Record<string, unknown>;
+      const containerStatuses = (status.containerStatuses || []) as Record<string, unknown>[];
+      const totalRestarts = containerStatuses.reduce((acc, cs) => acc + ((cs.restartCount as number) || 0), 0);
+      const readyCount = containerStatuses.filter(cs => cs.ready).length;
+      return {
+        name: ((pod.metadata || {}) as Record<string, unknown>).name as string || '',
+        namespace: ((pod.metadata || {}) as Record<string, unknown>).namespace as string || namespace,
+        phase: (status.phase as string) || 'Unknown',
+        ready: readyCount + '/' + containerStatuses.length,
+        restarts: totalRestarts,
+        containers: parseContainerStatuses(containerStatuses),
+      };
+    });
+  } catch {
+    return [];
+  }
 }

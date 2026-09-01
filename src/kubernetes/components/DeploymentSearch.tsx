@@ -55,7 +55,7 @@ export function DeploymentSearch() {
     enabled: debouncedQuery.length > 0,
   })
 
-  const results = useMemo(() => (searchResults || []).slice(0, 50), [searchResults])
+  const results = useMemo(() => (searchResults || []).sort((a, b) => a.name.localeCompare(b.name)).slice(0, 50), [searchResults])
 
   const { toggleDeploymentFavorite, isDeploymentFavorite } = useUserCollections()
   const [isProjectSelectionOpen, setIsProjectSelectionOpen] = useState(false)

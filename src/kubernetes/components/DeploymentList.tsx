@@ -9,7 +9,7 @@ import { BaseDialog } from "@/components/ui/BaseDialog"
 import { StatusCard } from "@/components/ui/StatusCard"
 import { Table } from "@/components/ui/Table"
 import { EmptyState } from "@/components/shared/EmptyState"
-import { NamespaceHealthBanner } from "@/kubernetes/components/NamespaceHealthBanner"
+import { NamespaceHealthIndicator } from "@/kubernetes/components/NamespaceHealthModal"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useUserCollections, type Project } from "@/hooks/useUserCollections"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
@@ -23,7 +23,7 @@ import { CopyButton } from "@/components/shared/CopyButton"
 import { DEFAULT_START_PORT } from "@/config/portForward"
 
 type CachedDeployment = DeploymentInfo & { fetchedAt?: number; isStale?: boolean }
-type DeploymentWithContext = CachedDeployment & { context: string; isPlaceholder?: boolean }
+export type DeploymentWithContext = CachedDeployment & { context: string; isPlaceholder?: boolean }
 
 const STORAGE_KEY = "kubernetes-deployments-metadata"
 
@@ -328,7 +328,6 @@ export const DeploymentList = ({
 				<div className="space-y-12">
 					{filteredContent.map(({ id, label, context, icon, deployments }) => (
 						<div key={id} className="space-y-0">
-							<NamespaceHealthBanner namespace={label} context={context || ''} />
 							<DeploymentsTable
 								deployments={deployments}
 								label={label}
@@ -482,6 +481,9 @@ function DeploymentsTable({
 							{context}
 						</span>
 					)}
+					{context && (
+						<NamespaceHealthIndicator namespace={label} context={context} deployments={deployments} />
+					)}
 				</div>
 			),
 			cell: ({ row }) => <DeploymentNameCell deployment={row.original} isLoading={isLoading} />,
@@ -535,7 +537,7 @@ function DeploymentsTable({
 				/>
 			),
 		},
-	], [label, context, icon, isLoading, onViewLogs, onOpenTerminal, onRemoveFavorite, onManageProjects])
+	], [label, context, icon, isLoading, deployments, onViewLogs, onOpenTerminal, onRemoveFavorite, onManageProjects])
 
 	// Ensure each deployment has its context correctly assigned in the data mapping
 	// This might require passing the context-to-deployment map if we want to be sure

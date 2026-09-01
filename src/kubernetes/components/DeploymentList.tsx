@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react"
 import { createPortal } from "react-dom"
 import { useQuery } from "@tanstack/react-query"
-import { Boxes, Terminal as TerminalIcon, Folder, CheckCircle2, ArrowDownCircle } from "lucide-react"
+import { Boxes, Terminal as TerminalIcon, Folder, CheckCircle2, ArrowDownCircle, AlertTriangle, Loader2, HelpCircle } from "lucide-react"
 import type { DeploymentInfo } from "@/api/kubectl"
 import { LogsViewer } from "@/components/shared/LogsViewer"
 import { Terminal } from "@/components/shared/Terminal"
@@ -147,23 +147,27 @@ export const DeploymentList = ({
 	// so the UI shows immediately; real data fills in when the query resolves.
 	const groupedContent = useMemo(() => {
 		if (activeTab === 'favorites') {
-			const groups: Record<string, DeploymentWithContext[]> = {}
+			const groups: Record<string, { namespace: string; context: string; deployments: DeploymentWithContext[] }> = {}
 			favorites?.forEach(favId => {
 				const cached = cachedDeployments[favId]
-				const [context] = favId.split('/')
-				if (!groups[context]) groups[context] = []
+				const [context, namespace] = favId.split('/')
+				const groupKey = `${context}/${namespace || 'unknown'}`
+				if (!groups[groupKey]) groups[groupKey] = { namespace: namespace || 'unknown', context: context || '', deployments: [] }
 				if (cached) {
-					groups[context].push({ ...cached, context })
+					groups[groupKey].deployments.push({ ...cached, context })
 				} else {
-					groups[context].push(buildPlaceholder(favId))
+					groups[groupKey].deployments.push(buildPlaceholder(favId))
 				}
 			})
-			return Object.entries(groups).map(([context, deployments]) => ({
-				id: context,
-				label: context,
-				icon: <Boxes className="w-4 h-4" />,
-				deployments,
-			}))
+			return Object.entries(groups)
+				.sort(([a], [b]) => a.localeCompare(b))
+				.map(([key, { namespace, context, deployments }]) => ({
+					id: key,
+					label: namespace,
+					context,
+					icon: <Boxes className="w-4 h-4" />,
+					deployments,
+				}))
 		} else {
 			return projects
 				.filter(p => p.deployments && p.deployments.length > 0)
@@ -181,6 +185,7 @@ export const DeploymentList = ({
 					return {
 						id: project.id,
 						label: project.name,
+					context: '',
 						icon: <Folder className="w-4 h-4" />,
 						deployments
 					}
@@ -306,11 +311,12 @@ export const DeploymentList = ({
 		<>
 			{groupedContent.length > 0 && (
 				<div className="space-y-12">
-					{groupedContent.map(({ id, label, icon, deployments }) => (
+					{groupedContent.map(({ id, label, context, icon, deployments }) => (
 						<div key={id} className="space-y-3">
 							<DeploymentsTable
 								deployments={deployments}
 								label={label}
+								context={context}
 								icon={icon}
 								isLoading={isLoading}
 								onViewLogs={handleViewLogs}
@@ -422,6 +428,7 @@ export const DeploymentList = ({
 function DeploymentsTable({
 	deployments,
 	label,
+	context,
 	icon,
 	isLoading,
 	onViewLogs,
@@ -433,6 +440,7 @@ function DeploymentsTable({
 }: {
 	deployments: DeploymentWithContext[]
 	label: string
+	context?: string
 	icon?: React.ReactNode
 	isLoading: boolean
 	onViewLogs: (deployment: DeploymentInfo, context: string) => void
@@ -453,16 +461,14 @@ function DeploymentsTable({
 				<div className="flex items-center gap-2">
 					{icon && <span className="text-primary">{icon}</span>}
 					<span className="text-xs font-medium text-muted-foreground">{label}</span>
+					{context && (
+						<span className="text-xs font-medium text-muted-foreground/60 truncate max-w-[200px]" title={context}>
+							{context}
+						</span>
+					)}
 				</div>
 			),
 			cell: ({ row }) => <DeploymentNameCell deployment={row.original} isLoading={isLoading} />,
-		},
-		{
-			id: "namespace",
-			accessorKey: "namespace",
-			header: () => <span className="text-xs font-medium text-muted-foreground">Namespace</span>,
-			cell: ({ row }) => <span className="text-xs font-medium text-muted-foreground">{row.original.namespace}</span>,
-			filterFn: 'equalsString',
 		},
 		{
 			accessorKey: "status",
@@ -513,7 +519,7 @@ function DeploymentsTable({
 				/>
 			),
 		},
-	], [label, icon, isLoading, onViewLogs, onOpenTerminal, onRemoveFavorite, onManageProjects])
+	], [label, context, icon, isLoading, onViewLogs, onOpenTerminal, onRemoveFavorite, onManageProjects])
 
 	// Ensure each deployment has its context correctly assigned in the data mapping
 	// This might require passing the context-to-deployment map if we want to be sure
@@ -567,18 +573,18 @@ function StatusCell({ deployment, isLoading }: { deployment: DeploymentInfo; isL
 		return <div className="h-6 bg-muted/30 rounded w-16 animate-pulse" />
 	}
 
-	const variants: Record<string, { className: string; label: string }> = {
-		healthy: { className: 'bg-success/20 text-success border-success/40', label: 'Saludable' },
-		progressing: { className: 'bg-info/20 text-info border-info/40', label: 'Procesando' },
-		degraded: { className: 'bg-destructive/20 text-destructive border-destructive/40', label: 'Degradado' },
-		unknown: { className: 'bg-muted/30 text-muted-foreground border-border', label: 'Desconocido' },
+	const variants: Record<string, { className: string; icon: React.ReactNode; label: string }> = {
+		healthy: { className: 'text-success', icon: <CheckCircle2 className="w-4 h-4" />, label: 'Saludable' },
+		progressing: { className: 'text-info', icon: <Loader2 className="w-4 h-4 animate-spin" />, label: 'Procesando' },
+		degraded: { className: 'text-destructive', icon: <AlertTriangle className="w-4 h-4" />, label: 'Degradado' },
+		unknown: { className: 'text-muted-foreground', icon: <HelpCircle className="w-4 h-4" />, label: 'Desconocido' },
 	}
 
 	const variant = variants[deployment.status] || variants.unknown
 
 	return (
-		<span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-xs font-medium uppercase ${variant.className}`}>
-			{variant.label}
+		<span className={`inline-flex items-center ${variant.className}`} title={variant.label}>
+			{variant.icon}
 		</span>
 	)
 }

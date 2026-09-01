@@ -7,6 +7,12 @@ export type OSType = "macOS" | "Linux" | "Windows" | "unknown";
 export interface CommandDef {
 	name: string;
 	command: string;
+	/**
+	 * Arguments used to probe the command's version. Defaults to `['--version']`.
+	 * Some CLIs use a subcommand instead of a flag (e.g. `kubectl version`,
+	 * `helm version`), so this lets each command declare its own probe.
+	 */
+	versionArgs?: string[];
 	description?: string;
 	setupInfo?: {
 		osCommands: Array<{
@@ -38,7 +44,8 @@ export function useSetup({ required, optional = [] }: UseSetupOptions) {
 			queryKey: ["tools", cmdDef.name, "version"],
 			queryFn: async () => {
 				try {
-					const result = await runCommand([cmdDef.command, '--version']);
+					const versionArgs = cmdDef.versionArgs ?? ['--version'];
+					const result = await runCommand([cmdDef.command, ...versionArgs]);
 					return result.stdout.trim();
 				} catch {
 					return null;

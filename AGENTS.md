@@ -2,6 +2,10 @@
 
 > System prompt para agentes autónomos. Solo prohibiciones duras y enrutamiento. Para detalles, seguir referencias.
 
+## Workflow
+
+- **Probar cada comando en la terminal antes de asumir su comportamiento**: Nunca asumir el flag/subcomando de un CLI (ej. `--version` vs `version`). Ejecutar el comando real, observar stdout/stderr/exit code, y recién entonces escribir código que lo invoque. Esto evita bugs por suposiciones sobre flags que no existen (caso real: `kubectl --version` falla con `unknown flag`, debe ser `kubectl version --client=true`).
+
 ## Aprendizaje de Build
 
 - Build exitoso ejecutando `npm install` primero, luego `npm run build`

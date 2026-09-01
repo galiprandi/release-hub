@@ -16,6 +16,7 @@ function KubernetesSetupPage() {
 		{
 			name: "kubectl",
 			command: "kubectl",
+			versionArgs: ["version", "--client=true"],
 			description: "Herramienta de línea de comandos de Kubernetes para controlar clusters. ReleaseHub lo utiliza para monitorear deployments y pods.",
 			setupInfo: {
 				osCommands: [
@@ -31,6 +32,7 @@ function KubernetesSetupPage() {
 		{
 			name: "helm",
 			command: "helm",
+			versionArgs: ["version", "--short"],
 			description: "Gestor de paquetes para Kubernetes. Opcional para funcionalidades avanzadas de gestión de releases.",
 			setupInfo: {
 				osCommands: [

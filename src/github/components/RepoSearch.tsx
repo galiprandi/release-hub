@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { Search, Loader2, GitBranch, X, FileCode } from 'lucide-react'
+import { useDebounce } from '@galiprandi/react-tools'
 import { useRepoSearch } from '@/hooks/useRepoSearch'
 import { useFileSearch, isFileSearchQuery } from '@/hooks/useFileSearch'
 import { useUserCollections } from '@/hooks/useUserCollections'
@@ -32,16 +33,17 @@ export function RepoSearch() {
   const navigate = useNavigate()
 
   const isFileMode = isFileSearchQuery(query)
+  const debouncedQuery = useDebounce(query, 400)
 
   // Load summary for total count
   const { data: summaryData } = useUserReposSummary()
 
   // Search repos or files depending on query prefix
   const { data: repoSearchData, isLoading: isRepoLoading } = useRepoSearch({
-    searchTerm: isFileMode ? '' : query,
+    searchTerm: isFileMode ? '' : debouncedQuery,
   })
   const { data: fileSearchData, isLoading: isFileLoading } = useFileSearch({
-    searchTerm: isFileMode ? query : '',
+    searchTerm: isFileMode ? debouncedQuery : '',
   })
 
   const isLoading = isFileMode ? isFileLoading : isRepoLoading

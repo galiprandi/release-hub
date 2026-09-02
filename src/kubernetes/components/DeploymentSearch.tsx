@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { Search, Loader2, X, Terminal } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
+import { useDebounce } from '@galiprandi/react-tools'
 import { applyCachePolicy } from '@/lib/queryKeys'
 import { useUserCollections } from '@/hooks/useUserCollections'
 import type { DeploymentInfo } from '@/api/kubectl'
@@ -21,12 +22,7 @@ export function DeploymentSearch() {
   const searchWidth = 'w-[35dvw]'
 
   // Debounce the query for namespace search
-  const [debouncedQuery, setDebouncedQuery] = useState('')
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(query), 400)
-    return () => clearTimeout(timer)
-  }, [query])
+  const debouncedQuery = useDebounce(query, 400)
 
   // Fetch accessible namespace count for the placeholder
   const { data: namespaces } = useQuery({
@@ -53,9 +49,22 @@ export function DeploymentSearch() {
     },
     ...applyCachePolicy('kubectl'),
     enabled: debouncedQuery.length > 0,
+    staleTime: 3 * 60 * 1000,
   })
 
-  const results = useMemo(() => (searchResults || []).sort((a, b) => a.name.localeCompare(b.name)).slice(0, 50), [searchResults])
+  const results = useMemo(() => {
+    const sorted = (searchResults || []).sort((a, b) => a.name.localeCompare(b.name))
+    const seen = new Map<string, { deployment: typeof sorted[0]; contexts: string[] }>()
+    for (const dep of sorted) {
+      const existing = seen.get(dep.name)
+      if (existing) {
+        existing.contexts.push(dep.context)
+      } else {
+        seen.set(dep.name, { deployment: dep, contexts: [dep.context] })
+      }
+    }
+    return Array.from(seen.values()).slice(0, 50)
+  }, [searchResults])
 
   const { toggleDeploymentFavorite, isDeploymentFavorite } = useUserCollections()
   const [isProjectSelectionOpen, setIsProjectSelectionOpen] = useState(false)
@@ -112,9 +121,9 @@ export function DeploymentSearch() {
         }
         if (event.key === 'Enter' && selectedIndex >= 0) {
           event.preventDefault()
-          const deployment = results[selectedIndex]
-          if (deployment) {
-            toggleDeploymentFavorite(`${deployment.context}/${deployment.namespace}/${deployment.name}`)
+          const result = results[selectedIndex]
+          if (result) {
+            const d = result.deployment; result.contexts.forEach(ctx => toggleDeploymentFavorite(`${ctx}/${d.namespace}/${d.name}`))
             handleSelect()
           }
         }
@@ -220,14 +229,15 @@ export function DeploymentSearch() {
             />
           ) : (
             <div id="deployment-search-results" role="listbox" className="max-h-80 overflow-y-auto">
-              {results.map((deployment, index) => {
-                const deploymentId = `${deployment.context}/${deployment.namespace}/${deployment.name}`
-                const isFav = isDeploymentFavorite(deploymentId)
+              {results.map((result, index) => {
+                const deployment = result.deployment
+                const allIds = result.contexts.map(ctx => `${ctx}/${deployment.namespace}/${deployment.name}`)
+                const isFav = allIds.every(id => isDeploymentFavorite(id))
                 const isSelected = index === selectedIndex
 
                 return (
                   <div
-                    key={deploymentId}
+                    key={allIds.join('|')}
                     role="option"
                     aria-selected={isSelected}
                     id={`deployment-option-${index}`}
@@ -246,7 +256,13 @@ export function DeploymentSearch() {
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-xs font-medium text-muted-foreground">{deployment.namespace}</span>
                           <div className="w-px h-2.5 bg-border mx-0.5" />
-                          <span className="text-xs font-medium text-muted-foreground truncate">{deployment.context}</span>
+                          {result.contexts.length === 1 ? (
+                            <span className="text-xs font-medium text-muted-foreground truncate">{result.contexts[0]}</span>
+                          ) : (
+                            <span className="text-xs font-medium text-muted-foreground truncate">
+                              {result.contexts.length} contextos
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center gap-4 mt-2">
                           <div className="flex items-center gap-1.5">
@@ -274,12 +290,12 @@ export function DeploymentSearch() {
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
                         <ActionButton
                           action={ACTION_DEFINITIONS.manageProjects}
-                          onClick={() => handleManageProjects(deploymentId)}
+                          onClick={() => handleManageProjects(allIds[0])}
                           size="sm"
                         />
                         <ActionButton
                           action={isFav ? ACTION_DEFINITIONS.removeFavorite : ACTION_DEFINITIONS.addFavorite}
-                          onClick={() => toggleDeploymentFavorite(deploymentId)}
+                          onClick={() => allIds.forEach(id => toggleDeploymentFavorite(id))}
                           size="sm"
                         />
                       </div>

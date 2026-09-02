@@ -77,6 +77,7 @@ export function useCommitStatus(sha?: string, enabled = true): CommitStatusResul
 		},
 		enabled: canFetch,
 		...applyCachePolicy("git"),
+		staleTime: 60 * 1000, // 1 minuto (compare cambia con cada push)
 	});
 
 	return useMemo(() => {

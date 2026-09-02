@@ -9,7 +9,7 @@ import { BaseDialog } from "@/components/ui/BaseDialog"
 import { StatusCard } from "@/components/ui/StatusCard"
 import { Table } from "@/components/ui/Table"
 import { EmptyState } from "@/components/shared/EmptyState"
-import { NamespaceHealthIndicator } from "@/kubernetes/components/NamespaceHealthModal"
+import { NamespaceHealthIndicator, PodHealthCell } from "@/kubernetes/components/NamespaceHealthModal"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useUserCollections, type Project } from "@/hooks/useUserCollections"
 import { ActionButton, ACTION_DEFINITIONS } from "@/components/ui/ActionButton"
@@ -482,7 +482,13 @@ function DeploymentsTable({
 						</span>
 					)}
 					{context && (
-						<NamespaceHealthIndicator namespace={label} context={context} deployments={deployments} />
+						<NamespaceHealthIndicator
+							namespace={label}
+							context={context}
+							deployments={deployments}
+							onViewLogs={onViewLogs}
+							onOpenTerminal={onOpenTerminal}
+						/>
 					)}
 				</div>
 			),
@@ -497,6 +503,12 @@ function DeploymentsTable({
 			accessorKey: "age",
 			header: () => <span className="text-xs font-medium text-muted-foreground">Age</span>,
 			cell: ({ row }) => <AgeCell deployment={row.original} isLoading={isLoading} />,
+		},
+		{
+			id: "pods",
+			header: () => <span className="text-xs font-medium text-muted-foreground">Pods</span>,
+			enableSorting: false,
+			cell: ({ row }) => <PodHealthCell deployment={row.original} isLoading={isLoading} />,
 		},
 		{
 			id: "gitCommit",
@@ -651,7 +663,7 @@ function CommitCell({ deployment, isLoading }: { deployment: DeploymentWithConte
 				{deployment.gitCommit.slice(0, 7)}
 			</span>
 			<CopyButton
-				text={deployment.gitCommit}
+				text={deployment.gitCommit.slice(0, 7)}
 				tooltip="Copiar commit"
 				className="p-0.5"
 			/>

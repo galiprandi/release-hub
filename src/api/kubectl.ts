@@ -55,6 +55,7 @@ export interface PodHealthInfo {
   phase: string;
   ready: string;
   restarts: number;
+  createdAt?: string;
   containers: PodContainerStatus[];
 }
 
@@ -543,6 +544,7 @@ export async function getPodHealthForNamespace(namespace: string, context?: stri
         phase: (status.phase as string) || 'Unknown',
         ready: readyCount + '/' + containerStatuses.length,
         restarts: totalRestarts,
+        createdAt: ((pod.metadata || {}) as Record<string, unknown>).creationTimestamp as string | undefined,
         containers: parseContainerStatuses(containerStatuses),
       };
     });

@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { AlertTriangle, ChevronDown, ChevronRight, CircleAlert, CircleDot } from "lucide-react"
+import { AlertTriangle, ChevronDown, ChevronRight, CircleAlert, CircleDot, Search, Terminal, FileText, CheckCircle2 } from "lucide-react"
 import { applyCachePolicy } from "@/lib/queryKeys"
 import type { PodHealthInfo } from "@/api/kubectl"
+import type { DeploymentInfo } from "@/api/kubectl"
 import type { DeploymentWithContext } from "./DeploymentList"
 import { useCommitStatus } from "@/hooks/useCommitStatus"
 import { BaseDialog } from "@/components/ui/BaseDialog"
@@ -11,7 +12,14 @@ export interface NamespaceHealthIssue {
 	type: 'crashloop' | 'not-ready' | 'oomkilled' | 'imagepull' | 'restarts' | 'old-image' | 'commit-behind'
 	label: string
 	count: number
-	detail?: string[]
+	pods?: PodGroup[]
+	deployments?: { name: string; behindBy: number }[]
+}
+
+interface PodGroup {
+	deploymentName: string
+	pods: PodHealthInfo[]
+	totalRestarts: number
 }
 
 const ISSUE_ICONS: Record<NamespaceHealthIssue['type'], typeof AlertTriangle> = {
@@ -32,6 +40,16 @@ const ISSUE_COLORS: Record<NamespaceHealthIssue['type'], string> = {
 	restarts: 'text-warning',
 	'old-image': 'text-warning',
 	'commit-behind': 'text-warning',
+}
+
+const ISSUE_PRIORITY: Record<NamespaceHealthIssue['type'], number> = {
+	crashloop: 0,
+	oomkilled: 1,
+	imagepull: 2,
+	'not-ready': 3,
+	restarts: 4,
+	'old-image': 5,
+	'commit-behind': 6,
 }
 
 const RESTART_THRESHOLD = 3
@@ -86,81 +104,95 @@ function formatRelative(isoDate?: string): string {
 	return `hace ${days}d`
 }
 
+function getDeploymentName(podName: string): string {
+	const match = podName.match(/^(.+)-[a-f0-9]{6,10}-[a-z0-9]{4,10}$/)
+	if (match) return match[1]
+	const match2 = podName.match(/^(.+)-[a-f0-9]+$/)
+	if (match2) return match2[1]
+	return podName
+}
+
+function groupPodsByDeployment(pods: PodHealthInfo[]): PodGroup[] {
+	const groups: Record<string, PodHealthInfo[]> = {}
+	for (const pod of pods) {
+		const depName = getDeploymentName(pod.name)
+		if (!groups[depName]) groups[depName] = []
+		groups[depName].push(pod)
+	}
+	return Object.entries(groups).map(([deploymentName, pods]) => ({
+		deploymentName,
+		pods: pods.sort((a, b) => b.restarts - a.restarts),
+		totalRestarts: pods.reduce((acc, p) => acc + p.restarts, 0),
+	})).sort((a, b) => b.totalRestarts - a.totalRestarts)
+}
+
+function formatRestartPattern(pod: PodHealthInfo): string {
+	if (!pod.createdAt || pod.restarts === 0) return ''
+	const ageMs = Date.now() - new Date(pod.createdAt).getTime()
+	if (ageMs <= 0) return ''
+	const ageHours = ageMs / (1000 * 60 * 60)
+	if (ageHours < 1) return ''
+	const interval = ageHours / pod.restarts
+	if (interval < 1) {
+		const mins = Math.round(interval * 60)
+		return `cada ~${mins}m`
+	}
+	return `cada ~${interval.toFixed(1)}h`
+}
+
 /**
  * Analyzes pods in a namespace and returns health issues.
- * Categories: CrashLoop, OOMKilled, ImagePullBackOff, NotReady, high restarts.
+ * Pods are grouped by deployment, sorted by severity.
  */
 function analyzePods(pods: PodHealthInfo[]): NamespaceHealthIssue[] {
 	const issues: NamespaceHealthIssue[] = []
 
-	const crashloop = pods.filter(p => p.phase === 'CrashLoopBackOff')
-	if (crashloop.length > 0) {
+	const crashloopPods = pods.filter(p => p.phase === 'CrashLoopBackOff')
+	if (crashloopPods.length > 0) {
 		issues.push({
-			type: 'crashloop', label: 'Crash loop', count: crashloop.length,
-			detail: crashloop.map(p => {
-				const c = p.containers[0]
-				const reason = formatReason(c?.stateReason || c?.lastStateReason)
-				const exit = formatExitCode(c?.lastStateExitCode)
-				return `${p.name}: ${reason}${exit ? ' (' + exit + ')' : ''}`
-			}),
+			type: 'crashloop', label: 'Crash loop', count: crashloopPods.length,
+			pods: groupPodsByDeployment(crashloopPods),
 		})
 	}
 
-	const oomkilled = pods.filter(p => p.containers.some(c => c.lastStateReason === 'OOMKilled' || c.stateReason === 'OOMKilled'))
-	if (oomkilled.length > 0) {
+	const oomkilledPods = pods.filter(p => (p.containers || []).some(c => c.lastStateReason === 'OOMKilled' || c.stateReason === 'OOMKilled'))
+	if (oomkilledPods.length > 0) {
 		issues.push({
-			type: 'oomkilled', label: 'Memoria agotada', count: oomkilled.length,
-			detail: oomkilled.map(p => {
-				const c = p.containers.find(c => c.lastStateReason === 'OOMKilled' || c.stateReason === 'OOMKilled')
-				const last = formatRelative(c?.lastStateFinishedAt)
-				return `${p.name}: memoria agotada${last ? ' · último ' + last : ''}`
-			}),
+			type: 'oomkilled', label: 'Memoria agotada', count: oomkilledPods.length,
+			pods: groupPodsByDeployment(oomkilledPods),
 		})
 	}
 
-	const imagepull = pods.filter(p => p.phase === 'ImagePullBackOff' || p.phase === 'ErrImagePull')
-	if (imagepull.length > 0) {
+	const imagepullPods = pods.filter(p => p.phase === 'ImagePullBackOff' || p.phase === 'ErrImagePull')
+	if (imagepullPods.length > 0) {
 		issues.push({
-			type: 'imagepull', label: 'Imagen no encontrada', count: imagepull.length,
-			detail: imagepull.map(p => {
-				const c = p.containers[0]
-				const msg = c?.stateMessage ? ' · ' + c.stateMessage : ''
-				return `${p.name}: ${formatReason(p.phase)}${msg}`
-			}),
+			type: 'imagepull', label: 'Imagen no encontrada', count: imagepullPods.length,
+			pods: groupPodsByDeployment(imagepullPods),
 		})
 	}
 
-	const notReady = pods.filter(p => {
+	const notReadyPods = pods.filter(p => {
 		if (p.phase !== 'Running') return false
+		if (!p.ready) return false
 		const [ready, total] = p.ready.split('/')
 		return ready !== total
 	})
-	if (notReady.length > 0) {
+	if (notReadyPods.length > 0) {
 		issues.push({
-			type: 'not-ready', label: 'No listo', count: notReady.length,
-			detail: notReady.map(p => {
-				const c = p.containers.find(c => !c.ready)
-				const reason = c?.stateReason ? ' · ' + formatReason(c.stateReason) : ''
-				return `${p.name}: ready ${p.ready}${reason}`
-			}),
+			type: 'not-ready', label: 'No listo', count: notReadyPods.length,
+			pods: groupPodsByDeployment(notReadyPods),
 		})
 	}
 
-	const highRestarts = pods.filter(p => p.restarts >= RESTART_THRESHOLD)
-	if (highRestarts.length > 0) {
+	const highRestartPods = pods.filter(p => p.restarts >= RESTART_THRESHOLD)
+	if (highRestartPods.length > 0) {
 		issues.push({
-			type: 'restarts', label: 'Restarts altos', count: highRestarts.length,
-			detail: highRestarts.map(p => {
-				const c = p.containers[0]
-				const reason = formatReason(c?.lastStateReason)
-				const exit = formatExitCode(c?.lastStateExitCode)
-				const last = formatRelative(c?.lastStateFinishedAt)
-				return `${p.name}: ${p.restarts} restarts · ${reason}${exit ? ' (' + exit + ')' : ''}${last ? ' · último ' + last : ''}`
-			}),
+			type: 'restarts', label: 'Restarts altos', count: highRestartPods.length,
+			pods: groupPodsByDeployment(highRestartPods),
 		})
 	}
 
-	return issues
+	return issues.sort((a, b) => ISSUE_PRIORITY[a.type] - ISSUE_PRIORITY[b.type])
 }
 
 /**
@@ -205,14 +237,13 @@ function useCommitHealth(deployments: DeploymentWithContext[], enabled: boolean)
 			type: 'commit-behind' as const,
 			label: 'Commit atrasado',
 			count: behind.length,
-			detail: behind.map(r => r.name + ': ' + r.behindBy + ' commits detrás de HEAD'),
+			deployments: behind.map(r => ({ name: r.name, behindBy: r.behindBy })),
 		} satisfies NamespaceHealthIssue
 	}, [results, commits])
 }
 
 /**
  * Hook that returns all health issues for a namespace/context.
- * Can be used by both the header indicator and the modal.
  */
 export function useNamespaceHealth(namespace: string, context: string, deployments: DeploymentWithContext[]) {
 	const enabled = !!context && !!namespace
@@ -223,23 +254,27 @@ export function useNamespaceHealth(namespace: string, context: string, deploymen
 		const all: NamespaceHealthIssue[] = []
 		if (podIssues && podIssues.length > 0) all.push(...podIssues)
 		if (commitIssue) all.push(commitIssue)
-		return { issues: all, isLoading }
+		return { issues: all.sort((a, b) => ISSUE_PRIORITY[a.type] - ISSUE_PRIORITY[b.type]), isLoading }
 	}, [podIssues, commitIssue, isLoading])
 }
 
 /**
  * Health indicator for the table header.
- * Shows an emoji if there are issues, opens the modal on click.
+ * Shows an icon if there are issues, opens the modal on click.
  * Returns null if no issues.
  */
 export function NamespaceHealthIndicator({
 	namespace,
 	context,
 	deployments,
+	onViewLogs,
+	onOpenTerminal,
 }: {
 	namespace: string
 	context: string
 	deployments: DeploymentWithContext[]
+	onViewLogs?: (deployment: DeploymentInfo, context: string) => void
+	onOpenTerminal?: (deployment: DeploymentInfo, context: string) => void
 }) {
 	const [isOpen, setIsOpen] = useState(false)
 	const { issues } = useNamespaceHealth(namespace, context, deployments)
@@ -268,8 +303,67 @@ export function NamespaceHealthIndicator({
 				namespace={namespace}
 				context={context}
 				issues={issues}
+				onViewLogs={onViewLogs}
+				onOpenTerminal={onOpenTerminal}
 			/>
 		</>
+	)
+}
+
+function PodRow({
+	pod,
+	onViewLogs,
+	onOpenTerminal,
+	deploymentName,
+}: {
+	pod: PodHealthInfo
+	onViewLogs?: (deployment: DeploymentInfo, context: string) => void
+	onOpenTerminal?: (deployment: DeploymentInfo, context: string) => void
+	deploymentName: string
+}) {
+	const c = (pod.containers || [])[0]
+	const reason = formatReason(c?.lastStateReason)
+	const exit = formatExitCode(c?.lastStateExitCode)
+	const last = formatRelative(c?.lastStateFinishedAt)
+	const pattern = formatRestartPattern(pod)
+	const age = formatRelative(pod.createdAt)
+
+	return (
+		<div className="flex items-center gap-2 py-0.5 group">
+			<span className="text-xs text-muted-foreground font-mono truncate flex-1">{pod.name}</span>
+			<span className="text-xs text-muted-foreground whitespace-nowrap">
+				{pod.restarts} restarts
+				{age ? ' · ' + age : ''}
+				{pattern ? ' · ' + pattern : ''}
+				{' · ' + reason}
+				{exit ? ' (' + exit + ')' : ''}
+				{last ? ' · último ' + last : ''}
+			</span>
+			{(onViewLogs || onOpenTerminal) && (
+				<div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+					{onViewLogs && (
+						<button
+							type="button"
+							onClick={() => onViewLogs({ name: deploymentName, namespace: pod.namespace } as DeploymentInfo, '')}
+							className="p-0.5 hover:bg-muted/30 rounded text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
+							title="Ver logs"
+						>
+							<FileText className="w-3 h-3" />
+						</button>
+					)}
+					{onOpenTerminal && (
+						<button
+							type="button"
+							onClick={() => onOpenTerminal({ name: deploymentName, namespace: pod.namespace } as DeploymentInfo, '')}
+							className="p-0.5 hover:bg-muted/30 rounded text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
+							title="Terminal"
+						>
+							<Terminal className="w-3 h-3" />
+						</button>
+					)}
+				</div>
+			)}
+		</div>
 	)
 }
 
@@ -279,16 +373,53 @@ function NamespaceHealthModal({
 	namespace,
 	context,
 	issues,
+	onViewLogs,
+	onOpenTerminal,
 }: {
 	open: boolean
 	onOpenChange: (open: boolean) => void
 	namespace: string
 	context: string
 	issues: NamespaceHealthIssue[]
+	onViewLogs?: (deployment: DeploymentInfo, context: string) => void
+	onOpenTerminal?: (deployment: DeploymentInfo, context: string) => void
 }) {
-	const [expandedIssue, setExpandedIssue] = useState<number | null>(null)
+	const [expandedIssues, setExpandedIssues] = useState<Set<number>>(() => new Set(issues.map((_, i) => i)))
+	const [filter, setFilter] = useState('')
 	const totalProblems = issues.reduce((acc, i) => acc + i.count, 0)
 	const hasCritical = issues.some(i => ISSUE_COLORS[i.type] === 'text-destructive')
+
+	const toggleIssue = (idx: number) => {
+		setExpandedIssues(prev => {
+			const next = new Set(prev)
+			if (next.has(idx)) next.delete(idx)
+			else next.add(idx)
+			return next
+		})
+	}
+
+	const filteredIssues = useMemo(() => {
+		if (!filter.trim()) return issues
+		const q = filter.toLowerCase()
+		return issues.map(issue => {
+			if (issue.pods) {
+				const filteredPods = issue.pods
+					.map(g => ({
+						...g,
+						pods: g.pods.filter(p =>
+							p.name.toLowerCase().includes(q) || g.deploymentName.toLowerCase().includes(q)
+						),
+					}))
+					.filter(g => g.pods.length > 0)
+				return { ...issue, pods: filteredPods, count: filteredPods.reduce((acc, g) => acc + g.pods.length, 0) }
+			}
+			if (issue.deployments) {
+				const filteredDeps = issue.deployments.filter(d => d.name.toLowerCase().includes(q))
+				return { ...issue, deployments: filteredDeps, count: filteredDeps.length }
+			}
+			return issue
+		}).filter(issue => issue.count > 0)
+	}, [issues, filter])
 
 	return (
 		<BaseDialog
@@ -304,43 +435,197 @@ function NamespaceHealthModal({
 				</span>
 			}
 			description={`Salud del namespace ${namespace} en ${context}`}
-			maxWidth="max-w-xl"
+			maxWidth="max-w-2xl"
 		>
 			<div className="flex flex-col gap-3 overflow-y-auto px-2 pb-2">
-				<div className="text-sm text-muted-foreground">
-					{totalProblems} {totalProblems === 1 ? 'problema' : 'problemas'} detectados
+				<div className="flex items-center justify-between gap-3">
+					<span className="text-sm text-muted-foreground">
+						{totalProblems} {totalProblems === 1 ? 'problema' : 'problemas'} detectados
+					</span>
+					<div className="relative flex-1 max-w-[240px]">
+						<Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+						<input
+							type="text"
+							value={filter}
+							onChange={(e) => setFilter(e.target.value)}
+							placeholder="Filtrar..."
+							className="w-full pl-7 pr-2 py-1 text-xs bg-muted/30 border border-border rounded-md focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none"
+						/>
+					</div>
 				</div>
-				{issues.map((issue, idx) => {
+				{filteredIssues.map((issue, idx) => {
 					const Icon = ISSUE_ICONS[issue.type]
 					const color = ISSUE_COLORS[issue.type]
-					const isExpanded = expandedIssue === idx
+					const isExpanded = expandedIssues.has(idx)
 					return (
 						<div key={idx} className="border border-border rounded-md">
 							<button
 								type="button"
-								onClick={() => setExpandedIssue(isExpanded ? null : idx)}
+								onClick={() => toggleIssue(idx)}
 								className="flex items-center gap-2 w-full text-left px-3 py-2 hover:bg-muted/30 transition-colors focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none rounded-md"
 							>
 								<Icon className={"w-4 h-4 shrink-0 " + color} />
 								<span className={"text-sm font-medium " + color}>{issue.label}</span>
 								<span className="text-xs text-muted-foreground">· {issue.count}</span>
-								{issue.detail && issue.detail.length > 0 && (
-									isExpanded
-										? <ChevronDown className="w-4 h-4 text-muted-foreground ml-auto" />
-										: <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto" />
-								)}
+								{isExpanded
+									? <ChevronDown className="w-4 h-4 text-muted-foreground ml-auto" />
+									: <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto" />
+								}
 							</button>
-							{isExpanded && issue.detail && issue.detail.length > 0 && (
-								<div className="flex flex-col gap-0.5 px-3 pb-2 pl-10">
-									{issue.detail.map((d, i) => (
-										<span key={i} className="text-xs text-muted-foreground font-mono">{d}</span>
+							{isExpanded && (
+								<div className="flex flex-col gap-2 px-3 pb-2 pl-10">
+									{issue.pods?.map((group, gi) => (
+										<div key={gi} className="flex flex-col gap-0.5">
+											<span className="text-xs font-medium text-foreground">
+												{group.deploymentName}
+												<span className="text-muted-foreground font-normal">
+													{' · '}{group.pods.length}{' '}{group.pods.length === 1 ? 'pod' : 'pods'}
+													{' · '}{group.totalRestarts} restarts total
+												</span>
+											</span>
+											{group.pods.map((pod, pi) => (
+												<PodRow
+													key={pi}
+													pod={pod}
+													deploymentName={group.deploymentName}
+													onViewLogs={onViewLogs}
+													onOpenTerminal={onOpenTerminal}
+												/>
+											))}
+										</div>
+									))}
+									{issue.deployments?.map((d, di) => (
+										<span key={di} className="text-xs text-muted-foreground font-mono">
+											{d.name}: {d.behindBy} commits detrás de HEAD
+										</span>
 									))}
 								</div>
 							)}
 						</div>
 					)
 				})}
+				{filteredIssues.length === 0 && filter && (
+					<div className="text-sm text-muted-foreground text-center py-4">
+						Sin resultados para "{filter}"
+					</div>
+				)}
 			</div>
 		</BaseDialog>
+	)
+}
+
+/**
+ * Hook that returns pod health for a single deployment.
+ * Reuses the namespace-level pod health query and filters by deployment name.
+ */
+export function useDeploymentPodHealth(namespace: string, context: string, deploymentName: string, enabled: boolean) {
+	return useQuery({
+		queryKey: ['kubectl', 'pod-health-detail', context, namespace, deploymentName],
+		queryFn: async () => {
+			const { getPodHealthForNamespace } = await import('@/api/kubectl')
+			const pods = await getPodHealthForNamespace(namespace, context)
+			return pods.filter(p => getDeploymentName(p.name) === deploymentName)
+		},
+		enabled,
+		...applyCachePolicy('kubectl'),
+		staleTime: 60 * 1000,
+	})
+}
+
+type DeploymentPodStatus = 'healthy' | 'warning' | 'critical' | 'unknown'
+
+function getDeploymentPodStatus(pods: PodHealthInfo[]): { status: DeploymentPodStatus; readyCount: number; totalCount: number; restarts: number; hasOom: boolean; hasCrash: boolean } {
+	if (pods.length === 0) return { status: 'unknown', readyCount: 0, totalCount: 0, restarts: 0, hasOom: false, hasCrash: false }
+
+	const totalCount = pods.length
+	const readyCount = pods.filter(p => {
+		if (!p.ready) return false
+		const [r, t] = p.ready.split('/')
+		return r === t
+	}).length
+	const totalRestarts = pods.reduce((acc, p) => acc + p.restarts, 0)
+	const hasCrash = pods.some(p => p.phase === 'CrashLoopBackOff')
+	const hasOom = pods.some(p => (p.containers || []).some(c => c.lastStateReason === 'OOMKilled' || c.stateReason === 'OOMKilled'))
+	const hasImagePull = pods.some(p => p.phase === 'ImagePullBackOff' || p.phase === 'ErrImagePull')
+	const hasHighRestarts = pods.some(p => p.restarts >= RESTART_THRESHOLD)
+
+	let status: DeploymentPodStatus = 'healthy'
+	if (hasCrash || hasOom || hasImagePull) status = 'critical'
+	else if (hasHighRestarts || readyCount < totalCount) status = 'warning'
+
+	return { status, readyCount, totalCount, restarts: totalRestarts, hasOom, hasCrash }
+}
+
+/**
+ * Cell component for the Pods column in the deployment table.
+ * Shows pod count and health status icon. Click opens a deployment-scoped health modal.
+ */
+export function PodHealthCell({
+	deployment,
+	isLoading,
+}: {
+	deployment: DeploymentWithContext
+	isLoading: boolean
+}) {
+	const [isOpen, setIsOpen] = useState(false)
+	const enabled = !!deployment.context && !!deployment.namespace && !deployment.isPlaceholder && !isLoading
+	const { data: pods, isLoading: isPodLoading } = useDeploymentPodHealth(
+		deployment.namespace,
+		deployment.context || '',
+		deployment.name,
+		enabled,
+	)
+
+	if (isLoading || deployment.isPlaceholder) {
+		return <div className="h-4 bg-muted rounded w-12 animate-pulse" />
+	}
+
+	if (isPodLoading || !pods) {
+		return <div className="h-4 bg-muted rounded w-12 animate-pulse" />
+	}
+
+	const { status, readyCount, totalCount, restarts, hasOom, hasCrash } = getDeploymentPodStatus(pods)
+
+	const icon = status === 'critical'
+		? <AlertTriangle className="w-3.5 h-3.5 text-destructive" />
+		: status === 'warning'
+			? <CircleAlert className="w-3.5 h-3.5 text-warning" />
+			: <CheckCircle2 className="w-3.5 h-3.5 text-success" />
+
+	const label = status === 'critical'
+		? `${readyCount}/${totalCount}${hasOom ? ' · OOM' : hasCrash ? ' · crash' : ''}`
+		: status === 'warning'
+			? `${readyCount}/${totalCount} · ${restarts}r`
+			: `${readyCount}/${totalCount}`
+
+	const title = status === 'healthy'
+		? `${readyCount}/${totalCount} pods ready`
+		: status === 'unknown'
+			? 'Sin datos de pods'
+			: `${readyCount}/${totalCount} pods ready · ${restarts} restarts${hasOom ? ' · OOMKilled' : ''}${hasCrash ? ' · CrashLoop' : ''} — click para ver detalle`
+
+	const issues = status === 'healthy' ? [] : analyzePods(pods)
+
+	return (
+		<>
+			<button
+				type="button"
+				onClick={() => setIsOpen(true)}
+				className="inline-flex items-center gap-1 text-xs hover:opacity-80 transition-opacity focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none rounded"
+				title={title}
+			>
+				{icon}
+				<span className="text-muted-foreground font-mono">{label}</span>
+			</button>
+			{isOpen && (
+				<NamespaceHealthModal
+					open={isOpen}
+					onOpenChange={setIsOpen}
+					namespace={deployment.name}
+					context={deployment.context || ''}
+					issues={issues}
+				/>
+			)}
+		</>
 	)
 }

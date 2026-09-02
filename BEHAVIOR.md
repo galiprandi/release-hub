@@ -185,89 +185,6 @@
 - retorna false si storage es nulo o JSON inválido
 - retorna true si el token existe
 
-## Module: DiffViewer
-- renders empty state initially
-- toggles expanded state when the expand/restore button is clicked
-
-## Module: ContainerSearch
-- calls setQuery on change
-- renders correctly with placeholder
-- shows clear button when query is present and clears on click
-
-## Module: BaseDialog
-- should accept maxWidth prop
-- should call onOpenChange when close button is clicked
-- should have proper accessibility attributes
-- should not render dialog when open is false
-- should render children
-- should render description when provided
-- should render dialog when open is true
-- should render title
-
-## Module: DialogCloseButton
-- should apply custom className when provided
-- should have proper accessibility attributes
-- should have screen reader text 'Cerrar'
-- should render the button with X icon
-
-## Module: DiscordNotification
-- should be disabled and not toggle when webhook is empty
-- should call onEnabledChange when clicked and webhook is present
-- should call onWebhookChange when typing in the input
-- should have correct ARIA attributes on the switch
-- should not show the webhook input when readonly
-- should render the component with title and label
-- should toggle webhook visibility between password and text type
-
-## Module: StatusCard
-- applies focus ring classes to buttons
-- applies hover and transition classes to retry button
-- calls onClose when close button is clicked
-- does not render close button if onClose is not provided
-- does not render retry button if onRetry is not provided
-- handles long messages with truncate class
-- renders custom retry button styles for non-error/warn types
-- renders error state with retry button
-- renders loading state correctly
-- renders offline state correctly
-- renders warn state with retry button
-
-## Module: JsonEditor
-- calls onChange when text is updated
-- copies text to clipboard when copy button is clicked
-- formats JSON on format button click
-- renders JsonEditor in editable mode
-- renders JsonEditor in readOnly mode
-- toggles search input when search button is clicked
-
-## Module: CommitsModal
-- should filter commits
-- should render commits when open
-- should toggle commit expansion
-- should trigger AI summary
-
-## Module: ProjectManagementDialog
-- should call createProject when submitting the form
-- should not render when closed
-- should render empty state when open and no projects exist
-- should render project list when projects exist
-- should show create project form when click 'Nuevo Proyecto'
-- should trigger deletion when confirmation is confirmed
-
-## Module: ProjectSelector
-- should call createProject when form is submitted
-- should open create project dialog
-- should open projects list when clicked
-- should render projects when they exist
-- should render trigger button
-
-## Module: PromoteDialog
-- should have focus rings on interactive elements
-- should open dialog when trigger is clicked
-- should render trigger button
-- should suggest next version correctly
-- should toggle commits list with accessibility attributes
-
 ## Module: AIChatModal
 - calls prompt with multimodal signature when send button is clicked
 - calls reset when clear button is clicked
@@ -311,6 +228,89 @@
 - should return null/undefined if line is empty
 - should return the same text if no ANSI codes are present
 - should strip ANSI codes before highlighting
+
+## Module: BaseDialog
+- should accept maxWidth prop
+- should call onOpenChange when close button is clicked
+- should have proper accessibility attributes
+- should not render dialog when open is false
+- should render children
+- should render description when provided
+- should render dialog when open is true
+- should render title
+
+## Module: DialogCloseButton
+- should apply custom className when provided
+- should have proper accessibility attributes
+- should have screen reader text 'Cerrar'
+- should render the button with X icon
+
+## Module: DiscordNotification
+- should be disabled and not toggle when webhook is empty
+- should call onEnabledChange when clicked and webhook is present
+- should call onWebhookChange when typing in the input
+- should have correct ARIA attributes on the switch
+- should not show the webhook input when readonly
+- should render the component with title and label
+- should toggle webhook visibility between password and text type
+
+## Module: StatusCard
+- applies focus ring classes to buttons
+- applies hover and transition classes to retry button
+- calls onClose when close button is clicked
+- does not render close button if onClose is not provided
+- does not render retry button if onRetry is not provided
+- handles long messages with truncate class
+- renders custom retry button styles for non-error/warn types
+- renders error state with retry button
+- renders loading state correctly
+- renders offline state correctly
+- renders warn state with retry button
+
+## Module: ContainerSearch
+- calls setQuery on change
+- renders correctly with placeholder
+- shows clear button when query is present and clears on click
+
+## Module: DiffViewer
+- renders empty state initially
+- toggles expanded state when the expand/restore button is clicked
+
+## Module: JsonEditor
+- calls onChange when text is updated
+- copies text to clipboard when copy button is clicked
+- formats JSON on format button click
+- renders JsonEditor in editable mode
+- renders JsonEditor in readOnly mode
+- toggles search input when search button is clicked
+
+## Module: CommitsModal
+- should filter commits
+- should render commits when open
+- should toggle commit expansion
+- should trigger AI summary
+
+## Module: ProjectManagementDialog
+- should call createProject when submitting the form
+- should not render when closed
+- should render empty state when open and no projects exist
+- should render project list when projects exist
+- should show create project form when click 'Nuevo Proyecto'
+- should trigger deletion when confirmation is confirmed
+
+## Module: ProjectSelector
+- should call createProject when form is submitted
+- should open create project dialog
+- should open projects list when clicked
+- should render projects when they exist
+- should render trigger button
+
+## Module: PromoteDialog
+- should have focus rings on interactive elements
+- should open dialog when trigger is clicked
+- should render trigger button
+- should suggest next version correctly
+- should toggle commits list with accessibility attributes
 
 ## Module: pulsarAdapter
 - detects failed image and extracts error step

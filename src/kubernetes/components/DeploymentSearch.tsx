@@ -66,7 +66,7 @@ export function DeploymentSearch() {
     return Array.from(seen.values()).slice(0, 50)
   }, [searchResults])
 
-  const { toggleDeploymentFavorite, isDeploymentFavorite } = useUserCollections()
+  const { toggleDeploymentFavorites, isDeploymentFavorite } = useUserCollections()
   const [isProjectSelectionOpen, setIsProjectSelectionOpen] = useState(false)
   const [deploymentToAssign, setDeploymentToAssign] = useState<string | null>(null)
 
@@ -123,7 +123,7 @@ export function DeploymentSearch() {
           event.preventDefault()
           const result = results[selectedIndex]
           if (result) {
-            const d = result.deployment; result.contexts.forEach(ctx => toggleDeploymentFavorite(`${ctx}/${d.namespace}/${d.name}`))
+            const d = result.deployment; const ids = result.contexts.map(ctx => `${ctx}/${d.namespace}/${d.name}`); toggleDeploymentFavorites(ids)
             handleSelect()
           }
         }
@@ -132,7 +132,7 @@ export function DeploymentSearch() {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, results, selectedIndex, toggleDeploymentFavorite])
+  }, [isOpen, results, selectedIndex, toggleDeploymentFavorites])
 
   // Scroll selected item into view
   useEffect(() => {
@@ -295,7 +295,7 @@ export function DeploymentSearch() {
                         />
                         <ActionButton
                           action={isFav ? ACTION_DEFINITIONS.removeFavorite : ACTION_DEFINITIONS.addFavorite}
-                          onClick={() => allIds.forEach(id => toggleDeploymentFavorite(id))}
+                          onClick={() => toggleDeploymentFavorites(allIds)}
                           size="sm"
                         />
                       </div>

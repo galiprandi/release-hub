@@ -121,6 +121,21 @@ export function useUserCollections() {
 		[data, setCollections]
 	);
 
+	const toggleDeploymentFavorites = useCallback(
+		(deployments: string[]) => {
+			const next = { ...data, deploymentFavorites: data.deploymentFavorites || [] };
+			const allFav = deployments.every((d) => next.deploymentFavorites.includes(d));
+			if (allFav) {
+				next.deploymentFavorites = next.deploymentFavorites.filter((f) => !deployments.includes(f));
+			} else {
+				const toAdd = deployments.filter((d) => !next.deploymentFavorites.includes(d));
+				next.deploymentFavorites = [...next.deploymentFavorites, ...toAdd];
+			}
+			setCollections(next);
+		},
+		[data, setCollections]
+	);
+
 	const isDeploymentFavorite = useCallback(
 		(deployment: string) => (data.deploymentFavorites || []).includes(deployment),
 		[data.deploymentFavorites]
@@ -320,6 +335,7 @@ export function useUserCollections() {
 		toggleFavorite,
 		isFavorite,
 		toggleDeploymentFavorite,
+		toggleDeploymentFavorites,
 		isDeploymentFavorite,
 		createProject,
 		updateProject,

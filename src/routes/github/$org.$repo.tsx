@@ -5,6 +5,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es";
 import { SekiPipelineMonitor } from "@/plugins/pipeline/seki/components";
 import { PulsarBuildMonitor } from "@/plugins/pipeline/pulsar/components";
+import { PluginSlot } from "@/plugins/PluginSlot";
 import { StageCommitsTable } from "@/github/components/StageCommitsTable";
 import { PromoteDialog } from "@/github/components/PromoteDialog";
 import { ForceRedeployDialog } from "@/github/components/ForceRedeployDialog";
@@ -164,6 +165,8 @@ function ProductIndex() {
 					repo={repo}
 				/>
 				<NoPipelineDataHint org={org} repo={repo} />
+			{/* Plugin system (paralelo) — autocontenido, sin dependencias externas */}
+			<PluginSlot slot="repo" position="header" props={{ org, repo }} />
 			</div>
 
 			<div className="mt-2">

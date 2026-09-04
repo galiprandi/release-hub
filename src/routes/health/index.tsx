@@ -13,9 +13,10 @@ import DayJS from '@/lib/dayjs';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 import { BaseDialog } from '@/components/ui/BaseDialog';
 import { CopyButton } from '@/components/shared/CopyButton';
+import { useHealthEndpointSync } from '@/plugins/healthBridge';
 
 export const Route = createFileRoute('/health/')({
-  component: HealthMonitorPage,
+  component: HealthMonitorPageWrapper,
   validateSearch: (search: Record<string, unknown>) => {
     return {
       environment: typeof search.environment === 'string' ? search.environment : undefined,
@@ -407,6 +408,17 @@ function ActionsCell({
       />
     </div>
   )
+}
+
+/**
+ * Wrapper que fuerza re-render de HealthMonitorPage cuando un plugin
+ * registra un nuevo health endpoint via pluginAPI.registerHealthEndpoint.
+ * El sync counter incrementa on cada registro, remountando la página
+ * y forzando a useHealthMonitor a re-leer localStorage.
+ */
+function HealthMonitorPageWrapper() {
+  const syncCounter = useHealthEndpointSync();
+  return <HealthMonitorPage key={syncCounter} />;
 }
 
 function HealthMonitorPage() {

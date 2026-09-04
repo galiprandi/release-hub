@@ -185,6 +185,50 @@
 - retorna false si storage es nulo o JSON inválido
 - retorna true si el token existe
 
+## Module: AIChatModal
+- calls prompt with multimodal signature when send button is clicked
+- calls reset when clear button is clicked
+- handles file selection and shows preview
+- renders correctly when open
+- shows stop button during prompting and calls reset on click
+- switches profiles and updates messages
+
+## Module: FeedbackDialog
+- should allow entering description and moving to next step
+- should have focus rings on inputs for accessibility
+- should open dialog when trigger is clicked
+- should render trigger button
+- should show stepper with proper accessibility
+
+## Module: LogsViewer
+- calls onResourceChange when resource is selected
+- copies logs to clipboard
+- enables auto-scroll when clicking play button
+- filters logs by level
+- highlights search term and calculates match count
+- renders as modal when asModal is true
+- renders logs correctly
+- shows empty message when no logs
+- toggles auto-scroll
+- toggles expand/collapse full screen option in modal mode
+
+## Module: logUtils
+- should detect JSON start with {
+- should detect kafka-client levels
+- should detect new logs by various patterns
+- should detect various bracket patterns
+- should group multi-line logs correctly
+- should handle empty input
+- should handle logs starting with ANSI codes
+- should handle regex special characters in filter
+- should highlight filter terms
+- should highlight log levels with appropriate colors
+- should highlight timestamps at the beginning of the line
+- should remove ANSI escape codes from text
+- should return null/undefined if line is empty
+- should return the same text if no ANSI codes are present
+- should strip ANSI codes before highlighting
+
 ## Module: BaseDialog
 - should accept maxWidth prop
 - should call onOpenChange when close button is clicked
@@ -239,50 +283,6 @@
 - renders JsonEditor in editable mode
 - renders JsonEditor in readOnly mode
 - toggles search input when search button is clicked
-
-## Module: AIChatModal
-- calls prompt with multimodal signature when send button is clicked
-- calls reset when clear button is clicked
-- handles file selection and shows preview
-- renders correctly when open
-- shows stop button during prompting and calls reset on click
-- switches profiles and updates messages
-
-## Module: FeedbackDialog
-- should allow entering description and moving to next step
-- should have focus rings on inputs for accessibility
-- should open dialog when trigger is clicked
-- should render trigger button
-- should show stepper with proper accessibility
-
-## Module: LogsViewer
-- calls onResourceChange when resource is selected
-- copies logs to clipboard
-- enables auto-scroll when clicking play button
-- filters logs by level
-- highlights search term and calculates match count
-- renders as modal when asModal is true
-- renders logs correctly
-- shows empty message when no logs
-- toggles auto-scroll
-- toggles expand/collapse full screen option in modal mode
-
-## Module: logUtils
-- should detect JSON start with {
-- should detect kafka-client levels
-- should detect new logs by various patterns
-- should detect various bracket patterns
-- should group multi-line logs correctly
-- should handle empty input
-- should handle logs starting with ANSI codes
-- should handle regex special characters in filter
-- should highlight filter terms
-- should highlight log levels with appropriate colors
-- should highlight timestamps at the beginning of the line
-- should remove ANSI escape codes from text
-- should return null/undefined if line is empty
-- should return the same text if no ANSI codes are present
-- should strip ANSI codes before highlighting
 
 ## Module: CommitsModal
 - should filter commits

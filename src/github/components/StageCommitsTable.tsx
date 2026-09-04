@@ -7,7 +7,6 @@ import { TagLink } from "./TagLink";
 import { Table } from "@/components/ui/Table";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Loader2 } from "lucide-react";
-import { StatusCard } from "@/components/ui/StatusCard";
 
 
 interface StageCommitsTableProps {
@@ -83,7 +82,16 @@ export function StageCommitsTable({
 	return (
 		<div className="space-y-4">
 			{isLoading && (!commits?.length && !tags?.length) ? (
-				<StatusCard type="loading" message="Cargando historial..." />
+				<div className="border border-border rounded-md bg-card overflow-hidden">
+					{Array.from({ length: 5 }).map((_, i) => (
+						<div key={i} className="flex items-center gap-4 p-3 border-b border-border last:border-b-0">
+							<div className="h-4 bg-muted rounded w-24 animate-pulse" />
+							<div className="h-4 bg-muted rounded w-20 animate-pulse" />
+							<div className="h-4 bg-muted rounded w-28 animate-pulse" />
+							<div className="h-4 bg-muted rounded flex-1 animate-pulse" />
+						</div>
+					))}
+				</div>
 			) : (
 				<>
 					{isCommits ? (

@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { Send, Search, X } from 'lucide-react';
+import { Send, Search, X, Layers, ArrowDownCircle, PlusCircle, Edit3, Trash2, Wrench, Clock, ArrowDownWideNarrow, Gauge, Activity } from 'lucide-react';
 import { useFetcherHistory } from '@/hooks/useFetcherHistory';
 import { useCurlAccess } from '@/hooks/useCurlAccess';
 import { StatusCard } from '@/components/ui/StatusCard';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { CollectionDropdown, type CollectionTab } from '@/components/shared/CollectionDropdown';
 import { QueryModal } from '@/fetcher/components/QueryModal';
 import { Table } from '@/components/ui/Table';
 import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
@@ -14,7 +15,6 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { parseCurlForDisplay, parseCurlCommand } from '@/utils/curlParser';
 import type { QueryRecord } from '@/types/queries';
 import { PageLayout } from '@/layouts/PageLayout';
-import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
 import DayJS from '@/lib/dayjs';
 
 type FetcherSortBy = 'recent' | 'method' | 'status' | 'duration';
@@ -229,14 +229,34 @@ function FetcherPage() {
 				/>
 			</div>
 			<ActionButton
-				action={ACTION_DEFINITIONS.send}
+				action={{
+					icon: Send,
+					label: "Enviar",
+					color: "primary",
+				}}
+				showLabel={false}
 				onClick={handleSendCurl}
 				disabled={!isCurlValid}
 				size="md"
-				className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
 			/>
 		</form>
 	);
+
+	const methodTabs: CollectionTab[] = useMemo(() => [
+		{ value: 'ALL', label: 'Todos', icon: Layers },
+		{ value: 'GET', label: 'GET', icon: ArrowDownCircle },
+		{ value: 'POST', label: 'POST', icon: PlusCircle },
+		{ value: 'PUT', label: 'PUT', icon: Edit3 },
+		{ value: 'DELETE', label: 'DELETE', icon: Trash2 },
+		{ value: 'PATCH', label: 'PATCH', icon: Wrench },
+	], []);
+
+	const sortTabs: CollectionTab[] = useMemo(() => [
+		{ value: 'recent', label: 'Recientes', icon: Clock },
+		{ value: 'method', label: 'Método', icon: ArrowDownWideNarrow },
+		{ value: 'status', label: 'Status', icon: Activity },
+		{ value: 'duration', label: 'Duración', icon: Gauge },
+	], []);
 
 	const searchComponent = (
 		<div className="flex items-center gap-3">
@@ -266,31 +286,19 @@ function FetcherPage() {
 				)}
 			</div>
 			<div className="w-px h-6 bg-border" />
-			<IndustrialTabs
-				options={[
-					{ id: 'ALL', label: 'Todos' },
-					{ id: 'GET', label: 'GET' },
-					{ id: 'POST', label: 'POST' },
-					{ id: 'PUT', label: 'PUT' },
-					{ id: 'DELETE', label: 'DELETE' },
-					{ id: 'PATCH', label: 'PATCH' },
-				]}
-				activeId={search.method || 'ALL'}
-				onChange={handleFilterChange}
-				className="w-[320px]"
-				aria-label="Filtrar por método"
+			<CollectionDropdown
+				menuLabel="Método"
+				ariaLabel="Filtrar por método"
+				tabs={methodTabs}
+				activeTab={search.method || 'ALL'}
+				onChange={(id) => handleFilterChange(id as FetcherMethod)}
 			/>
-			<IndustrialTabs
-				options={[
-					{ id: 'recent', label: 'Recientes' },
-					{ id: 'method', label: 'Método' },
-					{ id: 'status', label: 'Status' },
-					{ id: 'duration', label: 'Duración' },
-				]}
-				activeId={search.sortBy || 'recent'}
-				onChange={handleSortChange}
-				className="w-[280px]"
-				aria-label="Ordenar por"
+			<CollectionDropdown
+				menuLabel="Ordenar por"
+				ariaLabel="Ordenar por"
+				tabs={sortTabs}
+				activeTab={search.sortBy || 'recent'}
+				onChange={(id) => handleSortChange(id as FetcherSortBy)}
 			/>
 		</div>
 	);
@@ -298,7 +306,12 @@ function FetcherPage() {
 	return (
 		<PageLayout 
 			header={{
-				title: "Fetcher",
+				title: (
+					<div className="flex items-center gap-2">
+						<Send className="w-4 h-4 text-primary" />
+						<span>Fetcher</span>
+					</div>
+				),
 				searchComponent: access?.hasAccess && history.length > 0 ? searchComponent : undefined
 			}}
 			actions={access?.hasAccess ? [headerActions] : []}

@@ -22,7 +22,6 @@ import {
 	GitPullRequest,
 	GitPullRequestCreateArrow,
 	Play,
-	RefreshCw,
 	Search,
 	Settings2,
 	Star,
@@ -85,15 +84,12 @@ function Dashboard() {
 	const isIndexRoute = location.pathname === "/github";
 	const [isManageProjectsOpen, setIsManageProjectsOpen] = useState(false);
 	const queryClient = useQueryClient();
-	const [isRefreshing, setIsRefreshing] = useState(false);
 
 	const handleRefresh = useCallback(() => {
-		setIsRefreshing(true);
 		queryClient.invalidateQueries({
 			queryKey: ["git", "dashboard-details"],
 			exact: false,
 		});
-		setTimeout(() => setIsRefreshing(false), 1000);
 	}, [queryClient]);
 
 	const [collapsedOrgs, setCollapsedOrgs] = useState<Record<string, boolean>>(
@@ -194,10 +190,17 @@ function Dashboard() {
 	return (
 		<PageLayout
 			header={{
-				title: "Repositorios",
+				title: (
+					<div className="flex items-center gap-2">
+						<Github className="w-4 h-4 text-primary" />
+						<span>Repositorios</span>
+					</div>
+				),
 				searchComponent: (
 					<div className="flex items-center gap-3">
 						<CollectionDropdown
+							menuLabel="Colecciones"
+							ariaLabel="Seleccionar colección"
 							tabs={tabs}
 							activeTab={activeTab}
 							onChange={(id) =>
@@ -209,23 +212,13 @@ function Dashboard() {
 								})
 							}
 						/>
+						<div className="w-px h-6 bg-border" />
 						<RepoSearch />
 					</div>
 				),
 			}}
+			refreshFn={handleRefresh}
 			actions={[
-				<ActionButton
-					key="refresh"
-					action={{
-						icon: RefreshCw,
-						label: "Actualizar",
-						color: "default",
-					}}
-					showLabel={false}
-					onClick={handleRefresh}
-					size="md"
-					disabled={isRefreshing}
-				/>,
 				<ActionButton
 					key="manage-projects"
 					action={{

@@ -1,11 +1,11 @@
 import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Activity, ExternalLink, Box, HelpCircle, CheckCircle2, XCircle, Circle } from 'lucide-react';
+import { Activity, ExternalLink, Box, HelpCircle, CheckCircle2, XCircle, Circle, Layers, Globe, FlaskConical, AlertTriangle, ArrowDownWideNarrow, Clock, RefreshCw } from 'lucide-react';
 import { useHealthMonitor } from '@/plugins/pipeline/seki/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
 import { Table } from '@/components/ui/Table';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
+import { CollectionDropdown, type CollectionTab } from '@/components/shared/CollectionDropdown';
 import type { ColumnDef } from '@tanstack/react-table';
 import { PageLayout } from '../../layouts/PageLayout';
 import DayJS from '@/lib/dayjs';
@@ -535,50 +535,55 @@ function HealthMonitorPage() {
     return a.localeCompare(b);
   });
 
-  const headerActions = (
-    <div key="header-actions" className="flex gap-2">
+  const headerActions = [
+    <ActionButton
+      key="help"
+      action={{
+        icon: HelpCircle,
+        label: "Ayuda",
+        color: "default",
+      }}
+      showLabel={false}
+      onClick={() => setIsHelpOpen(true)}
+      size="md"
+    />,
+    ...(stats.unhealthy > 0 ? [
       <ActionButton
+        key="verify-unhealthy"
         action={{
-          icon: HelpCircle,
-          label: "Ayuda",
-          color: "default"
+          icon: RefreshCw,
+          label: isChecking ? 'Verificando...' : `Verificar ${stats.unhealthy}`,
+          color: "destructive",
         }}
-        onClick={() => setIsHelpOpen(true)}
+        showLabel={false}
+        onClick={() => {
+          const unhealthy = filteredEndpoints.filter((ep) => ep.isHealthy === false);
+          unhealthy.forEach((ep) => checkEndpoint(ep.id));
+        }}
+        loading={isChecking}
         size="md"
-        className="bg-background hover:bg-muted/30"
-      />
-      <div className="w-px h-6 bg-border mx-1" />
-      {stats.unhealthy > 0 && (
-        <ActionButton
-          action={{
-            ...ACTION_DEFINITIONS.refresh,
-            label: isChecking ? 'Verificando...' : `Verificar ${stats.unhealthy}`,
-            color: "destructive"
-          }}
-          onClick={() => {
-            const unhealthy = filteredEndpoints.filter((ep) => ep.isHealthy === false);
-            unhealthy.forEach((ep) => checkEndpoint(ep.id));
-          }}
-          loading={isChecking}
-          showLabel
-          className="bg-destructive/15 border border-destructive/40"
-        />
-      )}
-    </div>
-  );
+      />,
+    ] : []),
+  ];
 
-  const envOptions = useMemo(() => {
+  const envTabs: CollectionTab[] = useMemo(() => {
     const stagingCount = endpoints.filter(e => e.environment === 'staging').length;
     const productionCount = endpoints.filter(e => e.environment === 'production').length;
     const unhealthyCount = endpoints.filter(e => e.isHealthy === false).length;
 
     return [
-      { id: 'all', label: 'Todos' },
-      { id: 'production', label: `Production (${productionCount})` },
-      { id: 'staging', label: `Staging (${stagingCount})` },
-      { id: 'unhealthy', label: `Unhealthy (${unhealthyCount})` },
+      { value: 'all', label: 'Todos', icon: Layers, count: endpoints.length },
+      { value: 'production', label: 'Production', icon: Globe, count: productionCount },
+      { value: 'staging', label: 'Staging', icon: FlaskConical, count: stagingCount },
+      { value: 'unhealthy', label: 'Unhealthy', icon: AlertTriangle, count: unhealthyCount },
     ];
   }, [endpoints]);
+
+  const sortTabs: CollectionTab[] = useMemo(() => [
+    { value: 'default', label: 'Nombre', icon: ArrowDownWideNarrow },
+    { value: 'errors', label: 'Errores', icon: AlertTriangle },
+    { value: 'recent', label: 'Recientes', icon: Clock },
+  ], []);
 
   return (
     <PageLayout
@@ -615,23 +620,21 @@ function HealthMonitorPage() {
           </div>
         ),
         searchComponent: (
-          <div className="flex items-center gap-2">
-            <IndustrialTabs
-              options={envOptions}
-              activeId={environment}
+          <div className="flex items-center gap-3">
+            <CollectionDropdown
+              menuLabel="Ambiente"
+              ariaLabel="Filtrar por ambiente"
+              tabs={envTabs}
+              activeTab={environment}
               onChange={handleEnvironmentChange}
-              className="w-96"
             />
-            <div className="w-px h-6 bg-border mx-1" />
-            <IndustrialTabs
-              options={[
-                { id: 'default', label: 'Nombre' },
-                { id: 'errors', label: 'Errores' },
-                { id: 'recent', label: 'Recientes' },
-              ]}
-              activeId={sortBy}
+            <div className="w-px h-6 bg-border" />
+            <CollectionDropdown
+              menuLabel="Ordenar por"
+              ariaLabel="Ordenar por"
+              tabs={sortTabs}
+              activeTab={sortBy}
               onChange={handleSortChange}
-              className="w-96"
             />
           </div>
         )

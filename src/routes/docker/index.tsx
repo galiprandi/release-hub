@@ -2,15 +2,14 @@ import { createFileRoute, useNavigate, useSearch, useRouterState } from '@tansta
 import { useRef, useState, useMemo, useCallback, useEffect } from 'react';
 import { useDockerAccess } from '@/hooks/useDockerAccess';
 import { useQuery } from '@tanstack/react-query';
-import { Boxes } from 'lucide-react';
+import { Boxes, Layers, Play, Square, CircleStop } from 'lucide-react';
 import { ContainerList, type ContainerListRef } from '@/docker/components/ContainerList';
 import { ContainerSearch } from '@/docker/components/ContainerSearch';
 import { StatusCard } from '@/components/ui/StatusCard';
-import { IndustrialTabs } from '@/components/shared/IndustrialTabs';
+import { CollectionDropdown, type CollectionTab } from '@/components/shared/CollectionDropdown';
 import { getContainers } from '@/api/docker';
 import { queryKeys, applyCachePolicy } from '@/lib/queryKeys';
 import { PageLayout } from '../../layouts/PageLayout';
-import { ActionButton, ACTION_DEFINITIONS } from '@/components/ui/ActionButton';
 
 export const Route = createFileRoute('/docker/')({
   component: DockerManagerPage,
@@ -73,18 +72,16 @@ function DockerManagerPage() {
     };
   }, [containers]);
 
+  const statusTabs: CollectionTab[] = useMemo(() => [
+    { value: 'all', label: `Todos (${filterCounts.all})`, icon: Layers, count: filterCounts.all },
+    { value: 'running', label: `Ejecutando (${filterCounts.running})`, icon: Play, count: filterCounts.running },
+    { value: 'stopped', label: `Detenido (${filterCounts.stopped})`, icon: Square, count: filterCounts.stopped },
+    { value: 'exited', label: `Finalizado (${filterCounts.exited})`, icon: CircleStop, count: filterCounts.exited },
+  ], [filterCounts]);
+
   const handleRefresh = () => {
     containerListRef.current?.refetch();
   };
-
-  const headerActions = (
-    <ActionButton
-      action={ACTION_DEFINITIONS.refresh}
-      onClick={handleRefresh}
-      showLabel={true}
-      className="bg-background border border-border shadow-sm px-4 py-2 rounded-lg"
-    />
-  );
 
   return (
     <PageLayout
@@ -97,26 +94,19 @@ function DockerManagerPage() {
         ),
         searchComponent: access?.hasAccess ? (
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-muted-foreground">Estado:</span>
-              <IndustrialTabs
-                options={[
-                  { id: 'all', label: `Todos (${filterCounts.all})` },
-                  { id: 'running', label: `Ejecutando (${filterCounts.running})` },
-                  { id: 'stopped', label: `Detenido (${filterCounts.stopped})` },
-                  { id: 'exited', label: `Finalizado (${filterCounts.exited})` },
-                ]}
-                activeId={search.status || 'all'}
-                onChange={(id) => handleFilterChange({ id: 'status', value: id })}
-                className="w-full sm:w-[520px]"
-              />
-            </div>
-            <div className="w-px h-6 bg-border mx-1" />
+            <CollectionDropdown
+              menuLabel="Estado"
+              ariaLabel="Filtrar por estado"
+              tabs={statusTabs}
+              activeTab={search.status || 'all'}
+              onChange={(id) => handleFilterChange({ id: 'status', value: id })}
+            />
+            <div className="w-px h-6 bg-border" />
             <ContainerSearch query={searchQuery} setQuery={setSearchQuery} />
           </div>
         ) : undefined
       }}
-      actions={[headerActions]}
+      refreshFn={access?.hasAccess ? handleRefresh : undefined}
     >
       <div className="space-y-6">
       {/* Contenido */}

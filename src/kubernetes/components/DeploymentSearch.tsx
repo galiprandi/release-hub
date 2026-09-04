@@ -174,7 +174,7 @@ export function DeploymentSearch() {
           onBlur={() => setIsEditable(false)}
           placeholder={namespaceCount > 0 ? `Búsqueda en ${namespaceCount} namespaces... (Cmd+K)` : `Buscar por namespace... (Cmd+K)`}
           aria-label="Búsqueda de deployments"
-          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-lg text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground`}
+          className={`${searchWidth} pl-9 pr-14 py-2 bg-muted/30 border border-border rounded-md text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground`}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"

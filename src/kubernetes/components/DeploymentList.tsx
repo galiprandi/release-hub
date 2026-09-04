@@ -18,6 +18,7 @@ import { PortForwardControl } from "@/components/ui/PortForwardControl"
 import { usePortForward } from "@/hooks/usePortForward"
 import { usePortFree } from "@/hooks/usePortFree"
 import { useDeployedCommitStatus } from "@/hooks/useDeployedCommitStatus"
+import { usePrefetchCommitStatuses } from "@/hooks/usePrefetchCommitStatuses"
 import { usePodCommitSync } from "@/hooks/usePodCommitSync"
 import { CopyButton } from "@/components/shared/CopyButton"
 import { DEFAULT_START_PORT } from "@/config/portForward"
@@ -219,6 +220,14 @@ export const DeploymentList = ({
 			return null
 		}).filter(Boolean) as Array<{ context: string; deployment: DeploymentInfo }>
 	}, [allDeploymentIds, cachedDeployments])
+
+	// Prefetch repo resolution for all unique commit SHAs in parallel
+	const allCommitShas = useMemo(() => {
+		return allResolvedDeployments
+			.map(({ deployment }) => deployment.gitCommit)
+			.filter((sha): sha is string => !!sha)
+	}, [allResolvedDeployments])
+	usePrefetchCommitStatuses(allCommitShas, isKubectlInstalled === true)
 
 	// Fetch function for logs with cursor support
 	const fetchFn = async (cursor?: number) => {

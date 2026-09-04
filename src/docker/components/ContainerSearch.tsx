@@ -28,7 +28,7 @@ export function ContainerSearch({ query, setQuery, placeholder = "Buscar contene
         onFocus={() => setIsEditable(true)}
         onBlur={() => setIsEditable(false)}
         placeholder={placeholder}
-        className="w-64 pl-9 pr-9 py-1.5 bg-muted/30 border border-border rounded-lg text-xs focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground"
+        className="w-64 pl-9 pr-9 py-1.5 bg-muted/30 border border-border rounded-md text-xs focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground"
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"

@@ -27,5 +27,6 @@ export function useGitUser() {
       }
     },
     ...applyCachePolicy("git"),
+    staleTime: 60 * 60 * 1000, // 1 hora (usuario logueado no cambia)
   })
 }

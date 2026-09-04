@@ -21,68 +21,88 @@ interface ResolvedCommit {
 }
 
 /**
- * Resolves the GitHub repo from a commit SHA using GitHub's commit search API,
- * then compares that commit against HEAD to determine how far behind it is.
- *
- * Flow:
- * 1. `search/commits?q={sha}` → finds the repo the commit belongs to
- * 2. `repos/{repo}/compare/{sha}...HEAD` → ahead_by = commits behind
- *
- * System hook — no dependency on Kubernetes or naming conventions.
- * Can be used anywhere a commit SHA is available.
+ * Resolves the GitHub repo from a commit SHA using GitHub's commit search API.
+ * The mapping SHA → repo is immutable, so we cache it with staleTime: Infinity.
  */
-async function resolveAndCompare(sha: string): Promise<ResolvedCommit> {
-	// Step 1: find the repo from the commit SHA
+async function resolveRepoFromSha(sha: string): Promise<string | null> {
 	const searchResponse = await runCommand([
 		"gh", "api", `search/commits?q=${sha}`, "--jq", ".items[0].repository.full_name",
 	]);
 	const repo = searchResponse.stdout.trim();
-	if (!repo) {
-		return { repo: null, status: "unknown", aheadBy: 0 };
-	}
+	return repo || null;
+}
 
-	// Step 2: compare commit against HEAD
+/**
+ * Compares a commit against HEAD for a given repo.
+ * The result changes with each push, so we use staleTime: 1min.
+ */
+async function compareCommit(repo: string, sha: string): Promise<{ status: string; aheadBy: number }> {
 	const compareResponse = await runCommand([
 		"gh", "api", `repos/${repo}/compare/${sha}...HEAD`,
 		"--jq", "{status: .status, ahead_by: .ahead_by}",
 	]);
 	const parsed = JSON.parse(compareResponse.stdout.trim()) as { status: string; ahead_by: number };
-	return { repo, status: parsed.status, aheadBy: parsed.ahead_by };
+	return { status: parsed.status, aheadBy: parsed.ahead_by };
 }
 
 /**
  * Given a commit SHA, resolves its GitHub repo and compares it against HEAD.
  *
+ * Uses two separate queries:
+ * - `git.repo-from-sha`: immutable cache (SHA → repo mapping never changes)
+ * - `git.compare`: 1min staleTime (ahead_by changes with each push)
+ *
  * @param sha - The commit SHA to check (7-40 hex chars)
  * @param enabled - Whether to fetch (default: true)
  * @returns `{ repo, status, behindBy, isLoading }`
- *
- * @example
- * const { status, behindBy } = useCommitStatus('3398b6f4bd5efb05c30b998df481c3d4ea6ddd98')
- * // → { status: 'behind', behindBy: 28, repo: 'Cencosud-xlabs/argentina-arcus' }
  */
 export function useCommitStatus(sha?: string, enabled = true): CommitStatusResult {
 	const isValidSha = !!sha && SHA_REGEX.test(sha);
 	const canFetch = enabled && isValidSha;
 
-	const { data, isLoading } = useQuery({
-		queryKey: queryKeys.git.compare(sha || "", "search"),
+	// Step 1: resolve repo from SHA (immutable, cached forever)
+	const { data: repo, isLoading: isResolvingRepo } = useQuery<string | null>({
+		queryKey: queryKeys.git.compare(sha || "", "repo"),
 		queryFn: async () => {
 			if (!sha) return null;
 			try {
-				return await resolveAndCompare(sha);
+				return await resolveRepoFromSha(sha);
 			} catch {
 				return null;
 			}
 		},
 		enabled: canFetch,
 		...applyCachePolicy("git"),
+		staleTime: Infinity, // SHA → repo is immutable
+	});
+
+	// Step 2: compare against HEAD (changes with each push)
+	const { data: compareData, isLoading: isComparing } = useQuery<{ status: string; aheadBy: number } | null>({
+		queryKey: queryKeys.git.compare(sha || "", "search"),
+		queryFn: async () => {
+			if (!sha || !repo) return null;
+			try {
+				return await compareCommit(repo, sha);
+			} catch {
+				return null;
+			}
+		},
+		enabled: canFetch && !!repo,
+		...applyCachePolicy("git"),
 		staleTime: 60 * 1000, // 1 minuto (compare cambia con cada push)
 	});
 
+	const data: ResolvedCommit | null = useMemo(() => {
+		if (!repo) return null;
+		if (!compareData) return null;
+		return { repo, status: compareData.status, aheadBy: compareData.aheadBy };
+	}, [repo, compareData]);
+
+	const isLoading = canFetch && (isResolvingRepo || isComparing);
+
 	return useMemo(() => {
 		if (!canFetch || !data) {
-			return { repo: null, status: "unknown" as const, behindBy: 0, isLoading: canFetch && isLoading };
+			return { repo: null, status: "unknown" as const, behindBy: 0, isLoading };
 		}
 		if (!data.repo) {
 			return { repo: null, status: "unknown" as const, behindBy: 0, isLoading: false };

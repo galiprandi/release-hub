@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { Boxes, FolderOpen, Layers, Search, Star, Server } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { DeploymentList } from "@/kubernetes/components/DeploymentList";
 import { DeploymentSearch } from "@/kubernetes/components/DeploymentSearch";
 import { CollectionDropdown } from "@/components/shared/CollectionDropdown";
@@ -149,10 +149,21 @@ function KubernetesPage() {
 
 	const hasContent = activeTab === 'favorites' ? safeDeploymentFavorites.length > 0 : projects.some(p => p.deployments.length > 0);
 
+	const queryClient = useQueryClient();
+	const handleRefresh = useCallback(() => {
+		queryClient.invalidateQueries({ queryKey: ["kubectl"] });
+	}, [queryClient]);
+
 	return (
 		<PageLayout
+			refreshFn={isInstalled ? handleRefresh : undefined}
 			header={{
-				title: "Kubernetes",
+				title: (
+					<div className="flex items-center gap-2">
+						<Server className="w-4 h-4 text-primary" />
+						<span>Kubernetes</span>
+					</div>
+				),
 				searchComponent: isInstalled ? (
 					<div className="flex items-center gap-3">
 						<CollectionDropdown

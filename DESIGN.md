@@ -121,6 +121,29 @@
 - **Content**: `px-6 py-6 gap-6`. Más compacto que V2 (`px-8`).
 - **PageLayout**: título `text-lg font-semibold tracking-tight`, acciones alineadas a la derecha.
 
+## Header Standard (PageLayout)
+
+> Todos los módulos deben seguir este estándar para mantener consistencia visual.
+
+### Title
+- **Siempre JSX con icon**: `<div className="flex items-center gap-2"><Icon className="w-4 h-4 text-primary" /><span>Título</span></div>`.
+- Iconos por módulo: Docker=`Boxes`, Fetcher=`Send`, GitHub=`Github`, Health=`Activity`, Kubernetes=`Server`, Novedades=`Newspaper`.
+- Stats extra (como Health) se agregan dentro del mismo `div` con `text-xs`.
+
+### searchComponent
+- **Filtros**: `CollectionDropdown` (shadcn DropdownMenu), nunca `IndustrialTabs` ni `select` nativo.
+- **Dividers**: `<div className="w-px h-6 bg-border" />` entre dropdowns y search input.
+- **Search input**: componente dedicado del módulo (ej: `RepoSearch`, `DeploymentSearch`, `ContainerSearch`).
+- **Orden**: dropdowns de filtros → divider → search input.
+- **Sincronización**: todo estado via search params (TanStack Router).
+
+### Actions
+- **Refresh**: usar `refreshFn` prop del `PageLayout` (IconButton integrado, icon `RefreshCw`, tooltip "Refrescar"). No poner refresh en `actions`.
+- **Module-specific actions**: array de `ActionButton` con inline action, `showLabel={false}`, `size="md"`, sin className overrides.
+- **Inline action**: `action={{ icon: LucideIcon, label: "...", color: "default" }}`. No usar `ACTION_DEFINITIONS` en el header.
+- **Sin className**: no agregar `bg-*`, `border-*`, `shadow-*` overrides. El componente maneja su estilo.
+- **Excepción**: Fetcher usa un `<form>` con input + botón porque es una acción primaria de envío.
+
 ## State Management & Search
 
 - **URL-First**: todo estado visual vive en search params (TanStack Router). Sin cambios.
@@ -151,21 +174,21 @@
 ## Module Standards
 
 ### Docker
-- Status filtering en PageLayout header via Tabs (sync `status` param). Icon `Boxes` en título.
+- Status filtering en PageLayout header via `CollectionDropdown` (sync `status` param). Icon `Boxes` en título.
 - `StatusCell`: dot semántico + label `text-xs font-medium` (OK/Error/Detenido). Sin uppercase.
 - `ActionsCell`: hover-to-reveal (`opacity-0 group-hover:opacity-100`).
 - Empty state: icon en `rounded-md bg-muted/30`, label `text-sm`.
 
 ### Health Monitor
-- Environment filtering (Production/Staging/Unhealthy) en header via Tabs.
+- Environment filtering (Production/Staging/Unhealthy) en header via `CollectionDropdown`.
 - Product sections: `border border-border rounded-md bg-card`. Header con icon `Box` + `text-sm font-medium`.
 - Status dots: `w-1.5 h-1.5 rounded-full` con color semántico. OK pulse.
 - Double-line URLs: domain (`text-xs text-muted-foreground`), path (`font-mono text-xs`).
 
 ### Kubernetes
 - Setup: `SetupCard` con `rounded-md`, labels `text-xs font-medium`.
-- Dashboard: Tabs para Favoritos/Proyectos (sync `tab` param).
-- Namespace filtering en header via Tabs (sync `namespace` param).
+- Dashboard: `CollectionDropdown` para Favoritos/Proyectos (sync `tab` param).
+- Namespace filtering en header via `CollectionDropdown` (sync `namespace` param).
 - Deployment status: badges `rounded text-xs font-medium` con `/15` opacity. Labels localizados.
 
 ### GitHub
@@ -176,7 +199,7 @@
 - Detail view: nav + links en header. Links: `text-sm hover:bg-muted/30 rounded-md`.
 
 ### Fetcher
-- Dual Tabs para method filtering y sorting (sync `method`, `sortBy` params).
+- Dual `CollectionDropdown` para method filtering y sorting (sync `method`, `sortBy` params).
 - Header search (`q` param).
 - `UrlCell`: domain (`text-xs text-muted-foreground`), path (`text-sm font-medium`).
 - Headers: `text-xs font-medium text-muted-foreground`.

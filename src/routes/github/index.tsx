@@ -14,6 +14,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import {
 	Building2,
+	AlertCircle,
 	ChevronDown,
 	ChevronRight,
 	FolderOpen,
@@ -21,6 +22,7 @@ import {
 	Github,
 	GitPullRequest,
 	GitPullRequestCreateArrow,
+	Layers,
 	Play,
 	Search,
 	Settings2,
@@ -36,7 +38,6 @@ import { FreezeDialog } from "@/github/components/FreezeDialog";
 import { CommitsModal } from "@/github/components/CommitsModal";
 import { PageLayout } from "@/layouts/PageLayout";
 import { RepoSearch } from "@/github/components/RepoSearch";
-import { IndustrialTabs } from "@/components/shared/IndustrialTabs";
 import { CollectionDropdown } from "@/components/shared/CollectionDropdown";
 import { ProjectManagementDialog } from "@/github/components/ProjectManagementDialog";
 import { ItemProjectSelectionDialog } from "@/components/shared/ItemProjectSelectionDialog";
@@ -197,7 +198,7 @@ function Dashboard() {
 					</div>
 				),
 				searchComponent: (
-					<div className="flex items-center gap-3">
+					<div className="flex items-center gap-2">
 						<CollectionDropdown
 							menuLabel="Colecciones"
 							ariaLabel="Seleccionar colección"
@@ -208,6 +209,24 @@ function Dashboard() {
 									search: (prev: Record<string, unknown>) => ({
 										...prev,
 										tab: id,
+									}),
+								})
+							}
+						/>
+						<div className="w-px h-6 bg-border" />
+						<CollectionDropdown
+							menuLabel="Deploy"
+							ariaLabel="Filtrar por estado de deploy"
+							tabs={[
+								{ value: "all", label: "Todos", icon: Layers },
+								{ value: "true", label: "Sin deploy", icon: AlertCircle },
+							]}
+							activeTab={activeFilter || "all"}
+							onChange={(id) =>
+								navigate({
+									search: (prev: Record<string, unknown>) => ({
+										...prev,
+										filter: id === "all" ? undefined : (id as string),
 									}),
 								})
 							}
@@ -252,31 +271,10 @@ function Dashboard() {
 			}
 		>
 			<div className="space-y-6">
-				{/* Global Filters & Bulk Actions */}
+				{/* Global Bulk Actions */}
 				{!isEmpty && (
 					<div className="flex items-center justify-between px-1">
-						<div className="flex items-center gap-2">
-							<span className="text-xs font-medium text-muted-foreground">
-								Filtrar:
-							</span>
-							<div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border border-border">
-								<IndustrialTabs
-									options={[
-										{ id: "all", label: "Todos" },
-										{ id: "true", label: "Sin deploy" },
-									]}
-									activeId={activeFilter || "all"}
-									onChange={(id) =>
-										navigate({
-											search: (prev: Record<string, unknown>) => ({
-												...prev,
-												filter: id === "all" ? undefined : (id as string),
-											}),
-										})
-									}
-								/>
-							</div>
-						</div>
+						<div />
 
 						{sortedOrgs.length > 1 && (
 							<button
@@ -405,7 +403,7 @@ function Dashboard() {
 												<h2 className="text-xs font-medium  text-foreground">
 													{org}
 												</h2>
-												<span className="px-1.5 py-0.5 rounded-full bg-muted/30 text-xs font-bold text-muted-foreground">
+												<span className="px-1.5 py-0.5 rounded bg-muted/30 text-xs font-medium text-muted-foreground">
 													{repoCount}
 												</span>
 											</div>
@@ -625,7 +623,7 @@ function ReposTable({
 			{
 				id: "pending_filter",
 				accessorKey: "fullName",
-				header: "Sin deploy",
+				header: () => null,
 				enableHiding: true,
 				cell: () => null,
 				filterFn: (row, _columnId, filterValue) => {
@@ -711,7 +709,7 @@ function ReposTable({
 				accessorKey: "actions",
 				header: () => (
 					<div className="text-right text-xs font-medium text-muted-foreground">
-						Operations
+						Operaciones
 					</div>
 				),
 				enableSorting: false,
@@ -768,7 +766,7 @@ function RepoNameCell({ repo }: { repo: RepoInfo }) {
 									type="button"
 									onClick={() => setIsCommitsModalOpen(true)}
 										aria-label={`Ver ${pendingCount} commits pendientes de promoción`}
-									className="inline-flex items-center gap-1 text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full border border-warning/30 font-bold cursor-pointer hover:bg-warning/30 hover:border-warning/40 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
+									className="inline-flex items-center gap-1 text-xs bg-warning/15 text-warning px-2 py-0.5 rounded border border-warning/30 font-medium cursor-pointer hover:bg-warning/30 hover:border-warning/40 transition-all focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1"
 								>
 									<GitPullRequestCreateArrow className="w-2.5 h-2.5" />
 									<span>{pendingCount}</span>

@@ -270,7 +270,7 @@ function FetcherPage() {
 					}}
 					placeholder="Buscar en historial..."
 					aria-label="Buscar en historial"
-					className="w-48 pl-8 pr-3 py-1.5 bg-muted/30 border border-border rounded-md text-xs focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground font-medium uppercase tracking-tight"
+					className="w-48 pl-8 pr-3 py-1.5 bg-muted/30 border border-border rounded-md text-xs focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-offset-1 transition-all placeholder:text-muted-foreground font-medium"
 				/>
 				{search.q && (
 					<button
@@ -494,8 +494,9 @@ function StatusCell({ query }: { query: QueryRecord }) {
 			<div className="flex flex-col gap-1">
 				<button
 					onClick={() => isError && hasBody && setShowBody(!showBody)}
+					aria-expanded={isError && hasBody ? showBody : undefined}
 					className={`px-2 py-0.5 rounded-md border text-xs font-medium ${style} ${isError && hasBody ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
-					title={isError && hasBody ? 'Click to see error body' : undefined}
+					title={isError && hasBody ? 'Ver cuerpo del error' : undefined}
 				>
 					{status}
 				</button>

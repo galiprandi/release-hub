@@ -1,5 +1,3 @@
-# Novedades ReleaseHub
-
 ## Recientes
 - **Dashboard GitHub v2**: PRs y Actions integrados via GraphQL.
 - **Asistente Multimodal**: Diagnóstico por imagen y voz.

@@ -3,6 +3,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Activity, ExternalLink, Box, HelpCircle, CheckCircle2, XCircle, Circle, Layers, Globe, FlaskConical, AlertTriangle, ArrowDownWideNarrow, Clock, RefreshCw } from 'lucide-react';
 import { useHealthMonitor } from '@/plugins/pipeline/seki/hooks/useHealthMonitor';
 import { useUserCollections } from '@/hooks/useUserCollections';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
 import { Table } from '@/components/ui/Table';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { CollectionDropdown, type CollectionTab } from '@/components/shared/CollectionDropdown';
@@ -136,7 +137,7 @@ function ProductSection({
             return (
               <>
                 {healthy > 0 && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-success/20 border border-success/40 text-xs font-medium text-success">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-success/15 border border-success/40 text-xs font-medium text-success">
                     <div className="w-2.5 h-2.5 rounded-full bg-success" />
                     {healthy} OK
                   </span>
@@ -148,7 +149,7 @@ function ProductSection({
                   </span>
                 )}
                 {unhealthy > 0 && (
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-destructive/20 border border-destructive/40 text-xs font-medium text-destructive">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-destructive/15 border border-destructive/40 text-xs font-medium text-destructive">
                     <div className="w-2.5 h-2.5 rounded-full bg-destructive" />
                     {unhealthy} Error
                   </span>
@@ -246,9 +247,9 @@ function EndpointsTable({
 }
 
 function StatusCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
-  if (endpoint.isHealthy === null) return <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/40" title="Pendiente" />
-  if (endpoint.isHealthy === true) return <div className="w-2.5 h-2.5 rounded-full bg-success animate-pulse" title="Healthy" />
-  return <div className="w-2.5 h-2.5 rounded-full bg-destructive ring-2 ring-destructive/30" title="Error" />
+  if (endpoint.isHealthy === null) return <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" title="Pendiente" />
+  if (endpoint.isHealthy === true) return <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" title="Healthy" />
+  return <div className="w-1.5 h-1.5 rounded-full bg-destructive ring-2 ring-destructive/30" title="Error" />
 }
 
 function EnvironmentCell({ endpoint }: { endpoint: ReturnType<typeof useHealthMonitor>['endpoints'][0] }) {
@@ -421,6 +422,7 @@ function HealthMonitorPage() {
 
   const { favorites } = useUserCollections();
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [endpointToDelete, setEndpointToDelete] = useState<string | null>(null);
   const navigate = useNavigate();
   const search = useSearch({ from: '/health/' });
 
@@ -573,9 +575,9 @@ function HealthMonitorPage() {
 
     return [
       { value: 'all', label: 'Todos', icon: Layers, count: endpoints.length },
-      { value: 'production', label: 'Production', icon: Globe, count: productionCount },
+      { value: 'production', label: 'Producción', icon: Globe, count: productionCount },
       { value: 'staging', label: 'Staging', icon: FlaskConical, count: stagingCount },
-      { value: 'unhealthy', label: 'Unhealthy', icon: AlertTriangle, count: unhealthyCount },
+      { value: 'unhealthy', label: 'Con errores', icon: AlertTriangle, count: unhealthyCount },
     ];
   }, [endpoints]);
 
@@ -683,12 +685,21 @@ function HealthMonitorPage() {
               endpoints={endpointsByProduct[product]}
               isChecking={isChecking}
               onCheckEndpoint={checkEndpoint}
-              onRemoveEndpoint={removeEndpoint}
+              onRemoveEndpoint={setEndpointToDelete}
             />
           ))}
         </div>
       )}
       </div>
+      <DeleteConfirmDialog
+        open={endpointToDelete !== null}
+        onOpenChange={(open) => { if (!open) setEndpointToDelete(null); }}
+        onConfirm={() => {
+          if (endpointToDelete) removeEndpoint(endpointToDelete);
+          setEndpointToDelete(null);
+        }}
+        itemName="este endpoint"
+      />
     </PageLayout>
   );
 }

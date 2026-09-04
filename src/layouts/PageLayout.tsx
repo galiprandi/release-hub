@@ -233,12 +233,12 @@ export function PageLayout({
 				{/* Header Bar */}
 				{header && (
 					<div className="sticky top-0 z-10">
-						<header className="h-14 bg-background/80 backdrop-blur-sm border-b border-border flex items-center justify-between px-6 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+						<header className="h-14 bg-background/80 backdrop-blur-sm border-b border-border flex items-center justify-between px-6 shadow-sm">
 							<nav
 								className="flex items-center gap-4"
 								aria-label="Navegación de breadcrumb"
 							>
-								<h1 className="text-sm font-semibold text-muted-foreground">
+								<h1 className="text-lg font-semibold tracking-tight text-foreground">
 									{header.title}
 								</h1>
 							</nav>
@@ -376,7 +376,7 @@ function NavIcon({
 
 	if (to) {
 		return (
-			<Link to={to} preload="intent" className="block">
+			<Link to={to} preload="intent" className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 rounded-md" aria-label={label}>
 				{contentWithTooltip}
 			</Link>
 		);
